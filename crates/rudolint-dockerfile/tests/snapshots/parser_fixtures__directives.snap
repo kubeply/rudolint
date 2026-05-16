@@ -3,6 +3,16 @@ source: crates/rudolint-dockerfile/tests/parser_fixtures.rs
 expression: document_json(&document)
 ---
 {
+  "checks": [
+    {
+      "line": 3,
+      "value": "skip=JSONArgsRecommended"
+    }
+  ],
+  "escape": {
+    "character": "`",
+    "line": 2
+  },
   "has_buildkit_features": false,
   "instructions": [
     {
@@ -10,7 +20,7 @@ expression: document_json(&document)
       "flags": [],
       "heredocs": [],
       "keyword": "FROM",
-      "line": 3,
+      "line": 4,
       "mounts": []
     }
   ],

@@ -1,3 +1,5 @@
 mod parser;
 
-pub use parser::{Dockerfile, Instruction, parse_dockerfile};
+pub use parser::{
+    CheckDirective, Dockerfile, EscapeDirective, Instruction, SyntaxDirective, parse_dockerfile,
+};
