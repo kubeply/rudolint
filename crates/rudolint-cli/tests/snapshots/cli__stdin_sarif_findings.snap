@@ -1,0 +1,61 @@
+---
+source: crates/rudolint-cli/tests/cli.rs
+expression: normalized_json(&output)
+---
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "runs": [
+    {
+      "results": [
+        {
+          "level": "warning",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "<stdin>"
+                },
+                "region": {
+                  "startColumn": 1,
+                  "startLine": 1
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "avoid mutable latest base image tags"
+          },
+          "ruleId": "RDL3007"
+        },
+        {
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "<stdin>"
+                },
+                "region": {
+                  "startColumn": 1,
+                  "startLine": 2
+                }
+              }
+            }
+          ],
+          "message": {
+            "text": "WORKDIR should be absolute"
+          },
+          "ruleId": "RDL3000"
+        }
+      ],
+      "tool": {
+        "driver": {
+          "informationUri": "https://github.com/kubeply/rudolint",
+          "name": "rudolint",
+          "rules": []
+        }
+      }
+    }
+  ],
+  "version": "2.1.0"
+}
