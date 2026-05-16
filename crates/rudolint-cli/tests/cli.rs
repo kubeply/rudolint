@@ -501,6 +501,40 @@ fn fix_write_mode_leaves_nonrewritable_maintainer_values() {
 }
 
 #[test]
+fn fix_dry_run_renders_manual_json_entrypoint_suggestion() {
+    let output = rudolint_cmd()
+        .args(["check", "--fix", "--dry-run"])
+        .write_stdin("FROM alpine:3.20\nCMD echo hello\n")
+        .assert()
+        .code(1)
+        .get_output()
+        .stdout
+        .clone();
+
+    let output = String::from_utf8(output).expect("stdout should be UTF-8");
+    insta::assert_snapshot!("fix_dry_run_manual_json_entrypoint", output);
+}
+
+#[test]
+fn fix_write_mode_does_not_apply_manual_json_entrypoint_suggestion() {
+    let temp = tempfile::TempDir::new().expect("temp dir should be created");
+    let dockerfile = temp.path().join("Dockerfile");
+    let original = "FROM alpine:3.20\nCMD echo hello\n";
+    std::fs::write(&dockerfile, original).expect("Dockerfile should be written");
+
+    rudolint_cmd()
+        .args(["check", "--fix"])
+        .arg(&dockerfile)
+        .assert()
+        .code(1);
+
+    assert_eq!(
+        std::fs::read_to_string(&dockerfile).expect("Dockerfile should exist"),
+        original
+    );
+}
+
+#[test]
 fn fix_dry_run_json_includes_fix_envelope() {
     let output = rudolint_cmd()
         .args(["check", "--fix", "--dry-run", "--format", "json"])

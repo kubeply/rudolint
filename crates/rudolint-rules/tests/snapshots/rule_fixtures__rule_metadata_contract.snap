@@ -151,7 +151,7 @@ expression: metadata
     "code": "RDL3025",
     "default_severity": "warning",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3025.md",
-    "fix": "none",
+    "fix": "manual",
     "name": "json-entrypoints",
     "profile": "compat",
     "status": "implemented",

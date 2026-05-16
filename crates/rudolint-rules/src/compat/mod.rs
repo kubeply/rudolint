@@ -330,7 +330,8 @@ rule_metadata!(
     "RDL3025",
     "json-entrypoints",
     Severity::Warning,
-    "prefer JSON form for CMD and ENTRYPOINT"
+    "prefer JSON form for CMD and ENTRYPOINT",
+    crate::FixAvailability::Manual
 );
 
 impl Rule for JsonEntrypoints {
@@ -350,6 +351,19 @@ impl Rule for JsonEntrypoints {
                     "use exec/JSON form for CMD and ENTRYPOINT",
                     instruction,
                 )
+            })
+            .collect()
+    }
+
+    fn fix(&self, doc: &Dockerfile) -> Vec<FixPreview> {
+        doc.instructions
+            .iter()
+            .filter(|instruction| matches!(instruction.keyword.as_str(), "CMD" | "ENTRYPOINT"))
+            .filter(|instruction| !instruction.args.trim_start().starts_with('['))
+            .map(|instruction| FixPreview {
+                title: format!("convert {} to exec/JSON form", instruction.keyword),
+                applicability: FixApplicability::manual(),
+                edits: Vec::new(),
             })
             .collect()
     }
