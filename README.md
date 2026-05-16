@@ -63,6 +63,7 @@ rudolint check Dockerfile
 rudolint check . --format json
 rudolint check . --format sarif > rudolint.sarif
 rudolint rules --implemented
+rudolint check . --exit-zero
 ```
 
 Use stdin:

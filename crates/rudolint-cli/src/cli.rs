@@ -53,6 +53,10 @@ pub struct CheckArgs {
     /// Minimum severity that exits non-zero.
     #[arg(long, value_enum, default_value_t = Severity::Warning)]
     pub failure_threshold: Severity,
+
+    /// Always exit successfully after rendering diagnostics.
+    #[arg(long)]
+    pub exit_zero: bool,
 }
 
 impl Default for CheckArgs {
@@ -63,6 +67,7 @@ impl Default for CheckArgs {
             profile: Profile::Default,
             config: None,
             failure_threshold: Severity::Warning,
+            exit_zero: false,
         }
     }
 }

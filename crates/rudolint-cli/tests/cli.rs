@@ -174,6 +174,15 @@ fn findings_exit_with_code_one() {
 }
 
 #[test]
+fn exit_zero_succeeds_with_findings() {
+    rudolint_cmd()
+        .args(["check", "--failure-threshold", "error", "--exit-zero"])
+        .write_stdin("FROM alpine:latest\nWORKDIR app\n")
+        .assert()
+        .success();
+}
+
+#[test]
 fn missing_input_exits_with_code_two() {
     rudolint_cmd()
         .args(["check", "missing.Dockerfile"])
