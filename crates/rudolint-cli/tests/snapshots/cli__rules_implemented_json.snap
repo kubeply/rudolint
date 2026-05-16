@@ -88,6 +88,12 @@ expression: normalized_json(&output)
     "summary": "delete apt-get package lists after use"
   },
   {
+    "code": "RDL3010",
+    "severity": "info",
+    "status": "implemented",
+    "summary": "use ADD for extracting local archives"
+  },
+  {
     "code": "RDL3011",
     "severity": "error",
     "status": "implemented",

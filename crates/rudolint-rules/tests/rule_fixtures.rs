@@ -234,6 +234,22 @@ fn snapshots_rdl3009_clean_apt_lists_fixture() {
 }
 
 #[test]
+fn snapshots_rdl3010_use_add_for_archives_fixture() {
+    let source = read_fixture("rules/RDL3010.use-add-for-archives/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDL3010")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdl3010_use_add_for_archives_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rdl3011_valid_expose_port_fixture() {
     let source = read_fixture("rules/RDL3011.expose-port-validation/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");

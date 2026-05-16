@@ -89,9 +89,9 @@ expression: normalized_json(&output)
   },
   {
     "code": "RDL3010",
-    "severity": "warning",
-    "status": "planned",
-    "summary": "tracked for compatibility parity"
+    "severity": "info",
+    "status": "implemented",
+    "summary": "use ADD for extracting local archives"
   },
   {
     "code": "RDL3011",
