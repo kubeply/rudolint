@@ -47,6 +47,7 @@ expression: document_json(&document)
       "continuations": [],
       "copy": null,
       "env": null,
+      "expose": null,
       "flags": [],
       "form": {
         "kind": "shell",
@@ -104,6 +105,7 @@ expression: document_json(&document)
       "continuations": [],
       "copy": null,
       "env": null,
+      "expose": null,
       "flags": [],
       "form": {
         "kind": "shell",

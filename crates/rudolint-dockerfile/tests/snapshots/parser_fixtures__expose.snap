@@ -68,32 +68,54 @@ expression: document_json(&document)
     },
     {
       "arg": null,
-      "args": "[\"apk\", \"add\",]",
+      "args": "80 443/tcp 53/udp",
       "args_span": {
-        "end_byte": 36,
-        "end_column": 20,
+        "end_byte": 41,
+        "end_column": 25,
         "end_line": 2,
-        "start_byte": 21,
-        "start_column": 5,
+        "start_byte": 24,
+        "start_column": 8,
         "start_line": 2
       },
       "continuations": [],
       "copy": null,
       "env": null,
-      "expose": null,
+      "expose": {
+        "ports": [
+          {
+            "port": "80",
+            "protocol": null
+          },
+          {
+            "port": "443",
+            "protocol": "tcp"
+          },
+          {
+            "port": "53",
+            "protocol": "udp"
+          }
+        ]
+      },
       "flags": [],
       "form": {
-        "error": "trailing comma at line 1 column 15",
-        "kind": "invalid_json",
-        "raw": "[\"apk\", \"add\",]"
+        "kind": "shell",
+        "span": {
+          "end_byte": 41,
+          "end_column": 25,
+          "end_line": 2,
+          "start_byte": 24,
+          "start_column": 8,
+          "start_line": 2
+        },
+        "text": "80 443/tcp 53/udp"
       },
       "from": null,
       "healthcheck": null,
       "heredocs": [],
-      "keyword": "RUN",
+      "keyword": "EXPOSE",
       "keyword_span": {
-        "end_byte": 20,
-        "end_column": 4,
+        "end_byte": 23,
+        "end_column": 7,
         "end_line": 2,
         "start_byte": 17,
         "start_column": 1,
@@ -102,73 +124,12 @@ expression: document_json(&document)
       "line": 2,
       "mounts": [],
       "raw_span": {
-        "end_byte": 36,
-        "end_column": 20,
+        "end_byte": 41,
+        "end_column": 25,
         "end_line": 2,
         "start_byte": 17,
         "start_column": 1,
         "start_line": 2
-      },
-      "run": {
-        "flags": [],
-        "mounts": [],
-        "network": null,
-        "security": null,
-        "shell": {
-          "span": {
-            "end_byte": 36,
-            "end_column": 20,
-            "end_line": 2,
-            "start_byte": 21,
-            "start_column": 5,
-            "start_line": 2
-          },
-          "text": "[\"apk\", \"add\",]"
-        }
-      }
-    },
-    {
-      "arg": null,
-      "args": "[\"sh\", \"-c\", \"echo hello\"",
-      "args_span": {
-        "end_byte": 66,
-        "end_column": 30,
-        "end_line": 3,
-        "start_byte": 41,
-        "start_column": 5,
-        "start_line": 3
-      },
-      "continuations": [],
-      "copy": null,
-      "env": null,
-      "expose": null,
-      "flags": [],
-      "form": {
-        "error": "EOF while parsing a list at line 1 column 25",
-        "kind": "invalid_json",
-        "raw": "[\"sh\", \"-c\", \"echo hello\""
-      },
-      "from": null,
-      "healthcheck": null,
-      "heredocs": [],
-      "keyword": "CMD",
-      "keyword_span": {
-        "end_byte": 40,
-        "end_column": 4,
-        "end_line": 3,
-        "start_byte": 37,
-        "start_column": 1,
-        "start_line": 3
-      },
-      "line": 3,
-      "mounts": [],
-      "raw_span": {
-        "end_byte": 66,
-        "end_column": 30,
-        "end_line": 3,
-        "start_byte": 37,
-        "start_column": 1,
-        "start_line": 3
       },
       "run": null
     }

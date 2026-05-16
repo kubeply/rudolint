@@ -22,6 +22,7 @@ expression: document_json(&document)
       "continuations": [],
       "copy": null,
       "env": null,
+      "expose": null,
       "flags": [],
       "form": {
         "kind": "shell",
@@ -79,6 +80,7 @@ expression: document_json(&document)
       "continuations": [],
       "copy": null,
       "env": null,
+      "expose": null,
       "flags": [],
       "form": {
         "kind": "shell",
@@ -151,6 +153,7 @@ expression: document_json(&document)
         ]
       },
       "env": null,
+      "expose": null,
       "flags": [
         [
           "from",
@@ -226,6 +229,7 @@ expression: document_json(&document)
         ]
       },
       "env": null,
+      "expose": null,
       "flags": [
         [
           "chown",
@@ -296,6 +300,7 @@ expression: document_json(&document)
         ]
       },
       "env": null,
+      "expose": null,
       "flags": [],
       "form": {
         "kind": "shell",

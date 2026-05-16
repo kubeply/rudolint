@@ -62,6 +62,7 @@ pub struct Instruction {
     pub healthcheck: Option<HealthcheckInstruction>,
     pub arg: Option<ArgInstruction>,
     pub env: Option<EnvInstruction>,
+    pub expose: Option<ExposeInstruction>,
     pub line: usize,
     pub raw_span: Span,
     pub raw: String,
@@ -159,6 +160,17 @@ pub enum EnvForm {
 pub struct EnvAssignment {
     pub name: String,
     pub value: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ExposeInstruction {
+    pub ports: Vec<ExposedPort>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ExposedPort {
+    pub port: String,
+    pub protocol: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -370,6 +382,7 @@ fn parse_instruction(
             healthcheck: None,
             arg: None,
             env: None,
+            expose: None,
             line,
             raw_span,
             raw: raw.to_string(),
@@ -404,6 +417,7 @@ fn parse_instruction(
         .then(|| parse_healthcheck(&args, args_start, &flags, source_file));
     let arg = (keyword == "ARG").then(|| parse_arg(&args)).flatten();
     let env = (keyword == "ENV").then(|| parse_env(&args)).flatten();
+    let expose = (keyword == "EXPOSE").then(|| parse_expose(&args));
     let heredocs = parse_heredocs(raw, start_byte, &keyword, source_file)?;
 
     Ok(Some(Instruction {
@@ -422,6 +436,7 @@ fn parse_instruction(
         healthcheck,
         arg,
         env,
+        expose,
         line,
         raw_span,
         raw: raw.to_string(),
@@ -489,6 +504,23 @@ fn parse_env(args: &str) -> Option<EnvInstruction> {
         form: EnvForm::LegacyPair,
         assignments: vec![EnvAssignment { name, value }],
     })
+}
+
+fn parse_expose(args: &str) -> ExposeInstruction {
+    let ports = args
+        .split_whitespace()
+        .map(|token| {
+            let (port, protocol) = token
+                .split_once('/')
+                .map_or((token, None), |(port, protocol)| (port, Some(protocol)));
+            ExposedPort {
+                port: port.to_string(),
+                protocol: protocol.map(str::to_string),
+            }
+        })
+        .collect();
+
+    ExposeInstruction { ports }
 }
 
 fn parse_run(
