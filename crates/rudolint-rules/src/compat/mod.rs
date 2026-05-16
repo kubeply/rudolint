@@ -61,6 +61,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(NoEmptyLabels),
         Box::new(ValidUrlLabels),
         Box::new(ValidRfc3339Labels),
+        Box::new(ValidSpdxLabels),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -1920,6 +1921,54 @@ impl Rule for ValidRfc3339Labels {
 }
 
 rule_metadata!(
+    ValidSpdxLabels,
+    "RDL3054",
+    "valid-spdx-labels",
+    Severity::Warning,
+    "validate SPDX license label values"
+);
+
+impl Rule for ValidSpdxLabels {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, _doc: &Dockerfile) -> Vec<Finding> {
+        Vec::new()
+    }
+
+    fn check_with_config(&self, doc: &Dockerfile, config: &Config) -> Vec<Finding> {
+        if config.label_schema.is_empty() {
+            return Vec::new();
+        }
+
+        doc.instructions
+            .iter()
+            .filter(|instruction| {
+                instruction.label.as_ref().is_some_and(|label| {
+                    label.pairs.iter().any(|pair| {
+                        config
+                            .label_schema
+                            .get(&pair.key)
+                            .is_some_and(|schema| schema == "spdx")
+                            && !docker_label_value_is_empty(&pair.value)
+                            && !is_valid_spdx_label_value(&pair.value)
+                    })
+                })
+            })
+            .map(|instruction| {
+                diagnostic(
+                    "RDL3054",
+                    Severity::Warning,
+                    "configured SPDX label is not a valid SPDX expression",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -2661,6 +2710,11 @@ fn parse_fixed_digits(value: &str, width: usize) -> Option<u32> {
     (value.len() == width && value.chars().all(|character| character.is_ascii_digit()))
         .then(|| value.parse().ok())
         .flatten()
+}
+
+fn is_valid_spdx_label_value(value: &str) -> bool {
+    let value = value.trim_matches(|character| matches!(character, '\'' | '"'));
+    spdx::Expression::parse(value).is_ok()
 }
 
 fn missing_required_labels(doc: &Dockerfile, config: &Config) -> Vec<Finding> {
@@ -3574,7 +3628,7 @@ fn dnf_install_has_unpinned_packages(shell: &str) -> bool {
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061",
-        "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
+        "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062",
+        "RDL3063", "RDL4001", "RDL4005", "RDL4006",
     ]
 }

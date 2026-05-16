@@ -16,6 +16,7 @@ rudolint-policy.workspace = true
 rudolint-shell.workspace = true
 rudolint-source.workspace = true
 serde.workspace = true
+spdx.workspace = true
 url.workspace = true
 
 [dev-dependencies]

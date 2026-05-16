@@ -986,6 +986,35 @@ fn snapshots_rdl3053_valid_rfc3339_labels_fixture() {
 }
 
 #[test]
+fn snapshots_rdl3054_spdx_labels_validation_fixture() {
+    let source = read_fixture("rules/RDL3054.spdx-labels-validation/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let config = Config {
+        label_schema: BTreeMap::from([
+            (
+                "org.opencontainers.image.licenses".to_string(),
+                "spdx".to_string(),
+            ),
+            (
+                "org.opencontainers.image.title".to_string(),
+                "text".to_string(),
+            ),
+        ]),
+        ..Config::default()
+    };
+    let findings = RuleEngine::new(Profile::Default, config)
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDL3054")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdl3054_spdx_labels_validation_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rdl4000_deprecated_maintainer_fixture() {
     let source = read_fixture("rules/RDL4000.deprecated-maintainer/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
