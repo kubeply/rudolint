@@ -5,8 +5,8 @@ use std::fmt;
 use clap::ValueEnum;
 use rudolint_config::Config;
 use rudolint_diagnostics::{Finding, Severity};
-use rudolint_dockerfile::Dockerfile;
-use rudolint_policy::PolicyProfile;
+use rudolint_dockerfile::{Comment, Dockerfile, Instruction};
+use rudolint_policy::{InlineSuppression, PolicyProfile};
 use serde::Serialize;
 
 #[derive(Debug, Clone, Copy, Default, ValueEnum)]
@@ -83,6 +83,7 @@ impl RuleEngine {
     }
 
     pub fn lint(&self, document: &Dockerfile) -> Vec<Finding> {
+        let suppressions = targeted_suppressions(document);
         let mut findings = Vec::new();
         for rule in &self.rules {
             let info = rule.info();
@@ -96,6 +97,7 @@ impl RuleEngine {
                 finding
             }));
         }
+        findings.retain(|finding| !is_suppressed(finding, &suppressions));
         findings.sort_by(|left, right| {
             left.path
                 .cmp(&right.path)
@@ -109,4 +111,41 @@ impl RuleEngine {
     pub fn catalog(&self) -> Vec<RuleInfo> {
         core::catalog(self.policy)
     }
+}
+
+#[derive(Debug, Clone)]
+struct TargetedSuppression {
+    instruction_line: usize,
+    suppression: InlineSuppression,
+}
+
+fn targeted_suppressions(document: &Dockerfile) -> Vec<TargetedSuppression> {
+    document
+        .comments
+        .iter()
+        .filter_map(|comment| targeted_suppression(comment, &document.instructions))
+        .collect()
+}
+
+fn targeted_suppression(
+    comment: &Comment,
+    instructions: &[Instruction],
+) -> Option<TargetedSuppression> {
+    let suppression = InlineSuppression::parse_comment(comment.line, &comment.text)?;
+    let instruction_line = instructions
+        .iter()
+        .find(|instruction| instruction.line > comment.line)?
+        .line;
+
+    Some(TargetedSuppression {
+        instruction_line,
+        suppression,
+    })
+}
+
+fn is_suppressed(finding: &Finding, suppressions: &[TargetedSuppression]) -> bool {
+    suppressions.iter().any(|suppression| {
+        suppression.instruction_line == finding.line()
+            && suppression.suppression.matches(&finding.code)
+    })
 }
