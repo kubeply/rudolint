@@ -32,6 +32,7 @@ expression: document_json(&document)
         "start_line": 2
       },
       "continuations": [],
+      "copy": null,
       "flags": [
         [
           "platform",
@@ -95,6 +96,7 @@ expression: document_json(&document)
         "start_line": 3
       },
       "continuations": [],
+      "copy": null,
       "flags": [
         [
           "mount",
@@ -196,6 +198,7 @@ expression: document_json(&document)
         "start_line": 4
       },
       "continuations": [],
+      "copy": null,
       "flags": [],
       "form": {
         "kind": "shell",
@@ -274,6 +277,22 @@ expression: document_json(&document)
         "start_line": 7
       },
       "continuations": [],
+      "copy": {
+        "chmod": null,
+        "chown": null,
+        "destination": "/dst",
+        "flags": [
+          [
+            "from",
+            "base"
+          ]
+        ],
+        "from": "base",
+        "kind": "copy",
+        "sources": [
+          "/src"
+        ]
+      },
       "flags": [
         [
           "from",

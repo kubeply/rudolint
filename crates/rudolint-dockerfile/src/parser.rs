@@ -58,6 +58,7 @@ pub struct Instruction {
     pub heredocs: Vec<Heredoc>,
     pub from: Option<FromInstruction>,
     pub run: Option<RunInstruction>,
+    pub copy: Option<CopyInstruction>,
     pub line: usize,
     pub raw_span: Span,
     pub raw: String,
@@ -108,6 +109,23 @@ pub struct RunInstruction {
 pub struct ShellBody {
     pub text: String,
     pub span: Span,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CopyInstruction {
+    pub kind: CopyKind,
+    pub flags: Vec<(String, String)>,
+    pub from: Option<String>,
+    pub chown: Option<String>,
+    pub chmod: Option<String>,
+    pub sources: Vec<String>,
+    pub destination: Option<String>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CopyKind {
+    Copy,
+    Add,
 }
 
 #[derive(Debug, Clone)]
@@ -315,6 +333,7 @@ fn parse_instruction(
             heredocs: Vec::new(),
             from: None,
             run: None,
+            copy: None,
             line,
             raw_span,
             raw: raw.to_string(),
@@ -343,6 +362,8 @@ fn parse_instruction(
         .collect::<Vec<_>>();
     let run =
         (keyword == "RUN").then(|| parse_run(&args, args_start, &flags, &mounts, source_file));
+    let copy =
+        matches!(keyword.as_str(), "COPY" | "ADD").then(|| parse_copy(&keyword, &args, &flags));
     let heredocs = parse_heredocs(raw, start_byte, &keyword, source_file)?;
 
     Ok(Some(Instruction {
@@ -357,6 +378,7 @@ fn parse_instruction(
         heredocs,
         from,
         run,
+        copy,
         line,
         raw_span,
         raw: raw.to_string(),
@@ -408,6 +430,45 @@ fn strip_leading_flags(args: &str, args_start: usize) -> (&str, usize) {
         };
         offset += width;
         remaining = &remaining[width..];
+    }
+}
+
+fn parse_copy(keyword: &str, args: &str, flags: &[(String, String)]) -> CopyInstruction {
+    let from = flags
+        .iter()
+        .find(|(name, _)| name == "from")
+        .map(|(_, value)| value.clone());
+    let chown = flags
+        .iter()
+        .find(|(name, _)| name == "chown")
+        .map(|(_, value)| value.clone());
+    let chmod = flags
+        .iter()
+        .find(|(name, _)| name == "chmod")
+        .map(|(_, value)| value.clone());
+    let operands = args
+        .split_whitespace()
+        .filter(|part| !part.starts_with("--"))
+        .map(str::to_string)
+        .collect::<Vec<_>>();
+    let destination = operands.last().cloned();
+    let sources = operands
+        .get(..operands.len().saturating_sub(1))
+        .unwrap_or_default()
+        .to_vec();
+
+    CopyInstruction {
+        kind: if keyword == "COPY" {
+            CopyKind::Copy
+        } else {
+            CopyKind::Add
+        },
+        flags: flags.to_vec(),
+        from,
+        chown,
+        chmod,
+        sources,
+        destination,
     }
 }
 

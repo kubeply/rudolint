@@ -1,4 +1,4 @@
-use rudolint_dockerfile::{Dockerfile, Instruction, InstructionForm, parse_dockerfile};
+use rudolint_dockerfile::{CopyKind, Dockerfile, Instruction, InstructionForm, parse_dockerfile};
 use rudolint_test::read_fixture;
 use serde_json::{Value, json};
 
@@ -127,6 +127,20 @@ fn instruction_json(instruction: &Instruction) -> Value {
                         "span": shell.span,
                     })
                 }),
+            })
+        }),
+        "copy": instruction.copy.as_ref().map(|copy| {
+            json!({
+                "kind": match copy.kind {
+                    CopyKind::Copy => "copy",
+                    CopyKind::Add => "add",
+                },
+                "flags": copy.flags,
+                "from": copy.from,
+                "chown": copy.chown,
+                "chmod": copy.chmod,
+                "sources": copy.sources,
+                "destination": copy.destination,
             })
         }),
         "line": instruction.line,
