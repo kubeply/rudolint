@@ -55,6 +55,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(CopyRelativeWithoutWorkdir),
         Box::new(UseraddNoLogInit),
         Box::new(WgetProgress),
+        Box::new(ValidLabelKey),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -1667,6 +1668,43 @@ impl Rule for WgetProgress {
 }
 
 rule_metadata!(
+    ValidLabelKey,
+    "RDL3048",
+    "valid-label-key",
+    Severity::Style,
+    "reject invalid label keys"
+);
+
+impl Rule for ValidLabelKey {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        let mut findings = Vec::new();
+
+        for instruction in &doc.instructions {
+            if let Some(label) = &instruction.label {
+                for pair in label
+                    .pairs
+                    .iter()
+                    .filter(|pair| !is_valid_docker_label_key(&pair.key))
+                {
+                    findings.push(diagnostic(
+                        "RDL3048",
+                        Severity::Style,
+                        format!("invalid label key `{}`", pair.key),
+                        instruction,
+                    ));
+                }
+            }
+        }
+
+        findings
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -2246,6 +2284,23 @@ fn wget_has_progress_control(arguments: &[String]) -> bool {
             || argument.starts_with("-o")
             || argument.starts_with("-a")
     })
+}
+
+fn is_valid_docker_label_key(key: &str) -> bool {
+    key.starts_with(|character: char| character.is_ascii_lowercase())
+        && key.ends_with(|character: char| {
+            character.is_ascii_lowercase() || character.is_ascii_digit()
+        })
+        && key.chars().all(|character| {
+            character.is_ascii_lowercase()
+                || character.is_ascii_digit()
+                || matches!(character, '.' | '-' | '_' | '/')
+        })
+        && !key.starts_with("com.docker.")
+        && !key.starts_with("io.docker.")
+        && !key.starts_with("org.dockerproject.")
+        && !key.contains("..")
+        && !key.contains("--")
 }
 
 fn apt_get_install_missing_yes(shell: &str) -> bool {
@@ -3065,8 +3120,8 @@ fn dnf_install_has_unpinned_packages(shell: &str) -> bool {
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053", "RDL3054", "RDL3055",
-        "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063",
-        "RDL4001", "RDL4005", "RDL4006",
+        "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053", "RDL3054", "RDL3055", "RDL3056",
+        "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001",
+        "RDL4005", "RDL4006",
     ]
 }

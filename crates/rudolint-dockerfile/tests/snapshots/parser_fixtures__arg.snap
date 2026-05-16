@@ -51,6 +51,7 @@ expression: document_json(&document)
         "start_column": 1,
         "start_line": 1
       },
+      "label": null,
       "line": 1,
       "mounts": [],
       "raw_span": {
@@ -110,6 +111,7 @@ expression: document_json(&document)
         "start_column": 1,
         "start_line": 2
       },
+      "label": null,
       "line": 2,
       "mounts": [],
       "raw_span": {
@@ -166,6 +168,7 @@ expression: document_json(&document)
         "start_column": 1,
         "start_line": 3
       },
+      "label": null,
       "line": 3,
       "mounts": [],
       "raw_span": {
@@ -222,6 +225,7 @@ expression: document_json(&document)
         "start_column": 1,
         "start_line": 4
       },
+      "label": null,
       "line": 4,
       "mounts": [],
       "raw_span": {
@@ -278,6 +282,7 @@ expression: document_json(&document)
         "start_column": 1,
         "start_line": 5
       },
+      "label": null,
       "line": 5,
       "mounts": [],
       "raw_span": {
@@ -331,6 +336,7 @@ expression: document_json(&document)
         "start_column": 1,
         "start_line": 6
       },
+      "label": null,
       "line": 6,
       "mounts": [],
       "raw_span": {

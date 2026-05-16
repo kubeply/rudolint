@@ -298,6 +298,12 @@ expression: normalized_json(&output)
     "summary": "avoid noisy wget progress output"
   },
   {
+    "code": "RDL3048",
+    "severity": "style",
+    "status": "implemented",
+    "summary": "reject invalid label keys"
+  },
+  {
     "code": "RDL4000",
     "severity": "error",
     "status": "implemented",

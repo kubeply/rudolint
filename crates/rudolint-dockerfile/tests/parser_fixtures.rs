@@ -25,6 +25,7 @@ fn snapshots_parser_matrix() {
         ("invalid_json_form", "parser/invalid-json-form/Dockerfile"),
         ("arg", "parser/arg/Dockerfile"),
         ("env", "parser/env/Dockerfile"),
+        ("label", "parser/label/Dockerfile"),
         ("expose", "parser/expose/Dockerfile"),
         ("recovery", "parser/recovery/Dockerfile"),
         ("healthcheck", "parser/healthcheck/Dockerfile"),
@@ -177,6 +178,16 @@ fn instruction_json(instruction: &Instruction) -> Value {
                     json!({
                         "name": assignment.name,
                         "value": assignment.value,
+                    })
+                }).collect::<Vec<_>>(),
+            })
+        }),
+        "label": instruction.label.as_ref().map(|label| {
+            json!({
+                "pairs": label.pairs.iter().map(|pair| {
+                    json!({
+                        "key": pair.key,
+                        "value": pair.value,
                     })
                 }).collect::<Vec<_>>(),
             })

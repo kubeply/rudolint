@@ -544,6 +544,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3048",
+    "default_severity": "style",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3048.md",
+    "fix": "none",
+    "name": "valid-label-key",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "reject invalid label keys"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL4000",
     "default_severity": "error",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4000.md",

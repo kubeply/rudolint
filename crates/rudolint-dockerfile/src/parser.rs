@@ -85,6 +85,7 @@ pub struct Instruction {
     pub healthcheck: Option<HealthcheckInstruction>,
     pub arg: Option<ArgInstruction>,
     pub env: Option<EnvInstruction>,
+    pub label: Option<LabelInstruction>,
     pub expose: Option<ExposeInstruction>,
     pub recovery: Option<ParseRecovery>,
     pub line: usize,
@@ -199,6 +200,24 @@ pub enum EnvForm {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EnvAssignment {
     pub name: String,
+    pub value: String,
+}
+
+/// Parsed Docker [`LABEL`](https://docs.docker.com/reference/dockerfile/#label) instruction.
+///
+/// Each [`LabelPair`] represents one `key=value` label assignment.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LabelInstruction {
+    /// Label key-value pairs declared by this instruction.
+    pub pairs: Vec<LabelPair>,
+}
+
+/// A single key-value pair from a [`LabelInstruction`].
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LabelPair {
+    /// Label key, including any namespace prefix.
+    pub key: String,
+    /// Label value with surrounding quotes stripped and Dockerfile escapes normalized.
     pub value: String,
 }
 
@@ -443,6 +462,7 @@ fn parse_instruction(
             healthcheck: None,
             arg: None,
             env: None,
+            label: None,
             expose: None,
             recovery,
             line,
@@ -480,6 +500,7 @@ fn parse_instruction(
         .then(|| parse_healthcheck(&args, args_start, &flags, source_file));
     let arg = (keyword == "ARG").then(|| parse_arg(&args)).flatten();
     let env = (keyword == "ENV").then(|| parse_env(&args)).flatten();
+    let label = (keyword == "LABEL").then(|| parse_label(&args)).flatten();
     let expose = (keyword == "EXPOSE").then(|| parse_expose(&args));
     let heredocs = parse_heredocs(raw, start_byte, &keyword, source_file)?;
 
@@ -499,6 +520,7 @@ fn parse_instruction(
         healthcheck,
         arg,
         env,
+        label,
         expose,
         recovery,
         line,
@@ -642,6 +664,104 @@ fn parse_env(args: &str) -> Option<EnvInstruction> {
         form: EnvForm::LegacyPair,
         assignments: vec![EnvAssignment { name, value }],
     })
+}
+
+fn parse_label(args: &str) -> Option<LabelInstruction> {
+    let pairs = split_unquoted_whitespace(args)
+        .into_iter()
+        .filter_map(|token| {
+            let (key, value) = token.split_once('=')?;
+            Some(LabelPair {
+                key: key.to_string(),
+                value: unquote_label_value(value),
+            })
+        })
+        .collect::<Vec<_>>();
+
+    (!pairs.is_empty()).then_some(LabelInstruction { pairs })
+}
+
+fn split_unquoted_whitespace(args: &str) -> Vec<String> {
+    let mut tokens = Vec::new();
+    let mut token = String::new();
+    let mut in_single_quote = false;
+    let mut in_double_quote = false;
+    let mut escaped = false;
+
+    for character in args.chars() {
+        if escaped {
+            token.push(character);
+            escaped = false;
+            continue;
+        }
+
+        match character {
+            '\\' if in_single_quote || in_double_quote => {
+                token.push(character);
+                escaped = true;
+            }
+            '\'' if !in_double_quote => {
+                in_single_quote = !in_single_quote;
+                token.push(character);
+            }
+            '"' if !in_single_quote => {
+                in_double_quote = !in_double_quote;
+                token.push(character);
+            }
+            character if character.is_whitespace() && !in_single_quote && !in_double_quote => {
+                if !token.is_empty() {
+                    tokens.push(std::mem::take(&mut token));
+                }
+            }
+            _ => token.push(character),
+        }
+    }
+
+    if !token.is_empty() {
+        tokens.push(token);
+    }
+
+    tokens
+}
+
+fn unquote_label_value(value: &str) -> String {
+    if let Some(unquoted) = value
+        .strip_prefix('"')
+        .and_then(|value| value.strip_suffix('"'))
+    {
+        return unescape_label_value(unquoted);
+    }
+
+    if let Some(unquoted) = value
+        .strip_prefix('\'')
+        .and_then(|value| value.strip_suffix('\''))
+    {
+        return unquoted.to_string();
+    }
+
+    unescape_label_value(value)
+}
+
+fn unescape_label_value(value: &str) -> String {
+    let mut unescaped = String::new();
+    let mut escaped = false;
+
+    for character in value.chars() {
+        if escaped {
+            unescaped.push(character);
+            escaped = false;
+        } else if character == '\\' {
+            escaped = true;
+        } else {
+            unescaped.push(character);
+        }
+    }
+
+    if escaped {
+        unescaped.push('\\');
+    }
+
+    unescaped
 }
 
 fn parse_expose(args: &str) -> ExposeInstruction {
