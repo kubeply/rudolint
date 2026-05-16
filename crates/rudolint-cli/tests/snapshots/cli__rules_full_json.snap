@@ -402,8 +402,8 @@ expression: normalized_json(&output)
   {
     "code": "RDL4001",
     "severity": "warning",
-    "status": "planned",
-    "summary": "tracked for compatibility parity"
+    "status": "implemented",
+    "summary": "use either wget or curl in a stage"
   },
   {
     "code": "RDL4003",
