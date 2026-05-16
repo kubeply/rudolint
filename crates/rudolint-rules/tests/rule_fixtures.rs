@@ -1073,6 +1073,26 @@ fn snapshots_rdl3056_valid_semver_labels_fixture() {
 }
 
 #[test]
+fn snapshots_rdl3057_missing_healthcheck_fixture() {
+    let source = read_fixture("rules/RDL3057.missing-healthcheck/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let config = Config {
+        severity: BTreeMap::from([("RDL3057".to_string(), Severity::Warning)]),
+        ..Config::default()
+    };
+    let findings = RuleEngine::new(Profile::Default, config)
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDL3057")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdl3057_missing_healthcheck_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rdl4000_deprecated_maintainer_fixture() {
     let source = read_fixture("rules/RDL4000.deprecated-maintainer/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");

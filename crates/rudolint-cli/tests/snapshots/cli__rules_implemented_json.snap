@@ -352,6 +352,12 @@ expression: normalized_json(&output)
     "summary": "validate semantic version label values"
   },
   {
+    "code": "RDL3057",
+    "severity": "ignore",
+    "status": "implemented",
+    "summary": "require HEALTHCHECK instructions"
+  },
+  {
     "code": "RDL4000",
     "severity": "error",
     "status": "implemented",
