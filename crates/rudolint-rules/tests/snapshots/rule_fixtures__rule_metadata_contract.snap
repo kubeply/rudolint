@@ -71,6 +71,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3001",
+    "default_severity": "info",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3001.md",
+    "fix": "none",
+    "name": "disallowed-container-commands",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "avoid commands that rarely make sense during Docker builds"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL3002",
     "default_severity": "warning",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3002.md",
