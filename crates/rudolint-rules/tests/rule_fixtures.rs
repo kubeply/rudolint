@@ -87,6 +87,41 @@ fn snapshots_rdl3000_absolute_workdir_fixture() {
 }
 
 #[test]
+fn snapshots_rdl3002_final_user_not_root_fixture() {
+    let fixtures = [
+        "RDL3002.no-user",
+        "RDL3002.switches-away-from-root",
+        "RDL3002.numeric-non-root",
+        "RDL3002.final-root-name",
+        "RDL3002.final-root-id",
+        "RDL3002.final-root-group",
+    ];
+
+    let cases = fixtures
+        .into_iter()
+        .map(|fixture| {
+            let source = read_fixture(format!("rules/{fixture}/Dockerfile"));
+            let document = parse_dockerfile(&source).expect("fixture should parse");
+            let findings = RuleEngine::new(Profile::Default, Config::default())
+                .lint(&document)
+                .into_iter()
+                .filter(|finding| finding.code == "RDL3002")
+                .collect::<Vec<_>>();
+
+            serde_json::json!({
+                "fixture": fixture,
+                "findings": findings,
+            })
+        })
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdl3002_final_user_not_root_fixture",
+        serde_json::to_value(&cases).expect("cases should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rule_selection_matrix() {
     let source = read_fixture("rules/default-basic/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
