@@ -63,6 +63,21 @@ pub struct CopyOperation {
     pub from: Option<String>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MultiPlatformFacts {
+    pub targetplatform: Option<String>,
+    pub buildplatform: Option<String>,
+    pub targetarch: Option<String>,
+    pub targetos: Option<String>,
+    pub stage_platforms: Vec<StagePlatform>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct StagePlatform {
+    pub stage_index: usize,
+    pub platform: String,
+}
+
 pub fn stages(document: &Dockerfile) -> Vec<Stage> {
     let from_indexes = document
         .instructions
@@ -195,4 +210,33 @@ pub fn copy_graph(document: &Dockerfile) -> CopyGraph {
         .collect();
 
     CopyGraph { operations }
+}
+
+pub fn multi_platform_facts(document: &Dockerfile) -> MultiPlatformFacts {
+    let arg_scopes = arg_scopes(document);
+    let lookup = |name: &str| {
+        arg_scopes
+            .global
+            .iter()
+            .find(|arg| arg.name == name)
+            .and_then(|arg| arg.default.clone())
+    };
+    let stage_platforms = stages(document)
+        .into_iter()
+        .filter_map(|stage| {
+            let platform = stage.platform?;
+            Some(StagePlatform {
+                stage_index: stage.index,
+                platform,
+            })
+        })
+        .collect();
+
+    MultiPlatformFacts {
+        targetplatform: lookup("TARGETPLATFORM"),
+        buildplatform: lookup("BUILDPLATFORM"),
+        targetarch: lookup("TARGETARCH"),
+        targetos: lookup("TARGETOS"),
+        stage_platforms,
+    }
 }

@@ -1,3 +1,4 @@
+use rudolint_dockerfile::multi_platform_facts;
 use rudolint_dockerfile::{CopyKind, arg_scopes, copy_graph, env_scopes, parse_dockerfile, stages};
 use rudolint_test::read_fixture;
 use serde_json::json;
@@ -112,4 +113,24 @@ fn snapshots_copy_graph() {
             })
             .collect::<Vec<_>>()
     );
+}
+
+#[test]
+fn snapshots_multi_platform_facts() {
+    let source = read_fixture("parser/from-platform/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let facts = multi_platform_facts(&document);
+
+    insta::assert_json_snapshot!(json!({
+        "targetplatform": facts.targetplatform,
+        "buildplatform": facts.buildplatform,
+        "targetarch": facts.targetarch,
+        "targetos": facts.targetos,
+        "stage_platforms": facts.stage_platforms.iter().map(|platform| {
+            json!({
+                "stage_index": platform.stage_index,
+                "platform": platform.platform,
+            })
+        }).collect::<Vec<_>>(),
+    }));
 }
