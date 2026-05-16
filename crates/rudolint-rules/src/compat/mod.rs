@@ -25,6 +25,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(PinPipVersions),
         Box::new(AptGetInstallAssumeYes),
         Box::new(AptGetNoInstallRecommends),
+        Box::new(PinNpmVersions),
         Box::new(PreferCopy),
         Box::new(UniqueStageNames),
         Box::new(JsonEntrypoints),
@@ -583,6 +584,36 @@ impl Rule for AptGetNoInstallRecommends {
 }
 
 rule_metadata!(
+    PinNpmVersions,
+    "RDL3016",
+    "pin-npm-versions",
+    Severity::Warning,
+    "pin versions in npm install"
+);
+
+impl Rule for PinNpmVersions {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        doc.instructions
+            .iter()
+            .filter(|instruction| instruction.keyword == "RUN")
+            .filter(|instruction| npm_install_has_unpinned_packages(&instruction.args))
+            .map(|instruction| {
+                diagnostic(
+                    "RDL3016",
+                    Severity::Warning,
+                    "pin versions in npm install",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+rule_metadata!(
     PreferCopy,
     "RDL3020",
     "prefer-copy",
@@ -982,13 +1013,42 @@ fn apt_get_install_missing_no_install_recommends(shell: &str) -> bool {
         })
 }
 
+fn npm_install_has_unpinned_packages(shell: &str) -> bool {
+    detect_command_invocations(shell)
+        .into_iter()
+        .filter(|invocation| invocation.command == "npm")
+        .any(|invocation| {
+            let Some(install_index) = invocation
+                .arguments
+                .iter()
+                .position(|argument| matches!(argument.as_str(), "install" | "i" | "add"))
+            else {
+                return false;
+            };
+
+            invocation
+                .arguments
+                .iter()
+                .skip(install_index + 1)
+                .filter(|argument| !argument.starts_with('-'))
+                .filter(|argument| !argument.contains("://") && !argument.starts_with("git+"))
+                .any(|package| !npm_package_has_version(package))
+        })
+}
+
+fn npm_package_has_version(package: &str) -> bool {
+    package
+        .rfind('@')
+        .is_some_and(|index| index > 0 && index + 1 < package.len())
+}
+
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3016", "RDL3018", "RDL3019", "RDL3021", "RDL3022", "RDL3023", "RDL3026", "RDL3027",
-        "RDL3028", "RDL3029", "RDL3030", "RDL3032", "RDL3033", "RDL3034", "RDL3035", "RDL3036",
-        "RDL3037", "RDL3038", "RDL3040", "RDL3041", "RDL3042", "RDL3043", "RDL3044", "RDL3045",
-        "RDL3046", "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053",
-        "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061",
-        "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
+        "RDL3018", "RDL3019", "RDL3021", "RDL3022", "RDL3023", "RDL3026", "RDL3027", "RDL3028",
+        "RDL3029", "RDL3030", "RDL3032", "RDL3033", "RDL3034", "RDL3035", "RDL3036", "RDL3037",
+        "RDL3038", "RDL3040", "RDL3041", "RDL3042", "RDL3043", "RDL3044", "RDL3045", "RDL3046",
+        "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053", "RDL3054",
+        "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062",
+        "RDL3063", "RDL4001", "RDL4005", "RDL4006",
     ]
 }
