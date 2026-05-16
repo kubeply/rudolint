@@ -4,6 +4,7 @@ expression: document_json(&document)
 ---
 {
   "checks": [],
+  "comments": [],
   "escape": null,
   "has_buildkit_features": true,
   "instructions": [
