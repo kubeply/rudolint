@@ -40,6 +40,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(PinGemVersions),
         Box::new(NoFromPlatformFlag),
         Box::new(YumInstallAssumeYes),
+        Box::new(YumCleanAll),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -1074,6 +1075,36 @@ impl Rule for YumInstallAssumeYes {
 }
 
 rule_metadata!(
+    YumCleanAll,
+    "RDL3032",
+    "yum-clean-all",
+    Severity::Info,
+    "clean yum metadata after installs"
+);
+
+impl Rule for YumCleanAll {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        doc.instructions
+            .iter()
+            .filter(|instruction| instruction.keyword == "RUN")
+            .filter(|instruction| yum_install_missing_clean_all(&instruction.args))
+            .map(|instruction| {
+                diagnostic(
+                    "RDL3032",
+                    Severity::Info,
+                    "clean yum metadata with `yum clean all` in the same RUN layer",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -1576,12 +1607,32 @@ fn yum_install_missing_yes(shell: &str) -> bool {
         })
 }
 
+fn yum_install_missing_clean_all(shell: &str) -> bool {
+    let invocations = detect_command_invocations(shell);
+    let installs = invocations.iter().any(|invocation| {
+        invocation.command == "yum" && has_argument(&invocation.arguments, "install")
+    });
+    let cleans = invocations.iter().any(|invocation| {
+        invocation.command == "yum"
+            && invocation
+                .arguments
+                .windows(2)
+                .any(|window| window[0] == "clean" && window[1] == "all")
+    });
+
+    installs && !cleans
+}
+
+fn has_argument(arguments: &[String], value: &str) -> bool {
+    arguments.iter().any(|argument| argument == value)
+}
+
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3032", "RDL3033", "RDL3034", "RDL3035", "RDL3036", "RDL3037", "RDL3038", "RDL3040",
-        "RDL3041", "RDL3042", "RDL3043", "RDL3044", "RDL3045", "RDL3046", "RDL3047", "RDL3048",
-        "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053", "RDL3054", "RDL3055", "RDL3056",
-        "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001",
-        "RDL4005", "RDL4006",
+        "RDL3033", "RDL3034", "RDL3035", "RDL3036", "RDL3037", "RDL3038", "RDL3040", "RDL3041",
+        "RDL3042", "RDL3043", "RDL3044", "RDL3045", "RDL3046", "RDL3047", "RDL3048", "RDL3049",
+        "RDL3050", "RDL3051", "RDL3052", "RDL3053", "RDL3054", "RDL3055", "RDL3056", "RDL3057",
+        "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005",
+        "RDL4006",
     ]
 }
