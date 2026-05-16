@@ -5,7 +5,9 @@ use regex::Regex;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Dockerfile {
     pub syntax: Option<SyntaxDirective>,
+    /// Dockerfile `# escape=` parser directive, when present.
     pub escape: Option<EscapeDirective>,
+    /// Dockerfile `# check=` parser directives, in source order.
     pub checks: Vec<CheckDirective>,
     pub instructions: Vec<Instruction>,
     pub has_buildkit_features: bool,
@@ -17,15 +19,21 @@ pub struct SyntaxDirective {
     pub line: usize,
 }
 
+/// Dockerfile `# escape=` parser directive.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EscapeDirective {
+    /// Escape character selected by the directive.
     pub character: char,
+    /// One-based source line where the directive appears.
     pub line: usize,
 }
 
+/// Dockerfile `# check=` parser directive.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CheckDirective {
+    /// Raw check directive value after `=`.
     pub value: String,
+    /// One-based source line where the directive appears.
     pub line: usize,
 }
 
