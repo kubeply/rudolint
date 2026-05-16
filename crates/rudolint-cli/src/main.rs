@@ -72,7 +72,11 @@ impl AppError {
 }
 
 fn run_check(args: cli::CheckArgs) -> Result<ExitCode, AppError> {
-    let config = Config::load(args.config.as_deref())?;
+    let config = if args.no_config {
+        Config::default()
+    } else {
+        Config::load(args.config.as_deref())?
+    };
     let engine = RuleEngine::new(args.profile, config);
     let inputs = resolve_inputs(&args.paths)?;
     let mut findings = Vec::new();

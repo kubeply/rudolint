@@ -47,8 +47,12 @@ pub struct CheckArgs {
     pub profile: Profile,
 
     /// Optional .rudolint.yaml config path.
-    #[arg(long)]
+    #[arg(long, conflicts_with = "no_config")]
     pub config: Option<PathBuf>,
+
+    /// Disable configuration discovery.
+    #[arg(long)]
+    pub no_config: bool,
 
     /// Minimum severity that exits non-zero.
     #[arg(long, value_enum, default_value_t = Severity::Warning)]
@@ -66,6 +70,7 @@ impl Default for CheckArgs {
             format: OutputFormat::Human,
             profile: Profile::Default,
             config: None,
+            no_config: false,
             failure_threshold: Severity::Warning,
             exit_zero: false,
         }

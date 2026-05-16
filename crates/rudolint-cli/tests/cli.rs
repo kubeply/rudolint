@@ -183,6 +183,15 @@ fn exit_zero_succeeds_with_findings() {
 }
 
 #[test]
+fn no_config_flag_is_accepted() {
+    rudolint_cmd()
+        .args(["check", "--no-config", "--failure-threshold", "error"])
+        .write_stdin("FROM alpine:latest\n")
+        .assert()
+        .success();
+}
+
+#[test]
 fn missing_input_exits_with_code_two() {
     rudolint_cmd()
         .args(["check", "missing.Dockerfile"])
