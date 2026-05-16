@@ -1,5 +1,5 @@
-use crate::{Rule, metadata::diagnostic, metadata::rule};
-use rudolint_diagnostics::Severity;
+use crate::{Rule, RuleInfo, metadata::diagnostic, metadata::rule_metadata};
+use rudolint_diagnostics::{Finding, Severity};
 use rudolint_dockerfile::Dockerfile;
 
 pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
@@ -11,13 +11,20 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
     ]
 }
 
-rule!(
+rule_metadata!(
     BuildkitSyntaxWhenFeaturesUsed,
     "RDK1000",
     "buildkit-syntax-directive",
     Severity::Info,
-    "require explicit syntax directive for BuildKit-only features",
-    |doc: &Dockerfile| {
+    "require explicit syntax directive for BuildKit-only features"
+);
+
+impl Rule for BuildkitSyntaxWhenFeaturesUsed {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
         if doc.has_buildkit_features && doc.syntax.is_none() {
             let Some(instruction) = doc
                 .instructions
@@ -36,15 +43,22 @@ rule!(
             Vec::new()
         }
     }
-);
+}
 
-rule!(
+rule_metadata!(
     SecretLikeArgOrEnv,
     "RDK1001",
     "secret-like-arg-or-env",
     Severity::Warning,
-    "reject secret-like ARG and ENV names",
-    |doc: &Dockerfile| {
+    "reject secret-like ARG and ENV names"
+);
+
+impl Rule for SecretLikeArgOrEnv {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
         let secret_words = ["SECRET", "TOKEN", "PASSWORD", "PRIVATE_KEY", "ACCESS_KEY"];
         doc.instructions
             .iter()
@@ -66,7 +80,7 @@ rule!(
             })
             .collect()
     }
-);
+}
 
 fn has_secret_like_arg_or_env_name(keyword: &str, args: &str, secret_words: &[&str]) -> bool {
     let has_secret_like_name = |name: &str| {
@@ -95,13 +109,20 @@ fn has_secret_like_arg_or_env_name(keyword: &str, args: &str, secret_words: &[&s
     }
 }
 
-rule!(
+rule_metadata!(
     SecretInRun,
     "RDK1002",
     "secret-in-run",
     Severity::Warning,
-    "prefer BuildKit secret mounts for secret-consuming RUN steps",
-    |doc: &Dockerfile| {
+    "prefer BuildKit secret mounts for secret-consuming RUN steps"
+);
+
+impl Rule for SecretInRun {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
         doc.instructions
             .iter()
             .filter(|instruction| instruction.keyword == "RUN")
@@ -125,7 +146,7 @@ rule!(
             })
             .collect()
     }
-);
+}
 
 #[cfg(test)]
 mod tests {
@@ -169,13 +190,20 @@ mod tests {
     }
 }
 
-rule!(
+rule_metadata!(
     CacheMountForPackageInstall,
     "RDK1003",
     "cache-mount-for-package-install",
     Severity::Info,
-    "prefer BuildKit cache mounts for package-manager caches",
-    |doc: &Dockerfile| {
+    "prefer BuildKit cache mounts for package-manager caches"
+);
+
+impl Rule for CacheMountForPackageInstall {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
         doc.instructions
             .iter()
             .filter(|instruction| instruction.keyword == "RUN")
@@ -201,4 +229,4 @@ rule!(
             })
             .collect()
     }
-);
+}

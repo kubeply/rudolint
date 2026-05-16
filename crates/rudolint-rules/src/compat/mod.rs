@@ -1,6 +1,6 @@
 use std::collections::BTreeSet;
 
-use crate::{Rule, metadata::diagnostic, metadata::rule};
+use crate::{Rule, RuleInfo, metadata::diagnostic, metadata::rule_metadata};
 use rudolint_diagnostics::{Finding, Severity};
 use rudolint_dockerfile::{Comment, Dockerfile};
 use rudolint_policy::LegacySuppression;
@@ -23,19 +23,26 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
     ]
 }
 
-rule!(
+rule_metadata!(
     InlineIgnore,
     "RDL1001",
     "legacy-external-suppression",
     Severity::Warning,
-    "warn on legacy external linter suppression comments",
-    |doc: &Dockerfile| {
+    "warn on legacy external linter suppression comments"
+);
+
+impl Rule for InlineIgnore {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
         doc.comments
             .iter()
             .filter_map(legacy_suppression_comment)
             .collect()
     }
-);
+}
 
 fn legacy_suppression_comment(comment: &Comment) -> Option<Finding> {
     LegacySuppression::parse_comment(comment.line, &comment.text)?;
@@ -47,13 +54,20 @@ fn legacy_suppression_comment(comment: &Comment) -> Option<Finding> {
     ))
 }
 
-rule!(
+rule_metadata!(
     AbsoluteWorkdir,
     "RDL3000",
     "absolute-workdir",
     Severity::Error,
-    "require absolute WORKDIR paths",
-    |doc: &Dockerfile| {
+    "require absolute WORKDIR paths"
+);
+
+impl Rule for AbsoluteWorkdir {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
         doc.instructions
             .iter()
             .filter(|instruction| instruction.keyword == "WORKDIR")
@@ -71,15 +85,22 @@ rule!(
             })
             .collect()
     }
-);
+}
 
-rule!(
+rule_metadata!(
     LastUserNotRoot,
     "RDL3002",
     "final-user-not-root",
     Severity::Warning,
-    "require the final USER to be non-root",
-    |doc: &Dockerfile| {
+    "require the final USER to be non-root"
+);
+
+impl Rule for LastUserNotRoot {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
         let Some(last_user) = doc
             .instructions
             .iter()
@@ -100,15 +121,22 @@ rule!(
             Vec::new()
         }
     }
-);
+}
 
-rule!(
+rule_metadata!(
     ExplicitFromTag,
     "RDL3006",
     "explicit-from-tag",
     Severity::Warning,
-    "require explicit image tags in FROM",
-    |doc: &Dockerfile| {
+    "require explicit image tags in FROM"
+);
+
+impl Rule for ExplicitFromTag {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
         doc.instructions
             .iter()
             .filter(|instruction| instruction.keyword == "FROM")
@@ -127,15 +155,22 @@ rule!(
             })
             .collect()
     }
-);
+}
 
-rule!(
+rule_metadata!(
     NoLatestTag,
     "RDL3007",
     "no-latest-tag",
     Severity::Warning,
-    "reject latest base image tags",
-    |doc: &Dockerfile| {
+    "reject latest base image tags"
+);
+
+impl Rule for NoLatestTag {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
         doc.instructions
             .iter()
             .filter(|instruction| instruction.keyword == "FROM")
@@ -154,15 +189,22 @@ rule!(
             })
             .collect()
     }
-);
+}
 
-rule!(
+rule_metadata!(
     ValidExposePort,
     "RDL3011",
     "valid-expose-port",
     Severity::Error,
-    "validate EXPOSE port numbers",
-    |doc: &Dockerfile| {
+    "validate EXPOSE port numbers"
+);
+
+impl Rule for ValidExposePort {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
         doc.instructions
             .iter()
             .filter(|instruction| instruction.keyword == "EXPOSE")
@@ -186,30 +228,46 @@ rule!(
             })
             .collect()
     }
-);
+}
 
-rule!(
+rule_metadata!(
     SingleHealthcheck,
     "RDL3012",
     "single-healthcheck",
     Severity::Error,
-    "allow only one HEALTHCHECK instruction",
-    |doc: &Dockerfile| duplicates(
-        doc,
-        "HEALTHCHECK",
-        "RDL3012",
-        Severity::Error,
-        "only one HEALTHCHECK is allowed"
-    )
+    "allow only one HEALTHCHECK instruction"
 );
 
-rule!(
+impl Rule for SingleHealthcheck {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        duplicates(
+            doc,
+            "HEALTHCHECK",
+            "RDL3012",
+            Severity::Error,
+            "only one HEALTHCHECK is allowed",
+        )
+    }
+}
+
+rule_metadata!(
     PreferCopy,
     "RDL3020",
     "prefer-copy",
     Severity::Error,
-    "prefer COPY for plain local files",
-    |doc: &Dockerfile| {
+    "prefer COPY for plain local files"
+);
+
+impl Rule for PreferCopy {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
         doc.instructions
             .iter()
             .filter(|instruction| instruction.keyword == "ADD")
@@ -231,15 +289,22 @@ rule!(
             })
             .collect()
     }
-);
+}
 
-rule!(
+rule_metadata!(
     UniqueStageNames,
     "RDL3024",
     "unique-stage-names",
     Severity::Error,
-    "require unique multi-stage aliases",
-    |doc: &Dockerfile| {
+    "require unique multi-stage aliases"
+);
+
+impl Rule for UniqueStageNames {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
         let mut seen = BTreeSet::new();
         let mut findings = Vec::new();
         for instruction in &doc.instructions {
@@ -257,15 +322,22 @@ rule!(
         }
         findings
     }
-);
+}
 
-rule!(
+rule_metadata!(
     JsonEntrypoints,
     "RDL3025",
     "json-entrypoints",
     Severity::Warning,
-    "prefer JSON form for CMD and ENTRYPOINT",
-    |doc: &Dockerfile| {
+    "prefer JSON form for CMD and ENTRYPOINT"
+);
+
+impl Rule for JsonEntrypoints {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
         doc.instructions
             .iter()
             .filter(|instruction| matches!(instruction.keyword.as_str(), "CMD" | "ENTRYPOINT"))
@@ -280,15 +352,22 @@ rule!(
             })
             .collect()
     }
-);
+}
 
-rule!(
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
     Severity::Error,
-    "reject deprecated MAINTAINER instructions",
-    |doc: &Dockerfile| {
+    "reject deprecated MAINTAINER instructions"
+);
+
+impl Rule for DeprecatedMaintainer {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
         doc.instructions
             .iter()
             .filter(|instruction| instruction.keyword == "MAINTAINER")
@@ -302,37 +381,55 @@ rule!(
             })
             .collect()
     }
-);
+}
 
-rule!(
+rule_metadata!(
     SingleCmd,
     "RDL4003",
     "single-cmd",
     Severity::Warning,
-    "allow only one CMD instruction",
-    |doc: &Dockerfile| duplicates(
-        doc,
-        "CMD",
-        "RDL4003",
-        Severity::Warning,
-        "only the final CMD is used"
-    )
+    "allow only one CMD instruction"
 );
 
-rule!(
+impl Rule for SingleCmd {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        duplicates(
+            doc,
+            "CMD",
+            "RDL4003",
+            Severity::Warning,
+            "only the final CMD is used",
+        )
+    }
+}
+
+rule_metadata!(
     SingleEntrypoint,
     "RDL4004",
     "single-entrypoint",
     Severity::Error,
-    "allow only one ENTRYPOINT instruction",
-    |doc: &Dockerfile| duplicates(
-        doc,
-        "ENTRYPOINT",
-        "RDL4004",
-        Severity::Error,
-        "only the final ENTRYPOINT is used"
-    )
+    "allow only one ENTRYPOINT instruction"
 );
+
+impl Rule for SingleEntrypoint {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        duplicates(
+            doc,
+            "ENTRYPOINT",
+            "RDL4004",
+            Severity::Error,
+            "only the final ENTRYPOINT is used",
+        )
+    }
+}
 
 fn duplicates(
     doc: &Dockerfile,

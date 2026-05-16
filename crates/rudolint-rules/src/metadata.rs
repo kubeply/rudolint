@@ -124,11 +124,11 @@ impl FixAvailability {
     }
 }
 
-macro_rules! rule {
-    ($type_name:ident, $code:literal, $name:literal, $severity:expr, $summary:literal, $body:expr) => {
+macro_rules! rule_metadata {
+    ($type_name:ident, $code:literal, $name:literal, $severity:expr, $summary:literal) => {
         pub(crate) struct $type_name;
-        impl crate::Rule for $type_name {
-            fn info(&self) -> crate::RuleInfo {
+        impl $type_name {
+            fn metadata_info(&self) -> crate::RuleInfo {
                 crate::RuleInfo::from_metadata(crate::RuleMetadata::implemented(
                     $code,
                     $name,
@@ -137,18 +137,11 @@ macro_rules! rule {
                     crate::FixAvailability::None,
                 ))
             }
-
-            fn check(
-                &self,
-                document: &rudolint_dockerfile::Dockerfile,
-            ) -> Vec<rudolint_diagnostics::Finding> {
-                $body(document)
-            }
         }
     };
 }
 
-pub(crate) use rule;
+pub(crate) use rule_metadata;
 
 pub(crate) fn diagnostic(
     code: &'static str,
