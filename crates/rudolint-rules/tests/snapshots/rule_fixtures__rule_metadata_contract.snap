@@ -137,6 +137,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3008",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3008.md",
+    "fix": "none",
+    "name": "pin-apt-get-install-versions",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "pin versions in apt-get install"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL3011",
     "default_severity": "error",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3011.md",

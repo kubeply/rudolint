@@ -12,6 +12,8 @@ pub struct ShellProgram {
 pub struct ShellCommandInvocation {
     /// Command basename, with any leading path removed.
     pub command: String,
+    /// Arguments following the command until the next shell command boundary.
+    pub arguments: Vec<String>,
 }
 
 /// Package manager executable detected in shell command text.
@@ -160,10 +162,14 @@ pub fn detect_disallowed_container_commands(shell: &str) -> Vec<DisallowedContai
 /// Detects executable commands at shell command boundaries.
 pub fn detect_command_invocations(shell: &str) -> Vec<ShellCommandInvocation> {
     let mut commands = Vec::new();
+    let mut current_command: Option<ShellCommandInvocation> = None;
     let mut expect_command = true;
 
     for raw_token in shell_tokens(shell) {
         if raw_token.is_separator {
+            if let Some(command) = current_command.take() {
+                commands.push(command);
+            }
             expect_command = true;
             continue;
         }
@@ -174,21 +180,35 @@ pub fn detect_command_invocations(shell: &str) -> Vec<ShellCommandInvocation> {
             .trim_matches(|character| matches!(character, ';' | '&' | '|'));
 
         if token.is_empty() {
+            if let Some(command) = current_command.take() {
+                commands.push(command);
+            }
             expect_command = true;
             continue;
         }
 
         if expect_command {
+            if let Some(command) = current_command.take() {
+                commands.push(command);
+            }
+
             if is_env_assignment(token) {
                 continue;
             }
 
             let command = token.rsplit('/').next().unwrap_or(token);
-            commands.push(ShellCommandInvocation {
+            current_command = Some(ShellCommandInvocation {
                 command: command.to_string(),
+                arguments: Vec::new(),
             });
             expect_command = false;
+        } else if let Some(command) = &mut current_command {
+            command.arguments.push(token.to_string());
         }
+    }
+
+    if let Some(command) = current_command {
+        commands.push(command);
     }
 
     commands
@@ -352,7 +372,12 @@ mod tests {
                     "shell": case,
                     "commands": detect_command_invocations(case)
                         .into_iter()
-                        .map(|invocation| invocation.command)
+                        .map(|invocation| {
+                            json!({
+                                "command": invocation.command,
+                                "arguments": invocation.arguments,
+                            })
+                        })
                         .collect::<Vec<_>>(),
                 })
             })
