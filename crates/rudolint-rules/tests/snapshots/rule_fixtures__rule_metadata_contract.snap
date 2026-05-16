@@ -423,6 +423,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3036",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3036.md",
+    "fix": "none",
+    "name": "zypper-clean",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "clean zypper metadata after use"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL4000",
     "default_severity": "error",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4000.md",
