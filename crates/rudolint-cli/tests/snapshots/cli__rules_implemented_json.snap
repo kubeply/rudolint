@@ -160,6 +160,12 @@ expression: normalized_json(&output)
     "summary": "require COPY --from references to resolve to previous build stages"
   },
   {
+    "code": "RDL3023",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "forbid COPY --from references to the current stage"
+  },
+  {
     "code": "RDL3024",
     "severity": "error",
     "status": "implemented",

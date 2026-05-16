@@ -291,6 +291,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3023",
+    "default_severity": "error",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3023.md",
+    "fix": "none",
+    "name": "copy-from-own-stage",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "forbid COPY --from references to the current stage"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL3024",
     "default_severity": "error",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3024.md",
