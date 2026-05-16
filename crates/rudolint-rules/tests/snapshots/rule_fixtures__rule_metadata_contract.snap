@@ -478,6 +478,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3042",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3042.md",
+    "fix": "none",
+    "name": "pip-no-cache-dir",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "avoid pip cache directories"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL4000",
     "default_severity": "error",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4000.md",

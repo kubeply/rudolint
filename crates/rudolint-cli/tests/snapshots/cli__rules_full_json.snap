@@ -264,8 +264,8 @@ expression: normalized_json(&output)
   {
     "code": "RDL3042",
     "severity": "warning",
-    "status": "planned",
-    "summary": "tracked for compatibility parity"
+    "status": "implemented",
+    "summary": "avoid pip cache directories"
   },
   {
     "code": "RDL3043",

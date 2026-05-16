@@ -262,6 +262,12 @@ expression: normalized_json(&output)
     "summary": "pin versions in dnf install"
   },
   {
+    "code": "RDL3042",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "avoid pip cache directories"
+  },
+  {
     "code": "RDL4000",
     "severity": "error",
     "status": "implemented",
