@@ -32,6 +32,10 @@ pub fn normalize_json_paths(value: &mut Value) {
     normalize_paths(value);
 }
 
+pub fn normalize_path_prefix(value: &mut Value, prefix: &Path, placeholder: &str) {
+    normalize_path_prefix_inner(value, prefix, placeholder);
+}
+
 pub fn normalized_json(raw: &str) -> Value {
     let mut value: Value = serde_json::from_str(raw).expect("output should be valid JSON");
     normalize_json_paths(&mut value);
@@ -101,6 +105,28 @@ fn looks_like_workspace_path(text: &str) -> bool {
     text.contains(workspace_root().to_string_lossy().as_ref())
 }
 
+fn normalize_path_prefix_inner(value: &mut Value, prefix: &Path, placeholder: &str) {
+    let prefix = prefix.to_string_lossy();
+    match value {
+        Value::Array(items) => {
+            for item in items {
+                normalize_path_prefix_inner(item, Path::new(prefix.as_ref()), placeholder);
+            }
+        }
+        Value::Object(map) => {
+            for value in map.values_mut() {
+                normalize_path_prefix_inner(value, Path::new(prefix.as_ref()), placeholder);
+            }
+        }
+        Value::String(text) => {
+            if text.contains(prefix.as_ref()) {
+                *text = text.replace(prefix.as_ref(), placeholder);
+            }
+        }
+        Value::Null | Value::Bool(_) | Value::Number(_) => {}
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -127,5 +153,14 @@ mod tests {
         normalize_json_paths(&mut value);
 
         assert_eq!(value["path"], "$WORKSPACE/fixtures/parser/Dockerfile");
+    }
+
+    #[test]
+    fn normalize_path_prefix_replaces_custom_prefix() {
+        let mut value = json!({ "path": "/tmp/example/Dockerfile" });
+
+        normalize_path_prefix(&mut value, Path::new("/tmp/example"), "$TEMP");
+
+        assert_eq!(value["path"], "$TEMP/Dockerfile");
     }
 }

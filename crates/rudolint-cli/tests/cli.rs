@@ -1,4 +1,5 @@
-use rudolint_test::{normalized_json, rudolint_cmd};
+use rudolint_test::{normalize_path_prefix, normalized_json, rudolint_cmd};
+use tempfile::TempDir;
 
 #[test]
 fn emits_json_findings_for_stdin() {
@@ -43,4 +44,122 @@ fn emits_human_findings_for_stdin() {
 
     let output = String::from_utf8(output).expect("stdout should be UTF-8");
     insta::assert_snapshot!("stdin_human_findings", output);
+}
+
+#[test]
+fn checks_explicit_dockerfile_path() {
+    let temp = TempDir::new().expect("temp dir should be created");
+    let dockerfile = temp.path().join("Dockerfile");
+    std::fs::write(&dockerfile, "FROM alpine:latest\n").expect("fixture should be written");
+
+    let output = rudolint_cmd()
+        .args(["check", "--format", "json", "--failure-threshold", "error"])
+        .arg(&dockerfile)
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+
+    let output = String::from_utf8(output).expect("stdout should be UTF-8");
+    let mut output = normalized_json(&output);
+    normalize_path_prefix(&mut output, temp.path(), "$TEMP");
+    insta::assert_json_snapshot!("explicit_path_json_findings", output);
+}
+
+#[test]
+fn discovers_dockerfiles_in_directory() {
+    let temp = TempDir::new().expect("temp dir should be created");
+    let nested = temp.path().join("service");
+    std::fs::create_dir(&nested).expect("nested dir should be created");
+    std::fs::write(temp.path().join("Dockerfile"), "FROM alpine:latest\n")
+        .expect("root Dockerfile should be written");
+    std::fs::write(nested.join("Dockerfile.api"), "FROM busybox\nWORKDIR app\n")
+        .expect("nested Dockerfile should be written");
+
+    let output = rudolint_cmd()
+        .args(["check", "--format", "json", "--failure-threshold", "error"])
+        .arg(temp.path())
+        .assert()
+        .failure()
+        .get_output()
+        .stdout
+        .clone();
+
+    let output = String::from_utf8(output).expect("stdout should be UTF-8");
+    let mut output = normalized_json(&output);
+    normalize_path_prefix(&mut output, temp.path(), "$TEMP");
+    insta::assert_json_snapshot!("directory_discovery_json_findings", output);
+}
+
+#[test]
+fn explicit_config_can_ignore_rule() {
+    let temp = TempDir::new().expect("temp dir should be created");
+    let dockerfile = temp.path().join("Dockerfile");
+    let config = temp.path().join(".rudolint.yaml");
+    std::fs::write(&dockerfile, "FROM alpine:latest\nWORKDIR app\n")
+        .expect("fixture should be written");
+    std::fs::write(&config, "ignore:\n  - RDL3000\n").expect("config should be written");
+
+    let output = rudolint_cmd()
+        .args([
+            "check",
+            "--format",
+            "json",
+            "--failure-threshold",
+            "error",
+            "--config",
+        ])
+        .arg(&config)
+        .arg(&dockerfile)
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+
+    let output = String::from_utf8(output).expect("stdout should be UTF-8");
+    let mut output = normalized_json(&output);
+    normalize_path_prefix(&mut output, temp.path(), "$TEMP");
+    insta::assert_json_snapshot!("config_ignore_json_findings", output);
+}
+
+#[test]
+fn explicit_config_can_override_severity() {
+    let temp = TempDir::new().expect("temp dir should be created");
+    let dockerfile = temp.path().join("Dockerfile");
+    let config = temp.path().join(".rudolint.yaml");
+    std::fs::write(&dockerfile, "FROM alpine:latest\n").expect("fixture should be written");
+    std::fs::write(&config, "severity:\n  RDL3007: error\n").expect("config should be written");
+
+    let output = rudolint_cmd()
+        .args([
+            "check",
+            "--format",
+            "json",
+            "--failure-threshold",
+            "error",
+            "--config",
+        ])
+        .arg(&config)
+        .arg(&dockerfile)
+        .assert()
+        .failure()
+        .get_output()
+        .stdout
+        .clone();
+
+    let output = String::from_utf8(output).expect("stdout should be UTF-8");
+    let mut output = normalized_json(&output);
+    normalize_path_prefix(&mut output, temp.path(), "$TEMP");
+    insta::assert_json_snapshot!("config_severity_json_findings", output);
+}
+
+#[test]
+fn clean_input_exits_successfully() {
+    rudolint_cmd()
+        .args(["check", "--failure-threshold", "warning"])
+        .write_stdin("FROM alpine:3.20\nWORKDIR /app\nUSER app\n")
+        .assert()
+        .success();
 }

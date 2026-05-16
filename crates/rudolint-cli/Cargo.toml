@@ -21,3 +21,4 @@ assert_cmd.workspace = true
 insta.workspace = true
 predicates.workspace = true
 rudolint-test.workspace = true
+tempfile.workspace = true

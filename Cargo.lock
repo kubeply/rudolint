@@ -514,6 +514,7 @@ dependencies = [
  "rudolint-output",
  "rudolint-rules",
  "rudolint-test",
+ "tempfile",
 ]
 
 [[package]]
