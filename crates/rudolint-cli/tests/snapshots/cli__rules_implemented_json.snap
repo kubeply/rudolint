@@ -106,6 +106,12 @@ expression: normalized_json(&output)
     "summary": "allow only one HEALTHCHECK instruction"
   },
   {
+    "code": "RDL3013",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "pin versions in pip install"
+  },
+  {
     "code": "RDL3020",
     "severity": "error",
     "status": "implemented",

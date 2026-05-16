@@ -299,6 +299,22 @@ fn snapshots_rdl3012_healthcheck_cardinality_fixture() {
 }
 
 #[test]
+fn snapshots_rdl3013_pin_pip_versions_fixture() {
+    let source = read_fixture("rules/RDL3013.pin-pip-versions/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDL3013")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdl3013_pin_pip_versions_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rdl3020_prefer_copy_fixture() {
     let source = read_fixture("rules/RDL3020.prefer-copy/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
