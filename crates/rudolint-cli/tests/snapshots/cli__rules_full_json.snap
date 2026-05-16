@@ -275,9 +275,9 @@ expression: normalized_json(&output)
   },
   {
     "code": "RDL3044",
-    "severity": "warning",
-    "status": "planned",
-    "summary": "tracked for compatibility parity"
+    "severity": "error",
+    "status": "implemented",
+    "summary": "reject same-statement ENV references"
   },
   {
     "code": "RDL3045",
