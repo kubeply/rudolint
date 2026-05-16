@@ -10,6 +10,7 @@ use std::fmt;
 use clap::ValueEnum;
 use rudolint_diagnostics::{Finding, Severity};
 use rudolint_dockerfile::Dockerfile;
+use rudolint_fix::FixPreview;
 use rudolint_policy::PolicyProfile;
 
 pub use engine::RuleEngine;
@@ -80,4 +81,8 @@ impl RuleInfo {
 pub trait Rule: Send + Sync {
     fn info(&self) -> RuleInfo;
     fn check(&self, document: &Dockerfile) -> Vec<Finding>;
+
+    fn fix(&self, _document: &Dockerfile) -> Vec<FixPreview> {
+        Vec::new()
+    }
 }

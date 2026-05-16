@@ -1,6 +1,7 @@
 use rudolint_config::Config;
 use rudolint_diagnostics::Finding;
 use rudolint_dockerfile::{Comment, Dockerfile, Instruction};
+use rudolint_fix::FixPreview;
 use rudolint_policy::{InlineSuppression, PolicyProfile};
 
 use crate::{Profile, Rule, RuleInfo, catalog};
@@ -50,6 +51,18 @@ impl RuleEngine {
 
     pub fn catalog(&self) -> Vec<RuleInfo> {
         catalog::catalog(self.policy)
+    }
+
+    pub fn fixes(&self, document: &Dockerfile) -> Vec<FixPreview> {
+        let mut fixes = Vec::new();
+        for rule in &self.rules {
+            let info = rule.info();
+            if self.config.ignores(info.code) {
+                continue;
+            }
+            fixes.extend(rule.fix(document));
+        }
+        fixes
     }
 }
 

@@ -1,0 +1,10 @@
+---
+source: crates/rudolint-cli/tests/cli.rs
+expression: output
+---
+<stdin>:2:1: info RDK1000 BuildKit features are used without an explicit # syntax directive
+fixes: dry-run mode is enabled; 1 fix(es) available
+title: insert BuildKit syntax directive
+applicability: safe
+edits:
+- insert: line 1, column 1, content "# syntax=docker/dockerfile:1\n"

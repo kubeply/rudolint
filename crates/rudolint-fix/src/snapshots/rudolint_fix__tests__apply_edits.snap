@@ -1,0 +1,7 @@
+---
+source: crates/rudolint-fix/src/lib.rs
+expression: edited
+---
+# syntax=docker/dockerfile:1
+FROM alpine:3.20
+RUN echo ok

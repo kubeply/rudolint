@@ -5,26 +5,10 @@ expression: normalized_json(&output)
 {
   "findings": [
     {
-      "code": "RDL3007",
+      "code": "RDK1000",
       "help": null,
       "labels": [],
-      "message": "avoid mutable latest base image tags",
-      "path": "<stdin>",
-      "primary_span": {
-        "end_byte": 0,
-        "end_column": 1,
-        "end_line": 1,
-        "start_byte": 0,
-        "start_column": 1,
-        "start_line": 1
-      },
-      "severity": "warning"
-    },
-    {
-      "code": "RDL3000",
-      "help": null,
-      "labels": [],
-      "message": "WORKDIR should be absolute",
+      "message": "BuildKit features are used without an explicit # syntax directive",
       "path": "<stdin>",
       "primary_span": {
         "end_byte": 0,
@@ -34,8 +18,28 @@ expression: normalized_json(&output)
         "start_column": 1,
         "start_line": 2
       },
-      "severity": "error"
+      "severity": "info"
     }
   ],
-  "fixes": []
+  "fixes": [
+    {
+      "applicability": {
+        "type": "safe"
+      },
+      "edits": [
+        {
+          "kind": {
+            "content": "# syntax=docker/dockerfile:1\n",
+            "type": "insert"
+          },
+          "span": {
+            "column": 1,
+            "length": 0,
+            "line": 1
+          }
+        }
+      ],
+      "title": "insert BuildKit syntax directive"
+    }
+  ]
 }

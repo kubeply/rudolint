@@ -1,6 +1,7 @@
 use crate::{Rule, RuleInfo, metadata::diagnostic, metadata::rule_metadata};
 use rudolint_diagnostics::{Finding, Severity};
 use rudolint_dockerfile::Dockerfile;
+use rudolint_fix::{FixApplicability, FixPreview, TextEdit};
 
 pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
     vec![
@@ -16,7 +17,8 @@ rule_metadata!(
     "RDK1000",
     "buildkit-syntax-directive",
     Severity::Info,
-    "require explicit syntax directive for BuildKit-only features"
+    "require explicit syntax directive for BuildKit-only features",
+    crate::FixAvailability::Safe
 );
 
 impl Rule for BuildkitSyntaxWhenFeaturesUsed {
@@ -39,6 +41,18 @@ impl Rule for BuildkitSyntaxWhenFeaturesUsed {
                 "BuildKit features are used without an explicit # syntax directive",
                 instruction,
             )]
+        } else {
+            Vec::new()
+        }
+    }
+
+    fn fix(&self, doc: &Dockerfile) -> Vec<FixPreview> {
+        if doc.has_buildkit_features && doc.syntax.is_none() {
+            vec![FixPreview {
+                title: "insert BuildKit syntax directive".to_string(),
+                applicability: FixApplicability::safe(),
+                edits: vec![TextEdit::insert(1, 1, "# syntax=docker/dockerfile:1\n")],
+            }]
         } else {
             Vec::new()
         }

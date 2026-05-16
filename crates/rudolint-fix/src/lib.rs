@@ -100,6 +100,62 @@ fn edits_conflict(left: &TextEdit, right: &TextEdit) -> bool {
     left_start < right_end && right_start < left_end
 }
 
+pub fn apply_edits(source: &str, edits: &[TextEdit]) -> Result<String, ApplyError> {
+    let conflicts = detect_conflicts(edits);
+    if !conflicts.is_empty() {
+        return Err(ApplyError::ConflictingEdits(conflicts));
+    }
+
+    let mut replacements = edits
+        .iter()
+        .map(|edit| {
+            let start = byte_offset(source, edit.span.line, edit.span.column)?;
+            let end = byte_offset(source, edit.span.line, edit.end_column())?;
+            Ok((start, end, edit.replacement_text().to_string()))
+        })
+        .collect::<Result<Vec<_>, ApplyError>>()?;
+    replacements.sort_by_key(|(start, _, _)| *start);
+
+    let mut output = source.to_string();
+    for (start, end, replacement) in replacements.into_iter().rev() {
+        output.replace_range(start..end, &replacement);
+    }
+    Ok(output)
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ApplyError {
+    ConflictingEdits(Vec<EditConflict>),
+    InvalidSpan(SourceSpan),
+}
+
+fn byte_offset(source: &str, line: usize, column: usize) -> Result<usize, ApplyError> {
+    let mut current_line = 1;
+    let mut current_column = 1;
+
+    for (byte, character) in source.char_indices() {
+        if current_line == line && current_column == column {
+            return Ok(byte);
+        }
+        if character == '\n' {
+            current_line += 1;
+            current_column = 1;
+        } else {
+            current_column += 1;
+        }
+    }
+
+    if current_line == line && current_column == column {
+        return Ok(source.len());
+    }
+
+    Err(ApplyError::InvalidSpan(SourceSpan {
+        line,
+        column,
+        length: 0,
+    }))
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum FixApplicability {
@@ -317,6 +373,28 @@ mod tests {
             TextEdit::insert(1, 1, "# second\n"),
         ];
         assert_eq!(detect_conflicts(&inserts).len(), 1);
+    }
+
+    #[test]
+    fn applies_edits_from_bottom_to_top() {
+        let source = "FROM alpine:latest\nRUN echo ok\n";
+        let edited = apply_edits(
+            source,
+            &[
+                TextEdit::insert(1, 1, "# syntax=docker/dockerfile:1\n"),
+                TextEdit::replace(
+                    SourceSpan {
+                        line: 1,
+                        column: 13,
+                        length: 6,
+                    },
+                    "3.20",
+                ),
+            ],
+        )
+        .expect("edits should apply");
+
+        insta::assert_snapshot!("apply_edits", edited);
     }
 
     #[test]
