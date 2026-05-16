@@ -8,7 +8,7 @@ expression: metadata
     "code": "RDK1000",
     "default_severity": "info",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDK1000.md",
-    "fix": "none",
+    "fix": "safe",
     "name": "buildkit-syntax-directive",
     "profile": "default",
     "status": "implemented",

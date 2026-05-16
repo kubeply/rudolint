@@ -126,15 +126,21 @@ impl FixAvailability {
 
 macro_rules! rule_metadata {
     ($type_name:ident, $code:literal, $name:literal, $severity:expr, $summary:literal) => {
+        $crate::metadata::rule_metadata!(
+            $type_name,
+            $code,
+            $name,
+            $severity,
+            $summary,
+            $crate::FixAvailability::None
+        );
+    };
+    ($type_name:ident, $code:literal, $name:literal, $severity:expr, $summary:literal, $fix:expr) => {
         pub(crate) struct $type_name;
         impl $type_name {
             fn metadata_info(&self) -> crate::RuleInfo {
                 crate::RuleInfo::from_metadata(crate::RuleMetadata::implemented(
-                    $code,
-                    $name,
-                    $severity,
-                    $summary,
-                    crate::FixAvailability::None,
+                    $code, $name, $severity, $summary, $fix,
                 ))
             }
         }

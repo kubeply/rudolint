@@ -1,10 +1,12 @@
 use rudolint_config::Config;
 use rudolint_diagnostics::Finding;
 use rudolint_dockerfile::{Comment, Dockerfile, Instruction};
+use rudolint_fix::FixPreview;
 use rudolint_policy::{InlineSuppression, PolicyProfile};
 
 use crate::{Profile, Rule, RuleInfo, catalog};
 
+/// Executes configured lint rules and fix providers for a policy profile.
 pub struct RuleEngine {
     rules: Vec<Box<dyn Rule>>,
     policy: PolicyProfile,
@@ -12,6 +14,7 @@ pub struct RuleEngine {
 }
 
 impl RuleEngine {
+    /// Creates a rule engine for `profile` using the supplied configuration.
     pub fn new(profile: Profile, config: Config) -> Self {
         let policy = profile.policy();
         Self {
@@ -21,6 +24,7 @@ impl RuleEngine {
         }
     }
 
+    /// Returns diagnostics emitted by all enabled rules for `document`.
     pub fn lint(&self, document: &Dockerfile) -> Vec<Finding> {
         let suppressions = targeted_suppressions(document);
         let mut findings = Vec::new();
@@ -47,8 +51,22 @@ impl RuleEngine {
         findings
     }
 
+    /// Returns catalog metadata for rules in this engine's policy profile.
     pub fn catalog(&self) -> Vec<RuleInfo> {
         catalog::catalog(self.policy)
+    }
+
+    /// Returns fix previews emitted by all enabled rules for `document`.
+    pub fn fixes(&self, document: &Dockerfile) -> Vec<FixPreview> {
+        let mut fixes = Vec::new();
+        for rule in &self.rules {
+            let info = rule.info();
+            if self.config.ignores(info.code) {
+                continue;
+            }
+            fixes.extend(rule.fix(document));
+        }
+        fixes
     }
 }
 

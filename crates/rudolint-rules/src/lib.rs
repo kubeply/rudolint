@@ -10,6 +10,7 @@ use std::fmt;
 use clap::ValueEnum;
 use rudolint_diagnostics::{Finding, Severity};
 use rudolint_dockerfile::Dockerfile;
+use rudolint_fix::FixPreview;
 use rudolint_policy::PolicyProfile;
 use serde::Serialize;
 
@@ -82,7 +83,15 @@ impl RuleInfo {
     }
 }
 
+/// A lint rule that can emit diagnostics and optional fix previews.
 pub trait Rule: Send + Sync {
+    /// Returns stable catalog metadata for this rule.
     fn info(&self) -> RuleInfo;
+    /// Returns diagnostics for `document`.
     fn check(&self, document: &Dockerfile) -> Vec<Finding>;
+
+    /// Returns suggested fixes for `document`, if this rule supports them.
+    fn fix(&self, _document: &Dockerfile) -> Vec<FixPreview> {
+        Vec::new()
+    }
 }

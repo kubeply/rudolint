@@ -14,7 +14,7 @@ use crate::cli::{Cli, Command, OutputFormat, RulesOutputFormat};
 use rudolint_config::Config;
 use rudolint_diagnostics::Finding;
 use rudolint_dockerfile::parse_dockerfile;
-use rudolint_fix::FixPreview;
+use rudolint_fix::{FixPreview, TextEdit, apply_edits};
 use rudolint_rules::{RuleEngine, RuleStatus};
 use rudolint_settings::resolve_from_parts;
 
@@ -77,6 +77,11 @@ impl AppError {
 
 fn run_check(args: cli::CheckArgs) -> Result<ExitCode, AppError> {
     let inputs = resolve_inputs(&args.paths)?;
+    if inputs.is_empty() && args.fix && !args.dry_run {
+        return Err(AppError::usage(
+            "`--fix` write mode requires a Dockerfile path",
+        ));
+    }
     let starts = if inputs.is_empty() {
         args.paths.clone()
     } else {
@@ -87,21 +92,28 @@ fn run_check(args: cli::CheckArgs) -> Result<ExitCode, AppError> {
     let input_count = if inputs.is_empty() { 1 } else { inputs.len() };
     let mut findings = Vec::new();
     let mut sources = BTreeMap::new();
-    let fixes = Vec::<FixPreview>::new();
+    let mut fixes = Vec::<FixPreview>::new();
 
     if inputs.is_empty() {
         let mut source = String::new();
         io::stdin().read_to_string(&mut source).map_err(|error| {
             AppError::usage(format!("failed to read Dockerfile from stdin: {error}"))
         })?;
-        findings.extend(lint_source(&args.stdin_filename, &source, &engine)?);
+        let analysis = analyze_source(&args.stdin_filename, &source, &engine, args.fix)?;
+        findings.extend(analysis.findings);
+        fixes.extend(analysis.fixes);
         sources.insert(args.stdin_filename.clone(), source);
     } else {
         for path in inputs {
             let source = fs::read_to_string(&path).map_err(|error| {
                 AppError::usage(format!("failed to read {}: {error}", path.display()))
             })?;
-            findings.extend(lint_source(&path, &source, &engine)?);
+            let analysis = analyze_source(&path, &source, &engine, args.fix)?;
+            if args.fix && !args.dry_run {
+                apply_fixes(&path, &source, &analysis.fixes)?;
+            }
+            findings.extend(analysis.findings);
+            fixes.extend(analysis.fixes);
             sources.insert(path, source);
         }
     }
@@ -127,10 +139,8 @@ fn run_check(args: cli::CheckArgs) -> Result<ExitCode, AppError> {
         if args.show_source && matches!(args.format, OutputFormat::Human) {
             rendered.push_str(&source_excerpt(&findings, &sources));
         }
-        if args.fix && args.dry_run && matches!(args.format, OutputFormat::Human) {
-            rendered.push_str("fixes: dry-run mode is enabled; no fixes are currently available\n");
-        } else if args.fix && matches!(args.format, OutputFormat::Human) {
-            rendered.push_str("fixes: write mode is enabled; no fixes are currently available\n");
+        if args.fix && matches!(args.format, OutputFormat::Human) {
+            rendered.push_str(&render_fix_section(args.dry_run, &fixes));
         }
         print!("{rendered}");
     }
@@ -225,7 +235,17 @@ fn run_explain(args: cli::ExplainArgs) -> Result<ExitCode, AppError> {
     Ok(ExitCode::SUCCESS)
 }
 
-fn lint_source(path: &Path, source: &str, engine: &RuleEngine) -> Result<Vec<Finding>, AppError> {
+struct Analysis {
+    findings: Vec<Finding>,
+    fixes: Vec<FixPreview>,
+}
+
+fn analyze_source(
+    path: &Path,
+    source: &str,
+    engine: &RuleEngine,
+    collect_fixes: bool,
+) -> Result<Analysis, AppError> {
     let document = parse_dockerfile(source)
         .with_context(|| {
             format!(
@@ -234,11 +254,52 @@ fn lint_source(path: &Path, source: &str, engine: &RuleEngine) -> Result<Vec<Fin
             )
         })
         .map_err(|error| AppError::usage(error.to_string()))?;
-    Ok(engine
+    let findings = engine
         .lint(&document)
         .into_iter()
         .map(|finding| finding.with_path(path))
-        .collect())
+        .collect();
+    let fixes = if collect_fixes {
+        engine.fixes(&document)
+    } else {
+        Vec::new()
+    };
+    Ok(Analysis { findings, fixes })
+}
+
+fn apply_fixes(path: &Path, source: &str, fixes: &[FixPreview]) -> Result<(), AppError> {
+    let edits = safe_edits(fixes);
+    if edits.is_empty() {
+        return Ok(());
+    }
+    let edited = apply_edits(source, &edits)
+        .map_err(|error| AppError::internal(format!("failed to apply fixes: {error:?}")))?;
+    fs::write(path, edited)
+        .map_err(|error| AppError::usage(format!("failed to write {}: {error}", path.display())))
+}
+
+fn safe_edits(fixes: &[FixPreview]) -> Vec<TextEdit> {
+    fixes
+        .iter()
+        .filter(|fix| fix.applicability.is_automatically_applicable())
+        .flat_map(|fix| fix.edits.iter().cloned())
+        .collect()
+}
+
+fn render_fix_section(dry_run: bool, fixes: &[FixPreview]) -> String {
+    let mode = if dry_run { "dry-run" } else { "write" };
+    if fixes.is_empty() {
+        return format!("fixes: {mode} mode is enabled; no fixes are currently available\n");
+    }
+
+    let mut rendered = format!(
+        "fixes: {mode} mode is enabled; {} fix(es) available\n",
+        fixes.len()
+    );
+    for fix in fixes {
+        rendered.push_str(&fix.render());
+    }
+    rendered
 }
 
 fn resolve_inputs(paths: &[PathBuf]) -> Result<Vec<PathBuf>, AppError> {

@@ -390,6 +390,21 @@ fn fix_dry_run_reports_without_writing_files() {
 }
 
 #[test]
+fn fix_dry_run_renders_safe_fix_preview() {
+    let output = rudolint_cmd()
+        .args(["check", "--fix", "--dry-run"])
+        .write_stdin("FROM alpine:3.20\nRUN --mount=type=cache,target=/tmp/cache echo ok\n")
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+
+    let output = String::from_utf8(output).expect("stdout should be UTF-8");
+    insta::assert_snapshot!("fix_dry_run_safe_preview", output);
+}
+
+#[test]
 fn fix_write_mode_reports_without_writing_when_no_fixes_exist() {
     let temp = tempfile::TempDir::new().expect("temp dir should be created");
     let dockerfile = temp.path().join("Dockerfile");
@@ -419,12 +434,41 @@ fn fix_write_mode_reports_without_writing_when_no_fixes_exist() {
 }
 
 #[test]
+fn fix_write_mode_applies_safe_fix_idempotently() {
+    let temp = tempfile::TempDir::new().expect("temp dir should be created");
+    let dockerfile = temp.path().join("Dockerfile");
+    std::fs::write(
+        &dockerfile,
+        "FROM alpine:3.20\nRUN --mount=type=cache,target=/tmp/cache echo ok\n",
+    )
+    .expect("Dockerfile should be written");
+
+    rudolint_cmd()
+        .args(["check", "--fix"])
+        .arg(&dockerfile)
+        .assert()
+        .success();
+
+    let once = std::fs::read_to_string(&dockerfile).expect("Dockerfile should exist");
+    insta::assert_snapshot!("fix_write_mode_applied_file", once);
+
+    rudolint_cmd()
+        .args(["check", "--fix"])
+        .arg(&dockerfile)
+        .assert()
+        .success();
+
+    let twice = std::fs::read_to_string(&dockerfile).expect("Dockerfile should exist");
+    assert_eq!(twice, once);
+}
+
+#[test]
 fn fix_dry_run_json_includes_fix_envelope() {
     let output = rudolint_cmd()
         .args(["check", "--fix", "--dry-run", "--format", "json"])
-        .write_stdin("FROM alpine:latest\nWORKDIR app\n")
+        .write_stdin("FROM alpine:3.20\nRUN --mount=type=cache,target=/tmp/cache echo ok\n")
         .assert()
-        .code(1)
+        .success()
         .get_output()
         .stdout
         .clone();
