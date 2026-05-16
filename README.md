@@ -68,6 +68,7 @@ rudolint check . --no-config
 rudolint check --stdin-filename Dockerfile --format json < Dockerfile
 rudolint check . --quiet
 rudolint check . --verbose
+rudolint check . --show-source
 ```
 
 Use stdin:
