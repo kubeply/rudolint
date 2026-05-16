@@ -38,6 +38,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(TrustedRegistries),
         Box::new(UseAptGet),
         Box::new(PinGemVersions),
+        Box::new(NoFromPlatformFlag),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -1023,6 +1024,36 @@ impl Rule for PinGemVersions {
 }
 
 rule_metadata!(
+    NoFromPlatformFlag,
+    "RDL3029",
+    "no-from-platform-flag",
+    Severity::Warning,
+    "avoid --platform in FROM"
+);
+
+impl Rule for NoFromPlatformFlag {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        doc.instructions
+            .iter()
+            .filter(|instruction| instruction.keyword == "FROM")
+            .filter(|instruction| instruction.flags.iter().any(|(name, _)| name == "platform"))
+            .map(|instruction| {
+                diagnostic(
+                    "RDL3029",
+                    Severity::Warning,
+                    "avoid `--platform` in FROM; prefer build-time platform selection",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -1819,10 +1850,10 @@ fn gem_option_takes_value(argument: &str) -> bool {
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3029", "RDL3030", "RDL3032", "RDL3033", "RDL3034", "RDL3035", "RDL3036", "RDL3037",
-        "RDL3038", "RDL3040", "RDL3041", "RDL3042", "RDL3043", "RDL3044", "RDL3045", "RDL3046",
-        "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053", "RDL3054",
-        "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062",
-        "RDL3063", "RDL4001", "RDL4005", "RDL4006",
+        "RDL3030", "RDL3032", "RDL3033", "RDL3034", "RDL3035", "RDL3036", "RDL3037", "RDL3038",
+        "RDL3040", "RDL3041", "RDL3042", "RDL3043", "RDL3044", "RDL3045", "RDL3046", "RDL3047",
+        "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053", "RDL3054", "RDL3055",
+        "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063",
+        "RDL4001", "RDL4005", "RDL4006",
     ]
 }
