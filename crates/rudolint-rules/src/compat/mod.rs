@@ -60,6 +60,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(NoSuperfluousLabels),
         Box::new(NoEmptyLabels),
         Box::new(ValidUrlLabels),
+        Box::new(ValidRfc3339Labels),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -1871,6 +1872,54 @@ impl Rule for ValidUrlLabels {
 }
 
 rule_metadata!(
+    ValidRfc3339Labels,
+    "RDL3053",
+    "valid-rfc3339-labels",
+    Severity::Warning,
+    "validate RFC3339 label values"
+);
+
+impl Rule for ValidRfc3339Labels {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, _doc: &Dockerfile) -> Vec<Finding> {
+        Vec::new()
+    }
+
+    fn check_with_config(&self, doc: &Dockerfile, config: &Config) -> Vec<Finding> {
+        if config.label_schema.is_empty() {
+            return Vec::new();
+        }
+
+        doc.instructions
+            .iter()
+            .filter(|instruction| {
+                instruction.label.as_ref().is_some_and(|label| {
+                    label.pairs.iter().any(|pair| {
+                        config
+                            .label_schema
+                            .get(&pair.key)
+                            .is_some_and(|schema| schema == "rfc3339")
+                            && !docker_label_value_is_empty(&pair.value)
+                            && !is_valid_rfc3339_label_value(&pair.value)
+                    })
+                })
+            })
+            .map(|instruction| {
+                diagnostic(
+                    "RDL3053",
+                    Severity::Warning,
+                    "configured RFC3339 label is not a valid timestamp",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -2496,6 +2545,122 @@ fn is_valid_url_label_value(value: &str) -> bool {
     }
 
     url.has_host()
+}
+
+fn is_valid_rfc3339_label_value(value: &str) -> bool {
+    let value = value.trim_matches(|character| matches!(character, '\'' | '"'));
+    let Some((date, time_and_offset)) = value.split_once('T').or_else(|| value.split_once('t'))
+    else {
+        return false;
+    };
+    if !valid_rfc3339_date(date) {
+        return false;
+    }
+
+    let Some((time, offset)) = split_rfc3339_time_offset(time_and_offset) else {
+        return false;
+    };
+
+    valid_rfc3339_time(time) && valid_rfc3339_offset(offset)
+}
+
+fn valid_rfc3339_date(date: &str) -> bool {
+    let parts = date.split('-').collect::<Vec<_>>();
+    if parts.len() != 3 {
+        return false;
+    }
+
+    let Some(year) = parse_fixed_digits(parts[0], 4) else {
+        return false;
+    };
+    let Some(month) = parse_fixed_digits(parts[1], 2) else {
+        return false;
+    };
+    let Some(day) = parse_fixed_digits(parts[2], 2) else {
+        return false;
+    };
+
+    year > 0 && (1..=12).contains(&month) && (1..=days_in_month(year, month)).contains(&day)
+}
+
+fn days_in_month(year: u32, month: u32) -> u32 {
+    match month {
+        1 | 3 | 5 | 7 | 8 | 10 | 12 => 31,
+        4 | 6 | 9 | 11 => 30,
+        2 if is_leap_year(year) => 29,
+        2 => 28,
+        _ => 0,
+    }
+}
+
+fn is_leap_year(year: u32) -> bool {
+    year.is_multiple_of(4) && (!year.is_multiple_of(100) || year.is_multiple_of(400))
+}
+
+fn split_rfc3339_time_offset(value: &str) -> Option<(&str, &str)> {
+    if let Some(time) = value.strip_suffix('Z').or_else(|| value.strip_suffix('z')) {
+        return Some((time, "Z"));
+    }
+
+    let offset_start = value.rfind(['+', '-'])?;
+    Some((&value[..offset_start], &value[offset_start..]))
+}
+
+fn valid_rfc3339_time(time: &str) -> bool {
+    let parts = time.split(':').collect::<Vec<_>>();
+    if parts.len() != 3 {
+        return false;
+    }
+
+    let Some(hour) = parse_fixed_digits(parts[0], 2) else {
+        return false;
+    };
+    let Some(minute) = parse_fixed_digits(parts[1], 2) else {
+        return false;
+    };
+    let second = parts[2]
+        .split_once('.')
+        .map_or(parts[2], |(second, fraction)| {
+            if fraction.is_empty() || !fraction.chars().all(|character| character.is_ascii_digit())
+            {
+                return "";
+            }
+            second
+        });
+    let Some(second) = parse_fixed_digits(second, 2) else {
+        return false;
+    };
+
+    hour <= 23 && minute <= 59 && second <= 60
+}
+
+fn valid_rfc3339_offset(offset: &str) -> bool {
+    if offset == "Z" {
+        return true;
+    }
+
+    let Some(rest) = offset.strip_prefix(['+', '-']) else {
+        return false;
+    };
+    let parts = rest.split(':').collect::<Vec<_>>();
+    if parts.len() != 2 {
+        return false;
+    }
+
+    let Some(hour) = parse_fixed_digits(parts[0], 2) else {
+        return false;
+    };
+    let Some(minute) = parse_fixed_digits(parts[1], 2) else {
+        return false;
+    };
+
+    hour <= 23 && minute <= 59
+}
+
+fn parse_fixed_digits(value: &str, width: usize) -> Option<u32> {
+    (value.len() == width && value.chars().all(|character| character.is_ascii_digit()))
+        .then(|| value.parse().ok())
+        .flatten()
 }
 
 fn missing_required_labels(doc: &Dockerfile, config: &Config) -> Vec<Finding> {
@@ -3409,7 +3574,7 @@ fn dnf_install_has_unpinned_packages(shell: &str) -> bool {
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3053", "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060",
-        "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
+        "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061",
+        "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
     ]
 }

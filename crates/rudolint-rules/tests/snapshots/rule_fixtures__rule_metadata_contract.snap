@@ -599,6 +599,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3053",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3053.md",
+    "fix": "none",
+    "name": "valid-rfc3339-labels",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "validate RFC3339 label values"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL4000",
     "default_severity": "error",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4000.md",

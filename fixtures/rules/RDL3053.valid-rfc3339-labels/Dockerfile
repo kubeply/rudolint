@@ -1,0 +1,10 @@
+FROM alpine:3.20
+LABEL org.opencontainers.image.created="2026-05-16"
+LABEL org.opencontainers.image.created="2026-05-16T12:30:00Z"
+LABEL org.opencontainers.image.created="2026-05-16t12:30:00Z"
+LABEL org.opencontainers.image.created="2026-05-16T12:30:00z"
+LABEL org.opencontainers.image.created="2026-05-16T12:30:00+02:00"
+LABEL org.opencontainers.image.created="2026-05-16T12:30:00.123Z"
+LABEL org.opencontainers.image.created="2026-02-30T12:30:00Z"
+LABEL org.opencontainers.image.created=""
+LABEL org.opencontainers.image.title="not-a-date"
