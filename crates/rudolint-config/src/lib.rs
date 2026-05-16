@@ -1,6 +1,6 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 use rudolint_diagnostics::Severity;
@@ -44,6 +44,17 @@ impl Config {
         serde_yaml::from_str(&raw).with_context(|| format!("failed to parse {}", path.display()))
     }
 
+    /// Loads an explicit config or discovers `.rudolint.yaml` from the provided start paths.
+    pub fn load_discovered(explicit: Option<&Path>, starts: &[PathBuf]) -> Result<Self> {
+        if let Some(path) = explicit {
+            return Self::load(Some(path));
+        }
+        let Some(path) = discover(starts)? else {
+            return Ok(Self::default());
+        };
+        Self::load(Some(&path))
+    }
+
     /// Returns true when `code` is ignored by either ignore list.
     pub fn ignores(&self, code: &str) -> bool {
         self.ignore.contains(code) || self.extend_ignore.contains(code)
@@ -52,6 +63,40 @@ impl Config {
     /// Returns the configured severity override for `code`, if present.
     pub fn severity_override(&self, code: &str) -> Option<Severity> {
         self.severity.get(code).copied()
+    }
+}
+
+/// Discovers the nearest `.rudolint.yaml` by walking upward from the start paths.
+pub fn discover(starts: &[PathBuf]) -> Result<Option<PathBuf>> {
+    if starts.is_empty() {
+        return discover_from(std::env::current_dir().context("failed to get current directory")?);
+    }
+
+    for start in starts {
+        let start = if start.is_file() {
+            start.parent().unwrap_or(start).to_path_buf()
+        } else {
+            start.clone()
+        };
+        if let Some(path) = discover_from(start)? {
+            return Ok(Some(path));
+        }
+    }
+    Ok(None)
+}
+
+fn discover_from(start: PathBuf) -> Result<Option<PathBuf>> {
+    let mut current = start
+        .canonicalize()
+        .with_context(|| format!("failed to resolve {}", start.display()))?;
+    loop {
+        let candidate = current.join(".rudolint.yaml");
+        if candidate.is_file() {
+            return Ok(Some(candidate));
+        }
+        if !current.pop() {
+            return Ok(None);
+        }
     }
 }
 

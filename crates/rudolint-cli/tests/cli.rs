@@ -156,6 +156,84 @@ fn explicit_config_can_override_severity() {
 }
 
 #[test]
+fn discovers_nearest_dot_config_from_input_directory() {
+    let temp = TempDir::new().expect("temp dir should be created");
+    let nested = temp.path().join("service");
+    std::fs::create_dir(&nested).expect("nested dir should be created");
+    std::fs::write(temp.path().join(".rudolint.yaml"), "ignore:\n  - RDL3000\n")
+        .expect("config should be written");
+    std::fs::write(
+        nested.join("Dockerfile"),
+        "FROM alpine:latest\nWORKDIR app\n",
+    )
+    .expect("fixture should be written");
+
+    let output = rudolint_cmd()
+        .args(["check", "--format", "json", "--failure-threshold", "error"])
+        .arg(temp.path())
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+
+    let output = String::from_utf8(output).expect("stdout should be UTF-8");
+    let mut output = normalized_json(&output);
+    normalize_path_prefix(&mut output, temp.path(), "$TEMP");
+    insta::assert_json_snapshot!("discovered_config_json_findings", output);
+}
+
+#[test]
+fn explicit_config_takes_precedence_over_discovered_config() {
+    let temp = TempDir::new().expect("temp dir should be created");
+    let dockerfile = temp.path().join("Dockerfile");
+    let explicit = temp.path().join("explicit.yaml");
+    std::fs::write(temp.path().join(".rudolint.yaml"), "ignore:\n  - RDL3000\n")
+        .expect("discovered config should be written");
+    std::fs::write(&explicit, "ignore:\n  - RDL3007\n").expect("explicit config should be written");
+    std::fs::write(&dockerfile, "FROM alpine:latest\nWORKDIR app\n")
+        .expect("fixture should be written");
+
+    let output = rudolint_cmd()
+        .args([
+            "check",
+            "--format",
+            "json",
+            "--failure-threshold",
+            "error",
+            "--config",
+        ])
+        .arg(&explicit)
+        .arg(&dockerfile)
+        .assert()
+        .failure()
+        .get_output()
+        .stdout
+        .clone();
+
+    let output = String::from_utf8(output).expect("stdout should be UTF-8");
+    let mut output = normalized_json(&output);
+    normalize_path_prefix(&mut output, temp.path(), "$TEMP");
+    insta::assert_json_snapshot!("explicit_config_precedence_json_findings", output);
+}
+
+#[test]
+fn no_config_disables_discovery() {
+    let temp = TempDir::new().expect("temp dir should be created");
+    let dockerfile = temp.path().join("Dockerfile");
+    std::fs::write(temp.path().join(".rudolint.yaml"), "ignore:\n  - RDL3000\n")
+        .expect("config should be written");
+    std::fs::write(&dockerfile, "FROM alpine:latest\nWORKDIR app\n")
+        .expect("fixture should be written");
+
+    rudolint_cmd()
+        .args(["check", "--no-config", "--failure-threshold", "error"])
+        .arg(&dockerfile)
+        .assert()
+        .code(1);
+}
+
+#[test]
 fn clean_input_exits_successfully() {
     rudolint_cmd()
         .args(["check", "--failure-threshold", "warning"])
