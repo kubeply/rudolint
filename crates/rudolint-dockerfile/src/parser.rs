@@ -10,6 +10,7 @@ pub struct Dockerfile {
     pub escape: Option<EscapeDirective>,
     /// Dockerfile `# check=` parser directives, in source order.
     pub checks: Vec<CheckDirective>,
+    /// Dockerfile comments, in source order.
     pub comments: Vec<Comment>,
     pub instructions: Vec<Instruction>,
     pub has_buildkit_features: bool,
@@ -39,10 +40,14 @@ pub struct CheckDirective {
     pub line: usize,
 }
 
+/// Dockerfile comment with its source location.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Comment {
+    /// Trimmed comment text, including the leading `#`.
     pub text: String,
+    /// One-based source line where the comment appears.
     pub line: usize,
+    /// Source span covering the original comment line.
     pub span: Span,
 }
 
