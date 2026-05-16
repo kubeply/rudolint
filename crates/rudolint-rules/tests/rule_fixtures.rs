@@ -154,6 +154,22 @@ fn snapshots_rdl3007_no_latest_tag_fixture() {
 }
 
 #[test]
+fn snapshots_rdl3011_valid_expose_port_fixture() {
+    let source = read_fixture("rules/RDL3011.expose-port-validation/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDL3011")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdl3011_valid_expose_port_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rule_selection_matrix() {
     let source = read_fixture("rules/default-basic/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
