@@ -126,6 +126,61 @@ pub enum FixApplicability {
     NotAvailable { reason: String },
 }
 
+impl FixApplicability {
+    /// Creates a safe applicability value.
+    pub fn safe() -> Self {
+        Self::Safe
+    }
+
+    /// Creates a manual applicability value.
+    pub fn manual() -> Self {
+        Self::Manual
+    }
+
+    /// Creates a not-available applicability value with a reason.
+    pub fn not_available(reason: impl Into<String>) -> Self {
+        Self::NotAvailable {
+            reason: reason.into(),
+        }
+    }
+
+    /// Returns the [`FixApplicabilityKind`] for this applicability.
+    pub fn kind(&self) -> FixApplicabilityKind {
+        match self {
+            Self::Safe => FixApplicabilityKind::Safe,
+            Self::Manual => FixApplicabilityKind::Manual,
+            Self::NotAvailable { .. } => FixApplicabilityKind::NotAvailable,
+        }
+    }
+
+    /// Returns true when this fix can be applied automatically.
+    pub fn is_automatically_applicable(&self) -> bool {
+        matches!(self, Self::Safe)
+    }
+}
+
+/// Reason-free applicability classification.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FixApplicabilityKind {
+    /// Safe automatic fix.
+    Safe,
+    /// Manual fix.
+    Manual,
+    /// No fix is available.
+    NotAvailable,
+}
+
+impl FixApplicabilityKind {
+    /// Returns the stable string identifier for this [`FixApplicabilityKind`].
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Safe => "safe",
+            Self::Manual => "manual",
+            Self::NotAvailable => "not-available",
+        }
+    }
+}
+
 /// Human-facing preview of a suggested fix.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FixPreview {
@@ -146,17 +201,13 @@ impl FixPreview {
     pub fn render(&self) -> String {
         let mut output = String::new();
         let _ = writeln!(output, "title: {}", self.title);
-        match &self.applicability {
-            FixApplicability::Safe => {
-                let _ = writeln!(output, "applicability: safe");
-            }
-            FixApplicability::Manual => {
-                let _ = writeln!(output, "applicability: manual");
-            }
-            FixApplicability::NotAvailable { reason } => {
-                let _ = writeln!(output, "applicability: not-available");
-                let _ = writeln!(output, "reason: {reason}");
-            }
+        let _ = writeln!(
+            output,
+            "applicability: {}",
+            self.applicability.kind().as_str()
+        );
+        if let FixApplicability::NotAvailable { reason } = &self.applicability {
+            let _ = writeln!(output, "reason: {reason}");
         }
         let _ = writeln!(output, "edits:");
         for edit in &self.edits {
@@ -196,7 +247,7 @@ mod tests {
     fn snapshots_safe_fix_preview() {
         let preview = FixPreview {
             title: "replace latest tag".to_string(),
-            applicability: FixApplicability::Safe,
+            applicability: FixApplicability::safe(),
             edits: vec![TextEdit::replace(
                 SourceSpan {
                     line: 1,
@@ -214,7 +265,7 @@ mod tests {
     fn snapshots_edit_primitives() {
         let preview = FixPreview {
             title: "edit primitive matrix".to_string(),
-            applicability: FixApplicability::Manual,
+            applicability: FixApplicability::manual(),
             edits: vec![
                 TextEdit::replace(
                     SourceSpan {
@@ -305,12 +356,27 @@ mod tests {
     fn snapshots_no_fix_rationale() {
         let preview = FixPreview {
             title: "secret-like build argument".to_string(),
-            applicability: FixApplicability::NotAvailable {
-                reason: "cannot infer the correct secret mount without build context".to_string(),
-            },
+            applicability: FixApplicability::not_available(
+                "cannot infer the correct secret mount without build context",
+            ),
             edits: Vec::new(),
         };
 
         insta::assert_snapshot!("no_fix_rationale", preview.render());
+    }
+
+    #[test]
+    fn applicability_kind_is_stable() {
+        assert_eq!(FixApplicability::safe().kind().as_str(), "safe");
+        assert_eq!(FixApplicability::manual().kind().as_str(), "manual");
+        assert_eq!(
+            FixApplicability::not_available("needs context")
+                .kind()
+                .as_str(),
+            "not-available"
+        );
+        assert!(FixApplicability::safe().is_automatically_applicable());
+        assert!(!FixApplicability::manual().is_automatically_applicable());
+        assert!(!FixApplicability::not_available("needs context").is_automatically_applicable());
     }
 }
