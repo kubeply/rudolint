@@ -765,6 +765,7 @@ dependencies = [
  "rudolint-shell",
  "rudolint-source",
  "rudolint-test",
+ "semver",
  "serde",
  "serde_json",
  "spdx",

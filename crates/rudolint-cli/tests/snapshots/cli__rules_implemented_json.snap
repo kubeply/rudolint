@@ -346,6 +346,12 @@ expression: normalized_json(&output)
     "summary": "validate git hash label values"
   },
   {
+    "code": "RDL3056",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "validate semantic version label values"
+  },
+  {
     "code": "RDL4000",
     "severity": "error",
     "status": "implemented",

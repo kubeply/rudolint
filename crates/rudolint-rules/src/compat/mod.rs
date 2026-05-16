@@ -63,6 +63,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(ValidRfc3339Labels),
         Box::new(ValidSpdxLabels),
         Box::new(ValidGitHashLabels),
+        Box::new(ValidSemverLabels),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -2018,6 +2019,54 @@ impl Rule for ValidGitHashLabels {
 }
 
 rule_metadata!(
+    ValidSemverLabels,
+    "RDL3056",
+    "valid-semver-labels",
+    Severity::Warning,
+    "validate semantic version label values"
+);
+
+impl Rule for ValidSemverLabels {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, _doc: &Dockerfile) -> Vec<Finding> {
+        Vec::new()
+    }
+
+    fn check_with_config(&self, doc: &Dockerfile, config: &Config) -> Vec<Finding> {
+        if config.label_schema.is_empty() {
+            return Vec::new();
+        }
+
+        doc.instructions
+            .iter()
+            .filter(|instruction| {
+                instruction.label.as_ref().is_some_and(|label| {
+                    label.pairs.iter().any(|pair| {
+                        config
+                            .label_schema
+                            .get(&pair.key)
+                            .is_some_and(|schema| schema == "semver")
+                            && !docker_label_value_is_empty(&pair.value)
+                            && !is_valid_semver_label_value(&pair.value)
+                    })
+                })
+            })
+            .map(|instruction| {
+                diagnostic(
+                    "RDL3056",
+                    Severity::Warning,
+                    "configured semantic version label is not valid semver",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -2772,6 +2821,11 @@ fn is_valid_git_hash_label_value(value: &str) -> bool {
         && value
             .chars()
             .all(|character| matches!(character, '0'..='9' | 'a'..='f'))
+}
+
+fn is_valid_semver_label_value(value: &str) -> bool {
+    let value = value.trim_matches(|character| matches!(character, '\'' | '"'));
+    semver::Version::parse(value).is_ok()
 }
 
 fn missing_required_labels(doc: &Dockerfile, config: &Config) -> Vec<Finding> {
@@ -3685,7 +3739,7 @@ fn dnf_install_has_unpinned_packages(shell: &str) -> bool {
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063",
-        "RDL4001", "RDL4005", "RDL4006",
+        "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001",
+        "RDL4005", "RDL4006",
     ]
 }
