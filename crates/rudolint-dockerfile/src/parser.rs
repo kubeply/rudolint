@@ -89,6 +89,8 @@ pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
     let mut current = String::new();
     let mut start_line = 0;
     let mut start_byte = 0;
+    let mut start_escape = '\\';
+    let mut escape_character = '\\';
     let mut byte_offset = 0;
 
     for (index, segment) in source.split_inclusive('\n').enumerate() {
@@ -122,6 +124,7 @@ pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
                             character,
                             line: line_number,
                         });
+                        escape_character = character;
                     }
                 } else if let Some(value) = directive_value(trimmed, "check") {
                     checks.push(CheckDirective {
@@ -134,6 +137,7 @@ pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
             }
             start_line = line_number;
             start_byte = byte_offset;
+            start_escape = escape_character;
         }
 
         if !current.is_empty() {
@@ -141,13 +145,13 @@ pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
         }
         current.push_str(line);
 
-        if continues(line) {
+        if continues(line, start_escape) {
             byte_offset += segment.len();
             continue;
         }
 
         if let Some(instruction) =
-            parse_instruction(&current, start_line, start_byte, &source_file)?
+            parse_instruction(&current, start_line, start_byte, start_escape, &source_file)?
         {
             instructions.push(instruction);
         }
@@ -157,7 +161,7 @@ pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
 
     if !current.trim().is_empty()
         && let Some(instruction) =
-            parse_instruction(&current, start_line, start_byte, &source_file)?
+            parse_instruction(&current, start_line, start_byte, start_escape, &source_file)?
     {
         instructions.push(instruction);
     }
@@ -181,15 +185,28 @@ fn directive_value<'a>(comment: &'a str, name: &str) -> Option<&'a str> {
         .then_some(value.trim())
 }
 
-fn continues(line: &str) -> bool {
+fn continues(line: &str, escape: char) -> bool {
     let trimmed = line.trim_end();
-    trimmed.ends_with('\\') && !trimmed.ends_with("\\\\")
+    trimmed.ends_with(escape) && !ends_with_escaped_escape(trimmed, escape)
+}
+
+fn ends_with_escaped_escape(trimmed: &str, escape: char) -> bool {
+    let mut count = 0;
+    for character in trimmed.chars().rev() {
+        if character == escape {
+            count += 1;
+        } else {
+            break;
+        }
+    }
+    count > 1 && count % 2 == 0
 }
 
 fn parse_instruction(
     raw: &str,
     line: usize,
     start_byte: usize,
+    escape: char,
     source_file: &SourceFile,
 ) -> Result<Option<Instruction>, ParserError> {
     let trimmed = raw.trim_start();
@@ -207,7 +224,7 @@ fn parse_instruction(
             keyword_span,
             args: String::new(),
             args_span: None,
-            continuations: parse_continuations(raw, line, start_byte, source_file),
+            continuations: parse_continuations(raw, line, start_byte, escape, source_file),
             flags: Vec::new(),
             mounts: Vec::new(),
             heredocs: Vec::new(),
@@ -226,7 +243,7 @@ fn parse_instruction(
     let args = rest.trim().to_string();
     let args_span =
         (!args.is_empty()).then(|| source_file.span(args_start, args_start + args.len()));
-    let continuations = parse_continuations(raw, line, start_byte, source_file);
+    let continuations = parse_continuations(raw, line, start_byte, escape, source_file);
     let flags = parse_flags(&args);
     let mounts = flags
         .iter()
@@ -266,16 +283,17 @@ fn parse_continuations(
     raw: &str,
     start_line: usize,
     start_byte: usize,
+    escape: char,
     source_file: &SourceFile,
 ) -> Vec<LineContinuation> {
     let mut continuations = Vec::new();
     let mut line_start_byte = start_byte;
     for (line_index, line) in raw.split('\n').enumerate() {
-        if continues(line) {
+        if continues(line, escape) {
             let continuation_byte = line_start_byte + line.trim_end().len() - 1;
             continuations.push(LineContinuation {
                 line: start_line + line_index,
-                escape: '\\',
+                escape,
                 span: source_file.span(continuation_byte, continuation_byte + 1),
             });
         }

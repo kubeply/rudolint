@@ -18,6 +18,7 @@ fn snapshots_parser_matrix() {
         ("directives", "parser/directives/Dockerfile"),
         ("continuations", "parser/continuations/Dockerfile"),
         ("heredocs", "parser/heredocs/Dockerfile"),
+        ("windows_escape", "parser/windows-escape/Dockerfile"),
         ("run_mount", "parser/run-mount/Dockerfile"),
         ("from_platform", "parser/from-platform/Dockerfile"),
         ("copy_from", "parser/copy-from/Dockerfile"),
