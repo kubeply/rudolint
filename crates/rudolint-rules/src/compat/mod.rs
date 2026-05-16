@@ -1,32 +1,12 @@
 use std::collections::BTreeSet;
 
-use crate::{Rule, RuleInfo, RuleStatus};
+use crate::{Rule, metadata::diagnostic, metadata::rule};
 use rudolint_diagnostics::{Finding, Severity};
-use rudolint_dockerfile::{Comment, Dockerfile, Instruction};
-use rudolint_policy::{LegacySuppression, PolicyProfile};
+use rudolint_dockerfile::{Comment, Dockerfile};
+use rudolint_policy::LegacySuppression;
 
-macro_rules! rule {
-    ($name:ident, $code:literal, $severity:expr, $summary:literal, $body:expr) => {
-        struct $name;
-        impl Rule for $name {
-            fn info(&self) -> RuleInfo {
-                RuleInfo {
-                    code: $code,
-                    severity: $severity,
-                    summary: $summary,
-                    status: RuleStatus::Implemented,
-                }
-            }
-
-            fn check(&self, document: &Dockerfile) -> Vec<Finding> {
-                $body(document)
-            }
-        }
-    };
-}
-
-pub fn implemented_rules(profile: PolicyProfile) -> Vec<Box<dyn Rule>> {
-    let mut rules: Vec<Box<dyn Rule>> = vec![
+pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
+    vec![
         Box::new(InlineIgnore),
         Box::new(AbsoluteWorkdir),
         Box::new(LastUserNotRoot),
@@ -40,56 +20,7 @@ pub fn implemented_rules(profile: PolicyProfile) -> Vec<Box<dyn Rule>> {
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
-    ];
-
-    if profile.includes_buildkit_native_rules() {
-        rules.extend([
-            Box::new(BuildkitSyntaxWhenFeaturesUsed) as Box<dyn Rule>,
-            Box::new(SecretLikeArgOrEnv),
-            Box::new(SecretInRun),
-            Box::new(CacheMountForPackageInstall),
-        ]);
-    }
-
-    rules
-}
-
-pub fn catalog(profile: PolicyProfile) -> Vec<RuleInfo> {
-    let mut rules = implemented_rules(profile)
-        .into_iter()
-        .map(|rule| rule.info())
-        .collect::<Vec<_>>();
-
-    if profile.includes_compatibility_rules() {
-        rules.extend(planned_compat_rules().into_iter().map(|code| RuleInfo {
-            code,
-            severity: Severity::Warning,
-            summary: "tracked for compatibility parity",
-            status: RuleStatus::Planned,
-        }));
-    }
-
-    if profile.includes_shell_catalog() {
-        rules.extend(shell_rule_catalog().into_iter().map(|code| RuleInfo {
-            code,
-            severity: Severity::Warning,
-            summary: "shell diagnostics delegated to the shell-analysis layer",
-            status: RuleStatus::External,
-        }));
-    }
-
-    rules.sort_by_key(|rule| rule.code);
-    rules.dedup_by_key(|rule| rule.code);
-    rules
-}
-
-fn diagnostic(
-    code: &'static str,
-    severity: Severity,
-    message: impl Into<String>,
-    instruction: &Instruction,
-) -> Finding {
-    Finding::new(code, severity, message, instruction.line, 1)
+    ]
 }
 
 rule!(
@@ -390,122 +321,6 @@ rule!(
     )
 );
 
-rule!(
-    BuildkitSyntaxWhenFeaturesUsed,
-    "RDK1000",
-    Severity::Info,
-    "require explicit syntax directive for BuildKit-only features",
-    |doc: &Dockerfile| {
-        if doc.has_buildkit_features && doc.syntax.is_none() {
-            let Some(instruction) = doc
-                .instructions
-                .iter()
-                .find(|instruction| instruction.has_buildkit_features())
-            else {
-                return Vec::new();
-            };
-            vec![diagnostic(
-                "RDK1000",
-                Severity::Info,
-                "BuildKit features are used without an explicit # syntax directive",
-                instruction,
-            )]
-        } else {
-            Vec::new()
-        }
-    }
-);
-
-rule!(
-    SecretLikeArgOrEnv,
-    "RDK1001",
-    Severity::Warning,
-    "reject secret-like ARG and ENV names",
-    |doc: &Dockerfile| {
-        let secret_words = ["SECRET", "TOKEN", "PASSWORD", "PRIVATE_KEY", "ACCESS_KEY"];
-        doc.instructions
-            .iter()
-            .filter(|instruction| matches!(instruction.keyword.as_str(), "ARG" | "ENV"))
-            .filter(|instruction| {
-                let upper = instruction.args.to_ascii_uppercase();
-                secret_words.iter().any(|word| upper.contains(word))
-            })
-            .map(|instruction| {
-                diagnostic(
-                    "RDK1001",
-                    Severity::Warning,
-                    "secret-like values should use BuildKit secret mounts instead of ARG or ENV",
-                    instruction,
-                )
-            })
-            .collect()
-    }
-);
-
-rule!(
-    SecretInRun,
-    "RDK1002",
-    Severity::Warning,
-    "prefer BuildKit secret mounts for secret-consuming RUN steps",
-    |doc: &Dockerfile| {
-        doc.instructions
-            .iter()
-            .filter(|instruction| instruction.keyword == "RUN")
-            .filter(|instruction| {
-                let upper = instruction.args.to_ascii_uppercase();
-                upper.contains("TOKEN=") || upper.contains("PASSWORD=") || upper.contains("SECRET=")
-            })
-            .filter(|instruction| {
-                !instruction
-                    .mounts
-                    .iter()
-                    .any(|mount| mount.mount_type == "secret")
-            })
-            .map(|instruction| {
-                diagnostic(
-                    "RDK1002",
-                    Severity::Warning,
-                    "RUN appears to pass a secret without a type=secret mount",
-                    instruction,
-                )
-            })
-            .collect()
-    }
-);
-
-rule!(
-    CacheMountForPackageInstall,
-    "RDK1003",
-    Severity::Info,
-    "prefer BuildKit cache mounts for package-manager caches",
-    |doc: &Dockerfile| {
-        doc.instructions
-            .iter()
-            .filter(|instruction| instruction.keyword == "RUN")
-            .filter(|instruction| {
-                instruction.args.contains("apt-get install")
-                    || instruction.args.contains("apk add")
-                    || instruction.args.contains("dnf install")
-                    || instruction.args.contains("yum install")
-            })
-            .filter(|instruction| {
-                !instruction
-                    .mounts
-                    .iter()
-                    .any(|mount| mount.mount_type == "cache")
-            })
-            .map(|instruction| {
-                diagnostic(
-                    "RDK1003",
-                    Severity::Info,
-                    "package install step can use a BuildKit cache mount for repeat builds",
-                    instruction,
-                )
-            })
-            .collect()
-    }
-);
-
 fn duplicates(
     doc: &Dockerfile,
     keyword: &str,
@@ -533,7 +348,7 @@ fn is_windows_absolute(path: &str) -> bool {
     bytes.len() >= 3 && bytes[0].is_ascii_alphabetic() && bytes[1] == b':' && bytes[2] == b'\\'
 }
 
-fn planned_compat_rules() -> Vec<&'static str> {
+pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
         "RDL3001", "RDL3003", "RDL3004", "RDL3008", "RDL3009", "RDL3010", "RDL3013", "RDL3014",
         "RDL3015", "RDL3016", "RDL3018", "RDL3019", "RDL3021", "RDL3022", "RDL3023", "RDL3026",
@@ -542,14 +357,5 @@ fn planned_compat_rules() -> Vec<&'static str> {
         "RDL3045", "RDL3046", "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052",
         "RDL3053", "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060",
         "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
-    ]
-}
-
-fn shell_rule_catalog() -> Vec<&'static str> {
-    vec![
-        "RSC1000", "RSC1001", "RSC1007", "RSC1010", "RSC1018", "RSC1035", "RSC1045", "RSC1065",
-        "RSC1066", "RSC1077", "RSC1078", "RSC1079", "RSC1081", "RSC1083", "RSC1086", "RSC1095",
-        "RSC2002", "RSC2015", "RSC2026", "RSC2035", "RSC2046", "RSC2086", "RSC2140", "RSC2154",
-        "RSC2155", "RSC2164", "RSC2181", "RSC2196",
     ]
 }
