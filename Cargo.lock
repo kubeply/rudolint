@@ -513,6 +513,7 @@ dependencies = [
  "rudolint-dockerfile",
  "rudolint-output",
  "rudolint-rules",
+ "rudolint-settings",
  "rudolint-test",
  "serde_json",
  "tempfile",
