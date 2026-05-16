@@ -73,6 +73,10 @@ pub struct CheckArgs {
     /// Print a short run summary to stderr.
     #[arg(long)]
     pub verbose: bool,
+
+    /// Include source excerpts in human output.
+    #[arg(long)]
+    pub show_source: bool,
 }
 
 impl Default for CheckArgs {
@@ -88,6 +92,7 @@ impl Default for CheckArgs {
             stdin_filename: PathBuf::from("<stdin>"),
             quiet: false,
             verbose: false,
+            show_source: false,
         }
     }
 }

@@ -1,5 +1,6 @@
 mod cli;
 
+use std::collections::BTreeMap;
 use std::fs;
 use std::io::{self, Read};
 use std::path::{Path, PathBuf};
@@ -81,6 +82,7 @@ fn run_check(args: cli::CheckArgs) -> Result<ExitCode, AppError> {
     let inputs = resolve_inputs(&args.paths)?;
     let input_count = if inputs.is_empty() { 1 } else { inputs.len() };
     let mut findings = Vec::new();
+    let mut sources = BTreeMap::new();
 
     if inputs.is_empty() {
         let mut source = String::new();
@@ -88,17 +90,19 @@ fn run_check(args: cli::CheckArgs) -> Result<ExitCode, AppError> {
             AppError::usage(format!("failed to read Dockerfile from stdin: {error}"))
         })?;
         findings.extend(lint_source(&args.stdin_filename, &source, &engine)?);
+        sources.insert(args.stdin_filename.clone(), source);
     } else {
         for path in inputs {
             let source = fs::read_to_string(&path).map_err(|error| {
                 AppError::usage(format!("failed to read {}: {error}", path.display()))
             })?;
             findings.extend(lint_source(&path, &source, &engine)?);
+            sources.insert(path, source);
         }
     }
 
     if !args.quiet {
-        let rendered = match args.format {
+        let mut rendered = match args.format {
             OutputFormat::Human => rudolint_output::human(&findings),
             OutputFormat::Json => rudolint_output::json(&findings).map_err(|error| {
                 AppError::internal(format!("failed to render JSON output: {error}"))
@@ -107,6 +111,9 @@ fn run_check(args: cli::CheckArgs) -> Result<ExitCode, AppError> {
                 AppError::internal(format!("failed to render SARIF output: {error}"))
             })?,
         };
+        if args.show_source && matches!(args.format, OutputFormat::Human) {
+            rendered.push_str(&source_excerpt(&findings, &sources));
+        }
         print!("{rendered}");
     }
 
@@ -202,6 +209,25 @@ fn resolve_inputs(paths: &[PathBuf]) -> Result<Vec<PathBuf>, AppError> {
     }
     files.sort();
     Ok(files)
+}
+
+fn source_excerpt(findings: &[Finding], sources: &BTreeMap<PathBuf, String>) -> String {
+    let mut rendered = String::new();
+    for finding in findings {
+        let Some(source) = sources.get(&finding.path) else {
+            continue;
+        };
+        let Some(line) = source.lines().nth(finding.line.saturating_sub(1)) else {
+            continue;
+        };
+        rendered.push_str(&format!(
+            "  |\n{:>3} | {}\n  | {}^\n",
+            finding.line,
+            line,
+            " ".repeat(finding.column.saturating_sub(1))
+        ));
+    }
+    rendered
 }
 
 impl From<anyhow::Error> for AppError {
