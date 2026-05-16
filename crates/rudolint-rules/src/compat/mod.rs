@@ -58,6 +58,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(ValidLabelKey),
         Box::new(MissingRequiredLabels),
         Box::new(NoSuperfluousLabels),
+        Box::new(NoEmptyLabels),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -1777,6 +1778,50 @@ impl Rule for NoSuperfluousLabels {
 }
 
 rule_metadata!(
+    NoEmptyLabels,
+    "RDL3051",
+    "no-empty-labels",
+    Severity::Warning,
+    "reject empty configured label values"
+);
+
+impl Rule for NoEmptyLabels {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, _doc: &Dockerfile) -> Vec<Finding> {
+        Vec::new()
+    }
+
+    fn check_with_config(&self, doc: &Dockerfile, config: &Config) -> Vec<Finding> {
+        if config.label_schema.is_empty() {
+            return Vec::new();
+        }
+
+        let mut findings = Vec::new();
+
+        for instruction in &doc.instructions {
+            if let Some(label) = &instruction.label {
+                for pair in label.pairs.iter().filter(|pair| {
+                    config.label_schema.contains_key(&pair.key)
+                        && docker_label_value_is_empty(&pair.value)
+                }) {
+                    findings.push(diagnostic(
+                        "RDL3051",
+                        Severity::Warning,
+                        format!("configured label `{}` value is empty", pair.key),
+                        instruction,
+                    ));
+                }
+            }
+        }
+
+        findings
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -2373,6 +2418,13 @@ fn is_valid_docker_label_key(key: &str) -> bool {
         && !key.starts_with("org.dockerproject.")
         && !key.contains("..")
         && !key.contains("--")
+}
+
+fn docker_label_value_is_empty(value: &str) -> bool {
+    value
+        .trim_matches(|character| matches!(character, '\'' | '"'))
+        .trim()
+        .is_empty()
 }
 
 fn missing_required_labels(doc: &Dockerfile, config: &Config) -> Vec<Finding> {
@@ -3286,7 +3338,7 @@ fn dnf_install_has_unpinned_packages(shell: &str) -> bool {
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3051", "RDL3052", "RDL3053", "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058",
-        "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
+        "RDL3052", "RDL3053", "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059",
+        "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
     ]
 }

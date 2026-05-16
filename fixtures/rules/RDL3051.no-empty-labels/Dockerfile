@@ -1,0 +1,7 @@
+FROM alpine:3.20
+LABEL org.opencontainers.image.title=""
+LABEL org.opencontainers.image.title="   "
+LABEL org.opencontainers.image.source=
+LABEL org.opencontainers.image.title="rudolint"
+LABEL org.opencontainers.image.source="https://github.com/kubeply/rudolint"
+LABEL com.example.extra=""
