@@ -27,7 +27,15 @@ expression: document_json(&document)
       ],
       "form": {
         "kind": "shell",
-        "value": "--platform=$BUILDPLATFORM alpine:3.20 AS build"
+        "span": {
+          "end_byte": 51,
+          "end_column": 52,
+          "end_line": 1,
+          "start_byte": 5,
+          "start_column": 6,
+          "start_line": 1
+        },
+        "text": "--platform=$BUILDPLATFORM alpine:3.20 AS build"
       },
       "heredocs": [],
       "keyword": "FROM",
@@ -69,7 +77,15 @@ expression: document_json(&document)
       ],
       "form": {
         "kind": "shell",
-        "value": "--platform=$TARGETPLATFORM scratch"
+        "span": {
+          "end_byte": 91,
+          "end_column": 40,
+          "end_line": 2,
+          "start_byte": 57,
+          "start_column": 6,
+          "start_line": 2
+        },
+        "text": "--platform=$TARGETPLATFORM scratch"
       },
       "heredocs": [],
       "keyword": "FROM",

@@ -38,7 +38,15 @@ expression: document_json(&document)
       "flags": [],
       "form": {
         "kind": "shell",
-        "value": "mcr.microsoft.com/windows/nanoserver:ltsc2022"
+        "span": {
+          "end_byte": 61,
+          "end_column": 51,
+          "end_line": 2,
+          "start_byte": 16,
+          "start_column": 6,
+          "start_line": 2
+        },
+        "text": "mcr.microsoft.com/windows/nanoserver:ltsc2022"
       },
       "heredocs": [],
       "keyword": "FROM",
@@ -88,7 +96,15 @@ expression: document_json(&document)
       "flags": [],
       "form": {
         "kind": "shell",
-        "value": "powershell -Command `\n    Write-Host \"hello\""
+        "span": {
+          "end_byte": 110,
+          "end_column": 23,
+          "end_line": 4,
+          "start_byte": 66,
+          "start_column": 5,
+          "start_line": 3
+        },
+        "text": "powershell -Command `\n    Write-Host \"hello\""
       },
       "heredocs": [],
       "keyword": "RUN",

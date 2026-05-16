@@ -110,9 +110,10 @@ fn instruction_form_json(form: &InstructionForm) -> Value {
             "raw": raw,
             "error": error,
         }),
-        InstructionForm::Shell(value) => json!({
+        InstructionForm::Shell { text, span } => json!({
             "kind": "shell",
-            "value": value,
+            "text": text,
+            "span": span,
         }),
     }
 }

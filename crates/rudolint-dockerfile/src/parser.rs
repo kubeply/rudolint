@@ -66,7 +66,7 @@ pub enum InstructionForm {
     Empty,
     Json(Vec<String>),
     InvalidJson { raw: String, error: String },
-    Shell(String),
+    Shell { text: String, span: Span },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -253,7 +253,7 @@ fn parse_instruction(
     let args = rest.trim().to_string();
     let args_span =
         (!args.is_empty()).then(|| source_file.span(args_start, args_start + args.len()));
-    let form = parse_instruction_form(&args);
+    let form = parse_instruction_form(&args, args_span);
     let continuations = parse_continuations(raw, line, start_byte, escape, source_file);
     let flags = parse_flags(&args);
     let mounts = flags
@@ -279,7 +279,7 @@ fn parse_instruction(
     }))
 }
 
-fn parse_instruction_form(args: &str) -> InstructionForm {
+fn parse_instruction_form(args: &str, args_span: Option<Span>) -> InstructionForm {
     if args.is_empty() {
         return InstructionForm::Empty;
     }
@@ -294,7 +294,10 @@ fn parse_instruction_form(args: &str) -> InstructionForm {
         };
     }
 
-    InstructionForm::Shell(args.to_string())
+    InstructionForm::Shell {
+        text: args.to_string(),
+        span: args_span.expect("non-empty args should have a span"),
+    }
 }
 
 fn parse_flags(args: &str) -> Vec<(String, String)> {
