@@ -588,7 +588,8 @@ fn emits_rules_implemented_text() {
         .stdout(predicates::str::contains("RDL3034"))
         .stdout(predicates::str::contains("RDL3035"))
         .stdout(predicates::str::contains("RDL3036"))
-        .stdout(predicates::str::contains("RDL3037").not())
+        .stdout(predicates::str::contains("RDL3037"))
+        .stdout(predicates::str::contains("RDL3038").not())
         .stdout(predicates::str::contains("RSC1000").not());
 }
 
