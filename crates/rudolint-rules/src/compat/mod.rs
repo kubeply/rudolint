@@ -44,6 +44,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(PinYumVersions),
         Box::new(ZypperInstallAssumeYes),
         Box::new(NoZypperDistUpgrade),
+        Box::new(ZypperClean),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -1209,6 +1210,36 @@ impl Rule for NoZypperDistUpgrade {
 }
 
 rule_metadata!(
+    ZypperClean,
+    "RDL3036",
+    "zypper-clean",
+    Severity::Warning,
+    "clean zypper metadata after use"
+);
+
+impl Rule for ZypperClean {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        doc.instructions
+            .iter()
+            .filter(|instruction| instruction.keyword == "RUN")
+            .filter(|instruction| zypper_use_missing_clean(&instruction.args))
+            .map(|instruction| {
+                diagnostic(
+                    "RDL3036",
+                    Severity::Warning,
+                    "clean zypper metadata with `zypper clean` in the same RUN layer",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -2211,11 +2242,36 @@ fn shell_uses_zypper_dist_upgrade(shell: &str) -> bool {
         })
 }
 
+fn zypper_use_missing_clean(shell: &str) -> bool {
+    let invocations = detect_command_invocations(shell);
+    let last_zypper_use_index = invocations.iter().rposition(|invocation| {
+        if invocation.command != "zypper" {
+            return false;
+        }
+
+        zypper_subcommand_index(&invocation.arguments)
+            .is_some_and(|index| !matches!(invocation.arguments[index].as_str(), "clean" | "cc"))
+    });
+
+    let has_clean_after_last_use = last_zypper_use_index.is_some_and(|use_index| {
+        invocations.iter().skip(use_index + 1).any(|invocation| {
+            if invocation.command != "zypper" {
+                return false;
+            }
+
+            zypper_subcommand_index(&invocation.arguments)
+                .is_some_and(|index| matches!(invocation.arguments[index].as_str(), "clean" | "cc"))
+        })
+    });
+
+    last_zypper_use_index.is_some() && !has_clean_after_last_use
+}
+
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3036", "RDL3037", "RDL3038", "RDL3040", "RDL3041", "RDL3042", "RDL3043", "RDL3044",
-        "RDL3045", "RDL3046", "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052",
-        "RDL3053", "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060",
-        "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
+        "RDL3037", "RDL3038", "RDL3040", "RDL3041", "RDL3042", "RDL3043", "RDL3044", "RDL3045",
+        "RDL3046", "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053",
+        "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061",
+        "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
     ]
 }
