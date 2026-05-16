@@ -84,6 +84,7 @@ pub struct Instruction {
     pub copy: Option<CopyInstruction>,
     pub healthcheck: Option<HealthcheckInstruction>,
     pub arg: Option<ArgInstruction>,
+    pub env: Option<EnvInstruction>,
     pub line: usize,
     /// Source span covering the raw instruction text.
     pub raw_span: Span,
@@ -179,6 +180,24 @@ pub struct HealthcheckInstruction {
 pub struct ArgInstruction {
     pub name: String,
     pub default: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct EnvInstruction {
+    pub form: EnvForm,
+    pub assignments: Vec<EnvAssignment>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EnvForm {
+    KeyValue,
+    LegacyPair,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct EnvAssignment {
+    pub name: String,
+    pub value: String,
 }
 
 #[derive(Debug, Clone)]
@@ -395,6 +414,7 @@ fn parse_instruction(
             copy: None,
             healthcheck: None,
             arg: None,
+            env: None,
             line,
             raw_span,
             raw: raw.to_string(),
@@ -428,6 +448,7 @@ fn parse_instruction(
     let healthcheck = (keyword == "HEALTHCHECK")
         .then(|| parse_healthcheck(&args, args_start, &flags, source_file));
     let arg = (keyword == "ARG").then(|| parse_arg(&args)).flatten();
+    let env = (keyword == "ENV").then(|| parse_env(&args)).flatten();
     let heredocs = parse_heredocs(raw, start_byte, &keyword, source_file)?;
 
     Ok(Some(Instruction {
@@ -445,6 +466,7 @@ fn parse_instruction(
         copy,
         healthcheck,
         arg,
+        env,
         line,
         raw_span,
         raw: raw.to_string(),
@@ -511,6 +533,37 @@ fn parse_arg(args: &str) -> Option<ArgInstruction> {
     Some(ArgInstruction {
         name: name.to_string(),
         default: default.map(str::to_string),
+    })
+}
+
+fn parse_env(args: &str) -> Option<EnvInstruction> {
+    let tokens = args.split_whitespace().collect::<Vec<_>>();
+    if tokens.is_empty() {
+        return None;
+    }
+
+    if tokens.iter().any(|token| token.contains('=')) {
+        let assignments = tokens
+            .into_iter()
+            .filter_map(|token| {
+                let (name, value) = token.split_once('=')?;
+                Some(EnvAssignment {
+                    name: name.to_string(),
+                    value: value.to_string(),
+                })
+            })
+            .collect::<Vec<_>>();
+        return Some(EnvInstruction {
+            form: EnvForm::KeyValue,
+            assignments,
+        });
+    }
+
+    let name = tokens[0].to_string();
+    let value = tokens.get(1..).unwrap_or_default().join(" ");
+    Some(EnvInstruction {
+        form: EnvForm::LegacyPair,
+        assignments: vec![EnvAssignment { name, value }],
     })
 }
 

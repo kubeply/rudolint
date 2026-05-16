@@ -21,6 +21,7 @@ expression: document_json(&document)
       },
       "continuations": [],
       "copy": null,
+      "env": null,
       "flags": [
         [
           "platform",
@@ -87,6 +88,7 @@ expression: document_json(&document)
       },
       "continuations": [],
       "copy": null,
+      "env": null,
       "flags": [
         [
           "platform",

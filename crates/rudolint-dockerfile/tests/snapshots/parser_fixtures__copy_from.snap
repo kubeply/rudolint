@@ -1,6 +1,6 @@
 ---
 source: crates/rudolint-dockerfile/tests/parser_fixtures.rs
-assertion_line: 37
+assertion_line: 40
 expression: document_json(&document)
 ---
 {
@@ -22,6 +22,7 @@ expression: document_json(&document)
       },
       "continuations": [],
       "copy": null,
+      "env": null,
       "flags": [],
       "form": {
         "kind": "shell",
@@ -78,6 +79,7 @@ expression: document_json(&document)
       },
       "continuations": [],
       "copy": null,
+      "env": null,
       "flags": [],
       "form": {
         "kind": "shell",
@@ -149,6 +151,7 @@ expression: document_json(&document)
           "/out/app"
         ]
       },
+      "env": null,
       "flags": [
         [
           "from",
@@ -223,6 +226,7 @@ expression: document_json(&document)
           "bin/rudolint"
         ]
       },
+      "env": null,
       "flags": [
         [
           "chown",
@@ -292,6 +296,7 @@ expression: document_json(&document)
           "dir with spaces/file.txt"
         ]
       },
+      "env": null,
       "flags": [],
       "form": {
         "kind": "json",
@@ -347,6 +352,7 @@ expression: document_json(&document)
           "https://example.com/archive.tar.gz"
         ]
       },
+      "env": null,
       "flags": [],
       "form": {
         "kind": "shell",

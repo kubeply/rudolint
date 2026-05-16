@@ -6,7 +6,7 @@ expression: document_json(&document)
   "checks": [],
   "comments": [],
   "escape": null,
-  "has_buildkit_features": true,
+  "has_buildkit_features": false,
   "instructions": [
     {
       "arg": null,
@@ -67,50 +67,47 @@ expression: document_json(&document)
     },
     {
       "arg": null,
-      "args": "<<EOF\necho hello\nEOF",
+      "args": "APP_HOME=/app APP_ENV=production",
       "args_span": {
-        "end_byte": 41,
-        "end_column": 4,
-        "end_line": 4,
+        "end_byte": 53,
+        "end_column": 37,
+        "end_line": 2,
         "start_byte": 21,
         "start_column": 5,
         "start_line": 2
       },
       "continuations": [],
       "copy": null,
-      "env": null,
+      "env": {
+        "assignments": [
+          {
+            "name": "APP_HOME",
+            "value": "/app"
+          },
+          {
+            "name": "APP_ENV",
+            "value": "production"
+          }
+        ],
+        "form": "key_value"
+      },
       "flags": [],
       "form": {
         "kind": "shell",
         "span": {
-          "end_byte": 41,
-          "end_column": 4,
-          "end_line": 4,
+          "end_byte": 53,
+          "end_column": 37,
+          "end_line": 2,
           "start_byte": 21,
           "start_column": 5,
           "start_line": 2
         },
-        "text": "<<EOF\necho hello\nEOF"
+        "text": "APP_HOME=/app APP_ENV=production"
       },
       "from": null,
       "healthcheck": null,
-      "heredocs": [
-        {
-          "body": "echo hello\n",
-          "body_span": {
-            "end_byte": 38,
-            "end_column": 1,
-            "end_line": 4,
-            "start_byte": 27,
-            "start_column": 1,
-            "start_line": 3
-          },
-          "delimiter": "EOF",
-          "quoted": false,
-          "target_instruction": "RUN"
-        }
-      ],
-      "keyword": "RUN",
+      "heredocs": [],
+      "keyword": "ENV",
       "keyword_span": {
         "end_byte": 20,
         "end_column": 4,
@@ -122,112 +119,73 @@ expression: document_json(&document)
       "line": 2,
       "mounts": [],
       "raw_span": {
-        "end_byte": 41,
-        "end_column": 4,
-        "end_line": 4,
+        "end_byte": 53,
+        "end_column": 37,
+        "end_line": 2,
         "start_byte": 17,
         "start_column": 1,
         "start_line": 2
       },
-      "run": {
-        "flags": [],
-        "mounts": [],
-        "network": null,
-        "security": null,
-        "shell": {
-          "span": {
-            "end_byte": 41,
-            "end_column": 4,
-            "end_line": 4,
-            "start_byte": 21,
-            "start_column": 5,
-            "start_line": 2
-          },
-          "text": "<<EOF\necho hello\nEOF"
-        }
-      }
+      "run": null
     },
     {
       "arg": null,
-      "args": "<<'SCRIPT'\necho quoted\nSCRIPT",
+      "args": "PATH /usr/local/bin:$PATH",
       "args_span": {
-        "end_byte": 75,
-        "end_column": 7,
-        "end_line": 7,
-        "start_byte": 46,
+        "end_byte": 83,
+        "end_column": 30,
+        "end_line": 3,
+        "start_byte": 58,
         "start_column": 5,
-        "start_line": 5
+        "start_line": 3
       },
       "continuations": [],
       "copy": null,
-      "env": null,
+      "env": {
+        "assignments": [
+          {
+            "name": "PATH",
+            "value": "/usr/local/bin:$PATH"
+          }
+        ],
+        "form": "legacy_pair"
+      },
       "flags": [],
       "form": {
         "kind": "shell",
         "span": {
-          "end_byte": 75,
-          "end_column": 7,
-          "end_line": 7,
-          "start_byte": 46,
+          "end_byte": 83,
+          "end_column": 30,
+          "end_line": 3,
+          "start_byte": 58,
           "start_column": 5,
-          "start_line": 5
+          "start_line": 3
         },
-        "text": "<<'SCRIPT'\necho quoted\nSCRIPT"
+        "text": "PATH /usr/local/bin:$PATH"
       },
       "from": null,
       "healthcheck": null,
-      "heredocs": [
-        {
-          "body": "echo quoted\n",
-          "body_span": {
-            "end_byte": 69,
-            "end_column": 1,
-            "end_line": 7,
-            "start_byte": 57,
-            "start_column": 1,
-            "start_line": 6
-          },
-          "delimiter": "SCRIPT",
-          "quoted": true,
-          "target_instruction": "RUN"
-        }
-      ],
-      "keyword": "RUN",
+      "heredocs": [],
+      "keyword": "ENV",
       "keyword_span": {
-        "end_byte": 45,
+        "end_byte": 57,
         "end_column": 4,
-        "end_line": 5,
-        "start_byte": 42,
+        "end_line": 3,
+        "start_byte": 54,
         "start_column": 1,
-        "start_line": 5
+        "start_line": 3
       },
-      "line": 5,
+      "line": 3,
       "mounts": [],
       "raw_span": {
-        "end_byte": 75,
-        "end_column": 7,
-        "end_line": 7,
-        "start_byte": 42,
+        "end_byte": 83,
+        "end_column": 30,
+        "end_line": 3,
+        "start_byte": 54,
         "start_column": 1,
-        "start_line": 5
+        "start_line": 3
       },
-      "run": {
-        "flags": [],
-        "mounts": [],
-        "network": null,
-        "security": null,
-        "shell": {
-          "span": {
-            "end_byte": 75,
-            "end_column": 7,
-            "end_line": 7,
-            "start_byte": 46,
-            "start_column": 5,
-            "start_line": 5
-          },
-          "text": "<<'SCRIPT'\necho quoted\nSCRIPT"
-        }
-      }
+      "run": null
     }
   ],
   "syntax": null

@@ -1,4 +1,6 @@
-use rudolint_dockerfile::{CopyKind, Dockerfile, Instruction, InstructionForm, parse_dockerfile};
+use rudolint_dockerfile::{
+    CopyKind, Dockerfile, EnvForm, Instruction, InstructionForm, parse_dockerfile,
+};
 use rudolint_test::read_fixture;
 use serde_json::{Value, json};
 
@@ -22,6 +24,7 @@ fn snapshots_parser_matrix() {
         ("json_form", "parser/json-form/Dockerfile"),
         ("invalid_json_form", "parser/invalid-json-form/Dockerfile"),
         ("arg", "parser/arg/Dockerfile"),
+        ("env", "parser/env/Dockerfile"),
         ("healthcheck", "parser/healthcheck/Dockerfile"),
         ("run_mount", "parser/run-mount/Dockerfile"),
         ("from_platform", "parser/from-platform/Dockerfile"),
@@ -160,6 +163,20 @@ fn instruction_json(instruction: &Instruction) -> Value {
             json!({
                 "name": arg.name,
                 "default": arg.default,
+            })
+        }),
+        "env": instruction.env.as_ref().map(|env| {
+            json!({
+                "form": match env.form {
+                    EnvForm::KeyValue => "key_value",
+                    EnvForm::LegacyPair => "legacy_pair",
+                },
+                "assignments": env.assignments.iter().map(|assignment| {
+                    json!({
+                        "name": assignment.name,
+                        "value": assignment.value,
+                    })
+                }).collect::<Vec<_>>(),
             })
         }),
         "line": instruction.line,
