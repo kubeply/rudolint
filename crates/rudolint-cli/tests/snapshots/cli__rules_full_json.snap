@@ -186,8 +186,8 @@ expression: normalized_json(&output)
   {
     "code": "RDL3027",
     "severity": "warning",
-    "status": "planned",
-    "summary": "tracked for compatibility parity"
+    "status": "implemented",
+    "summary": "prefer apt-get or apt-cache over apt"
   },
   {
     "code": "RDL3028",

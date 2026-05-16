@@ -184,6 +184,12 @@ expression: normalized_json(&output)
     "summary": "restrict FROM images to trusted registries"
   },
   {
+    "code": "RDL3027",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "prefer apt-get or apt-cache over apt"
+  },
+  {
     "code": "RDL4000",
     "severity": "error",
     "status": "implemented",
