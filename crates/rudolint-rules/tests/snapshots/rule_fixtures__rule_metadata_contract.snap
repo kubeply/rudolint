@@ -412,6 +412,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3035",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3035.md",
+    "fix": "none",
+    "name": "no-zypper-dist-upgrade",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "avoid zypper dist-upgrade"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL4000",
     "default_severity": "error",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4000.md",
