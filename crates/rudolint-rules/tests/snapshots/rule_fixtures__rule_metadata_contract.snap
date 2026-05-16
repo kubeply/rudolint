@@ -665,6 +665,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3059",
+    "default_severity": "info",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3059.md",
+    "fix": "none",
+    "name": "consecutive-run",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "combine consecutive RUN instructions"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL4000",
     "default_severity": "error",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4000.md",
