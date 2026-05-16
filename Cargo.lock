@@ -618,6 +618,7 @@ dependencies = [
  "rudolint-dockerfile",
  "rudolint-fix",
  "rudolint-policy",
+ "rudolint-source",
  "rudolint-test",
  "serde",
  "serde_json",

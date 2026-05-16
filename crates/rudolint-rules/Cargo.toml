@@ -13,6 +13,7 @@ rudolint-diagnostics.workspace = true
 rudolint-dockerfile.workspace = true
 rudolint-fix.workspace = true
 rudolint-policy.workspace = true
+rudolint-source.workspace = true
 serde.workspace = true
 
 [dev-dependencies]

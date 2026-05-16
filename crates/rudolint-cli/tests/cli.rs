@@ -463,6 +463,44 @@ fn fix_write_mode_applies_safe_fix_idempotently() {
 }
 
 #[test]
+fn fix_write_mode_replaces_maintainer_when_deterministic() {
+    let temp = tempfile::TempDir::new().expect("temp dir should be created");
+    let dockerfile = temp.path().join("Dockerfile");
+    std::fs::write(
+        &dockerfile,
+        "FROM alpine:3.20\nMAINTAINER ops@example.com\n",
+    )
+    .expect("Dockerfile should be written");
+
+    rudolint_cmd()
+        .args(["check", "--fix"])
+        .arg(&dockerfile)
+        .assert()
+        .code(1);
+
+    let output = std::fs::read_to_string(&dockerfile).expect("Dockerfile should exist");
+    insta::assert_snapshot!("fix_write_mode_maintainer_file", output);
+}
+
+#[test]
+fn fix_write_mode_leaves_nonrewritable_maintainer_values() {
+    let temp = tempfile::TempDir::new().expect("temp dir should be created");
+    let dockerfile = temp.path().join("Dockerfile");
+    let original = "FROM alpine:3.20\nMAINTAINER \"bad@example.com\nMAINTAINER bad\\user@example.com\nMAINTAINER \n";
+    std::fs::write(&dockerfile, original).expect("Dockerfile should be written");
+
+    rudolint_cmd()
+        .args(["check", "--fix"])
+        .arg(&dockerfile)
+        .assert()
+        .code(1);
+
+    let output = std::fs::read_to_string(&dockerfile).expect("Dockerfile should exist");
+    assert_eq!(output, original);
+    insta::assert_snapshot!("fix_write_mode_maintainer_nonrewritable_file", output);
+}
+
+#[test]
 fn fix_dry_run_json_includes_fix_envelope() {
     let output = rudolint_cmd()
         .args(["check", "--fix", "--dry-run", "--format", "json"])

@@ -1,0 +1,8 @@
+---
+source: crates/rudolint-cli/tests/cli.rs
+expression: output
+---
+FROM alpine:3.20
+MAINTAINER "bad@example.com
+MAINTAINER bad\user@example.com
+MAINTAINER 

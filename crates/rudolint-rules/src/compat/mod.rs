@@ -3,6 +3,7 @@ use std::collections::BTreeSet;
 use crate::{Rule, RuleInfo, metadata::diagnostic, metadata::rule_metadata};
 use rudolint_diagnostics::{Finding, Severity};
 use rudolint_dockerfile::{Comment, Dockerfile};
+use rudolint_fix::{FixApplicability, FixPreview, TextEdit};
 use rudolint_policy::LegacySuppression;
 
 pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
@@ -359,7 +360,8 @@ rule_metadata!(
     "RDL4000",
     "deprecated-maintainer",
     Severity::Error,
-    "reject deprecated MAINTAINER instructions"
+    "reject deprecated MAINTAINER instructions",
+    crate::FixAvailability::Safe
 );
 
 impl Rule for DeprecatedMaintainer {
@@ -378,6 +380,31 @@ impl Rule for DeprecatedMaintainer {
                     "use OCI labels instead of MAINTAINER",
                     instruction,
                 )
+            })
+            .collect()
+    }
+
+    fn fix(&self, doc: &Dockerfile) -> Vec<FixPreview> {
+        doc.instructions
+            .iter()
+            .filter(|instruction| instruction.keyword == "MAINTAINER")
+            .filter_map(|instruction| {
+                let maintainer = instruction.args.trim();
+                if maintainer.is_empty() || maintainer.contains(['"', '\\']) {
+                    return None;
+                }
+                Some(FixPreview {
+                    title: "replace MAINTAINER with OCI authors label".to_string(),
+                    applicability: FixApplicability::safe(),
+                    edits: vec![TextEdit::replace(
+                        rudolint_source::SourceSpan {
+                            line: instruction.line,
+                            column: 1,
+                            length: instruction.raw.chars().count(),
+                        },
+                        format!("LABEL org.opencontainers.image.authors=\"{maintainer}\""),
+                    )],
+                })
             })
             .collect()
     }
