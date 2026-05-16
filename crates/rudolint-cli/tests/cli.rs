@@ -192,6 +192,20 @@ fn no_config_flag_is_accepted() {
 }
 
 #[test]
+fn config_and_no_config_conflict() {
+    let temp = TempDir::new().expect("temp dir should be created");
+    let config = temp.path().join(".rudolint.yaml");
+    std::fs::write(&config, "ignore:\n  - RDL3000\n").expect("config should be written");
+
+    rudolint_cmd()
+        .args(["check", "--no-config", "--config"])
+        .arg(&config)
+        .write_stdin("FROM alpine:latest\n")
+        .assert()
+        .code(2);
+}
+
+#[test]
 fn missing_input_exits_with_code_two() {
     let temp = TempDir::new().expect("temp dir should be created");
     let missing = temp.path().join("missing.Dockerfile");
