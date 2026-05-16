@@ -1,0 +1,108 @@
+---
+source: crates/rudolint-cli/tests/cli.rs
+expression: normalized_json(&output)
+---
+[
+  {
+    "code": "RDK1000",
+    "severity": "info",
+    "status": "implemented",
+    "summary": "require explicit syntax directive for BuildKit-only features"
+  },
+  {
+    "code": "RDK1001",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "reject secret-like ARG and ENV names"
+  },
+  {
+    "code": "RDK1002",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "prefer BuildKit secret mounts for secret-consuming RUN steps"
+  },
+  {
+    "code": "RDK1003",
+    "severity": "info",
+    "status": "implemented",
+    "summary": "prefer BuildKit cache mounts for package-manager caches"
+  },
+  {
+    "code": "RDL1001",
+    "severity": "ignore",
+    "status": "implemented",
+    "summary": "discourage inline linter suppression comments"
+  },
+  {
+    "code": "RDL3000",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "require absolute WORKDIR paths"
+  },
+  {
+    "code": "RDL3002",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "require the final USER to be non-root"
+  },
+  {
+    "code": "RDL3006",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "require explicit image tags in FROM"
+  },
+  {
+    "code": "RDL3007",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "reject latest base image tags"
+  },
+  {
+    "code": "RDL3011",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "validate EXPOSE port numbers"
+  },
+  {
+    "code": "RDL3012",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "allow only one HEALTHCHECK instruction"
+  },
+  {
+    "code": "RDL3020",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "prefer COPY for plain local files"
+  },
+  {
+    "code": "RDL3024",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "require unique multi-stage aliases"
+  },
+  {
+    "code": "RDL3025",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "prefer JSON form for CMD and ENTRYPOINT"
+  },
+  {
+    "code": "RDL4000",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "reject deprecated MAINTAINER instructions"
+  },
+  {
+    "code": "RDL4003",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "allow only one CMD instruction"
+  },
+  {
+    "code": "RDL4004",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "allow only one ENTRYPOINT instruction"
+  }
+]

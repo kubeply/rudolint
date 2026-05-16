@@ -266,6 +266,20 @@ fn show_source_adds_human_source_excerpts() {
 }
 
 #[test]
+fn emits_rules_json() {
+    let output = rudolint_cmd()
+        .args(["rules", "--implemented", "--format", "json"])
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+
+    let output = String::from_utf8(output).expect("stdout should be UTF-8");
+    insta::assert_json_snapshot!("rules_implemented_json", normalized_json(&output));
+}
+
+#[test]
 fn missing_input_exits_with_code_two() {
     let temp = TempDir::new().expect("temp dir should be created");
     let missing = temp.path().join("missing.Dockerfile");
