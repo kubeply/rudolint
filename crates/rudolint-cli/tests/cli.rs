@@ -1,3 +1,4 @@
+use predicates::prelude::PredicateBooleanExt;
 use rudolint_test::{normalize_path_prefix, normalized_json, rudolint_cmd};
 use tempfile::TempDir;
 
@@ -231,6 +232,22 @@ fn no_config_disables_discovery() {
         .arg(&dockerfile)
         .assert()
         .code(1);
+}
+
+#[test]
+fn config_parse_errors_include_line_and_column() {
+    let temp = TempDir::new().expect("temp dir should be created");
+    let dockerfile = temp.path().join("Dockerfile");
+    let config = temp.path().join(".rudolint.yaml");
+    std::fs::write(&dockerfile, "FROM alpine:3.20\n").expect("fixture should be written");
+    std::fs::write(&config, "ignore: [RDL3000\n").expect("config should be written");
+
+    rudolint_cmd()
+        .args(["check"])
+        .arg(&dockerfile)
+        .assert()
+        .code(2)
+        .stderr(predicates::str::contains("line 1").and(predicates::str::contains("column")));
 }
 
 #[test]
