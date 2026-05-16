@@ -1,0 +1,65 @@
+---
+source: crates/rudolint-shell/src/lib.rs
+expression: values
+---
+[
+  {
+    "package_managers": [
+      "apt-get"
+    ],
+    "shell": "apt-get update && apt-get install -y curl"
+  },
+  {
+    "package_managers": [
+      "apt"
+    ],
+    "shell": "apt update && apt install -y curl"
+  },
+  {
+    "package_managers": [
+      "apk"
+    ],
+    "shell": "apk add --no-cache git"
+  },
+  {
+    "package_managers": [
+      "dnf",
+      "pip"
+    ],
+    "shell": "dnf install -y gcc && pip install maturin"
+  },
+  {
+    "package_managers": [
+      "pip"
+    ],
+    "shell": "pip3 install -r requirements.txt"
+  },
+  {
+    "package_managers": [
+      "npm",
+      "pnpm",
+      "yarn"
+    ],
+    "shell": "npm ci && pnpm install && yarn install"
+  },
+  {
+    "package_managers": [
+      "cargo",
+      "go"
+    ],
+    "shell": "cargo install cargo-deny && go install example.com/tool@latest"
+  },
+  {
+    "package_managers": [
+      "microdnf",
+      "yum"
+    ],
+    "shell": "microdnf install shadow-utils || yum install shadow-utils"
+  },
+  {
+    "package_managers": [
+      "apt-get"
+    ],
+    "shell": "(apt-get update)"
+  }
+]
