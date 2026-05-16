@@ -235,6 +235,31 @@ fn snapshots_rdl3024_unique_stage_names_fixture() {
 }
 
 #[test]
+fn snapshots_rdl3025_json_entrypoints_fixture() {
+    let source = read_fixture("rules/RDL3025.json-entrypoints/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let engine = RuleEngine::new(Profile::Default, Config::default());
+    let findings = engine
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDL3025")
+        .collect::<Vec<_>>();
+    let fixes = engine
+        .fixes(&document)
+        .into_iter()
+        .filter(|fix| fix.title.contains("exec/JSON form"))
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdl3025_json_entrypoints_fixture",
+        serde_json::json!({
+            "findings": findings,
+            "fixes": fixes,
+        })
+    );
+}
+
+#[test]
 fn snapshots_rule_selection_matrix() {
     let source = read_fixture("rules/default-basic/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
