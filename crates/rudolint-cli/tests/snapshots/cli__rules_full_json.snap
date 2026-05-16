@@ -149,9 +149,9 @@ expression: normalized_json(&output)
   },
   {
     "code": "RDL3021",
-    "severity": "warning",
-    "status": "planned",
-    "summary": "tracked for compatibility parity"
+    "severity": "error",
+    "status": "implemented",
+    "summary": "require trailing slash for COPY destinations with multiple sources"
   },
   {
     "code": "RDL3022",

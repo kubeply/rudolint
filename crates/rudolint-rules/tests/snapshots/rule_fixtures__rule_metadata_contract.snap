@@ -269,6 +269,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3021",
+    "default_severity": "error",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3021.md",
+    "fix": "none",
+    "name": "copy-multiple-destination-slash",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "require trailing slash for COPY destinations with multiple sources"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL3024",
     "default_severity": "error",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3024.md",
