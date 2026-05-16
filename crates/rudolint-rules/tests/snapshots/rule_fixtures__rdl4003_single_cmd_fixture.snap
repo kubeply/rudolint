@@ -1,0 +1,51 @@
+---
+source: crates/rudolint-rules/tests/rule_fixtures.rs
+expression: "serde_json::to_value(&cases).expect(\"cases should serialize\")"
+---
+[
+  {
+    "findings": [],
+    "fixture": "RDL4003.no-cmd"
+  },
+  {
+    "findings": [],
+    "fixture": "RDL4003.single-cmd"
+  },
+  {
+    "findings": [
+      {
+        "code": "RDL4003",
+        "help": null,
+        "labels": [],
+        "message": "only the final CMD is used",
+        "path": "",
+        "primary_span": {
+          "end_byte": 0,
+          "end_column": 1,
+          "end_line": 4,
+          "start_byte": 0,
+          "start_column": 1,
+          "start_line": 4
+        },
+        "severity": "warning"
+      },
+      {
+        "code": "RDL4003",
+        "help": null,
+        "labels": [],
+        "message": "only the final CMD is used",
+        "path": "",
+        "primary_span": {
+          "end_byte": 0,
+          "end_column": 1,
+          "end_line": 5,
+          "start_byte": 0,
+          "start_column": 1,
+          "start_line": 5
+        },
+        "severity": "warning"
+      }
+    ],
+    "fixture": "RDL4003.duplicate-cmd"
+  }
+]
