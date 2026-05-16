@@ -192,6 +192,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3013",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3013.md",
+    "fix": "none",
+    "name": "pin-pip-versions",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "pin versions in pip install"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL3020",
     "default_severity": "error",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3020.md",
