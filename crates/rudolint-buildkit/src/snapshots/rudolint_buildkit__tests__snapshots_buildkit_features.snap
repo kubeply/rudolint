@@ -1,0 +1,28 @@
+---
+source: crates/rudolint-buildkit/src/lib.rs
+expression: "json!({\n    \"frontend\":\n    features.frontend.as_ref().map(|frontend|\n    { json!({ \"image\": frontend.image, \"version\": frontend.version, }) }),\n    \"mounts\":\n    features.mounts.iter().map(|mount|\n    {\n        json!({ \"type\": mount.mount_type, \"options\": mount.options, })\n    }).collect::<Vec<_>>(), \"heredoc_count\": features.heredoc_count,\n    \"network_modes\": features.network_modes, \"security_modes\":\n    features.security_modes,\n})"
+---
+{
+  "frontend": {
+    "image": "docker/dockerfile:1.7",
+    "version": "1.7"
+  },
+  "heredoc_count": 1,
+  "mounts": [
+    {
+      "options": [
+        [
+          "type",
+          "cache"
+        ],
+        [
+          "target",
+          "/var/cache/apk"
+        ]
+      ],
+      "type": "cache"
+    }
+  ],
+  "network_modes": [],
+  "security_modes": []
+}
