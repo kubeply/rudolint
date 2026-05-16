@@ -304,6 +304,12 @@ expression: normalized_json(&output)
     "summary": "reject invalid label keys"
   },
   {
+    "code": "RDL3049",
+    "severity": "info",
+    "status": "implemented",
+    "summary": "require configured labels"
+  },
+  {
     "code": "RDL4000",
     "severity": "error",
     "status": "implemented",

@@ -305,9 +305,9 @@ expression: normalized_json(&output)
   },
   {
     "code": "RDL3049",
-    "severity": "warning",
-    "status": "planned",
-    "summary": "tracked for compatibility parity"
+    "severity": "info",
+    "status": "implemented",
+    "summary": "require configured labels"
   },
   {
     "code": "RDL3050",

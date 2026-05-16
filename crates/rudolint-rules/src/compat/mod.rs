@@ -56,6 +56,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(UseraddNoLogInit),
         Box::new(WgetProgress),
         Box::new(ValidLabelKey),
+        Box::new(MissingRequiredLabels),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -1652,6 +1653,32 @@ impl Rule for ValidLabelKey {
 }
 
 rule_metadata!(
+    MissingRequiredLabels,
+    "RDL3049",
+    "missing-required-labels",
+    Severity::Info,
+    "require configured labels"
+);
+
+impl Rule for MissingRequiredLabels {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, _doc: &Dockerfile) -> Vec<Finding> {
+        Vec::new()
+    }
+
+    fn check_with_config(&self, doc: &Dockerfile, config: &Config) -> Vec<Finding> {
+        if config.label_schema.is_empty() {
+            return Vec::new();
+        }
+
+        missing_required_labels(doc, config)
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -2124,6 +2151,67 @@ fn is_valid_docker_label_key(key: &str) -> bool {
         && !key.contains("--")
 }
 
+fn missing_required_labels(doc: &Dockerfile, config: &Config) -> Vec<Finding> {
+    let mut current_stage = None;
+    let mut current_stage_line = None;
+    let mut stage_labels: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+    let mut stage_lines: BTreeMap<String, usize> = BTreeMap::new();
+    let mut referenced_stages = BTreeSet::new();
+
+    for instruction in &doc.instructions {
+        match instruction.keyword.as_str() {
+            "FROM" => {
+                if let Some(from) = &instruction.from {
+                    let parent_labels = stage_labels.get(&from.image).cloned().unwrap_or_default();
+                    let stage = from.alias.clone().unwrap_or_else(|| from.image.clone());
+                    stage_labels.insert(stage.clone(), parent_labels);
+                    stage_lines.insert(stage.clone(), instruction.line);
+                    current_stage = Some(stage);
+                    current_stage_line = Some(instruction.line);
+                }
+            }
+            "LABEL" => {
+                if let (Some(stage), Some(label)) = (&current_stage, &instruction.label) {
+                    let labels = stage_labels.entry(stage.clone()).or_default();
+                    labels.extend(label.pairs.iter().map(|pair| pair.key.clone()));
+                }
+            }
+            "COPY" => {
+                if let Some(source_stage) = instruction
+                    .copy
+                    .as_ref()
+                    .and_then(|copy| copy.from.as_ref())
+                {
+                    referenced_stages.insert(source_stage.clone());
+                }
+            }
+            _ => {}
+        }
+    }
+
+    let required = config.label_schema.keys().cloned().collect::<BTreeSet<_>>();
+    stage_labels
+        .iter()
+        .filter(|(stage, _)| !referenced_stages.contains(*stage))
+        .flat_map(|(stage, labels)| {
+            let line = stage_lines
+                .get(stage)
+                .copied()
+                .or(current_stage_line)
+                .unwrap_or(1);
+            required.difference(labels).map(move |label| {
+                Finding::new(
+                    "RDL3049",
+                    Severity::Info,
+                    format!("Label `{label}` is missing"),
+                    line,
+                    1,
+                )
+            })
+        })
+        .collect()
+}
+
 fn apt_get_install_missing_yes(shell: &str) -> bool {
     detect_command_invocations(shell)
         .into_iter()
@@ -2548,8 +2636,8 @@ fn dnf_install_has_unpinned_packages(shell: &str) -> bool {
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053", "RDL3054", "RDL3055", "RDL3056",
-        "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001",
-        "RDL4005", "RDL4006",
+        "RDL3050", "RDL3051", "RDL3052", "RDL3053", "RDL3054", "RDL3055", "RDL3056", "RDL3057",
+        "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005",
+        "RDL4006",
     ]
 }

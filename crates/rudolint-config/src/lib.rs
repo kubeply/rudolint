@@ -20,6 +20,8 @@ pub struct Config {
     #[serde(default)]
     pub trusted_registries: Vec<String>,
     #[serde(default)]
+    pub label_schema: BTreeMap<String, String>,
+    #[serde(default)]
     pub allow_entitlements: BTreeSet<String>,
     #[serde(default)]
     pub per_file_ignores: BTreeMap<String, BTreeSet<String>>,
@@ -115,6 +117,9 @@ severity:
   RDL3000: error
 trusted-registries:
   - ghcr.io
+label-schema:
+  org.opencontainers.image.title: text
+  org.opencontainers.image.source: url
 allow-entitlements:
   - security.insecure
 per-file-ignores:
@@ -129,6 +134,14 @@ per-file-ignores:
         assert!(config.ignores("RDL3007"));
         assert_eq!(config.severity_override("RDL3000"), Some(Severity::Error));
         assert_eq!(config.trusted_registries, ["ghcr.io"]);
+        assert_eq!(
+            config.label_schema["org.opencontainers.image.title"],
+            "text"
+        );
+        assert_eq!(
+            config.label_schema["org.opencontainers.image.source"],
+            "url"
+        );
         assert!(config.allow_entitlements.contains("security.insecure"));
         assert!(config.per_file_ignores["fixtures/**"].contains("RDL3000"));
     }
