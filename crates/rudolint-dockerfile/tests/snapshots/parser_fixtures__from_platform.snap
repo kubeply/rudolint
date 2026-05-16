@@ -25,6 +25,10 @@ expression: document_json(&document)
           "$BUILDPLATFORM"
         ]
       ],
+      "form": {
+        "kind": "shell",
+        "value": "--platform=$BUILDPLATFORM alpine:3.20 AS build"
+      },
       "heredocs": [],
       "keyword": "FROM",
       "keyword_span": {
@@ -63,6 +67,10 @@ expression: document_json(&document)
           "$TARGETPLATFORM"
         ]
       ],
+      "form": {
+        "kind": "shell",
+        "value": "--platform=$TARGETPLATFORM scratch"
+      },
       "heredocs": [],
       "keyword": "FROM",
       "keyword_span": {

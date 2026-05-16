@@ -1,4 +1,4 @@
-use rudolint_dockerfile::{Dockerfile, Instruction, parse_dockerfile};
+use rudolint_dockerfile::{Dockerfile, Instruction, InstructionForm, parse_dockerfile};
 use rudolint_test::read_fixture;
 use serde_json::{Value, json};
 
@@ -19,6 +19,7 @@ fn snapshots_parser_matrix() {
         ("continuations", "parser/continuations/Dockerfile"),
         ("heredocs", "parser/heredocs/Dockerfile"),
         ("windows_escape", "parser/windows-escape/Dockerfile"),
+        ("json_form", "parser/json-form/Dockerfile"),
         ("run_mount", "parser/run-mount/Dockerfile"),
         ("from_platform", "parser/from-platform/Dockerfile"),
         ("copy_from", "parser/copy-from/Dockerfile"),
@@ -75,6 +76,7 @@ fn instruction_json(instruction: &Instruction) -> Value {
         "keyword_span": instruction.keyword_span,
         "args": instruction.args,
         "args_span": instruction.args_span,
+        "form": instruction_form_json(&instruction.form),
         "continuations": instruction.continuations.iter().map(|continuation| {
             json!({
                 "line": continuation.line,
@@ -93,4 +95,18 @@ fn instruction_json(instruction: &Instruction) -> Value {
         "line": instruction.line,
         "raw_span": instruction.raw_span,
     })
+}
+
+fn instruction_form_json(form: &InstructionForm) -> Value {
+    match form {
+        InstructionForm::Empty => json!({ "kind": "empty" }),
+        InstructionForm::Json(values) => json!({
+            "kind": "json",
+            "values": values,
+        }),
+        InstructionForm::Shell(value) => json!({
+            "kind": "shell",
+            "value": value,
+        }),
+    }
 }

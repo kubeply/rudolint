@@ -33,6 +33,10 @@ expression: document_json(&document)
       },
       "continuations": [],
       "flags": [],
+      "form": {
+        "kind": "shell",
+        "value": "alpine:3.20"
+      },
       "heredocs": [],
       "keyword": "FROM",
       "keyword_span": {
@@ -71,6 +75,10 @@ expression: document_json(&document)
           "type=cache,target=/var/cache/apk,sharing=locked"
         ]
       ],
+      "form": {
+        "kind": "shell",
+        "value": "--mount=type=cache,target=/var/cache/apk,sharing=locked apk add curl"
+      },
       "heredocs": [],
       "keyword": "RUN",
       "keyword_span": {

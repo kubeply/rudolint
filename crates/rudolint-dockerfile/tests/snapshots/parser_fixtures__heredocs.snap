@@ -20,6 +20,10 @@ expression: document_json(&document)
       },
       "continuations": [],
       "flags": [],
+      "form": {
+        "kind": "shell",
+        "value": "alpine:3.20"
+      },
       "heredocs": [],
       "keyword": "FROM",
       "keyword_span": {
@@ -53,6 +57,10 @@ expression: document_json(&document)
       },
       "continuations": [],
       "flags": [],
+      "form": {
+        "kind": "shell",
+        "value": "<<EOF"
+      },
       "heredocs": [
         "EOF"
       ],
@@ -88,6 +96,10 @@ expression: document_json(&document)
       },
       "continuations": [],
       "flags": [],
+      "form": {
+        "kind": "shell",
+        "value": "hello"
+      },
       "heredocs": [],
       "keyword": "ECHO",
       "keyword_span": {
@@ -114,6 +126,9 @@ expression: document_json(&document)
       "args_span": null,
       "continuations": [],
       "flags": [],
+      "form": {
+        "kind": "empty"
+      },
       "heredocs": [],
       "keyword": "EOF",
       "keyword_span": {
