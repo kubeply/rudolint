@@ -1,6 +1,5 @@
 ---
 source: crates/rudolint-dockerfile/tests/parser_fixtures.rs
-assertion_line: 40
 expression: document_json(&document)
 ---
 {
@@ -36,6 +35,7 @@ expression: document_json(&document)
       "continuations": [],
       "copy": null,
       "env": null,
+      "expose": null,
       "flags": [
         [
           "platform",
@@ -103,6 +103,7 @@ expression: document_json(&document)
       "continuations": [],
       "copy": null,
       "env": null,
+      "expose": null,
       "flags": [
         [
           "mount",
@@ -208,6 +209,7 @@ expression: document_json(&document)
       "continuations": [],
       "copy": null,
       "env": null,
+      "expose": null,
       "flags": [],
       "form": {
         "kind": "shell",
@@ -290,6 +292,7 @@ expression: document_json(&document)
       "continuations": [],
       "copy": null,
       "env": null,
+      "expose": null,
       "flags": [],
       "form": {
         "kind": "shell",
@@ -362,6 +365,7 @@ expression: document_json(&document)
         ]
       },
       "env": null,
+      "expose": null,
       "flags": [
         [
           "from",

@@ -25,6 +25,7 @@ fn snapshots_parser_matrix() {
         ("invalid_json_form", "parser/invalid-json-form/Dockerfile"),
         ("arg", "parser/arg/Dockerfile"),
         ("env", "parser/env/Dockerfile"),
+        ("expose", "parser/expose/Dockerfile"),
         ("healthcheck", "parser/healthcheck/Dockerfile"),
         ("run_mount", "parser/run-mount/Dockerfile"),
         ("from_platform", "parser/from-platform/Dockerfile"),
@@ -175,6 +176,16 @@ fn instruction_json(instruction: &Instruction) -> Value {
                     json!({
                         "name": assignment.name,
                         "value": assignment.value,
+                    })
+                }).collect::<Vec<_>>(),
+            })
+        }),
+        "expose": instruction.expose.as_ref().map(|expose| {
+            json!({
+                "ports": expose.ports.iter().map(|port| {
+                    json!({
+                        "port": port.port,
+                        "protocol": port.protocol,
                     })
                 }).collect::<Vec<_>>(),
             })
