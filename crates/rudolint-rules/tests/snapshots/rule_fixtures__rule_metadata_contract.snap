@@ -148,6 +148,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3009",
+    "default_severity": "info",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3009.md",
+    "fix": "none",
+    "name": "clean-apt-lists",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "delete apt-get package lists after use"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL3011",
     "default_severity": "error",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3011.md",

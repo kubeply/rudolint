@@ -83,9 +83,9 @@ expression: normalized_json(&output)
   },
   {
     "code": "RDL3009",
-    "severity": "warning",
-    "status": "planned",
-    "summary": "tracked for compatibility parity"
+    "severity": "info",
+    "status": "implemented",
+    "summary": "delete apt-get package lists after use"
   },
   {
     "code": "RDL3010",
