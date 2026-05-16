@@ -30,6 +30,25 @@ pub struct ArgValue {
     pub default: Option<String>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct EnvScopes {
+    pub stages: Vec<StageEnv>,
+    pub final_env: Vec<EnvValue>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct StageEnv {
+    pub stage_index: usize,
+    pub vars: Vec<EnvValue>,
+    pub effective: Vec<EnvValue>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct EnvValue {
+    pub name: String,
+    pub value: String,
+}
+
 pub fn stages(document: &Dockerfile) -> Vec<Stage> {
     let from_indexes = document
         .instructions
@@ -99,4 +118,47 @@ fn arg_value(arg: &crate::ArgInstruction) -> ArgValue {
         name: arg.name.clone(),
         default: arg.default.clone(),
     }
+}
+
+pub fn env_scopes(document: &Dockerfile) -> EnvScopes {
+    let stage_values = stages(document)
+        .iter()
+        .map(|stage| {
+            let vars = document.instructions[stage.instruction_range.clone()]
+                .iter()
+                .filter_map(|instruction| instruction.env.as_ref())
+                .flat_map(|env| env.assignments.iter())
+                .map(|assignment| EnvValue {
+                    name: assignment.name.clone(),
+                    value: assignment.value.clone(),
+                })
+                .collect::<Vec<_>>();
+            StageEnv {
+                stage_index: stage.index,
+                effective: collapse_env(&vars),
+                vars,
+            }
+        })
+        .collect::<Vec<_>>();
+    let final_env = stage_values
+        .last()
+        .map(|stage| stage.effective.clone())
+        .unwrap_or_default();
+
+    EnvScopes {
+        stages: stage_values,
+        final_env,
+    }
+}
+
+fn collapse_env(values: &[EnvValue]) -> Vec<EnvValue> {
+    let mut collapsed = Vec::<EnvValue>::new();
+    for value in values {
+        if let Some(existing) = collapsed.iter_mut().find(|item| item.name == value.name) {
+            existing.value.clone_from(&value.value);
+        } else {
+            collapsed.push(value.clone());
+        }
+    }
+    collapsed
 }

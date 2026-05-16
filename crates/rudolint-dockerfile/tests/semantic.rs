@@ -1,4 +1,4 @@
-use rudolint_dockerfile::{arg_scopes, parse_dockerfile, stages};
+use rudolint_dockerfile::{arg_scopes, env_scopes, parse_dockerfile, stages};
 use rudolint_test::read_fixture;
 use serde_json::json;
 
@@ -56,4 +56,34 @@ fn snapshots_arg_scope_model() {
             })
         }).collect::<Vec<_>>(),
     }));
+}
+
+#[test]
+fn snapshots_env_model() {
+    let source = read_fixture("parser/env/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let scopes = env_scopes(&document);
+
+    insta::assert_json_snapshot!(json!({
+        "stages": scopes.stages.iter().map(|stage| {
+            json!({
+                "stage_index": stage.stage_index,
+                "vars": env_values_json(&stage.vars),
+                "effective": env_values_json(&stage.effective),
+            })
+        }).collect::<Vec<_>>(),
+        "final_env": env_values_json(&scopes.final_env),
+    }));
+}
+
+fn env_values_json(values: &[rudolint_dockerfile::EnvValue]) -> Vec<serde_json::Value> {
+    values
+        .iter()
+        .map(|value| {
+            json!({
+                "name": value.name,
+                "value": value.value,
+            })
+        })
+        .collect()
 }

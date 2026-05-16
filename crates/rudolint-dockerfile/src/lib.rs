@@ -7,4 +7,7 @@ pub use parser::{
     HealthcheckInstruction, Heredoc, Instruction, InstructionForm, LineContinuation, ParseRecovery,
     RecoveryKind, RunInstruction, ShellBody, SyntaxDirective, parse_dockerfile,
 };
-pub use semantic::{ArgScopes, ArgValue, Stage, StageArgs, arg_scopes, stages};
+pub use semantic::{
+    ArgScopes, ArgValue, EnvScopes, EnvValue, Stage, StageArgs, StageEnv, arg_scopes, env_scopes,
+    stages,
+};
