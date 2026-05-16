@@ -1154,6 +1154,22 @@ fn snapshots_rdl3060_yarn_cache_clean_fixture() {
 }
 
 #[test]
+fn snapshots_rdl3061_instruction_order_fixture() {
+    let source = read_fixture("rules/RDL3061.instruction-order/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDL3061")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdl3061_instruction_order_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rdl4000_deprecated_maintainer_fixture() {
     let source = read_fixture("rules/RDL4000.deprecated-maintainer/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");

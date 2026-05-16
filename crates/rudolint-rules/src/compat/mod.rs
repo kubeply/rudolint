@@ -68,6 +68,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(ValidEmailLabels),
         Box::new(ConsecutiveRun),
         Box::new(YarnCacheClean),
+        Box::new(InstructionOrder),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -2220,6 +2221,41 @@ impl Rule for YarnCacheClean {
 }
 
 rule_metadata!(
+    InstructionOrder,
+    "RDL3061",
+    "instruction-order",
+    Severity::Error,
+    "require Dockerfiles to begin with FROM, ARG, or comments"
+);
+
+impl Rule for InstructionOrder {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        let mut seen_from = false;
+        doc.instructions
+            .iter()
+            .filter_map(|instruction| match instruction.keyword.as_str() {
+                "FROM" => {
+                    seen_from = true;
+                    None
+                }
+                "ARG" if !seen_from => None,
+                _ if seen_from => None,
+                _ => Some(diagnostic(
+                    "RDL3061",
+                    Severity::Error,
+                    "Dockerfile must begin with FROM, ARG, or comment",
+                    instruction,
+                )),
+            })
+            .collect()
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -4063,7 +4099,5 @@ fn dnf_install_has_unpinned_packages(shell: &str) -> bool {
 }
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
-    vec![
-        "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
-    ]
+    vec!["RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006"]
 }
