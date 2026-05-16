@@ -288,8 +288,8 @@ expression: normalized_json(&output)
   {
     "code": "RDL3046",
     "severity": "warning",
-    "status": "planned",
-    "summary": "tracked for compatibility parity"
+    "status": "implemented",
+    "summary": "use no-log-init with high useradd UIDs"
   },
   {
     "code": "RDL3047",

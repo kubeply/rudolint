@@ -53,6 +53,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(NoOnbuildTrigger),
         Box::new(NoEnvSelfReference),
         Box::new(CopyRelativeWithoutWorkdir),
+        Box::new(UseraddNoLogInit),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -1601,6 +1602,38 @@ impl Rule for CopyRelativeWithoutWorkdir {
 }
 
 rule_metadata!(
+    UseraddNoLogInit,
+    "RDL3046",
+    "useradd-no-log-init",
+    Severity::Warning,
+    "use no-log-init with high useradd UIDs"
+);
+
+impl Rule for UseraddNoLogInit {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        doc.instructions
+            .iter()
+            .filter_map(|instruction| {
+                instruction_shell_or_onbuild_run(instruction).map(|shell| (instruction, shell))
+            })
+            .filter(|(_, shell)| useradd_missing_no_log_init(shell))
+            .map(|(instruction, _)| {
+                diagnostic(
+                    "RDL3046",
+                    Severity::Warning,
+                    "`useradd` without flag `-l` and high UID will result in excessively large image",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -2091,6 +2124,67 @@ fn is_relative_copy_destination(destination: &str) -> bool {
     !destination.starts_with('/')
         && !destination.starts_with('$')
         && !is_windows_absolute(destination)
+}
+
+fn instruction_shell_or_onbuild_run(instruction: &Instruction) -> Option<&str> {
+    match instruction.keyword.as_str() {
+        "RUN" => Some(&instruction.args),
+        "ONBUILD" => strip_instruction_prefix(&instruction.args, "RUN"),
+        _ => None,
+    }
+}
+
+fn strip_instruction_prefix<'a>(args: &'a str, keyword: &str) -> Option<&'a str> {
+    let trimmed = args.trim_start();
+    let (head, tail) = trimmed
+        .split_once(char::is_whitespace)
+        .unwrap_or((trimmed, ""));
+    head.eq_ignore_ascii_case(keyword)
+        .then_some(tail.trim_start())
+}
+
+fn useradd_missing_no_log_init(shell: &str) -> bool {
+    detect_command_invocations(shell)
+        .into_iter()
+        .filter(|invocation| invocation.command == "useradd")
+        .any(|invocation| {
+            !has_useradd_no_log_init_flag(&invocation.arguments)
+                && useradd_uid_values(&invocation.arguments)
+                    .into_iter()
+                    .any(|uid| uid.parse::<u64>().is_ok_and(|value| value > 99_999))
+        })
+}
+
+fn has_useradd_no_log_init_flag(arguments: &[String]) -> bool {
+    arguments
+        .iter()
+        .any(|argument| matches!(argument.as_str(), "-l" | "--no-log-init"))
+}
+
+fn useradd_uid_values(arguments: &[String]) -> Vec<&str> {
+    let mut values = Vec::new();
+    let mut index = 0;
+
+    while index < arguments.len() {
+        let argument = arguments[index].as_str();
+        if matches!(argument, "-u" | "--uid") {
+            if let Some(value) = arguments.get(index + 1) {
+                values.push(value.as_str());
+            }
+            index += 2;
+            continue;
+        }
+        if let Some(value) = argument.strip_prefix("--uid=") {
+            values.push(value);
+        } else if !argument.starts_with("--")
+            && let Some(value) = argument.strip_prefix("-u")
+        {
+            values.push(value.trim_start_matches('='));
+        }
+        index += 1;
+    }
+
+    values
 }
 
 fn apt_get_install_missing_yes(shell: &str) -> bool {
@@ -2910,8 +3004,8 @@ fn dnf_install_has_unpinned_packages(shell: &str) -> bool {
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3046", "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053",
-        "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061",
-        "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
+        "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053", "RDL3054",
+        "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062",
+        "RDL3063", "RDL4001", "RDL4005", "RDL4006",
     ]
 }
