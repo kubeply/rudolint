@@ -24,6 +24,7 @@ expression: document_json(&document)
       },
       "continuations": [],
       "copy": null,
+      "env": null,
       "flags": [],
       "form": {
         "kind": "shell",
@@ -74,6 +75,7 @@ expression: document_json(&document)
       },
       "continuations": [],
       "copy": null,
+      "env": null,
       "flags": [],
       "form": {
         "kind": "shell",
@@ -133,6 +135,7 @@ expression: document_json(&document)
       },
       "continuations": [],
       "copy": null,
+      "env": null,
       "flags": [],
       "form": {
         "kind": "shell",
@@ -186,6 +189,7 @@ expression: document_json(&document)
       },
       "continuations": [],
       "copy": null,
+      "env": null,
       "flags": [],
       "form": {
         "kind": "shell",
