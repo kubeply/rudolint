@@ -500,6 +500,26 @@ fn snapshots_rdl3025_json_entrypoints_fixture() {
 }
 
 #[test]
+fn snapshots_rdl3026_trusted_registries_fixture() {
+    let source = read_fixture("rules/RDL3026.trusted-registries/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let config = Config {
+        trusted_registries: vec!["ghcr.io".to_string(), "localhost:5000".to_string()],
+        ..Config::default()
+    };
+    let findings = RuleEngine::new(Profile::Default, config)
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDL3026")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdl3026_trusted_registries_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rdl4000_deprecated_maintainer_fixture() {
     let source = read_fixture("rules/RDL4000.deprecated-maintainer/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");

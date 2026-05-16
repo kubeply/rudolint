@@ -1,6 +1,7 @@
 use std::collections::BTreeSet;
 
 use crate::{Rule, RuleInfo, metadata::diagnostic, metadata::rule_metadata};
+use rudolint_config::Config;
 use rudolint_diagnostics::{Finding, Severity};
 use rudolint_dockerfile::{Comment, CopyKind, Dockerfile, Instruction, InstructionForm};
 use rudolint_fix::{FixApplicability, FixPreview, TextEdit};
@@ -34,6 +35,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(CopyFromOwnStage),
         Box::new(UniqueStageNames),
         Box::new(JsonEntrypoints),
+        Box::new(TrustedRegistries),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -909,6 +911,56 @@ impl Rule for JsonEntrypoints {
 }
 
 rule_metadata!(
+    TrustedRegistries,
+    "RDL3026",
+    "trusted-registries",
+    Severity::Error,
+    "restrict FROM images to trusted registries"
+);
+
+impl Rule for TrustedRegistries {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, _doc: &Dockerfile) -> Vec<Finding> {
+        Vec::new()
+    }
+
+    fn check_with_config(&self, doc: &Dockerfile, config: &Config) -> Vec<Finding> {
+        if config.trusted_registries.is_empty() {
+            return Vec::new();
+        }
+
+        let mut stage_aliases = BTreeSet::new();
+        let mut findings = Vec::new();
+        for instruction in &doc.instructions {
+            if instruction.keyword != "FROM" {
+                continue;
+            }
+            let Some(from) = &instruction.from else {
+                continue;
+            };
+
+            if !from_image_uses_trusted_registry(&from.image, &stage_aliases, config) {
+                findings.push(diagnostic(
+                    "RDL3026",
+                    Severity::Error,
+                    format!("base image `{}` is not from a trusted registry", from.image),
+                    instruction,
+                ));
+            }
+
+            if let Some(alias) = instruction.stage_alias() {
+                stage_aliases.insert(alias.to_ascii_lowercase());
+            }
+        }
+
+        findings
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -1568,12 +1620,41 @@ fn copy_from_references_current_stage(
         })
 }
 
+fn from_image_uses_trusted_registry(
+    image: &str,
+    stage_aliases: &BTreeSet<String>,
+    config: &Config,
+) -> bool {
+    if image == "scratch" || stage_aliases.contains(&image.to_ascii_lowercase()) {
+        return true;
+    }
+
+    image_registry(image).is_some_and(|registry| {
+        config
+            .trusted_registries
+            .iter()
+            .any(|trusted| trusted.trim_end_matches('/') == registry)
+    })
+}
+
+fn image_registry(image: &str) -> Option<&str> {
+    let first_component = image.split('/').next()?;
+    if first_component == "localhost"
+        || first_component.contains('.')
+        || first_component.contains(':')
+    {
+        Some(first_component)
+    } else {
+        None
+    }
+}
+
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3026", "RDL3027", "RDL3028", "RDL3029", "RDL3030", "RDL3032", "RDL3033", "RDL3034",
-        "RDL3035", "RDL3036", "RDL3037", "RDL3038", "RDL3040", "RDL3041", "RDL3042", "RDL3043",
-        "RDL3044", "RDL3045", "RDL3046", "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051",
-        "RDL3052", "RDL3053", "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059",
-        "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
+        "RDL3027", "RDL3028", "RDL3029", "RDL3030", "RDL3032", "RDL3033", "RDL3034", "RDL3035",
+        "RDL3036", "RDL3037", "RDL3038", "RDL3040", "RDL3041", "RDL3042", "RDL3043", "RDL3044",
+        "RDL3045", "RDL3046", "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052",
+        "RDL3053", "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060",
+        "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
     ]
 }

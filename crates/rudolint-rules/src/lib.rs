@@ -8,6 +8,7 @@ mod shell;
 use std::fmt;
 
 use clap::ValueEnum;
+use rudolint_config::Config;
 use rudolint_diagnostics::{Finding, Severity};
 use rudolint_dockerfile::Dockerfile;
 use rudolint_fix::FixPreview;
@@ -89,6 +90,11 @@ pub trait Rule: Send + Sync {
     fn info(&self) -> RuleInfo;
     /// Returns diagnostics for `document`.
     fn check(&self, document: &Dockerfile) -> Vec<Finding>;
+
+    /// Returns diagnostics for `document` using configuration, when needed.
+    fn check_with_config(&self, document: &Dockerfile, _config: &Config) -> Vec<Finding> {
+        self.check(document)
+    }
 
     /// Returns suggested fixes for `document`, if this rule supports them.
     fn fix(&self, _document: &Dockerfile) -> Vec<FixPreview> {

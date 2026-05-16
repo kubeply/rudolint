@@ -1,0 +1,38 @@
+---
+source: crates/rudolint-rules/tests/rule_fixtures.rs
+expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
+---
+[
+  {
+    "code": "RDL3026",
+    "help": null,
+    "labels": [],
+    "message": "base image `docker.io/library/alpine:3.20` is not from a trusted registry",
+    "path": "",
+    "primary_span": {
+      "end_byte": 0,
+      "end_column": 1,
+      "end_line": 4,
+      "start_byte": 0,
+      "start_column": 1,
+      "start_line": 4
+    },
+    "severity": "error"
+  },
+  {
+    "code": "RDL3026",
+    "help": null,
+    "labels": [],
+    "message": "base image `alpine:3.20` is not from a trusted registry",
+    "path": "",
+    "primary_span": {
+      "end_byte": 0,
+      "end_column": 1,
+      "end_line": 10,
+      "start_byte": 0,
+      "start_column": 1,
+      "start_line": 10
+    },
+    "severity": "error"
+  }
+]
