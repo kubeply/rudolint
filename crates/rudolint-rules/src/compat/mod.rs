@@ -300,12 +300,10 @@ impl Rule for PreferCopy {
             .iter()
             .filter(|instruction| instruction.keyword == "ADD")
             .filter(|instruction| {
-                let source = instruction.args.split_whitespace().next().unwrap_or("");
-                !(source.starts_with("http://")
-                    || source.starts_with("https://")
-                    || source.ends_with(".tar")
-                    || source.ends_with(".tar.gz")
-                    || source.ends_with(".tgz"))
+                let sources = add_sources(&instruction.args);
+                !sources
+                    .iter()
+                    .all(|source| is_url_source(source) || is_archive_source(source))
             })
             .map(|instruction| {
                 diagnostic(
@@ -535,6 +533,32 @@ fn image_needs_explicit_tag(image: &str, stage_aliases: &BTreeSet<String>) -> bo
     }
 
     !image.rsplit('/').next().unwrap_or("").contains(':')
+}
+
+fn add_sources(args: &str) -> Vec<&str> {
+    let mut parts = args
+        .split_whitespace()
+        .filter(|part| !part.starts_with("--"))
+        .collect::<Vec<_>>();
+    if parts.len() <= 1 {
+        return Vec::new();
+    }
+
+    parts.pop();
+    parts
+}
+
+fn is_url_source(source: &str) -> bool {
+    source.starts_with("http://") || source.starts_with("https://")
+}
+
+fn is_archive_source(source: &str) -> bool {
+    let source = source.to_ascii_lowercase();
+    [
+        ".tar", ".tar.gz", ".tgz", ".tar.bz2", ".tbz2", ".tar.xz", ".txz", ".gz", ".bz2", ".xz",
+    ]
+    .iter()
+    .any(|suffix| source.ends_with(suffix))
 }
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
