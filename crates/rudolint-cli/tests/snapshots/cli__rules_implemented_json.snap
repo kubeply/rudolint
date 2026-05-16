@@ -416,5 +416,11 @@ expression: normalized_json(&output)
     "severity": "error",
     "status": "implemented",
     "summary": "allow only one ENTRYPOINT instruction"
+  },
+  {
+    "code": "RDL4005",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "use SHELL to change the default shell"
   }
 ]

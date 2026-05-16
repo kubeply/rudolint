@@ -761,5 +761,16 @@ expression: metadata
     "profile": "compat",
     "status": "implemented",
     "summary": "allow only one ENTRYPOINT instruction"
+  },
+  {
+    "category": "compatibility",
+    "code": "RDL4005",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4005.md",
+    "fix": "none",
+    "name": "use-shell-for-default-shell",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "use SHELL to change the default shell"
   }
 ]

@@ -73,6 +73,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(ReservedStageName),
         Box::new(DeprecatedMaintainer),
         Box::new(EitherWgetOrCurl),
+        Box::new(UseShellForDefaultShell),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
     ]
@@ -2437,6 +2438,37 @@ impl Rule for EitherWgetOrCurl {
 }
 
 rule_metadata!(
+    UseShellForDefaultShell,
+    "RDL4005",
+    "use-shell-for-default-shell",
+    Severity::Warning,
+    "use SHELL to change the default shell"
+);
+
+impl Rule for UseShellForDefaultShell {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        doc.instructions
+            .iter()
+            .filter(|instruction| {
+                instruction.keyword == "RUN" && run_links_default_shell(instruction)
+            })
+            .map(|instruction| {
+                diagnostic(
+                    "RDL4005",
+                    Severity::Warning,
+                    "use SHELL to change the default shell",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+rule_metadata!(
     SingleCmd,
     "RDL4003",
     "single-cmd",
@@ -3370,6 +3402,29 @@ fn download_commands(instruction: &Instruction) -> BTreeSet<&'static str> {
             _ => None,
         })
         .collect()
+}
+
+fn run_links_default_shell(instruction: &Instruction) -> bool {
+    let Some(shell) = instruction.run.as_ref().and_then(|run| run.shell.as_ref()) else {
+        return false;
+    };
+
+    detect_command_invocations(&shell.text)
+        .iter()
+        .any(|invocation| {
+            invocation.command == "ln"
+                && invocation
+                    .arguments
+                    .iter()
+                    .rfind(|argument| !argument.starts_with('-'))
+                    .is_some_and(|argument| argument == "/bin/sh")
+                && invocation.arguments.iter().any(|argument| {
+                    argument == "--symbolic"
+                        || (argument.starts_with('-')
+                            && !argument.starts_with("--")
+                            && argument.chars().skip(1).any(|flag| flag == 's'))
+                })
+        })
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -4367,5 +4422,5 @@ fn dnf_install_has_unpinned_packages(shell: &str) -> bool {
 }
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
-    vec!["RDL4005", "RDL4006"]
+    vec!["RDL4006"]
 }

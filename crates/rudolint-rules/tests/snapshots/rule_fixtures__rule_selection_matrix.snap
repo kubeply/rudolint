@@ -135,7 +135,8 @@ expression: snapshot
       "RDL4000",
       "RDL4001",
       "RDL4003",
-      "RDL4004"
+      "RDL4004",
+      "RDL4005"
     ],
     "default": [
       "RDK1000",
@@ -206,7 +207,8 @@ expression: snapshot
       "RDL4000",
       "RDL4001",
       "RDL4003",
-      "RDL4004"
+      "RDL4004",
+      "RDL4005"
     ]
   },
   "profile_findings": {
