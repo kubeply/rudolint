@@ -540,6 +540,7 @@ dependencies = [
  "rudolint-diagnostics",
  "serde",
  "serde_yaml",
+ "tempfile",
 ]
 
 [[package]]

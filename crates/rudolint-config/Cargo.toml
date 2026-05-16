@@ -11,3 +11,6 @@ anyhow.workspace = true
 rudolint-diagnostics.workspace = true
 serde.workspace = true
 serde_yaml.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true

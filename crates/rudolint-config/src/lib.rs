@@ -32,7 +32,9 @@ impl Config {
         };
         let raw = fs::read_to_string(path)
             .with_context(|| format!("failed to read {}", path.display()))?;
-        serde_yaml::from_str(&raw).with_context(|| format!("failed to parse {}", path.display()))
+        serde_yaml::from_str(&raw)
+            .map_err(|error| parse_error(path, error))
+            .with_context(|| format!("failed to parse {}", path.display()))
     }
 
     pub fn load_discovered(explicit: Option<&Path>, starts: &[PathBuf]) -> Result<Self> {
@@ -52,6 +54,14 @@ impl Config {
     pub fn severity_override(&self, code: &str) -> Option<Severity> {
         self.severity.get(code).copied()
     }
+}
+
+fn parse_error(path: &Path, error: serde_yaml::Error) -> anyhow::Error {
+    let location = error
+        .location()
+        .map(|location| format!(" at line {}, column {}", location.line(), location.column()))
+        .unwrap_or_default();
+    anyhow::anyhow!("{}{}: {}", path.display(), location, error)
 }
 
 pub fn discover(starts: &[PathBuf]) -> Result<Option<PathBuf>> {
@@ -121,5 +131,18 @@ per-file-ignores:
         assert_eq!(config.trusted_registries, ["ghcr.io"]);
         assert!(config.allow_entitlements.contains("security.insecure"));
         assert!(config.per_file_ignores["fixtures/**"].contains("RDL3000"));
+    }
+
+    #[test]
+    fn parse_errors_include_line_and_column_when_available() {
+        let temp = tempfile::TempDir::new().expect("temp dir should be created");
+        let path = temp.path().join(".rudolint.yaml");
+        std::fs::write(&path, "ignore: [RDL3000\n").expect("config should be written");
+
+        let error = Config::load(Some(&path)).expect_err("config should fail to parse");
+        let message = format!("{error:#}");
+
+        assert!(message.contains("line 1"));
+        assert!(message.contains("column"));
     }
 }

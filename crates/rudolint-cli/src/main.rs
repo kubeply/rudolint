@@ -282,6 +282,6 @@ fn source_excerpt(findings: &[Finding], sources: &BTreeMap<PathBuf, String>) -> 
 
 impl From<anyhow::Error> for AppError {
     fn from(error: anyhow::Error) -> Self {
-        AppError::usage(error.to_string())
+        AppError::usage(format!("{error:#}"))
     }
 }
