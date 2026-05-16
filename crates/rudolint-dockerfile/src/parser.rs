@@ -62,6 +62,7 @@ pub struct Instruction {
     pub healthcheck: Option<HealthcheckInstruction>,
     pub arg: Option<ArgInstruction>,
     pub env: Option<EnvInstruction>,
+    pub label: Option<LabelInstruction>,
     pub expose: Option<ExposeInstruction>,
     pub recovery: Option<ParseRecovery>,
     pub line: usize,
@@ -160,6 +161,17 @@ pub enum EnvForm {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EnvAssignment {
     pub name: String,
+    pub value: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LabelInstruction {
+    pub pairs: Vec<LabelPair>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LabelPair {
+    pub key: String,
     pub value: String,
 }
 
@@ -398,6 +410,7 @@ fn parse_instruction(
             healthcheck: None,
             arg: None,
             env: None,
+            label: None,
             expose: None,
             recovery,
             line,
@@ -435,6 +448,7 @@ fn parse_instruction(
         .then(|| parse_healthcheck(&args, args_start, &flags, source_file));
     let arg = (keyword == "ARG").then(|| parse_arg(&args)).flatten();
     let env = (keyword == "ENV").then(|| parse_env(&args)).flatten();
+    let label = (keyword == "LABEL").then(|| parse_label(&args)).flatten();
     let expose = (keyword == "EXPOSE").then(|| parse_expose(&args));
     let heredocs = parse_heredocs(raw, start_byte, &keyword, source_file)?;
 
@@ -454,6 +468,7 @@ fn parse_instruction(
         healthcheck,
         arg,
         env,
+        label,
         expose,
         recovery,
         line,
@@ -566,6 +581,21 @@ fn parse_env(args: &str) -> Option<EnvInstruction> {
         form: EnvForm::LegacyPair,
         assignments: vec![EnvAssignment { name, value }],
     })
+}
+
+fn parse_label(args: &str) -> Option<LabelInstruction> {
+    let pairs = args
+        .split_whitespace()
+        .filter_map(|token| {
+            let (key, value) = token.split_once('=')?;
+            Some(LabelPair {
+                key: key.to_string(),
+                value: value.to_string(),
+            })
+        })
+        .collect::<Vec<_>>();
+
+    (!pairs.is_empty()).then_some(LabelInstruction { pairs })
 }
 
 fn parse_expose(args: &str) -> ExposeInstruction {

@@ -70,62 +70,61 @@ expression: document_json(&document)
     },
     {
       "arg": null,
-      "args": "APP_HOME=/app APP_ENV=production",
+      "args": "org.opencontainers.image.title=\"rudolint\" maintainer=ops@example.com",
       "args_span": {
-        "end_byte": 53,
-        "end_column": 37,
+        "end_byte": 91,
+        "end_column": 75,
         "end_line": 2,
-        "start_byte": 21,
-        "start_column": 5,
+        "start_byte": 23,
+        "start_column": 7,
         "start_line": 2
       },
       "continuations": [],
       "copy": null,
-      "env": {
-        "assignments": [
-          {
-            "name": "APP_HOME",
-            "value": "/app"
-          },
-          {
-            "name": "APP_ENV",
-            "value": "production"
-          }
-        ],
-        "form": "key_value"
-      },
+      "env": null,
       "expose": null,
       "flags": [],
       "form": {
         "kind": "shell",
         "span": {
-          "end_byte": 53,
-          "end_column": 37,
+          "end_byte": 91,
+          "end_column": 75,
           "end_line": 2,
-          "start_byte": 21,
-          "start_column": 5,
+          "start_byte": 23,
+          "start_column": 7,
           "start_line": 2
         },
-        "text": "APP_HOME=/app APP_ENV=production"
+        "text": "org.opencontainers.image.title=\"rudolint\" maintainer=ops@example.com"
       },
       "from": null,
       "healthcheck": null,
       "heredocs": [],
-      "keyword": "ENV",
+      "keyword": "LABEL",
       "keyword_span": {
-        "end_byte": 20,
-        "end_column": 4,
+        "end_byte": 22,
+        "end_column": 6,
         "end_line": 2,
         "start_byte": 17,
         "start_column": 1,
         "start_line": 2
       },
-      "label": null,
+      "label": {
+        "pairs": [
+          {
+            "key": "org.opencontainers.image.title",
+            "value": "\"rudolint\""
+          },
+          {
+            "key": "maintainer",
+            "value": "ops@example.com"
+          }
+        ]
+      },
       "line": 2,
       "mounts": [],
       "raw_span": {
-        "end_byte": 53,
-        "end_column": 37,
+        "end_byte": 91,
+        "end_column": 75,
         "end_line": 2,
         "start_byte": 17,
         "start_column": 1,
@@ -136,60 +135,59 @@ expression: document_json(&document)
     },
     {
       "arg": null,
-      "args": "PATH /usr/local/bin:$PATH",
+      "args": "version=\"1.0.0\"",
       "args_span": {
-        "end_byte": 83,
-        "end_column": 30,
+        "end_byte": 113,
+        "end_column": 22,
         "end_line": 3,
-        "start_byte": 58,
-        "start_column": 5,
+        "start_byte": 98,
+        "start_column": 7,
         "start_line": 3
       },
       "continuations": [],
       "copy": null,
-      "env": {
-        "assignments": [
-          {
-            "name": "PATH",
-            "value": "/usr/local/bin:$PATH"
-          }
-        ],
-        "form": "legacy_pair"
-      },
+      "env": null,
       "expose": null,
       "flags": [],
       "form": {
         "kind": "shell",
         "span": {
-          "end_byte": 83,
-          "end_column": 30,
+          "end_byte": 113,
+          "end_column": 22,
           "end_line": 3,
-          "start_byte": 58,
-          "start_column": 5,
+          "start_byte": 98,
+          "start_column": 7,
           "start_line": 3
         },
-        "text": "PATH /usr/local/bin:$PATH"
+        "text": "version=\"1.0.0\""
       },
       "from": null,
       "healthcheck": null,
       "heredocs": [],
-      "keyword": "ENV",
+      "keyword": "LABEL",
       "keyword_span": {
-        "end_byte": 57,
-        "end_column": 4,
+        "end_byte": 97,
+        "end_column": 6,
         "end_line": 3,
-        "start_byte": 54,
+        "start_byte": 92,
         "start_column": 1,
         "start_line": 3
       },
-      "label": null,
+      "label": {
+        "pairs": [
+          {
+            "key": "version",
+            "value": "\"1.0.0\""
+          }
+        ]
+      },
       "line": 3,
       "mounts": [],
       "raw_span": {
-        "end_byte": 83,
-        "end_column": 30,
+        "end_byte": 113,
+        "end_column": 22,
         "end_line": 3,
-        "start_byte": 54,
+        "start_byte": 92,
         "start_column": 1,
         "start_line": 3
       },

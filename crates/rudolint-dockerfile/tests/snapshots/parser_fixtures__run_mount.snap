@@ -67,6 +67,7 @@ expression: document_json(&document)
         "start_column": 1,
         "start_line": 2
       },
+      "label": null,
       "line": 2,
       "mounts": [],
       "raw_span": {
@@ -125,6 +126,7 @@ expression: document_json(&document)
         "start_column": 1,
         "start_line": 3
       },
+      "label": null,
       "line": 3,
       "mounts": [
         {
@@ -244,6 +246,7 @@ expression: document_json(&document)
         "start_column": 1,
         "start_line": 4
       },
+      "label": null,
       "line": 4,
       "mounts": [],
       "raw_span": {
