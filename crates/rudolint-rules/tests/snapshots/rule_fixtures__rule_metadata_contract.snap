@@ -335,6 +335,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3027",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3027.md",
+    "fix": "none",
+    "name": "use-apt-get",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "prefer apt-get or apt-cache over apt"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL4000",
     "default_severity": "error",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4000.md",
