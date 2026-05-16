@@ -92,6 +92,13 @@ pub enum InstructionForm {
     Empty,
     /// Instruction uses JSON exec form.
     Json(Vec<String>),
+    /// Instruction starts like JSON exec form but could not be parsed.
+    InvalidJson {
+        /// Raw argument string.
+        raw: String,
+        /// JSON parser error message.
+        error: String,
+    },
     /// Instruction uses shell form.
     Shell(String),
 }
@@ -317,10 +324,14 @@ fn parse_instruction_form(args: &str) -> InstructionForm {
         return InstructionForm::Empty;
     }
 
-    if args.starts_with('[')
-        && let Ok(values) = serde_json::from_str::<Vec<String>>(args)
-    {
-        return InstructionForm::Json(values);
+    if args.starts_with('[') {
+        return match serde_json::from_str::<Vec<String>>(args) {
+            Ok(values) => InstructionForm::Json(values),
+            Err(error) => InstructionForm::InvalidJson {
+                raw: args.to_string(),
+                error: error.to_string(),
+            },
+        };
     }
 
     InstructionForm::Shell(args.to_string())

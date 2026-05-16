@@ -20,6 +20,7 @@ fn snapshots_parser_matrix() {
         ("heredocs", "parser/heredocs/Dockerfile"),
         ("windows_escape", "parser/windows-escape/Dockerfile"),
         ("json_form", "parser/json-form/Dockerfile"),
+        ("invalid_json_form", "parser/invalid-json-form/Dockerfile"),
         ("run_mount", "parser/run-mount/Dockerfile"),
         ("from_platform", "parser/from-platform/Dockerfile"),
         ("copy_from", "parser/copy-from/Dockerfile"),
@@ -103,6 +104,11 @@ fn instruction_form_json(form: &InstructionForm) -> Value {
         InstructionForm::Json(values) => json!({
             "kind": "json",
             "values": values,
+        }),
+        InstructionForm::InvalidJson { raw, error } => json!({
+            "kind": "invalid_json",
+            "raw": raw,
+            "error": error,
         }),
         InstructionForm::Shell(value) => json!({
             "kind": "shell",
