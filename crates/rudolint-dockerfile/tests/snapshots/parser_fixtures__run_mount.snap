@@ -1,0 +1,52 @@
+---
+source: crates/rudolint-dockerfile/tests/parser_fixtures.rs
+expression: document_json(&document)
+---
+{
+  "has_buildkit_features": true,
+  "instructions": [
+    {
+      "args": "alpine:3.20",
+      "flags": [],
+      "heredocs": [],
+      "keyword": "FROM",
+      "line": 2,
+      "mounts": []
+    },
+    {
+      "args": "--mount=type=cache,target=/var/cache/apk,sharing=locked apk add curl",
+      "flags": [
+        [
+          "mount",
+          "type=cache,target=/var/cache/apk,sharing=locked"
+        ]
+      ],
+      "heredocs": [],
+      "keyword": "RUN",
+      "line": 3,
+      "mounts": [
+        {
+          "options": [
+            [
+              "type",
+              "cache"
+            ],
+            [
+              "target",
+              "/var/cache/apk"
+            ],
+            [
+              "sharing",
+              "locked"
+            ]
+          ],
+          "type": "cache"
+        }
+      ]
+    }
+  ],
+  "syntax": {
+    "image": "docker/dockerfile:1.7",
+    "line": 1
+  }
+}

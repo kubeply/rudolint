@@ -1,0 +1,44 @@
+---
+source: crates/rudolint-dockerfile/tests/parser_fixtures.rs
+expression: document_json(&document)
+---
+{
+  "has_buildkit_features": true,
+  "instructions": [
+    {
+      "args": "alpine:3.20",
+      "flags": [],
+      "heredocs": [],
+      "keyword": "FROM",
+      "line": 1,
+      "mounts": []
+    },
+    {
+      "args": "<<EOF",
+      "flags": [],
+      "heredocs": [
+        "EOF"
+      ],
+      "keyword": "RUN",
+      "line": 2,
+      "mounts": []
+    },
+    {
+      "args": "hello",
+      "flags": [],
+      "heredocs": [],
+      "keyword": "ECHO",
+      "line": 3,
+      "mounts": []
+    },
+    {
+      "args": "",
+      "flags": [],
+      "heredocs": [],
+      "keyword": "EOF",
+      "line": 4,
+      "mounts": []
+    }
+  ],
+  "syntax": null
+}

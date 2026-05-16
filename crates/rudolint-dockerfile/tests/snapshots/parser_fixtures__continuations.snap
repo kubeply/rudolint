@@ -1,0 +1,26 @@
+---
+source: crates/rudolint-dockerfile/tests/parser_fixtures.rs
+expression: document_json(&document)
+---
+{
+  "has_buildkit_features": false,
+  "instructions": [
+    {
+      "args": "alpine:3.20",
+      "flags": [],
+      "heredocs": [],
+      "keyword": "FROM",
+      "line": 1,
+      "mounts": []
+    },
+    {
+      "args": "apk add \\\n    curl \\\n    git",
+      "flags": [],
+      "heredocs": [],
+      "keyword": "RUN",
+      "line": 2,
+      "mounts": []
+    }
+  ],
+  "syntax": null
+}
