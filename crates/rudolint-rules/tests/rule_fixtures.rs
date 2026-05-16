@@ -309,6 +309,38 @@ fn snapshots_rdl4003_single_cmd_fixture() {
 }
 
 #[test]
+fn snapshots_rdl4004_single_entrypoint_fixture() {
+    let fixtures = [
+        "RDL4004.no-entrypoint",
+        "RDL4004.single-entrypoint",
+        "RDL4004.duplicate-entrypoint",
+    ];
+
+    let cases = fixtures
+        .into_iter()
+        .map(|fixture| {
+            let source = read_fixture(format!("rules/{fixture}/Dockerfile"));
+            let document = parse_dockerfile(&source).expect("fixture should parse");
+            let findings = RuleEngine::new(Profile::Default, Config::default())
+                .lint(&document)
+                .into_iter()
+                .filter(|finding| finding.code == "RDL4004")
+                .collect::<Vec<_>>();
+
+            serde_json::json!({
+                "fixture": fixture,
+                "findings": findings,
+            })
+        })
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdl4004_single_entrypoint_fixture",
+        serde_json::to_value(&cases).expect("cases should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rule_selection_matrix() {
     let source = read_fixture("rules/default-basic/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
