@@ -130,6 +130,12 @@ expression: normalized_json(&output)
     "summary": "pin versions in npm install"
   },
   {
+    "code": "RDL3018",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "pin versions in apk add"
+  },
+  {
     "code": "RDL3020",
     "severity": "error",
     "status": "implemented",
