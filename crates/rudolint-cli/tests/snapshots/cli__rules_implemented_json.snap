@@ -58,6 +58,12 @@ expression: normalized_json(&output)
     "summary": "prefer WORKDIR over RUN cd"
   },
   {
+    "code": "RDL3004",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "avoid sudo in Docker builds"
+  },
+  {
     "code": "RDL3006",
     "severity": "warning",
     "status": "implemented",

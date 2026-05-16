@@ -154,6 +154,22 @@ fn snapshots_rdl3003_use_workdir_for_cd_fixture() {
 }
 
 #[test]
+fn snapshots_rdl3004_no_sudo_fixture() {
+    let source = read_fixture("rules/RDL3004.no-sudo/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDL3004")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdl3004_no_sudo_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rdl3006_explicit_from_tag_fixture() {
     let source = read_fixture("rules/RDL3006.explicit-from-tag/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");

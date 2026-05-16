@@ -104,6 +104,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3004",
+    "default_severity": "error",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3004.md",
+    "fix": "none",
+    "name": "no-sudo",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "avoid sudo in Docker builds"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL3006",
     "default_severity": "warning",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3006.md",
