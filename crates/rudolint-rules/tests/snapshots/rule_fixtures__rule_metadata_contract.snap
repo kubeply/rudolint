@@ -368,6 +368,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3030",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3030.md",
+    "fix": "none",
+    "name": "yum-install-assume-yes",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "use -y with yum install"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL4000",
     "default_severity": "error",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4000.md",

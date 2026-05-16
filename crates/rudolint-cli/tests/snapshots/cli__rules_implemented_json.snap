@@ -202,6 +202,12 @@ expression: normalized_json(&output)
     "summary": "avoid --platform in FROM"
   },
   {
+    "code": "RDL3030",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "use -y with yum install"
+  },
+  {
     "code": "RDL4000",
     "severity": "error",
     "status": "implemented",
