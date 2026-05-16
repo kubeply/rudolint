@@ -138,6 +138,22 @@ fn snapshots_rdl3002_final_user_not_root_fixture() {
 }
 
 #[test]
+fn snapshots_rdl3003_use_workdir_for_cd_fixture() {
+    let source = read_fixture("rules/RDL3003.use-workdir-for-cd/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDL3003")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdl3003_use_workdir_for_cd_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rdl3006_explicit_from_tag_fixture() {
     let source = read_fixture("rules/RDL3006.explicit-from-tag/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");

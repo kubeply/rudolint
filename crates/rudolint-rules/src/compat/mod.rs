@@ -5,7 +5,7 @@ use rudolint_diagnostics::{Finding, Severity};
 use rudolint_dockerfile::{Comment, Dockerfile};
 use rudolint_fix::{FixApplicability, FixPreview, TextEdit};
 use rudolint_policy::LegacySuppression;
-use rudolint_shell::detect_disallowed_container_commands;
+use rudolint_shell::{detect_command_invocations, detect_disallowed_container_commands};
 
 pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
     vec![
@@ -13,6 +13,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(DisallowedContainerCommands),
         Box::new(AbsoluteWorkdir),
         Box::new(LastUserNotRoot),
+        Box::new(UseWorkdirForCd),
         Box::new(ExplicitFromTag),
         Box::new(NoLatestTag),
         Box::new(ValidExposePort),
@@ -160,6 +161,40 @@ impl Rule for LastUserNotRoot {
         } else {
             Vec::new()
         }
+    }
+}
+
+rule_metadata!(
+    UseWorkdirForCd,
+    "RDL3003",
+    "use-workdir-for-cd",
+    Severity::Warning,
+    "prefer WORKDIR over RUN cd"
+);
+
+impl Rule for UseWorkdirForCd {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        doc.instructions
+            .iter()
+            .filter(|instruction| instruction.keyword == "RUN")
+            .filter(|instruction| {
+                detect_command_invocations(&instruction.args)
+                    .into_iter()
+                    .any(|invocation| invocation.command == "cd")
+            })
+            .map(|instruction| {
+                diagnostic(
+                    "RDL3003",
+                    Severity::Warning,
+                    "use WORKDIR instead of RUN cd",
+                    instruction,
+                )
+            })
+            .collect()
     }
 }
 
@@ -593,12 +628,12 @@ fn normalized_add_source(source: &str) -> String {
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3003", "RDL3004", "RDL3008", "RDL3009", "RDL3010", "RDL3013", "RDL3014", "RDL3015",
-        "RDL3016", "RDL3018", "RDL3019", "RDL3021", "RDL3022", "RDL3023", "RDL3026", "RDL3027",
-        "RDL3028", "RDL3029", "RDL3030", "RDL3032", "RDL3033", "RDL3034", "RDL3035", "RDL3036",
-        "RDL3037", "RDL3038", "RDL3040", "RDL3041", "RDL3042", "RDL3043", "RDL3044", "RDL3045",
-        "RDL3046", "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053",
-        "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061",
-        "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
+        "RDL3004", "RDL3008", "RDL3009", "RDL3010", "RDL3013", "RDL3014", "RDL3015", "RDL3016",
+        "RDL3018", "RDL3019", "RDL3021", "RDL3022", "RDL3023", "RDL3026", "RDL3027", "RDL3028",
+        "RDL3029", "RDL3030", "RDL3032", "RDL3033", "RDL3034", "RDL3035", "RDL3036", "RDL3037",
+        "RDL3038", "RDL3040", "RDL3041", "RDL3042", "RDL3043", "RDL3044", "RDL3045", "RDL3046",
+        "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053", "RDL3054",
+        "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062",
+        "RDL3063", "RDL4001", "RDL4005", "RDL4006",
     ]
 }

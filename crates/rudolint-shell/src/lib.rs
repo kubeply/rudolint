@@ -7,6 +7,13 @@ pub struct ShellProgram {
     pub source: String,
 }
 
+/// Executable command detected at a shell command boundary.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ShellCommandInvocation {
+    /// Command basename, with any leading path removed.
+    pub command: String,
+}
+
 /// Package manager executable detected in shell command text.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PackageManager {
@@ -36,6 +43,7 @@ pub enum PackageManager {
     Go,
 }
 
+/// Commands that rarely make sense inside Docker build `RUN` steps.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DisallowedContainerCommand {
     /// OpenSSH client command.
@@ -137,6 +145,21 @@ pub fn detect_package_managers(shell: &str) -> Vec<PackageManager> {
 /// returns each detected command once, preserving first-seen order.
 pub fn detect_disallowed_container_commands(shell: &str) -> Vec<DisallowedContainerCommand> {
     let mut commands = Vec::new();
+
+    for invocation in detect_command_invocations(shell) {
+        if let Some(command) = disallowed_container_command(&invocation.command)
+            && !commands.contains(&command)
+        {
+            commands.push(command);
+        }
+    }
+
+    commands
+}
+
+/// Detects executable commands at shell command boundaries.
+pub fn detect_command_invocations(shell: &str) -> Vec<ShellCommandInvocation> {
+    let mut commands = Vec::new();
     let mut expect_command = true;
 
     for raw_token in shell_tokens(shell) {
@@ -161,11 +184,9 @@ pub fn detect_disallowed_container_commands(shell: &str) -> Vec<DisallowedContai
             }
 
             let command = token.rsplit('/').next().unwrap_or(token);
-            if let Some(command) = disallowed_container_command(command)
-                && !commands.contains(&command)
-            {
-                commands.push(command);
-            }
+            commands.push(ShellCommandInvocation {
+                command: command.to_string(),
+            });
             expect_command = false;
         }
     }
@@ -306,6 +327,32 @@ mod tests {
                     "commands": detect_disallowed_container_commands(case)
                         .into_iter()
                         .map(DisallowedContainerCommand::as_str)
+                        .collect::<Vec<_>>(),
+                })
+            })
+            .collect::<Vec<_>>();
+
+        insta::assert_json_snapshot!(values);
+    }
+
+    #[test]
+    fn snapshots_command_invocation_detection() {
+        let cases = [
+            "cd /tmp && make",
+            "apk add vim",
+            "FOO=bar /usr/bin/service nginx start",
+            "printf '%s' cd",
+            "mount -t proc proc /proc; ifconfig",
+            "mount -t proc proc /proc;ifconfig",
+        ];
+        let values = cases
+            .iter()
+            .map(|case| {
+                json!({
+                    "shell": case,
+                    "commands": detect_command_invocations(case)
+                        .into_iter()
+                        .map(|invocation| invocation.command)
                         .collect::<Vec<_>>(),
                 })
             })
