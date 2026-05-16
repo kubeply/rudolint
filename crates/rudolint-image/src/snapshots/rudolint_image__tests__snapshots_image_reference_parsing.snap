@@ -1,0 +1,54 @@
+---
+source: crates/rudolint-image/src/lib.rs
+expression: references
+---
+[
+  {
+    "digest": null,
+    "local_stage_reference": false,
+    "raw": "alpine:3.20",
+    "registry": null,
+    "repository": "alpine",
+    "tag": "3.20"
+  },
+  {
+    "digest": null,
+    "local_stage_reference": false,
+    "raw": "docker.io/library/alpine:latest",
+    "registry": "docker.io",
+    "repository": "library/alpine",
+    "tag": "latest"
+  },
+  {
+    "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "local_stage_reference": false,
+    "raw": "ghcr.io/kubeply/rudolint@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "registry": "ghcr.io",
+    "repository": "kubeply/rudolint",
+    "tag": null
+  },
+  {
+    "digest": null,
+    "local_stage_reference": false,
+    "raw": "localhost:5000/team/image:dev",
+    "registry": "localhost:5000",
+    "repository": "team/image",
+    "tag": "dev"
+  },
+  {
+    "digest": null,
+    "local_stage_reference": true,
+    "raw": "build",
+    "registry": null,
+    "repository": "build",
+    "tag": null
+  },
+  {
+    "digest": null,
+    "local_stage_reference": true,
+    "raw": "build:v1",
+    "registry": null,
+    "repository": "build",
+    "tag": "v1"
+  }
+]
