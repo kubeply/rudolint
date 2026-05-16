@@ -422,5 +422,11 @@ expression: normalized_json(&output)
     "severity": "warning",
     "status": "implemented",
     "summary": "use SHELL to change the default shell"
+  },
+  {
+    "code": "RDL4006",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "set pipefail before RUN instructions with pipes"
   }
 ]

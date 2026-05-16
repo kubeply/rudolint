@@ -74,6 +74,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(DeprecatedMaintainer),
         Box::new(EitherWgetOrCurl),
         Box::new(UseShellForDefaultShell),
+        Box::new(PipefailBeforePipe),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
     ]
@@ -2410,6 +2411,43 @@ impl Rule for UseShellForDefaultShell {
 }
 
 rule_metadata!(
+    PipefailBeforePipe,
+    "RDL4006",
+    "pipefail-before-pipe",
+    Severity::Warning,
+    "set pipefail before RUN instructions with pipes"
+);
+
+impl Rule for PipefailBeforePipe {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        let mut shell_handles_pipes = false;
+        let mut findings = Vec::new();
+
+        for instruction in &doc.instructions {
+            match instruction.keyword.as_str() {
+                "FROM" => shell_handles_pipes = false,
+                "SHELL" => shell_handles_pipes = shell_instruction_handles_pipes(instruction),
+                "RUN" if !shell_handles_pipes && run_has_pipe(instruction) => {
+                    findings.push(diagnostic(
+                        "RDL4006",
+                        Severity::Warning,
+                        "set the SHELL option -o pipefail before RUN with a pipe in it",
+                        instruction,
+                    ));
+                }
+                _ => {}
+            }
+        }
+
+        findings
+    }
+}
+
+rule_metadata!(
     SingleCmd,
     "RDL4003",
     "single-cmd",
@@ -3144,6 +3182,55 @@ fn run_links_default_shell(instruction: &Instruction) -> bool {
         })
 }
 
+fn shell_instruction_handles_pipes(instruction: &Instruction) -> bool {
+    match &instruction.form {
+        InstructionForm::Json(parts) => {
+            let Some(shell) = parts.first().map(String::as_str) else {
+                return false;
+            };
+            shell_is_non_posix(shell)
+                || (shell_supports_pipefail(shell)
+                    && parts
+                        .windows(2)
+                        .any(|window| window[0] == "-o" && window[1] == "pipefail"))
+        }
+        InstructionForm::Shell { text, .. } => {
+            shell_is_non_posix(text)
+                || (shell_supports_pipefail(text)
+                    && text.contains("-o")
+                    && text.contains("pipefail"))
+        }
+        _ => false,
+    }
+}
+
+fn shell_is_non_posix(shell: &str) -> bool {
+    matches!(shell, "powershell" | "pwsh" | "cmd" | "cmd.exe")
+        || shell.ends_with("/powershell")
+        || shell.ends_with("/pwsh")
+        || shell.ends_with("/cmd")
+        || shell.ends_with("/cmd.exe")
+}
+
+fn shell_supports_pipefail(shell: &str) -> bool {
+    matches!(shell, "bash" | "zsh" | "ash")
+        || shell.ends_with("/bash")
+        || shell.ends_with("/zsh")
+        || shell.ends_with("/ash")
+}
+
+fn run_has_pipe(instruction: &Instruction) -> bool {
+    instruction
+        .run
+        .as_ref()
+        .and_then(|run| run.shell.as_ref())
+        .is_some_and(|shell| shell.text.split_whitespace().any(shell_token_has_pipe))
+}
+
+fn shell_token_has_pipe(token: &str) -> bool {
+    token.contains('|') && token != "||"
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 struct HealthcheckStage {
     source: String,
@@ -3708,5 +3795,5 @@ fn dnf_install_has_unpinned_packages(shell: &str) -> bool {
 }
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
-    vec!["RDL4006"]
+    Vec::new()
 }
