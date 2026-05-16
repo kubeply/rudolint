@@ -467,6 +467,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3041",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3041.md",
+    "fix": "none",
+    "name": "pin-dnf-versions",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "pin versions in dnf install"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL4000",
     "default_severity": "error",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4000.md",

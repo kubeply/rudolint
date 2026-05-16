@@ -256,6 +256,12 @@ expression: normalized_json(&output)
     "summary": "clean dnf metadata after installs"
   },
   {
+    "code": "RDL3041",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "pin versions in dnf install"
+  },
+  {
     "code": "RDL4000",
     "severity": "error",
     "status": "implemented",
