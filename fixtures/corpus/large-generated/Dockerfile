@@ -1,0 +1,33 @@
+FROM alpine:3.20
+WORKDIR /app
+COPY file-001 /app/file-001
+COPY file-002 /app/file-002
+COPY file-003 /app/file-003
+COPY file-004 /app/file-004
+COPY file-005 /app/file-005
+COPY file-006 /app/file-006
+COPY file-007 /app/file-007
+COPY file-008 /app/file-008
+COPY file-009 /app/file-009
+COPY file-010 /app/file-010
+COPY file-011 /app/file-011
+COPY file-012 /app/file-012
+COPY file-013 /app/file-013
+COPY file-014 /app/file-014
+COPY file-015 /app/file-015
+COPY file-016 /app/file-016
+COPY file-017 /app/file-017
+COPY file-018 /app/file-018
+COPY file-019 /app/file-019
+COPY file-020 /app/file-020
+COPY file-021 /app/file-021
+COPY file-022 /app/file-022
+COPY file-023 /app/file-023
+COPY file-024 /app/file-024
+COPY file-025 /app/file-025
+COPY file-026 /app/file-026
+COPY file-027 /app/file-027
+COPY file-028 /app/file-028
+COPY file-029 /app/file-029
+COPY file-030 /app/file-030
+RUN echo done
