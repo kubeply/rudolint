@@ -61,6 +61,10 @@ pub struct CheckArgs {
     /// Always exit successfully after rendering diagnostics.
     #[arg(long)]
     pub exit_zero: bool,
+
+    /// Display path to use when reading Dockerfile source from stdin.
+    #[arg(long, default_value = "<stdin>")]
+    pub stdin_filename: PathBuf,
 }
 
 impl Default for CheckArgs {
@@ -73,6 +77,7 @@ impl Default for CheckArgs {
             no_config: false,
             failure_threshold: Severity::Warning,
             exit_zero: false,
+            stdin_filename: PathBuf::from("<stdin>"),
         }
     }
 }

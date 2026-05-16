@@ -192,6 +192,29 @@ fn no_config_flag_is_accepted() {
 }
 
 #[test]
+fn stdin_filename_changes_display_path() {
+    let output = rudolint_cmd()
+        .args([
+            "check",
+            "--format",
+            "json",
+            "--failure-threshold",
+            "error",
+            "--stdin-filename",
+            "Dockerfile.custom",
+        ])
+        .write_stdin("FROM alpine:latest\nWORKDIR app\n")
+        .assert()
+        .code(1)
+        .get_output()
+        .stdout
+        .clone();
+
+    let output = String::from_utf8(output).expect("stdout should be UTF-8");
+    insta::assert_json_snapshot!("stdin_filename_json_findings", normalized_json(&output));
+}
+
+#[test]
 fn missing_input_exits_with_code_two() {
     rudolint_cmd()
         .args(["check", "missing.Dockerfile"])
