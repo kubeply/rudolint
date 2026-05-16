@@ -10,22 +10,78 @@ expression: document_json(&document)
   "instructions": [
     {
       "args": "alpine:3.20 AS build",
+      "args_span": {
+        "end_byte": 25,
+        "end_column": 26,
+        "end_line": 1,
+        "start_byte": 5,
+        "start_column": 6,
+        "start_line": 1
+      },
       "flags": [],
       "heredocs": [],
       "keyword": "FROM",
+      "keyword_span": {
+        "end_byte": 4,
+        "end_column": 5,
+        "end_line": 1,
+        "start_byte": 0,
+        "start_column": 1,
+        "start_line": 1
+      },
       "line": 1,
-      "mounts": []
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 25,
+        "end_column": 26,
+        "end_line": 1,
+        "start_byte": 0,
+        "start_column": 1,
+        "start_line": 1
+      }
     },
     {
       "args": "scratch",
+      "args_span": {
+        "end_byte": 38,
+        "end_column": 13,
+        "end_line": 2,
+        "start_byte": 31,
+        "start_column": 6,
+        "start_line": 2
+      },
       "flags": [],
       "heredocs": [],
       "keyword": "FROM",
+      "keyword_span": {
+        "end_byte": 30,
+        "end_column": 5,
+        "end_line": 2,
+        "start_byte": 26,
+        "start_column": 1,
+        "start_line": 2
+      },
       "line": 2,
-      "mounts": []
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 38,
+        "end_column": 13,
+        "end_line": 2,
+        "start_byte": 26,
+        "start_column": 1,
+        "start_line": 2
+      }
     },
     {
       "args": "--from=build /out/app /app",
+      "args_span": {
+        "end_byte": 70,
+        "end_column": 32,
+        "end_line": 3,
+        "start_byte": 44,
+        "start_column": 6,
+        "start_line": 3
+      },
       "flags": [
         [
           "from",
@@ -34,8 +90,24 @@ expression: document_json(&document)
       ],
       "heredocs": [],
       "keyword": "COPY",
+      "keyword_span": {
+        "end_byte": 43,
+        "end_column": 5,
+        "end_line": 3,
+        "start_byte": 39,
+        "start_column": 1,
+        "start_line": 3
+      },
       "line": 3,
-      "mounts": []
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 70,
+        "end_column": 32,
+        "end_line": 3,
+        "start_byte": 39,
+        "start_column": 1,
+        "start_line": 3
+      }
     }
   ],
   "syntax": null

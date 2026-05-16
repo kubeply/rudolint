@@ -53,12 +53,20 @@ pub struct Comment {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Instruction {
+    /// Uppercase Dockerfile instruction keyword.
     pub keyword: String,
+    /// Source span covering the instruction keyword.
+    pub keyword_span: Span,
+    /// Trimmed instruction arguments.
     pub args: String,
+    /// Source span covering the instruction arguments, when present.
+    pub args_span: Option<Span>,
     pub flags: Vec<(String, String)>,
     pub mounts: Vec<Mount>,
     pub heredocs: Vec<String>,
     pub line: usize,
+    /// Source span covering the raw instruction text.
+    pub raw_span: Span,
     pub raw: String,
 }
 
@@ -90,6 +98,7 @@ pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
     let mut instructions = Vec::new();
     let mut current = String::new();
     let mut start_line = 0;
+    let mut start_byte = 0;
     let mut byte_offset = 0;
 
     for (index, segment) in source.split_inclusive('\n').enumerate() {
@@ -134,6 +143,7 @@ pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
                 continue;
             }
             start_line = line_number;
+            start_byte = byte_offset;
         }
 
         if !current.is_empty() {
@@ -146,7 +156,9 @@ pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
             continue;
         }
 
-        if let Some(instruction) = parse_instruction(&current, start_line)? {
+        if let Some(instruction) =
+            parse_instruction(&current, start_line, start_byte, &source_file)?
+        {
             instructions.push(instruction);
         }
         current.clear();
@@ -154,7 +166,8 @@ pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
     }
 
     if !current.trim().is_empty()
-        && let Some(instruction) = parse_instruction(&current, start_line)?
+        && let Some(instruction) =
+            parse_instruction(&current, start_line, start_byte, &source_file)?
     {
         instructions.push(instruction);
     }
@@ -183,26 +196,45 @@ fn continues(line: &str) -> bool {
     trimmed.ends_with('\\') && !trimmed.ends_with("\\\\")
 }
 
-fn parse_instruction(raw: &str, line: usize) -> Result<Option<Instruction>, ParserError> {
+fn parse_instruction(
+    raw: &str,
+    line: usize,
+    start_byte: usize,
+    source_file: &SourceFile,
+) -> Result<Option<Instruction>, ParserError> {
     let trimmed = raw.trim_start();
     if trimmed.is_empty() || trimmed.starts_with('#') {
         return Ok(None);
     }
+    let leading_whitespace = raw.len() - trimmed.len();
+    let keyword_start = start_byte + leading_whitespace;
+    let raw_span = source_file.span(start_byte, start_byte + raw.len());
 
-    let Some((keyword, rest)) = trimmed.split_once(char::is_whitespace) else {
+    let Some(keyword_width) = trimmed.find(char::is_whitespace) else {
+        let keyword_span = source_file.span(keyword_start, keyword_start + trimmed.len());
         return Ok(Some(Instruction {
             keyword: trimmed.to_ascii_uppercase(),
+            keyword_span,
             args: String::new(),
+            args_span: None,
             flags: Vec::new(),
             mounts: Vec::new(),
             heredocs: Vec::new(),
             line,
+            raw_span,
             raw: raw.to_string(),
         }));
     };
 
+    let keyword = &trimmed[..keyword_width];
+    let rest = &trimmed[keyword_width..];
     let keyword = keyword.to_ascii_uppercase();
+    let keyword_span = source_file.span(keyword_start, keyword_start + keyword_width);
+    let rest_leading_whitespace = rest.len() - rest.trim_start().len();
+    let args_start = keyword_start + keyword_width + rest_leading_whitespace;
     let args = rest.trim().to_string();
+    let args_span =
+        (!args.is_empty()).then(|| source_file.span(args_start, args_start + args.len()));
     let flags = parse_flags(&args);
     let mounts = flags
         .iter()
@@ -213,11 +245,14 @@ fn parse_instruction(raw: &str, line: usize) -> Result<Option<Instruction>, Pars
 
     Ok(Some(Instruction {
         keyword,
+        keyword_span,
         args,
+        args_span,
         flags,
         mounts,
         heredocs,
         line,
+        raw_span,
         raw: raw.to_string(),
     }))
 }
