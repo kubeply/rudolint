@@ -75,12 +75,6 @@ impl AppError {
 }
 
 fn run_check(args: cli::CheckArgs) -> Result<ExitCode, AppError> {
-    if args.fix && !args.dry_run {
-        return Err(AppError::usage(
-            "`--fix` requires `--dry-run` until fix application is implemented",
-        ));
-    }
-
     let inputs = resolve_inputs(&args.paths)?;
     let starts = if inputs.is_empty() {
         args.paths.clone()
@@ -125,6 +119,8 @@ fn run_check(args: cli::CheckArgs) -> Result<ExitCode, AppError> {
         }
         if args.fix && args.dry_run && matches!(args.format, OutputFormat::Human) {
             rendered.push_str("fixes: dry-run mode is enabled; no fixes are currently available\n");
+        } else if args.fix && matches!(args.format, OutputFormat::Human) {
+            rendered.push_str("fixes: write mode is enabled; no fixes are currently available\n");
         }
         print!("{rendered}");
     }
