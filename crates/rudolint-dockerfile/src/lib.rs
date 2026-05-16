@@ -8,6 +8,6 @@ pub use parser::{
     RecoveryKind, RunInstruction, ShellBody, SyntaxDirective, parse_dockerfile,
 };
 pub use semantic::{
-    ArgScopes, ArgValue, EnvScopes, EnvValue, Stage, StageArgs, StageEnv, arg_scopes, env_scopes,
-    stages,
+    ArgScopes, ArgValue, CopyGraph, CopyOperation, EnvScopes, EnvValue, Stage, StageArgs, StageEnv,
+    arg_scopes, copy_graph, env_scopes, stages,
 };

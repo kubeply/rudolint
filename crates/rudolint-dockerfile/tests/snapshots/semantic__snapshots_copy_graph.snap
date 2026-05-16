@@ -1,0 +1,42 @@
+---
+source: crates/rudolint-dockerfile/tests/semantic.rs
+expression: "graph.operations.iter().map(|operation|\n{\n    json!({\n        \"instruction_index\": operation.instruction_index, \"kind\": match\n        operation.kind { CopyKind::Copy => \"copy\", CopyKind::Add => \"add\", },\n        \"sources\": operation.sources, \"destination\": operation.destination,\n        \"from\": operation.from,\n    })\n}).collect::<Vec<_>>()"
+---
+[
+  {
+    "destination": "/app",
+    "from": "build",
+    "instruction_index": 2,
+    "kind": "copy",
+    "sources": [
+      "/out/app"
+    ]
+  },
+  {
+    "destination": "/usr/local/bin/rudolint",
+    "from": null,
+    "instruction_index": 3,
+    "kind": "copy",
+    "sources": [
+      "bin/rudolint"
+    ]
+  },
+  {
+    "destination": "/opt/dir with spaces/file.txt",
+    "from": null,
+    "instruction_index": 4,
+    "kind": "copy",
+    "sources": [
+      "dir with spaces/file.txt"
+    ]
+  },
+  {
+    "destination": "/tmp/archive.tar.gz",
+    "from": null,
+    "instruction_index": 5,
+    "kind": "add",
+    "sources": [
+      "https://example.com/archive.tar.gz"
+    ]
+  }
+]
