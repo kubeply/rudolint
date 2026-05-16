@@ -51,6 +51,18 @@ expression: document_json(&document)
         },
         "text": "--platform=$BUILDPLATFORM alpine:3.20 AS base"
       },
+      "from": {
+        "alias": "base",
+        "digest": null,
+        "flags": [
+          [
+            "platform",
+            "$BUILDPLATFORM"
+          ]
+        ],
+        "image": "alpine:3.20",
+        "platform": "$BUILDPLATFORM"
+      },
       "heredocs": [],
       "keyword": "FROM",
       "keyword_span": {
@@ -101,6 +113,7 @@ expression: document_json(&document)
         },
         "text": "--mount=type=cache,target=/var/cache/apk apk add curl"
       },
+      "from": null,
       "heredocs": [],
       "keyword": "RUN",
       "keyword_span": {
@@ -160,6 +173,7 @@ expression: document_json(&document)
         },
         "text": "<<EOF\necho hello\nEOF"
       },
+      "from": null,
       "heredocs": [
         {
           "body": "echo hello\n",
@@ -220,6 +234,13 @@ expression: document_json(&document)
         },
         "text": "alpine:3.20 AS final"
       },
+      "from": {
+        "alias": "final",
+        "digest": null,
+        "flags": [],
+        "image": "alpine:3.20",
+        "platform": null
+      },
       "heredocs": [],
       "keyword": "FROM",
       "keyword_span": {
@@ -270,6 +291,7 @@ expression: document_json(&document)
         },
         "text": "--from=base /src /dst"
       },
+      "from": null,
       "heredocs": [],
       "keyword": "COPY",
       "keyword_span": {

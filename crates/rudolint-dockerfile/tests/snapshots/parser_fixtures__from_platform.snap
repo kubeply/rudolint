@@ -37,6 +37,18 @@ expression: document_json(&document)
         },
         "text": "--platform=$BUILDPLATFORM alpine:3.20 AS build"
       },
+      "from": {
+        "alias": "build",
+        "digest": null,
+        "flags": [
+          [
+            "platform",
+            "$BUILDPLATFORM"
+          ]
+        ],
+        "image": "alpine:3.20",
+        "platform": "$BUILDPLATFORM"
+      },
       "heredocs": [],
       "keyword": "FROM",
       "keyword_span": {
@@ -59,10 +71,10 @@ expression: document_json(&document)
       }
     },
     {
-      "args": "--platform=$TARGETPLATFORM scratch",
+      "args": "--platform=$TARGETPLATFORM scratch@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       "args_span": {
-        "end_byte": 91,
-        "end_column": 40,
+        "end_byte": 163,
+        "end_column": 112,
         "end_line": 2,
         "start_byte": 57,
         "start_column": 6,
@@ -78,14 +90,26 @@ expression: document_json(&document)
       "form": {
         "kind": "shell",
         "span": {
-          "end_byte": 91,
-          "end_column": 40,
+          "end_byte": 163,
+          "end_column": 112,
           "end_line": 2,
           "start_byte": 57,
           "start_column": 6,
           "start_line": 2
         },
-        "text": "--platform=$TARGETPLATFORM scratch"
+        "text": "--platform=$TARGETPLATFORM scratch@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "from": {
+        "alias": null,
+        "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "flags": [
+          [
+            "platform",
+            "$TARGETPLATFORM"
+          ]
+        ],
+        "image": "scratch",
+        "platform": "$TARGETPLATFORM"
       },
       "heredocs": [],
       "keyword": "FROM",
@@ -100,8 +124,8 @@ expression: document_json(&document)
       "line": 2,
       "mounts": [],
       "raw_span": {
-        "end_byte": 91,
-        "end_column": 40,
+        "end_byte": 163,
+        "end_column": 112,
         "end_line": 2,
         "start_byte": 52,
         "start_column": 1,

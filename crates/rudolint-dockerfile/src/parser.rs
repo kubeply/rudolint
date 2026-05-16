@@ -79,6 +79,7 @@ pub struct Instruction {
     pub flags: Vec<(String, String)>,
     pub mounts: Vec<Mount>,
     pub heredocs: Vec<Heredoc>,
+    pub from: Option<FromInstruction>,
     pub line: usize,
     /// Source span covering the raw instruction text.
     pub raw_span: Span,
@@ -121,6 +122,15 @@ pub struct Heredoc {
     pub target_instruction: String,
     pub body: String,
     pub body_span: Span,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct FromInstruction {
+    pub image: String,
+    pub digest: Option<String>,
+    pub alias: Option<String>,
+    pub platform: Option<String>,
+    pub flags: Vec<(String, String)>,
 }
 
 #[derive(Debug, Clone)]
@@ -332,6 +342,7 @@ fn parse_instruction(
             flags: Vec::new(),
             mounts: Vec::new(),
             heredocs: Vec::new(),
+            from: None,
             line,
             raw_span,
             raw: raw.to_string(),
@@ -350,6 +361,9 @@ fn parse_instruction(
     let form = parse_instruction_form(&args, args_span);
     let continuations = parse_continuations(raw, line, start_byte, source_file, escape_character);
     let flags = parse_flags(&args);
+    let from = (keyword == "FROM")
+        .then(|| parse_from(&args, &flags))
+        .flatten();
     let mounts = flags
         .iter()
         .filter(|(name, _)| name == "mount")
@@ -367,10 +381,35 @@ fn parse_instruction(
         flags,
         mounts,
         heredocs,
+        from,
         line,
         raw_span,
         raw: raw.to_string(),
     }))
+}
+
+fn parse_from(args: &str, flags: &[(String, String)]) -> Option<FromInstruction> {
+    let parts = args.split_whitespace().collect::<Vec<_>>();
+    let image = parts.iter().find(|part| !part.starts_with("--"))?;
+    let (image, digest) = image
+        .split_once('@')
+        .map_or((*image, None), |(name, digest)| (name, Some(digest)));
+    let alias = parts
+        .windows(2)
+        .find(|window| window[0].eq_ignore_ascii_case("AS"))
+        .map(|window| window[1].to_string());
+    let platform = flags
+        .iter()
+        .find(|(name, _)| name == "platform")
+        .map(|(_, value)| value.clone());
+
+    Some(FromInstruction {
+        image: image.to_string(),
+        digest: digest.map(str::to_string),
+        alias,
+        platform,
+        flags: flags.to_vec(),
+    })
 }
 
 fn parse_instruction_form(args: &str, args_span: Option<Span>) -> InstructionForm {

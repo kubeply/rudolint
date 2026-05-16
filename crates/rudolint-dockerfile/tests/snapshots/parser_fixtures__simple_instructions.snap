@@ -32,6 +32,13 @@ expression: document_json(&document)
         },
         "text": "alpine:3.20"
       },
+      "from": {
+        "alias": null,
+        "digest": null,
+        "flags": [],
+        "image": "alpine:3.20",
+        "platform": null
+      },
       "heredocs": [],
       "keyword": "FROM",
       "keyword_span": {
@@ -77,6 +84,7 @@ expression: document_json(&document)
         },
         "text": "/app"
       },
+      "from": null,
       "heredocs": [],
       "keyword": "WORKDIR",
       "keyword_span": {
@@ -122,6 +130,7 @@ expression: document_json(&document)
         },
         "text": ". /app"
       },
+      "from": null,
       "heredocs": [],
       "keyword": "COPY",
       "keyword_span": {
@@ -162,6 +171,7 @@ expression: document_json(&document)
           "hello"
         ]
       },
+      "from": null,
       "heredocs": [],
       "keyword": "CMD",
       "keyword_span": {
