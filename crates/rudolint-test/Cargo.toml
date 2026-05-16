@@ -8,3 +8,5 @@ repository.workspace = true
 publish = false
 
 [dependencies]
+assert_cmd.workspace = true
+serde_json.workspace = true

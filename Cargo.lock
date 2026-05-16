@@ -485,6 +485,10 @@ version = "0.1.0"
 [[package]]
 name = "rudolint-test"
 version = "0.1.0"
+dependencies = [
+ "assert_cmd",
+ "serde_json",
+]
 
 [[package]]
 name = "ryu"
