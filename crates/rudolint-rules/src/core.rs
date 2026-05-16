@@ -1,8 +1,9 @@
 use std::collections::BTreeSet;
 
-use crate::{Profile, Rule, RuleInfo, RuleStatus};
+use crate::{Rule, RuleInfo, RuleStatus};
 use rudolint_diagnostics::{Finding, Severity};
 use rudolint_dockerfile::{Dockerfile, Instruction};
+use rudolint_policy::PolicyProfile;
 
 macro_rules! rule {
     ($name:ident, $code:literal, $severity:expr, $summary:literal, $body:expr) => {
@@ -24,7 +25,7 @@ macro_rules! rule {
     };
 }
 
-pub fn implemented_rules(profile: Profile) -> Vec<Box<dyn Rule>> {
+pub fn implemented_rules(profile: PolicyProfile) -> Vec<Box<dyn Rule>> {
     let mut rules: Vec<Box<dyn Rule>> = vec![
         Box::new(InlineIgnore),
         Box::new(AbsoluteWorkdir),
@@ -41,7 +42,7 @@ pub fn implemented_rules(profile: Profile) -> Vec<Box<dyn Rule>> {
         Box::new(SingleEntrypoint),
     ];
 
-    if matches!(profile, Profile::Default) {
+    if profile.includes_buildkit_native_rules() {
         rules.extend([
             Box::new(BuildkitSyntaxWhenFeaturesUsed) as Box<dyn Rule>,
             Box::new(SecretLikeArgOrEnv),
@@ -53,25 +54,29 @@ pub fn implemented_rules(profile: Profile) -> Vec<Box<dyn Rule>> {
     rules
 }
 
-pub fn catalog(profile: Profile) -> Vec<RuleInfo> {
+pub fn catalog(profile: PolicyProfile) -> Vec<RuleInfo> {
     let mut rules = implemented_rules(profile)
         .into_iter()
         .map(|rule| rule.info())
         .collect::<Vec<_>>();
 
-    rules.extend(planned_compat_rules().into_iter().map(|code| RuleInfo {
-        code,
-        severity: Severity::Warning,
-        summary: "tracked for compatibility parity",
-        status: RuleStatus::Planned,
-    }));
+    if profile.includes_compatibility_rules() {
+        rules.extend(planned_compat_rules().into_iter().map(|code| RuleInfo {
+            code,
+            severity: Severity::Warning,
+            summary: "tracked for compatibility parity",
+            status: RuleStatus::Planned,
+        }));
+    }
 
-    rules.extend(shell_rule_catalog().into_iter().map(|code| RuleInfo {
-        code,
-        severity: Severity::Warning,
-        summary: "shell diagnostics delegated to the shell-analysis layer",
-        status: RuleStatus::External,
-    }));
+    if profile.includes_shell_catalog() {
+        rules.extend(shell_rule_catalog().into_iter().map(|code| RuleInfo {
+            code,
+            severity: Severity::Warning,
+            summary: "shell diagnostics delegated to the shell-analysis layer",
+            status: RuleStatus::External,
+        }));
+    }
 
     rules.sort_by_key(|rule| rule.code);
     rules.dedup_by_key(|rule| rule.code);

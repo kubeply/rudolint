@@ -11,6 +11,7 @@ clap.workspace = true
 rudolint-config.workspace = true
 rudolint-diagnostics.workspace = true
 rudolint-dockerfile.workspace = true
+rudolint-policy.workspace = true
 serde.workspace = true
 
 [dev-dependencies]
