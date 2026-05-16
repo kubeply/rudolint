@@ -434,6 +434,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3037",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3037.md",
+    "fix": "none",
+    "name": "pin-zypper-versions",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "pin versions in zypper install"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL4000",
     "default_severity": "error",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4000.md",
