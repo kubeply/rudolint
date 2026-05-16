@@ -322,6 +322,12 @@ expression: normalized_json(&output)
     "summary": "reject empty configured label values"
   },
   {
+    "code": "RDL3052",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "validate URL label values"
+  },
+  {
     "code": "RDL4000",
     "severity": "error",
     "status": "implemented",

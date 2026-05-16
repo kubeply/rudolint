@@ -1,0 +1,9 @@
+FROM alpine:3.20
+LABEL org.opencontainers.image.source="not-a-url"
+LABEL org.opencontainers.image.source="https://github.com/kubeply/rudolint"
+LABEL org.opencontainers.image.source="http://example.com/project"
+LABEL org.opencontainers.image.source="http://localhost/project"
+LABEL org.opencontainers.image.source="http://[::1]/project"
+LABEL org.opencontainers.image.source="mailto:ops@example.com"
+LABEL org.opencontainers.image.source=""
+LABEL org.opencontainers.image.title="not-a-url"

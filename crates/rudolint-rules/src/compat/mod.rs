@@ -59,6 +59,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(MissingRequiredLabels),
         Box::new(NoSuperfluousLabels),
         Box::new(NoEmptyLabels),
+        Box::new(ValidUrlLabels),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -1822,6 +1823,54 @@ impl Rule for NoEmptyLabels {
 }
 
 rule_metadata!(
+    ValidUrlLabels,
+    "RDL3052",
+    "valid-url-labels",
+    Severity::Warning,
+    "validate URL label values"
+);
+
+impl Rule for ValidUrlLabels {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, _doc: &Dockerfile) -> Vec<Finding> {
+        Vec::new()
+    }
+
+    fn check_with_config(&self, doc: &Dockerfile, config: &Config) -> Vec<Finding> {
+        if config.label_schema.is_empty() {
+            return Vec::new();
+        }
+
+        doc.instructions
+            .iter()
+            .filter(|instruction| {
+                instruction.label.as_ref().is_some_and(|label| {
+                    label.pairs.iter().any(|pair| {
+                        config
+                            .label_schema
+                            .get(&pair.key)
+                            .is_some_and(|schema| schema == "url")
+                            && !docker_label_value_is_empty(&pair.value)
+                            && !is_valid_url_label_value(&pair.value)
+                    })
+                })
+            })
+            .map(|instruction| {
+                diagnostic(
+                    "RDL3052",
+                    Severity::Warning,
+                    "configured URL label is not a valid URL",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -2425,6 +2474,28 @@ fn docker_label_value_is_empty(value: &str) -> bool {
         .trim_matches(|character| matches!(character, '\'' | '"'))
         .trim()
         .is_empty()
+}
+
+fn is_valid_url_label_value(value: &str) -> bool {
+    let value = value.trim_matches(|character| matches!(character, '\'' | '"'));
+    let Ok(url) = url::Url::parse(value) else {
+        return false;
+    };
+    let scheme = url.scheme();
+
+    if scheme.is_empty()
+        || !scheme.chars().all(|character| {
+            character.is_ascii_alphanumeric() || matches!(character, '+' | '-' | '.')
+        })
+    {
+        return false;
+    }
+
+    if matches!(scheme, "mailto" | "urn") {
+        return !url.path().is_empty();
+    }
+
+    url.has_host()
 }
 
 fn missing_required_labels(doc: &Dockerfile, config: &Config) -> Vec<Finding> {
@@ -3338,7 +3409,7 @@ fn dnf_install_has_unpinned_packages(shell: &str) -> bool {
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3052", "RDL3053", "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059",
-        "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
+        "RDL3053", "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060",
+        "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
     ]
 }
