@@ -37,6 +37,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(JsonEntrypoints),
         Box::new(TrustedRegistries),
         Box::new(UseAptGet),
+        Box::new(PinGemVersions),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -992,6 +993,36 @@ impl Rule for UseAptGet {
 }
 
 rule_metadata!(
+    PinGemVersions,
+    "RDL3028",
+    "pin-gem-versions",
+    Severity::Warning,
+    "pin versions in gem install"
+);
+
+impl Rule for PinGemVersions {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        doc.instructions
+            .iter()
+            .filter(|instruction| instruction.keyword == "RUN")
+            .filter(|instruction| gem_install_has_unpinned_packages(&instruction.args))
+            .map(|instruction| {
+                diagnostic(
+                    "RDL3028",
+                    Severity::Warning,
+                    "pin versions in gem install",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -1686,12 +1717,112 @@ fn shell_uses_apt(shell: &str) -> bool {
         .any(|invocation| invocation.command == "apt")
 }
 
+fn gem_install_has_unpinned_packages(shell: &str) -> bool {
+    detect_command_invocations(shell)
+        .into_iter()
+        .filter(|invocation| invocation.command == "gem")
+        .any(|invocation| {
+            let Some(install_index) = gem_subcommand_index(&invocation.arguments) else {
+                return false;
+            };
+            if invocation.arguments[install_index] != "install" {
+                return false;
+            }
+
+            let mut expect_option_value = false;
+            let mut expect_version_value = false;
+            let mut has_version_option = false;
+            let mut has_unpinned_package = false;
+            for argument in invocation.arguments.iter().skip(install_index + 1) {
+                if argument == "\\" {
+                    continue;
+                }
+
+                if expect_option_value {
+                    if expect_version_value {
+                        has_version_option = true;
+                    }
+                    expect_option_value = false;
+                    expect_version_value = false;
+                    continue;
+                }
+
+                if matches!(argument.as_str(), "-v" | "--version") {
+                    expect_option_value = true;
+                    expect_version_value = true;
+                    continue;
+                }
+
+                if let Some(version) = argument.strip_prefix("--version=") {
+                    has_version_option = !version.is_empty();
+                    continue;
+                }
+
+                if gem_option_takes_value(argument) {
+                    expect_option_value = true;
+                    continue;
+                }
+
+                if argument.starts_with('-') {
+                    continue;
+                }
+
+                if !argument.contains(':') {
+                    has_unpinned_package = true;
+                }
+            }
+
+            has_unpinned_package && !has_version_option
+        })
+}
+
+fn gem_subcommand_index(arguments: &[String]) -> Option<usize> {
+    let mut expect_option_value = false;
+    for (index, argument) in arguments.iter().enumerate() {
+        if argument == "\\" {
+            continue;
+        }
+
+        if expect_option_value {
+            expect_option_value = false;
+            continue;
+        }
+
+        if gem_option_takes_value(argument) {
+            expect_option_value = true;
+            continue;
+        }
+
+        if argument.starts_with('-') {
+            continue;
+        }
+
+        return Some(index);
+    }
+
+    None
+}
+
+fn gem_option_takes_value(argument: &str) -> bool {
+    matches!(
+        argument,
+        "--config-file"
+            | "--source"
+            | "--platform"
+            | "-i"
+            | "--install-dir"
+            | "-n"
+            | "--bindir"
+            | "--build-root"
+    )
+}
+
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3028", "RDL3029", "RDL3030", "RDL3032", "RDL3033", "RDL3034", "RDL3035", "RDL3036",
-        "RDL3037", "RDL3038", "RDL3040", "RDL3041", "RDL3042", "RDL3043", "RDL3044", "RDL3045",
-        "RDL3046", "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053",
-        "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061",
-        "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
+        "RDL3029", "RDL3030", "RDL3032", "RDL3033", "RDL3034", "RDL3035", "RDL3036", "RDL3037",
+        "RDL3038", "RDL3040", "RDL3041", "RDL3042", "RDL3043", "RDL3044", "RDL3045", "RDL3046",
+        "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053", "RDL3054",
+        "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062",
+        "RDL3063", "RDL4001", "RDL4005", "RDL4006",
     ]
 }
