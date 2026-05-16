@@ -41,6 +41,35 @@ impl PolicyProfile {
 
 pub type PolicyMode = PolicyProfile;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum LegacySuppressionTool {
+    Hadolint,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LegacySuppression {
+    pub line: usize,
+    pub tool: LegacySuppressionTool,
+}
+
+impl LegacySuppression {
+    pub fn parse_comment(line: usize, text: &str) -> Option<Self> {
+        let body = text.strip_prefix('#')?.trim_start();
+        let mut fields = body.split_whitespace();
+        let tool = match fields.next()? {
+            value if value.eq_ignore_ascii_case("hadolint") => LegacySuppressionTool::Hadolint,
+            _ => return None,
+        };
+
+        let ignored = fields.find_map(ignore_field)?;
+        if ignored.trim().is_empty() {
+            return None;
+        }
+
+        Some(Self { line, tool })
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct InlineSuppression {
     pub line: usize,
@@ -55,7 +84,7 @@ impl InlineSuppression {
             return None;
         }
 
-        let ignored = fields.find_map(|field| field.strip_prefix("ignore="))?;
+        let ignored = fields.find_map(ignore_field)?;
         let target = SuppressionTarget::parse(ignored)?;
 
         Some(Self { line, target })
@@ -63,6 +92,15 @@ impl InlineSuppression {
 
     pub fn matches(&self, code: &str) -> bool {
         self.target.matches(code)
+    }
+}
+
+fn ignore_field(field: &str) -> Option<&str> {
+    let (name, value) = field.split_once('=')?;
+    if name.eq_ignore_ascii_case("ignore") {
+        Some(value)
+    } else {
+        None
     }
 }
 
@@ -102,7 +140,10 @@ impl SuppressionTarget {
 
 #[cfg(test)]
 mod tests {
-    use super::{InlineSuppression, PolicyProfile, SuppressionTarget};
+    use super::{
+        InlineSuppression, LegacySuppression, LegacySuppressionTool, PolicyProfile,
+        SuppressionTarget,
+    };
 
     #[test]
     fn default_profile_combines_compatibility_and_native_rules() {
@@ -164,5 +205,21 @@ mod tests {
         assert!(InlineSuppression::parse_comment(1, "# hadolint ignore=DL3000").is_none());
         assert!(InlineSuppression::parse_comment(1, "# rudolint ignore=").is_none());
         assert!(InlineSuppression::parse_comment(1, "# regular comment").is_none());
+    }
+
+    #[test]
+    fn parses_legacy_hadolint_suppression_comments() {
+        let suppression = LegacySuppression::parse_comment(8, "# hadolint ignore=DL3007")
+            .expect("legacy suppression should parse");
+
+        assert_eq!(suppression.line, 8);
+        assert_eq!(suppression.tool, LegacySuppressionTool::Hadolint);
+    }
+
+    #[test]
+    fn ignores_unrelated_or_empty_legacy_suppression_comments() {
+        assert!(LegacySuppression::parse_comment(1, "# rudolint ignore=RDL3000").is_none());
+        assert!(LegacySuppression::parse_comment(1, "# hadolint ignore=").is_none());
+        assert!(LegacySuppression::parse_comment(1, "# regular comment").is_none());
     }
 }

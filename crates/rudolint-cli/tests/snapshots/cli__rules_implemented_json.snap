@@ -29,9 +29,9 @@ expression: normalized_json(&output)
   },
   {
     "code": "RDL1001",
-    "severity": "ignore",
+    "severity": "warning",
     "status": "implemented",
-    "summary": "discourage inline linter suppression comments"
+    "summary": "warn on legacy external linter suppression comments"
   },
   {
     "code": "RDL3000",
