@@ -1,8 +1,0 @@
----
-source: crates/rudolint-fix/src/lib.rs
-expression: preview.render()
----
-title: manual refactor suggestion
-applicability: manual
-edits:
-- line: 5, column: 1, length: 10, replacement: "refactored"

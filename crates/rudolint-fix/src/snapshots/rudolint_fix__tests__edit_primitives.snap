@@ -1,0 +1,10 @@
+---
+source: crates/rudolint-fix/src/lib.rs
+expression: preview.render()
+---
+title: edit primitive matrix
+applicability: manual
+edits:
+- replace: line 1, column 6, length 6, with "3.20"
+- insert: line 1, column 1, content "# syntax=docker/dockerfile:1\n"
+- delete: line 4, column 1, length 12

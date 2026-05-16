@@ -4,10 +4,67 @@ use std::fmt::Write;
 
 use rudolint_source::SourceSpan;
 
+/// A source edit that can be previewed or applied.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Fix {
+pub struct TextEdit {
+    /// Span affected by the edit, or insertion point for insertions.
     pub span: SourceSpan,
-    pub replacement: String,
+    /// Kind of edit to apply at `span`.
+    pub kind: EditKind,
+}
+
+impl TextEdit {
+    /// Creates a replacement edit for `span`.
+    pub fn replace(span: SourceSpan, replacement: impl Into<String>) -> Self {
+        Self {
+            span,
+            kind: EditKind::Replace {
+                replacement: replacement.into(),
+            },
+        }
+    }
+
+    /// Creates an insertion edit at a 1-based `line` and `column`.
+    pub fn insert(line: usize, column: usize, content: impl Into<String>) -> Self {
+        Self {
+            span: SourceSpan {
+                line,
+                column,
+                length: 0,
+            },
+            kind: EditKind::Insert {
+                content: content.into(),
+            },
+        }
+    }
+
+    /// Creates a deletion edit for `span`.
+    pub fn delete(span: SourceSpan) -> Self {
+        Self {
+            span,
+            kind: EditKind::Delete,
+        }
+    }
+
+    /// Returns the text inserted by this edit, or an empty string for deletions.
+    pub fn replacement_text(&self) -> &str {
+        match &self.kind {
+            EditKind::Replace { replacement } => replacement,
+            EditKind::Insert { content } => content,
+            EditKind::Delete => "",
+        }
+    }
+}
+
+/// The operation performed by a [`TextEdit`].
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum EditKind {
+    /// Replace the associated span with `replacement`.
+    Replace { replacement: String },
+    /// Insert `content` at the edit span.
+    Insert { content: String },
+    /// Delete the associated span.
+    Delete,
 }
 
 /// Describes whether a suggested [`FixPreview`] can be applied automatically.
@@ -26,10 +83,10 @@ pub enum FixApplicability {
 pub struct FixPreview {
     /// Short description of the fix.
     pub title: String,
-    /// Applicability classification for the suggested [`Fix`] values.
+    /// Applicability classification for the suggested [`TextEdit`] values.
     pub applicability: FixApplicability,
     /// Source edits that would be applied.
-    pub edits: Vec<Fix>,
+    pub edits: Vec<TextEdit>,
 }
 
 impl FixPreview {
@@ -55,11 +112,29 @@ impl FixPreview {
         }
         let _ = writeln!(output, "edits:");
         for edit in &self.edits {
-            let _ = writeln!(
-                output,
-                "- line: {}, column: {}, length: {}, replacement: {:?}",
-                edit.span.line, edit.span.column, edit.span.length, edit.replacement
-            );
+            match &edit.kind {
+                EditKind::Replace { replacement } => {
+                    let _ = writeln!(
+                        output,
+                        "- replace: line {}, column {}, length {}, with {:?}",
+                        edit.span.line, edit.span.column, edit.span.length, replacement
+                    );
+                }
+                EditKind::Insert { content } => {
+                    let _ = writeln!(
+                        output,
+                        "- insert: line {}, column {}, content {:?}",
+                        edit.span.line, edit.span.column, content
+                    );
+                }
+                EditKind::Delete => {
+                    let _ = writeln!(
+                        output,
+                        "- delete: line {}, column {}, length {}",
+                        edit.span.line, edit.span.column, edit.span.length
+                    );
+                }
+            }
         }
         output
     }
@@ -74,35 +149,43 @@ mod tests {
         let preview = FixPreview {
             title: "replace latest tag".to_string(),
             applicability: FixApplicability::Safe,
-            edits: vec![Fix {
-                span: SourceSpan {
+            edits: vec![TextEdit::replace(
+                SourceSpan {
                     line: 1,
                     column: 13,
                     length: 6,
                 },
-                replacement: "3.20".to_string(),
-            }],
+                "3.20",
+            )],
         };
 
         insta::assert_snapshot!("safe_fix_preview", preview.render());
     }
 
     #[test]
-    fn snapshots_manual_fix_preview() {
+    fn snapshots_edit_primitives() {
         let preview = FixPreview {
-            title: "manual refactor suggestion".to_string(),
+            title: "edit primitive matrix".to_string(),
             applicability: FixApplicability::Manual,
-            edits: vec![Fix {
-                span: SourceSpan {
-                    line: 5,
+            edits: vec![
+                TextEdit::replace(
+                    SourceSpan {
+                        line: 1,
+                        column: 6,
+                        length: 6,
+                    },
+                    "3.20",
+                ),
+                TextEdit::insert(1, 1, "# syntax=docker/dockerfile:1\n"),
+                TextEdit::delete(SourceSpan {
+                    line: 4,
                     column: 1,
-                    length: 10,
-                },
-                replacement: "refactored".to_string(),
-            }],
+                    length: 12,
+                }),
+            ],
         };
 
-        insta::assert_snapshot!("manual_fix_preview", preview.render());
+        insta::assert_snapshot!("edit_primitives", preview.render());
     }
 
     #[test]
