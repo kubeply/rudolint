@@ -250,6 +250,12 @@ expression: normalized_json(&output)
     "summary": "use -y with dnf install"
   },
   {
+    "code": "RDL3040",
+    "severity": "info",
+    "status": "implemented",
+    "summary": "clean dnf metadata after installs"
+  },
+  {
     "code": "RDL4000",
     "severity": "error",
     "status": "implemented",
