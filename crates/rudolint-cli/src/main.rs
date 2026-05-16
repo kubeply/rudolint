@@ -15,6 +15,7 @@ use rudolint_config::Config;
 use rudolint_diagnostics::Finding;
 use rudolint_dockerfile::parse_dockerfile;
 use rudolint_rules::{RuleEngine, RuleStatus};
+use rudolint_settings::resolve_from_parts;
 
 fn main() -> ExitCode {
     match run() {
@@ -75,21 +76,13 @@ impl AppError {
 
 fn run_check(args: cli::CheckArgs) -> Result<ExitCode, AppError> {
     let inputs = resolve_inputs(&args.paths)?;
-    let config = if args.no_config {
-        Config::default()
+    let starts = if inputs.is_empty() {
+        args.paths.clone()
     } else {
-        let starts = if inputs.is_empty() {
-            if args.paths.is_empty() {
-                Vec::new()
-            } else {
-                args.paths.clone()
-            }
-        } else {
-            inputs.clone()
-        };
-        Config::load_discovered(args.config.as_deref(), &starts)?
+        inputs.clone()
     };
-    let engine = RuleEngine::new(args.profile, config);
+    let settings = resolve_from_parts(args.config.as_deref(), args.no_config, starts)?;
+    let engine = RuleEngine::new(args.profile, settings.config);
     let input_count = if inputs.is_empty() { 1 } else { inputs.len() };
     let mut findings = Vec::new();
     let mut sources = BTreeMap::new();
