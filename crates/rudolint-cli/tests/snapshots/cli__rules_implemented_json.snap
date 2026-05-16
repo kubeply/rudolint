@@ -148,6 +148,12 @@ expression: normalized_json(&output)
     "summary": "prefer COPY for plain local files"
   },
   {
+    "code": "RDL3021",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "require trailing slash for COPY destinations with multiple sources"
+  },
+  {
     "code": "RDL3024",
     "severity": "error",
     "status": "implemented",

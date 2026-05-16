@@ -2,7 +2,7 @@ use std::collections::BTreeSet;
 
 use crate::{Rule, RuleInfo, metadata::diagnostic, metadata::rule_metadata};
 use rudolint_diagnostics::{Finding, Severity};
-use rudolint_dockerfile::{Comment, Dockerfile};
+use rudolint_dockerfile::{Comment, CopyKind, Dockerfile, Instruction, InstructionForm};
 use rudolint_fix::{FixApplicability, FixPreview, TextEdit};
 use rudolint_policy::LegacySuppression;
 use rudolint_shell::{detect_command_invocations, detect_disallowed_container_commands};
@@ -29,6 +29,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(PinApkVersions),
         Box::new(ApkAddNoCache),
         Box::new(PreferCopy),
+        Box::new(CopyMultipleDestinationSlash),
         Box::new(UniqueStageNames),
         Box::new(JsonEntrypoints),
         Box::new(DeprecatedMaintainer),
@@ -710,6 +711,35 @@ impl Rule for PreferCopy {
 }
 
 rule_metadata!(
+    CopyMultipleDestinationSlash,
+    "RDL3021",
+    "copy-multiple-destination-slash",
+    Severity::Error,
+    "require trailing slash for COPY destinations with multiple sources"
+);
+
+impl Rule for CopyMultipleDestinationSlash {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        doc.instructions
+            .iter()
+            .filter(|instruction| copy_multiple_sources_without_directory_destination(instruction))
+            .map(|instruction| {
+                diagnostic(
+                    "RDL3021",
+                    Severity::Error,
+                    "`COPY` with multiple sources requires the destination to end with `/`",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+rule_metadata!(
     UniqueStageNames,
     "RDL3024",
     "unique-stage-names",
@@ -1376,13 +1406,36 @@ fn apk_add_missing_no_cache(shell: &str) -> bool {
         })
 }
 
+fn copy_multiple_sources_without_directory_destination(instruction: &Instruction) -> bool {
+    let Some(copy) = &instruction.copy else {
+        return false;
+    };
+    if copy.kind != CopyKind::Copy {
+        return false;
+    }
+
+    let operands = match &instruction.form {
+        InstructionForm::Json(values) => values.clone(),
+        _ => {
+            let mut operands = copy.sources.clone();
+            operands.extend(copy.destination.iter().cloned());
+            operands
+        }
+    };
+
+    operands.len() > 2
+        && operands
+            .last()
+            .is_some_and(|destination| !destination.ends_with('/'))
+}
+
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3021", "RDL3022", "RDL3023", "RDL3026", "RDL3027", "RDL3028", "RDL3029", "RDL3030",
-        "RDL3032", "RDL3033", "RDL3034", "RDL3035", "RDL3036", "RDL3037", "RDL3038", "RDL3040",
-        "RDL3041", "RDL3042", "RDL3043", "RDL3044", "RDL3045", "RDL3046", "RDL3047", "RDL3048",
-        "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053", "RDL3054", "RDL3055", "RDL3056",
-        "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001",
-        "RDL4005", "RDL4006",
+        "RDL3022", "RDL3023", "RDL3026", "RDL3027", "RDL3028", "RDL3029", "RDL3030", "RDL3032",
+        "RDL3033", "RDL3034", "RDL3035", "RDL3036", "RDL3037", "RDL3038", "RDL3040", "RDL3041",
+        "RDL3042", "RDL3043", "RDL3044", "RDL3045", "RDL3046", "RDL3047", "RDL3048", "RDL3049",
+        "RDL3050", "RDL3051", "RDL3052", "RDL3053", "RDL3054", "RDL3055", "RDL3056", "RDL3057",
+        "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005",
+        "RDL4006",
     ]
 }
