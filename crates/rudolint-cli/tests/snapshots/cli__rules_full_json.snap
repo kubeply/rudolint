@@ -1,0 +1,600 @@
+---
+source: crates/rudolint-cli/tests/cli.rs
+expression: normalized_json(&output)
+---
+[
+  {
+    "code": "RDK1000",
+    "severity": "info",
+    "status": "implemented",
+    "summary": "require explicit syntax directive for BuildKit-only features"
+  },
+  {
+    "code": "RDK1001",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "reject secret-like ARG and ENV names"
+  },
+  {
+    "code": "RDK1002",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "prefer BuildKit secret mounts for secret-consuming RUN steps"
+  },
+  {
+    "code": "RDK1003",
+    "severity": "info",
+    "status": "implemented",
+    "summary": "prefer BuildKit cache mounts for package-manager caches"
+  },
+  {
+    "code": "RDL1001",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "warn on legacy external linter suppression comments"
+  },
+  {
+    "code": "RDL3000",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "require absolute WORKDIR paths"
+  },
+  {
+    "code": "RDL3001",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3002",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "require the final USER to be non-root"
+  },
+  {
+    "code": "RDL3003",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3004",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3006",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "require explicit image tags in FROM"
+  },
+  {
+    "code": "RDL3007",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "reject latest base image tags"
+  },
+  {
+    "code": "RDL3008",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3009",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3010",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3011",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "validate EXPOSE port numbers"
+  },
+  {
+    "code": "RDL3012",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "allow only one HEALTHCHECK instruction"
+  },
+  {
+    "code": "RDL3013",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3014",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3015",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3016",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3018",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3019",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3020",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "prefer COPY for plain local files"
+  },
+  {
+    "code": "RDL3021",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3022",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3023",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3024",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "require unique multi-stage aliases"
+  },
+  {
+    "code": "RDL3025",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "prefer JSON form for CMD and ENTRYPOINT"
+  },
+  {
+    "code": "RDL3026",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3027",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3028",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3029",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3030",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3032",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3033",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3034",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3035",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3036",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3037",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3038",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3040",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3041",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3042",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3043",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3044",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3045",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3046",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3047",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3048",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3049",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3050",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3051",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3052",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3053",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3054",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3055",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3056",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3057",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3058",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3059",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3060",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3061",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3062",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL3063",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL4000",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "reject deprecated MAINTAINER instructions"
+  },
+  {
+    "code": "RDL4001",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL4003",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "allow only one CMD instruction"
+  },
+  {
+    "code": "RDL4004",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "allow only one ENTRYPOINT instruction"
+  },
+  {
+    "code": "RDL4005",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RDL4006",
+    "severity": "warning",
+    "status": "planned",
+    "summary": "tracked for compatibility parity"
+  },
+  {
+    "code": "RSC1000",
+    "severity": "warning",
+    "status": "external",
+    "summary": "shell diagnostics delegated to the shell-analysis layer"
+  },
+  {
+    "code": "RSC1001",
+    "severity": "warning",
+    "status": "external",
+    "summary": "shell diagnostics delegated to the shell-analysis layer"
+  },
+  {
+    "code": "RSC1007",
+    "severity": "warning",
+    "status": "external",
+    "summary": "shell diagnostics delegated to the shell-analysis layer"
+  },
+  {
+    "code": "RSC1010",
+    "severity": "warning",
+    "status": "external",
+    "summary": "shell diagnostics delegated to the shell-analysis layer"
+  },
+  {
+    "code": "RSC1018",
+    "severity": "warning",
+    "status": "external",
+    "summary": "shell diagnostics delegated to the shell-analysis layer"
+  },
+  {
+    "code": "RSC1035",
+    "severity": "warning",
+    "status": "external",
+    "summary": "shell diagnostics delegated to the shell-analysis layer"
+  },
+  {
+    "code": "RSC1045",
+    "severity": "warning",
+    "status": "external",
+    "summary": "shell diagnostics delegated to the shell-analysis layer"
+  },
+  {
+    "code": "RSC1065",
+    "severity": "warning",
+    "status": "external",
+    "summary": "shell diagnostics delegated to the shell-analysis layer"
+  },
+  {
+    "code": "RSC1066",
+    "severity": "warning",
+    "status": "external",
+    "summary": "shell diagnostics delegated to the shell-analysis layer"
+  },
+  {
+    "code": "RSC1077",
+    "severity": "warning",
+    "status": "external",
+    "summary": "shell diagnostics delegated to the shell-analysis layer"
+  },
+  {
+    "code": "RSC1078",
+    "severity": "warning",
+    "status": "external",
+    "summary": "shell diagnostics delegated to the shell-analysis layer"
+  },
+  {
+    "code": "RSC1079",
+    "severity": "warning",
+    "status": "external",
+    "summary": "shell diagnostics delegated to the shell-analysis layer"
+  },
+  {
+    "code": "RSC1081",
+    "severity": "warning",
+    "status": "external",
+    "summary": "shell diagnostics delegated to the shell-analysis layer"
+  },
+  {
+    "code": "RSC1083",
+    "severity": "warning",
+    "status": "external",
+    "summary": "shell diagnostics delegated to the shell-analysis layer"
+  },
+  {
+    "code": "RSC1086",
+    "severity": "warning",
+    "status": "external",
+    "summary": "shell diagnostics delegated to the shell-analysis layer"
+  },
+  {
+    "code": "RSC1095",
+    "severity": "warning",
+    "status": "external",
+    "summary": "shell diagnostics delegated to the shell-analysis layer"
+  },
+  {
+    "code": "RSC2002",
+    "severity": "warning",
+    "status": "external",
+    "summary": "shell diagnostics delegated to the shell-analysis layer"
+  },
+  {
+    "code": "RSC2015",
+    "severity": "warning",
+    "status": "external",
+    "summary": "shell diagnostics delegated to the shell-analysis layer"
+  },
+  {
+    "code": "RSC2026",
+    "severity": "warning",
+    "status": "external",
+    "summary": "shell diagnostics delegated to the shell-analysis layer"
+  },
+  {
+    "code": "RSC2035",
+    "severity": "warning",
+    "status": "external",
+    "summary": "shell diagnostics delegated to the shell-analysis layer"
+  },
+  {
+    "code": "RSC2046",
+    "severity": "warning",
+    "status": "external",
+    "summary": "shell diagnostics delegated to the shell-analysis layer"
+  },
+  {
+    "code": "RSC2086",
+    "severity": "warning",
+    "status": "external",
+    "summary": "shell diagnostics delegated to the shell-analysis layer"
+  },
+  {
+    "code": "RSC2140",
+    "severity": "warning",
+    "status": "external",
+    "summary": "shell diagnostics delegated to the shell-analysis layer"
+  },
+  {
+    "code": "RSC2154",
+    "severity": "warning",
+    "status": "external",
+    "summary": "shell diagnostics delegated to the shell-analysis layer"
+  },
+  {
+    "code": "RSC2155",
+    "severity": "warning",
+    "status": "external",
+    "summary": "shell diagnostics delegated to the shell-analysis layer"
+  },
+  {
+    "code": "RSC2164",
+    "severity": "warning",
+    "status": "external",
+    "summary": "shell diagnostics delegated to the shell-analysis layer"
+  },
+  {
+    "code": "RSC2181",
+    "severity": "warning",
+    "status": "external",
+    "summary": "shell diagnostics delegated to the shell-analysis layer"
+  },
+  {
+    "code": "RSC2196",
+    "severity": "warning",
+    "status": "external",
+    "summary": "shell diagnostics delegated to the shell-analysis layer"
+  }
+]

@@ -375,6 +375,32 @@ fn emits_rules_json() {
 }
 
 #[test]
+fn emits_rules_implemented_text() {
+    rudolint_cmd()
+        .args(["rules", "--implemented"])
+        .assert()
+        .success()
+        .stdout(predicates::str::contains("RDK1000"))
+        .stdout(predicates::str::contains("implemented"))
+        .stdout(predicates::str::contains("RDL3001").not())
+        .stdout(predicates::str::contains("RSC1000").not());
+}
+
+#[test]
+fn emits_full_rules_json() {
+    let output = rudolint_cmd()
+        .args(["rules", "--format", "json"])
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+
+    let output = String::from_utf8(output).expect("stdout should be UTF-8");
+    insta::assert_json_snapshot!("rules_full_json", normalized_json(&output));
+}
+
+#[test]
 fn explains_rule() {
     rudolint_cmd()
         .args(["explain", "RDL3007"])
