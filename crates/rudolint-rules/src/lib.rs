@@ -6,6 +6,7 @@ use clap::ValueEnum;
 use rudolint_config::Config;
 use rudolint_diagnostics::{Finding, Severity};
 use rudolint_dockerfile::Dockerfile;
+use serde::Serialize;
 
 #[derive(Debug, Clone, Copy, Default, ValueEnum)]
 pub enum Profile {
@@ -16,7 +17,8 @@ pub enum Profile {
     Compat,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "kebab-case")]
 pub enum RuleStatus {
     Implemented,
     Planned,

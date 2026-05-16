@@ -163,7 +163,7 @@ fn run_rules(args: cli::RulesArgs) -> Result<ExitCode, AppError> {
                         "code": rule.code,
                         "severity": rule.severity,
                         "summary": rule.summary,
-                        "status": rule.status.to_string(),
+                        "status": rule.status,
                     })
                 })
                 .collect::<Vec<_>>();

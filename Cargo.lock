@@ -603,6 +603,7 @@ dependencies = [
  "rudolint-diagnostics",
  "rudolint-dockerfile",
  "rudolint-test",
+ "serde",
  "serde_json",
 ]
 
