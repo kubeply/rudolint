@@ -292,6 +292,12 @@ expression: normalized_json(&output)
     "summary": "use no-log-init with high useradd UIDs"
   },
   {
+    "code": "RDL3047",
+    "severity": "info",
+    "status": "implemented",
+    "summary": "avoid noisy wget progress output"
+  },
+  {
     "code": "RDL4000",
     "severity": "error",
     "status": "implemented",

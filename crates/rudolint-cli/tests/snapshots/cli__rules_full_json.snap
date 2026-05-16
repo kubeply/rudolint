@@ -293,9 +293,9 @@ expression: normalized_json(&output)
   },
   {
     "code": "RDL3047",
-    "severity": "warning",
-    "status": "planned",
-    "summary": "tracked for compatibility parity"
+    "severity": "info",
+    "status": "implemented",
+    "summary": "avoid noisy wget progress output"
   },
   {
     "code": "RDL3048",

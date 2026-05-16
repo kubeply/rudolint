@@ -808,6 +808,22 @@ fn snapshots_rdl3046_useradd_no_log_init_fixture() {
 }
 
 #[test]
+fn snapshots_rdl3047_wget_progress_fixture() {
+    let source = read_fixture("rules/RDL3047.wget-progress/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDL3047")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdl3047_wget_progress_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rdl4000_deprecated_maintainer_fixture() {
     let source = read_fixture("rules/RDL4000.deprecated-maintainer/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");

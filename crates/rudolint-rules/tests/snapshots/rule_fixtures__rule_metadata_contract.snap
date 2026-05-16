@@ -533,6 +533,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3047",
+    "default_severity": "info",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3047.md",
+    "fix": "none",
+    "name": "wget-progress",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "avoid noisy wget progress output"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL4000",
     "default_severity": "error",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4000.md",
