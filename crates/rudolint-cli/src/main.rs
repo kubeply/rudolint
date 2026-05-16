@@ -103,6 +103,10 @@ fn run_check(args: cli::CheckArgs) -> Result<ExitCode, AppError> {
     };
     print!("{rendered}");
 
+    if args.exit_zero {
+        return Ok(ExitCode::SUCCESS);
+    }
+
     if findings
         .iter()
         .any(|finding| finding.severity.is_failure(args.failure_threshold))
