@@ -220,6 +220,12 @@ expression: normalized_json(&output)
     "summary": "pin versions in yum install"
   },
   {
+    "code": "RDL3034",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "use a non-interactive flag with zypper install"
+  },
+  {
     "code": "RDL4000",
     "severity": "error",
     "status": "implemented",

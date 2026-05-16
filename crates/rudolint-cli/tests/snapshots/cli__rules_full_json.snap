@@ -222,8 +222,8 @@ expression: normalized_json(&output)
   {
     "code": "RDL3034",
     "severity": "warning",
-    "status": "planned",
-    "summary": "tracked for compatibility parity"
+    "status": "implemented",
+    "summary": "use a non-interactive flag with zypper install"
   },
   {
     "code": "RDL3035",
