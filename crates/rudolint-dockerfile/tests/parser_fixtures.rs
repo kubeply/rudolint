@@ -40,6 +40,18 @@ fn document_json(document: &Dockerfile) -> Value {
                 "line": syntax.line,
             })
         }),
+        "escape": document.escape.as_ref().map(|escape| {
+            json!({
+                "character": escape.character.to_string(),
+                "line": escape.line,
+            })
+        }),
+        "checks": document.checks.iter().map(|check| {
+            json!({
+                "value": check.value,
+                "line": check.line,
+            })
+        }).collect::<Vec<_>>(),
         "has_buildkit_features": document.has_buildkit_features,
         "instructions": document
             .instructions

@@ -3,6 +3,8 @@ source: crates/rudolint-dockerfile/tests/parser_fixtures.rs
 expression: document_json(&document)
 ---
 {
+  "checks": [],
+  "escape": null,
   "has_buildkit_features": false,
   "instructions": [
     {

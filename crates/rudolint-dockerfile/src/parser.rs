@@ -5,6 +5,8 @@ use regex::Regex;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Dockerfile {
     pub syntax: Option<SyntaxDirective>,
+    pub escape: Option<EscapeDirective>,
+    pub checks: Vec<CheckDirective>,
     pub instructions: Vec<Instruction>,
     pub has_buildkit_features: bool,
 }
@@ -12,6 +14,18 @@ pub struct Dockerfile {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SyntaxDirective {
     pub image: String,
+    pub line: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct EscapeDirective {
+    pub character: char,
+    pub line: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CheckDirective {
+    pub value: String,
     pub line: usize,
 }
 
@@ -47,6 +61,8 @@ impl std::error::Error for ParserError {}
 
 pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
     let mut syntax = None;
+    let mut escape = None;
+    let mut checks = Vec::new();
     let mut instructions = Vec::new();
     let mut current = String::new();
     let mut start_line = 0;
@@ -60,9 +76,21 @@ pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
                 continue;
             }
             if trimmed.starts_with('#') {
-                if let Some(value) = trimmed.strip_prefix("# syntax=") {
+                if let Some(value) = directive_value(trimmed, "syntax") {
                     syntax = Some(SyntaxDirective {
                         image: value.trim().to_string(),
+                        line: line_number,
+                    });
+                } else if let Some(value) = directive_value(trimmed, "escape") {
+                    if let Some(character) = value.trim().chars().next() {
+                        escape = Some(EscapeDirective {
+                            character,
+                            line: line_number,
+                        });
+                    }
+                } else if let Some(value) = directive_value(trimmed, "check") {
+                    checks.push(CheckDirective {
+                        value: value.trim().to_string(),
                         line: line_number,
                     });
                 }
@@ -95,9 +123,19 @@ pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
     let has_buildkit_features = instructions.iter().any(Instruction::has_buildkit_features);
     Ok(Dockerfile {
         syntax,
+        escape,
+        checks,
         instructions,
         has_buildkit_features,
     })
+}
+
+fn directive_value<'a>(comment: &'a str, name: &str) -> Option<&'a str> {
+    let rest = comment.strip_prefix('#')?.trim_start();
+    let (directive_name, value) = rest.split_once('=')?;
+    directive_name
+        .eq_ignore_ascii_case(name)
+        .then_some(value.trim())
 }
 
 fn continues(line: &str) -> bool {
@@ -232,8 +270,24 @@ RUN --mount=type=cache,target=/var/cache/apk apk add curl
         )
         .unwrap();
 
-        assert_eq!(doc.syntax.unwrap().image, "docker/dockerfile:1.7");
+        assert_eq!(doc.syntax.as_ref().unwrap().image, "docker/dockerfile:1.7");
         assert!(doc.has_buildkit_features);
         assert_eq!(doc.instructions[1].mounts[0].mount_type, "cache");
+    }
+
+    #[test]
+    fn parses_parser_directives() {
+        let doc = parse_dockerfile(
+            r#"# syntax=docker/dockerfile:1.7
+# escape=`
+# check=skip=JSONArgsRecommended
+FROM alpine:3.20
+"#,
+        )
+        .unwrap();
+
+        assert_eq!(doc.syntax.unwrap().image, "docker/dockerfile:1.7");
+        assert_eq!(doc.escape.unwrap().character, '`');
+        assert_eq!(doc.checks[0].value, "skip=JSONArgsRecommended");
     }
 }
