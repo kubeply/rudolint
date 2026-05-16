@@ -247,6 +247,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3019",
+    "default_severity": "info",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3019.md",
+    "fix": "none",
+    "name": "apk-add-no-cache",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "use --no-cache with apk add"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL3020",
     "default_severity": "error",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3020.md",

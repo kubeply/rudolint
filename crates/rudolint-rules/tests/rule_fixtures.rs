@@ -379,6 +379,22 @@ fn snapshots_rdl3018_pin_apk_versions_fixture() {
 }
 
 #[test]
+fn snapshots_rdl3019_apk_add_no_cache_fixture() {
+    let source = read_fixture("rules/RDL3019.apk-add-no-cache/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDL3019")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdl3019_apk_add_no_cache_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rdl3020_prefer_copy_fixture() {
     let source = read_fixture("rules/RDL3020.prefer-copy/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");

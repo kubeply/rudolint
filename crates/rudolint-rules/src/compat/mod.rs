@@ -27,6 +27,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(AptGetNoInstallRecommends),
         Box::new(PinNpmVersions),
         Box::new(PinApkVersions),
+        Box::new(ApkAddNoCache),
         Box::new(PreferCopy),
         Box::new(UniqueStageNames),
         Box::new(JsonEntrypoints),
@@ -636,6 +637,36 @@ impl Rule for PinApkVersions {
                     "RDL3018",
                     Severity::Warning,
                     "pin versions in apk add",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+rule_metadata!(
+    ApkAddNoCache,
+    "RDL3019",
+    "apk-add-no-cache",
+    Severity::Info,
+    "use --no-cache with apk add"
+);
+
+impl Rule for ApkAddNoCache {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        doc.instructions
+            .iter()
+            .filter(|instruction| instruction.keyword == "RUN")
+            .filter(|instruction| apk_add_missing_no_cache(&instruction.args))
+            .map(|instruction| {
+                diagnostic(
+                    "RDL3019",
+                    Severity::Info,
+                    "use `apk add --no-cache` to avoid persisting the apk package cache",
                     instruction,
                 )
             })
@@ -1331,13 +1362,27 @@ fn apk_add_option_takes_value(argument: &str) -> bool {
     matches!(argument, "-t" | "--virtual" | "-X" | "--repository")
 }
 
+fn apk_add_missing_no_cache(shell: &str) -> bool {
+    detect_command_invocations(shell)
+        .into_iter()
+        .filter(|invocation| invocation.command == "apk")
+        .any(|invocation| {
+            apk_subcommand_index(&invocation.arguments)
+                .is_some_and(|index| invocation.arguments[index] == "add")
+                && !invocation
+                    .arguments
+                    .iter()
+                    .any(|argument| argument == "--no-cache")
+        })
+}
+
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3019", "RDL3021", "RDL3022", "RDL3023", "RDL3026", "RDL3027", "RDL3028", "RDL3029",
-        "RDL3030", "RDL3032", "RDL3033", "RDL3034", "RDL3035", "RDL3036", "RDL3037", "RDL3038",
-        "RDL3040", "RDL3041", "RDL3042", "RDL3043", "RDL3044", "RDL3045", "RDL3046", "RDL3047",
-        "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053", "RDL3054", "RDL3055",
-        "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063",
-        "RDL4001", "RDL4005", "RDL4006",
+        "RDL3021", "RDL3022", "RDL3023", "RDL3026", "RDL3027", "RDL3028", "RDL3029", "RDL3030",
+        "RDL3032", "RDL3033", "RDL3034", "RDL3035", "RDL3036", "RDL3037", "RDL3038", "RDL3040",
+        "RDL3041", "RDL3042", "RDL3043", "RDL3044", "RDL3045", "RDL3046", "RDL3047", "RDL3048",
+        "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053", "RDL3054", "RDL3055", "RDL3056",
+        "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001",
+        "RDL4005", "RDL4006",
     ]
 }

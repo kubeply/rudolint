@@ -136,6 +136,12 @@ expression: normalized_json(&output)
     "summary": "pin versions in apk add"
   },
   {
+    "code": "RDL3019",
+    "severity": "info",
+    "status": "implemented",
+    "summary": "use --no-cache with apk add"
+  },
+  {
     "code": "RDL3020",
     "severity": "error",
     "status": "implemented",

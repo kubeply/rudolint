@@ -84,6 +84,22 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "severity": "warning"
   },
   {
+    "code": "RDL3019",
+    "help": null,
+    "labels": [],
+    "message": "use `apk add --no-cache` to avoid persisting the apk package cache",
+    "path": "",
+    "primary_span": {
+      "end_byte": 0,
+      "end_column": 1,
+      "end_line": 5,
+      "start_byte": 0,
+      "start_column": 1,
+      "start_line": 5
+    },
+    "severity": "info"
+  },
+  {
     "code": "RDL3020",
     "help": null,
     "labels": [],
