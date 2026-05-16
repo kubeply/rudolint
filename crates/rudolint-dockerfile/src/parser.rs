@@ -113,6 +113,7 @@ pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
     let mut current = String::new();
     let mut start_line = 0;
     let mut start_byte = 0;
+    let mut start_escape = '\\';
     let mut byte_offset = 0;
 
     for (index, segment) in source.split_inclusive('\n').enumerate() {
@@ -159,6 +160,7 @@ pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
             }
             start_line = line_number;
             start_byte = byte_offset;
+            start_escape = escape_character;
         }
 
         if !current.is_empty() {
@@ -166,18 +168,14 @@ pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
         }
         current.push_str(line);
 
-        if continues(line, escape_character) {
+        if continues(line, start_escape) {
             byte_offset += segment.len();
             continue;
         }
 
-        if let Some(instruction) = parse_instruction(
-            &current,
-            start_line,
-            start_byte,
-            &source_file,
-            escape_character,
-        )? {
+        if let Some(instruction) =
+            parse_instruction(&current, start_line, start_byte, &source_file, start_escape)?
+        {
             instructions.push(instruction);
         }
         current.clear();
@@ -185,13 +183,8 @@ pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
     }
 
     if !current.trim().is_empty()
-        && let Some(instruction) = parse_instruction(
-            &current,
-            start_line,
-            start_byte,
-            &source_file,
-            escape_character,
-        )?
+        && let Some(instruction) =
+            parse_instruction(&current, start_line, start_byte, &source_file, start_escape)?
     {
         instructions.push(instruction);
     }
@@ -217,9 +210,19 @@ fn directive_value<'a>(comment: &'a str, name: &str) -> Option<&'a str> {
 
 fn continues(line: &str, escape_character: char) -> bool {
     let trimmed = line.trim_end();
-    let mut chars = trimmed.chars().rev();
-    matches!(chars.next(), Some(character) if character == escape_character)
-        && !matches!(chars.next(), Some(character) if character == escape_character)
+    trimmed.ends_with(escape_character) && !ends_with_escaped_escape(trimmed, escape_character)
+}
+
+fn ends_with_escaped_escape(trimmed: &str, escape_character: char) -> bool {
+    let mut count = 0;
+    for character in trimmed.chars().rev() {
+        if character == escape_character {
+            count += 1;
+        } else {
+            break;
+        }
+    }
+    count > 1 && count % 2 == 0
 }
 
 fn parse_instruction(
