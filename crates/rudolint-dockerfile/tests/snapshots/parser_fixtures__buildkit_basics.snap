@@ -241,6 +241,7 @@ expression: document_json(&document)
         "image": "alpine:3.20",
         "platform": null
       },
+      "from": null,
       "heredocs": [],
       "keyword": "FROM",
       "keyword_span": {
