@@ -119,9 +119,9 @@ expression: normalized_json(&output)
   },
   {
     "code": "RDL3015",
-    "severity": "warning",
-    "status": "planned",
-    "summary": "tracked for compatibility parity"
+    "severity": "info",
+    "status": "implemented",
+    "summary": "avoid recommended packages in apt-get install"
   },
   {
     "code": "RDL3016",

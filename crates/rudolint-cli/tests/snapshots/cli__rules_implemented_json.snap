@@ -118,6 +118,12 @@ expression: normalized_json(&output)
     "summary": "use -y with apt-get install"
   },
   {
+    "code": "RDL3015",
+    "severity": "info",
+    "status": "implemented",
+    "summary": "avoid recommended packages in apt-get install"
+  },
+  {
     "code": "RDL3020",
     "severity": "error",
     "status": "implemented",
