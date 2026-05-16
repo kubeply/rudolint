@@ -36,6 +36,22 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "severity": "error"
   },
   {
+    "code": "RDL3018",
+    "help": null,
+    "labels": [],
+    "message": "pin versions in apk add",
+    "path": "",
+    "primary_span": {
+      "end_byte": 0,
+      "end_column": 1,
+      "end_line": 5,
+      "start_byte": 0,
+      "start_column": 1,
+      "start_line": 5
+    },
+    "severity": "warning"
+  },
+  {
     "code": "RDL3020",
     "help": null,
     "labels": [],
