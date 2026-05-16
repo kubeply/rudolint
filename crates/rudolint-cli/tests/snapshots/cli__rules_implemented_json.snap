@@ -208,6 +208,12 @@ expression: normalized_json(&output)
     "summary": "use -y with yum install"
   },
   {
+    "code": "RDL3032",
+    "severity": "info",
+    "status": "implemented",
+    "summary": "clean yum metadata after installs"
+  },
+  {
     "code": "RDL4000",
     "severity": "error",
     "status": "implemented",
