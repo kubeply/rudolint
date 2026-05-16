@@ -370,6 +370,12 @@ expression: normalized_json(&output)
     "summary": "combine consecutive RUN instructions"
   },
   {
+    "code": "RDL3060",
+    "severity": "info",
+    "status": "implemented",
+    "summary": "clean yarn cache after yarn install"
+  },
+  {
     "code": "RDL4000",
     "severity": "error",
     "status": "implemented",
