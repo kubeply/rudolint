@@ -5,8 +5,16 @@ use rudolint_diagnostics::Severity;
 use rudolint_rules::Profile;
 
 #[derive(Debug, Parser)]
-#[command(author, version, about)]
+#[command(author, about, disable_version_flag = true)]
 pub struct Cli {
+    /// Print version information.
+    #[arg(long, global = true)]
+    pub version: bool,
+
+    /// Print global command output as JSON where supported.
+    #[arg(long, global = true)]
+    pub json: bool,
+
     #[command(subcommand)]
     pub command: Option<Command>,
 }

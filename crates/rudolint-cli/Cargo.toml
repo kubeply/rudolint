@@ -15,6 +15,7 @@ rudolint-diagnostics.workspace = true
 rudolint-dockerfile.workspace = true
 rudolint-output.workspace = true
 rudolint-rules.workspace = true
+serde_json.workspace = true
 
 [dev-dependencies]
 assert_cmd.workspace = true
