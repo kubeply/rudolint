@@ -544,6 +544,7 @@ name = "rudolint-diagnostics"
 version = "0.1.0"
 dependencies = [
  "clap",
+ "rudolint-source",
  "serde",
 ]
 
@@ -621,6 +622,9 @@ version = "0.1.0"
 [[package]]
 name = "rudolint-source"
 version = "0.1.0"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "rudolint-test"

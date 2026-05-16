@@ -12,8 +12,8 @@ pub fn human(findings: &[Finding]) -> String {
         rendered.push_str(&format!(
             "{}:{}:{}: {} {} {}\n",
             finding.path.display(),
-            finding.line,
-            finding.column,
+            finding.line(),
+            finding.column(),
             finding.severity,
             finding.code,
             finding.message
@@ -38,8 +38,10 @@ pub fn sarif(findings: &[Finding]) -> Result<String> {
                     "physicalLocation": {
                         "artifactLocation": { "uri": finding.path.to_string_lossy() },
                         "region": {
-                            "startLine": finding.line,
-                            "startColumn": finding.column
+                            "startLine": finding.primary_span.start_line,
+                            "startColumn": finding.primary_span.start_column,
+                            "endLine": finding.primary_span.end_line,
+                            "endColumn": finding.primary_span.end_column
                         }
                     }
                 }]

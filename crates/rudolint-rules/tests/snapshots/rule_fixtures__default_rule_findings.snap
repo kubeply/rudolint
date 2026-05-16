@@ -5,58 +5,114 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
 [
   {
     "code": "RDL3007",
-    "column": 1,
-    "line": 2,
+    "help": null,
+    "labels": [],
     "message": "avoid mutable latest base image tags",
     "path": "",
+    "primary_span": {
+      "end_byte": 0,
+      "end_column": 1,
+      "end_line": 2,
+      "start_byte": 0,
+      "start_column": 1,
+      "start_line": 2
+    },
     "severity": "warning"
   },
   {
     "code": "RDL3000",
-    "column": 1,
-    "line": 3,
+    "help": null,
+    "labels": [],
     "message": "WORKDIR should be absolute",
     "path": "",
+    "primary_span": {
+      "end_byte": 0,
+      "end_column": 1,
+      "end_line": 3,
+      "start_byte": 0,
+      "start_column": 1,
+      "start_line": 3
+    },
     "severity": "error"
   },
   {
     "code": "RDK1001",
-    "column": 1,
-    "line": 4,
+    "help": null,
+    "labels": [],
     "message": "secret-like values should use BuildKit secret mounts instead of ARG or ENV",
     "path": "",
+    "primary_span": {
+      "end_byte": 0,
+      "end_column": 1,
+      "end_line": 4,
+      "start_byte": 0,
+      "start_column": 1,
+      "start_line": 4
+    },
     "severity": "warning"
   },
   {
     "code": "RDK1003",
-    "column": 1,
-    "line": 5,
+    "help": null,
+    "labels": [],
     "message": "package install step can use a BuildKit cache mount for repeat builds",
     "path": "",
+    "primary_span": {
+      "end_byte": 0,
+      "end_column": 1,
+      "end_line": 5,
+      "start_byte": 0,
+      "start_column": 1,
+      "start_line": 5
+    },
     "severity": "info"
   },
   {
     "code": "RDL3020",
-    "column": 1,
-    "line": 6,
+    "help": null,
+    "labels": [],
     "message": "use COPY for local files unless archive extraction or remote fetch is intended",
     "path": "",
+    "primary_span": {
+      "end_byte": 0,
+      "end_column": 1,
+      "end_line": 6,
+      "start_byte": 0,
+      "start_column": 1,
+      "start_line": 6
+    },
     "severity": "error"
   },
   {
     "code": "RDL3025",
-    "column": 1,
-    "line": 7,
+    "help": null,
+    "labels": [],
     "message": "use exec/JSON form for CMD and ENTRYPOINT",
     "path": "",
+    "primary_span": {
+      "end_byte": 0,
+      "end_column": 1,
+      "end_line": 7,
+      "start_byte": 0,
+      "start_column": 1,
+      "start_line": 7
+    },
     "severity": "warning"
   },
   {
     "code": "RDL4003",
-    "column": 1,
-    "line": 8,
+    "help": null,
+    "labels": [],
     "message": "only the final CMD is used",
     "path": "",
+    "primary_span": {
+      "end_byte": 0,
+      "end_column": 1,
+      "end_line": 8,
+      "start_byte": 0,
+      "start_column": 1,
+      "start_line": 8
+    },
     "severity": "warning"
   }
 ]

@@ -81,8 +81,8 @@ impl RuleEngine {
         findings.sort_by(|left, right| {
             left.path
                 .cmp(&right.path)
-                .then(left.line.cmp(&right.line))
-                .then(left.column.cmp(&right.column))
+                .then(left.line().cmp(&right.line()))
+                .then(left.column().cmp(&right.column()))
                 .then(left.code.cmp(&right.code))
         });
         findings

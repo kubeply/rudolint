@@ -2,6 +2,8 @@
 
 use std::path::PathBuf;
 
+use serde::Serialize;
+
 /// Source text plus cached line offset data for diagnostics and edits.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SourceFile {
@@ -133,7 +135,7 @@ pub struct SourceRange {
 }
 
 /// Compact source span with byte offsets and one-based line/column positions.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 pub struct Span {
     /// Inclusive zero-based start byte.
     pub start_byte: usize,
@@ -147,6 +149,20 @@ pub struct Span {
     pub end_line: usize,
     /// One-based end column counted in Unicode scalar values.
     pub end_column: usize,
+}
+
+impl Span {
+    /// Creates a zero-length span at a one-based line and column position.
+    pub fn point(line: usize, column: usize) -> Self {
+        Self {
+            start_byte: 0,
+            end_byte: 0,
+            start_line: line,
+            start_column: column,
+            end_line: line,
+            end_column: column,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

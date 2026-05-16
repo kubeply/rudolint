@@ -258,14 +258,14 @@ fn source_excerpt(findings: &[Finding], sources: &BTreeMap<PathBuf, String>) -> 
         let Some(source) = sources.get(&finding.path) else {
             continue;
         };
-        let Some(line) = source.lines().nth(finding.line.saturating_sub(1)) else {
+        let Some(line) = source.lines().nth(finding.line().saturating_sub(1)) else {
             continue;
         };
         rendered.push_str(&format!(
             "  |\n{:>3} | {}\n  | {}^\n",
-            finding.line,
+            finding.line(),
             line,
-            " ".repeat(finding.column.saturating_sub(1))
+            " ".repeat(finding.column().saturating_sub(1))
         ));
     }
     rendered
