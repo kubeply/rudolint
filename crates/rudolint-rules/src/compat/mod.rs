@@ -46,6 +46,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(NoZypperDistUpgrade),
         Box::new(ZypperClean),
         Box::new(PinZypperVersions),
+        Box::new(DnfInstallAssumeYes),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -1271,6 +1272,36 @@ impl Rule for PinZypperVersions {
 }
 
 rule_metadata!(
+    DnfInstallAssumeYes,
+    "RDL3038",
+    "dnf-install-assume-yes",
+    Severity::Warning,
+    "use -y with dnf install"
+);
+
+impl Rule for DnfInstallAssumeYes {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        doc.instructions
+            .iter()
+            .filter(|instruction| instruction.keyword == "RUN")
+            .filter(|instruction| dnf_install_missing_yes(&instruction.args))
+            .map(|instruction| {
+                diagnostic(
+                    "RDL3038",
+                    Severity::Warning,
+                    "use `dnf install -y` to avoid interactive prompts",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -2320,11 +2351,31 @@ fn zypper_install_has_unpinned_packages(shell: &str) -> bool {
         })
 }
 
+fn dnf_install_missing_yes(shell: &str) -> bool {
+    detect_command_invocations(shell)
+        .into_iter()
+        .filter(|invocation| invocation.command == "dnf")
+        .any(|invocation| {
+            dnf_subcommand_index(&invocation.arguments)
+                .is_some_and(|index| invocation.arguments[index] == "install")
+                && !invocation
+                    .arguments
+                    .iter()
+                    .any(|argument| matches!(argument.as_str(), "-y" | "--assumeyes"))
+        })
+}
+
+fn dnf_subcommand_index(arguments: &[String]) -> Option<usize> {
+    // dnf_subcommand_index intentionally delegates to yum_subcommand_index
+    // because DNF preserves YUM-compatible command-line parsing here.
+    yum_subcommand_index(arguments)
+}
+
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3038", "RDL3040", "RDL3041", "RDL3042", "RDL3043", "RDL3044", "RDL3045", "RDL3046",
-        "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053", "RDL3054",
-        "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062",
-        "RDL3063", "RDL4001", "RDL4005", "RDL4006",
+        "RDL3040", "RDL3041", "RDL3042", "RDL3043", "RDL3044", "RDL3045", "RDL3046", "RDL3047",
+        "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053", "RDL3054", "RDL3055",
+        "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063",
+        "RDL4001", "RDL4005", "RDL4006",
     ]
 }
