@@ -1,4 +1,5 @@
 mod parser;
+mod semantic;
 
 pub use parser::{
     ArgInstruction, CheckDirective, Comment, CopyInstruction, CopyKind, Dockerfile, EnvAssignment,
@@ -6,3 +7,4 @@ pub use parser::{
     HealthcheckInstruction, Heredoc, Instruction, InstructionForm, LineContinuation, ParseRecovery,
     RecoveryKind, RunInstruction, ShellBody, SyntaxDirective, parse_dockerfile,
 };
+pub use semantic::{Stage, stages};
