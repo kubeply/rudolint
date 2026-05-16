@@ -239,6 +239,18 @@ fn quiet_suppresses_output_but_preserves_failure() {
 }
 
 #[test]
+fn verbose_emits_summary_to_stderr() {
+    rudolint_cmd()
+        .args(["check", "--verbose", "--failure-threshold", "error"])
+        .write_stdin("FROM alpine:latest\nWORKDIR app\n")
+        .assert()
+        .code(1)
+        .stderr(predicates::str::contains(
+            "checked 1 Dockerfile(s), emitted 2 finding(s)",
+        ));
+}
+
+#[test]
 fn missing_input_exits_with_code_two() {
     let temp = TempDir::new().expect("temp dir should be created");
     let missing = temp.path().join("missing.Dockerfile");
