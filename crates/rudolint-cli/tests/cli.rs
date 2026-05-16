@@ -163,3 +163,20 @@ fn clean_input_exits_successfully() {
         .assert()
         .success();
 }
+
+#[test]
+fn findings_exit_with_code_one() {
+    rudolint_cmd()
+        .args(["check", "--failure-threshold", "error"])
+        .write_stdin("FROM alpine:latest\nWORKDIR app\n")
+        .assert()
+        .code(1);
+}
+
+#[test]
+fn missing_input_exits_with_code_two() {
+    rudolint_cmd()
+        .args(["check", "missing.Dockerfile"])
+        .assert()
+        .code(2);
+}

@@ -71,6 +71,13 @@ Use stdin:
 rudolint check --format json < Dockerfile
 ```
 
+Exit codes:
+
+- `0`: no findings at or above the failure threshold.
+- `1`: findings met or exceeded the failure threshold.
+- `2`: usage, config, or input error.
+- `3`: unexpected internal error.
+
 ## Configuration
 
 `.rudolint.yaml`:
