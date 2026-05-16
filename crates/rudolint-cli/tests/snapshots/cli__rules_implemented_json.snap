@@ -82,6 +82,12 @@ expression: normalized_json(&output)
     "summary": "pin versions in apt-get install"
   },
   {
+    "code": "RDL3009",
+    "severity": "info",
+    "status": "implemented",
+    "summary": "delete apt-get package lists after use"
+  },
+  {
     "code": "RDL3011",
     "severity": "error",
     "status": "implemented",
