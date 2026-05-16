@@ -64,6 +64,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(ValidSpdxLabels),
         Box::new(ValidGitHashLabels),
         Box::new(ValidSemverLabels),
+        Box::new(MissingHealthcheck),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -2014,6 +2015,35 @@ impl Rule for ValidSemverLabels {
 }
 
 rule_metadata!(
+    MissingHealthcheck,
+    "RDL3057",
+    "missing-healthcheck",
+    Severity::Ignore,
+    "require HEALTHCHECK instructions"
+);
+
+impl Rule for MissingHealthcheck {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, _doc: &Dockerfile) -> Vec<Finding> {
+        Vec::new()
+    }
+
+    fn check_with_config(&self, doc: &Dockerfile, config: &Config) -> Vec<Finding> {
+        if config
+            .severity_override("RDL3057")
+            .is_none_or(|severity| severity == Severity::Ignore)
+        {
+            return Vec::new();
+        }
+
+        missing_healthcheck_findings(doc)
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -2639,6 +2669,86 @@ fn is_valid_semver_label_value(value: &str) -> bool {
     semver::Version::parse(value).is_ok()
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+struct HealthcheckStage {
+    source: String,
+    name: String,
+    instruction_index: usize,
+}
+
+fn missing_healthcheck_findings(doc: &Dockerfile) -> Vec<Finding> {
+    let mut current_stage = None;
+    let mut good_stages = BTreeSet::new();
+    let mut bad_stages = BTreeSet::new();
+
+    for (instruction_index, instruction) in doc.instructions.iter().enumerate() {
+        if let Some(from) = &instruction.from {
+            let stage = HealthcheckStage {
+                source: from.image.clone(),
+                name: from.alias.clone().unwrap_or_else(|| from.image.clone()),
+                instruction_index,
+            };
+
+            if stage_inherits_healthcheck(&stage.source, &good_stages) {
+                good_stages.insert(stage.clone());
+            } else {
+                bad_stages.insert(stage.clone());
+            }
+            current_stage = Some(stage);
+            continue;
+        }
+
+        if instruction.healthcheck.is_some() {
+            let Some(stage) = &current_stage else {
+                continue;
+            };
+
+            let now_good = recursively_good_healthcheck_stages(&bad_stages, stage);
+            for inherited in &now_good {
+                bad_stages.remove(inherited);
+                good_stages.insert(inherited.clone());
+            }
+            bad_stages.remove(stage);
+            good_stages.insert(stage.clone());
+        }
+    }
+
+    bad_stages
+        .into_iter()
+        .filter_map(|stage| doc.instructions.get(stage.instruction_index))
+        .map(|instruction| {
+            diagnostic(
+                "RDL3057",
+                Severity::Ignore,
+                "HEALTHCHECK instruction is missing",
+                instruction,
+            )
+        })
+        .collect()
+}
+
+fn stage_inherits_healthcheck(source: &str, good_stages: &BTreeSet<HealthcheckStage>) -> bool {
+    good_stages.iter().any(|stage| stage.name == source)
+}
+
+fn recursively_good_healthcheck_stages(
+    bad_stages: &BTreeSet<HealthcheckStage>,
+    stage: &HealthcheckStage,
+) -> BTreeSet<HealthcheckStage> {
+    let direct = bad_stages
+        .iter()
+        .filter(|candidate| candidate.name == stage.source)
+        .cloned()
+        .collect::<BTreeSet<_>>();
+
+    direct
+        .iter()
+        .fold(direct.clone(), |mut accumulated, candidate| {
+            accumulated.extend(recursively_good_healthcheck_stages(bad_stages, candidate));
+            accumulated
+        })
+}
+
 fn missing_required_labels(doc: &Dockerfile, config: &Config) -> Vec<Finding> {
     let mut current_stage = None;
     let mut current_stage_line = None;
@@ -3124,7 +3234,7 @@ fn dnf_install_has_unpinned_packages(shell: &str) -> bool {
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001",
-        "RDL4005", "RDL4006",
+        "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005",
+        "RDL4006",
     ]
 }

@@ -353,9 +353,9 @@ expression: normalized_json(&output)
   },
   {
     "code": "RDL3057",
-    "severity": "warning",
-    "status": "planned",
-    "summary": "tracked for compatibility parity"
+    "severity": "ignore",
+    "status": "implemented",
+    "summary": "require HEALTHCHECK instructions"
   },
   {
     "code": "RDL3058",
