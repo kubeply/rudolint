@@ -2,8 +2,8 @@ use std::collections::BTreeSet;
 
 use crate::{Rule, RuleInfo, RuleStatus};
 use rudolint_diagnostics::{Finding, Severity};
-use rudolint_dockerfile::{Dockerfile, Instruction};
-use rudolint_policy::PolicyProfile;
+use rudolint_dockerfile::{Comment, Dockerfile, Instruction};
+use rudolint_policy::{LegacySuppression, PolicyProfile};
 
 macro_rules! rule {
     ($name:ident, $code:literal, $severity:expr, $summary:literal, $body:expr) => {
@@ -95,23 +95,25 @@ fn diagnostic(
 rule!(
     InlineIgnore,
     "RDL1001",
-    Severity::Ignore,
-    "discourage inline linter suppression comments",
+    Severity::Warning,
+    "warn on legacy external linter suppression comments",
     |doc: &Dockerfile| {
-        doc.instructions
+        doc.comments
             .iter()
-            .filter(|instruction| instruction.raw.contains("hadolint ignore="))
-            .map(|instruction| {
-                diagnostic(
-                    "RDL1001",
-                    Severity::Ignore,
-                    "prefer central rule configuration over inline suppressions",
-                    instruction,
-                )
-            })
+            .filter_map(legacy_suppression_comment)
             .collect()
     }
 );
+
+fn legacy_suppression_comment(comment: &Comment) -> Option<Finding> {
+    LegacySuppression::parse_comment(comment.line, &comment.text)?;
+    Some(Finding::with_span(
+        "RDL1001",
+        Severity::Warning,
+        "prefer native rudolint suppression comments over legacy external suppressions",
+        comment.span,
+    ))
+}
 
 rule!(
     AbsoluteWorkdir,
