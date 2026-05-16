@@ -311,9 +311,9 @@ expression: normalized_json(&output)
   },
   {
     "code": "RDL3050",
-    "severity": "warning",
-    "status": "planned",
-    "summary": "tracked for compatibility parity"
+    "severity": "info",
+    "status": "implemented",
+    "summary": "reject labels outside the configured label schema"
   },
   {
     "code": "RDL3051",

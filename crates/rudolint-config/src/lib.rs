@@ -22,6 +22,8 @@ pub struct Config {
     #[serde(default)]
     pub label_schema: BTreeMap<String, String>,
     #[serde(default)]
+    pub strict_labels: bool,
+    #[serde(default)]
     pub allow_entitlements: BTreeSet<String>,
     #[serde(default)]
     pub per_file_ignores: BTreeMap<String, BTreeSet<String>>,
@@ -120,6 +122,7 @@ trusted-registries:
 label-schema:
   org.opencontainers.image.title: text
   org.opencontainers.image.source: url
+strict-labels: true
 allow-entitlements:
   - security.insecure
 per-file-ignores:
@@ -142,6 +145,7 @@ per-file-ignores:
             config.label_schema["org.opencontainers.image.source"],
             "url"
         );
+        assert!(config.strict_labels);
         assert!(config.allow_entitlements.contains("security.insecure"));
         assert!(config.per_file_ignores["fixtures/**"].contains("RDL3000"));
     }

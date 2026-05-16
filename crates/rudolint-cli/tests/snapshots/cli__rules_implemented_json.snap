@@ -310,6 +310,12 @@ expression: normalized_json(&output)
     "summary": "require configured labels"
   },
   {
+    "code": "RDL3050",
+    "severity": "info",
+    "status": "implemented",
+    "summary": "reject labels outside the configured label schema"
+  },
+  {
     "code": "RDL4000",
     "severity": "error",
     "status": "implemented",
