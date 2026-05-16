@@ -25,6 +25,9 @@ pub struct Config {
     /// Registry hostnames considered trusted by registry-sensitive rules.
     #[serde(default)]
     pub trusted_registries: Vec<String>,
+    /// Required label keys and expected schema values used by label validation rules.
+    #[serde(default)]
+    pub label_schema: BTreeMap<String, String>,
     /// BuildKit entitlements allowed by policy.
     #[serde(default)]
     pub allow_entitlements: BTreeSet<String>,
@@ -128,6 +131,9 @@ severity:
   RDL3000: error
 trusted-registries:
   - ghcr.io
+label-schema:
+  org.opencontainers.image.title: text
+  org.opencontainers.image.source: url
 allow-entitlements:
   - security.insecure
 per-file-ignores:
@@ -142,6 +148,14 @@ per-file-ignores:
         assert!(config.ignores("RDL3007"));
         assert_eq!(config.severity_override("RDL3000"), Some(Severity::Error));
         assert_eq!(config.trusted_registries, ["ghcr.io"]);
+        assert_eq!(
+            config.label_schema["org.opencontainers.image.title"],
+            "text"
+        );
+        assert_eq!(
+            config.label_schema["org.opencontainers.image.source"],
+            "url"
+        );
         assert!(config.allow_entitlements.contains("security.insecure"));
         assert!(config.per_file_ignores["fixtures/**"].contains("RDL3000"));
     }
