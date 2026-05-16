@@ -24,6 +24,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(SingleHealthcheck),
         Box::new(PinPipVersions),
         Box::new(AptGetInstallAssumeYes),
+        Box::new(AptGetNoInstallRecommends),
         Box::new(PreferCopy),
         Box::new(UniqueStageNames),
         Box::new(JsonEntrypoints),
@@ -551,6 +552,36 @@ impl Rule for AptGetInstallAssumeYes {
 }
 
 rule_metadata!(
+    AptGetNoInstallRecommends,
+    "RDL3015",
+    "apt-get-no-install-recommends",
+    Severity::Info,
+    "avoid recommended packages in apt-get install"
+);
+
+impl Rule for AptGetNoInstallRecommends {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        doc.instructions
+            .iter()
+            .filter(|instruction| instruction.keyword == "RUN")
+            .filter(|instruction| apt_get_install_missing_no_install_recommends(&instruction.args))
+            .map(|instruction| {
+                diagnostic(
+                    "RDL3015",
+                    Severity::Info,
+                    "use --no-install-recommends with apt-get install",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+rule_metadata!(
     PreferCopy,
     "RDL3020",
     "prefer-copy",
@@ -996,10 +1027,8 @@ fn apt_get_install_missing_yes(shell: &str) -> bool {
         .into_iter()
         .filter(|invocation| invocation.command == "apt-get")
         .any(|invocation| {
-            let has_install = invocation
-                .arguments
-                .iter()
-                .any(|argument| argument == "install");
+            let has_install = apt_get_subcommand_index(&invocation.arguments)
+                .is_some_and(|index| invocation.arguments[index] == "install");
             let has_assume_yes = invocation
                 .arguments
                 .iter()
@@ -1009,13 +1038,56 @@ fn apt_get_install_missing_yes(shell: &str) -> bool {
         })
 }
 
+fn apt_get_install_missing_no_install_recommends(shell: &str) -> bool {
+    detect_command_invocations(shell)
+        .into_iter()
+        .filter(|invocation| invocation.command == "apt-get")
+        .any(|invocation| {
+            let has_install = apt_get_subcommand_index(&invocation.arguments)
+                .is_some_and(|index| invocation.arguments[index] == "install");
+            let has_no_install_recommends = invocation
+                .arguments
+                .iter()
+                .any(|argument| argument == "--no-install-recommends");
+
+            has_install && !has_no_install_recommends
+        })
+}
+
+fn apt_get_subcommand_index(arguments: &[String]) -> Option<usize> {
+    let mut expect_option_value = false;
+    for (index, argument) in arguments.iter().enumerate() {
+        if argument == "\\" {
+            continue;
+        }
+
+        if expect_option_value {
+            expect_option_value = false;
+            continue;
+        }
+
+        if apt_get_install_option_takes_value(argument) {
+            expect_option_value = true;
+            continue;
+        }
+
+        if argument.starts_with('-') {
+            continue;
+        }
+
+        return Some(index);
+    }
+
+    None
+}
+
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3015", "RDL3016", "RDL3018", "RDL3019", "RDL3021", "RDL3022", "RDL3023", "RDL3026",
-        "RDL3027", "RDL3028", "RDL3029", "RDL3030", "RDL3032", "RDL3033", "RDL3034", "RDL3035",
-        "RDL3036", "RDL3037", "RDL3038", "RDL3040", "RDL3041", "RDL3042", "RDL3043", "RDL3044",
-        "RDL3045", "RDL3046", "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052",
-        "RDL3053", "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060",
-        "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
+        "RDL3016", "RDL3018", "RDL3019", "RDL3021", "RDL3022", "RDL3023", "RDL3026", "RDL3027",
+        "RDL3028", "RDL3029", "RDL3030", "RDL3032", "RDL3033", "RDL3034", "RDL3035", "RDL3036",
+        "RDL3037", "RDL3038", "RDL3040", "RDL3041", "RDL3042", "RDL3043", "RDL3044", "RDL3045",
+        "RDL3046", "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053",
+        "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061",
+        "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
     ]
 }

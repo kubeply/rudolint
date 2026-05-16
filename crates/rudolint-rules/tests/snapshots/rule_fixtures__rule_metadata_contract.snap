@@ -214,6 +214,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3015",
+    "default_severity": "info",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3015.md",
+    "fix": "none",
+    "name": "apt-get-no-install-recommends",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "avoid recommended packages in apt-get install"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL3020",
     "default_severity": "error",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3020.md",

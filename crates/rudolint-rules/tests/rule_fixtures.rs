@@ -331,6 +331,22 @@ fn snapshots_rdl3014_apt_get_install_assume_yes_fixture() {
 }
 
 #[test]
+fn snapshots_rdl3015_apt_get_no_install_recommends_fixture() {
+    let source = read_fixture("rules/RDL3015.apt-get-no-install-recommends/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDL3015")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdl3015_apt_get_no_install_recommends_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rdl3020_prefer_copy_fixture() {
     let source = read_fixture("rules/RDL3020.prefer-copy/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
