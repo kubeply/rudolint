@@ -137,9 +137,9 @@ expression: normalized_json(&output)
   },
   {
     "code": "RDL3019",
-    "severity": "warning",
-    "status": "planned",
-    "summary": "tracked for compatibility parity"
+    "severity": "info",
+    "status": "implemented",
+    "summary": "use --no-cache with apk add"
   },
   {
     "code": "RDL3020",
