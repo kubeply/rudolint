@@ -1,4 +1,4 @@
-use rudolint_dockerfile::{parse_dockerfile, stages};
+use rudolint_dockerfile::{arg_scopes, parse_dockerfile, stages};
 use rudolint_test::read_fixture;
 use serde_json::json;
 
@@ -23,4 +23,37 @@ fn snapshots_stage_model() {
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(values);
+}
+
+#[test]
+fn snapshots_arg_scope_model() {
+    let source = read_fixture("parser/arg/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let scopes = arg_scopes(&document);
+
+    insta::assert_json_snapshot!(json!({
+        "global": scopes.global.iter().map(|arg| {
+            json!({
+                "name": arg.name,
+                "default": arg.default,
+            })
+        }).collect::<Vec<_>>(),
+        "stages": scopes.stages.iter().map(|stage| {
+            json!({
+                "stage_index": stage.stage_index,
+                "args": stage.args.iter().map(|arg| {
+                    json!({
+                        "name": arg.name,
+                        "default": arg.default,
+                    })
+                }).collect::<Vec<_>>(),
+                "inherited": stage.inherited.iter().map(|arg| {
+                    json!({
+                        "name": arg.name,
+                        "default": arg.default,
+                    })
+                }).collect::<Vec<_>>(),
+            })
+        }).collect::<Vec<_>>(),
+    }));
 }
