@@ -1,0 +1,11 @@
+FROM alpine:3.20
+RUN wget https://example.com/archive.tar.gz
+RUN wget --progress=dot:giga https://example.com/archive.tar.gz
+RUN wget -q https://example.com/archive.tar.gz
+RUN wget --quiet https://example.com/archive.tar.gz
+RUN wget -nv https://example.com/archive.tar.gz
+RUN wget --no-verbose https://example.com/archive.tar.gz
+RUN wget -o wget.log https://example.com/archive.tar.gz
+RUN wget --output-file wget.log https://example.com/archive.tar.gz
+RUN echo wget https://example.com/archive.tar.gz
+ONBUILD RUN wget https://example.com/onbuild.tar.gz

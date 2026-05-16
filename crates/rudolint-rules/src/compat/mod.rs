@@ -54,6 +54,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(NoEnvSelfReference),
         Box::new(CopyRelativeWithoutWorkdir),
         Box::new(UseraddNoLogInit),
+        Box::new(WgetProgress),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -1587,6 +1588,38 @@ impl Rule for UseraddNoLogInit {
 }
 
 rule_metadata!(
+    WgetProgress,
+    "RDL3047",
+    "wget-progress",
+    Severity::Info,
+    "avoid noisy wget progress output"
+);
+
+impl Rule for WgetProgress {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        doc.instructions
+            .iter()
+            .filter_map(|instruction| {
+                instruction_shell_or_onbuild_run(instruction).map(|shell| (instruction, shell))
+            })
+            .filter(|(_, shell)| wget_missing_progress_control(shell))
+            .map(|(instruction, _)| {
+                diagnostic(
+                    "RDL3047",
+                    Severity::Info,
+                    "avoid wget without `--progress=dot:giga`, `-q`, or `-nv`",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -2018,6 +2051,30 @@ fn useradd_uid_values(arguments: &[String]) -> Vec<&str> {
     values
 }
 
+fn wget_missing_progress_control(shell: &str) -> bool {
+    detect_command_invocations(shell)
+        .into_iter()
+        .filter(|invocation| invocation.command == "wget")
+        .any(|invocation| !wget_has_progress_control(&invocation.arguments))
+}
+
+fn wget_has_progress_control(arguments: &[String]) -> bool {
+    arguments.iter().any(|argument| {
+        matches!(
+            argument.as_str(),
+            "-q" | "--quiet"
+                | "-nv"
+                | "--no-verbose"
+                | "-o"
+                | "--output-file"
+                | "-a"
+                | "--append-output"
+        ) || argument.starts_with("--progress")
+            || argument.starts_with("-o")
+            || argument.starts_with("-a")
+    })
+}
+
 fn apt_get_install_missing_yes(shell: &str) -> bool {
     detect_command_invocations(shell)
         .into_iter()
@@ -2442,8 +2499,8 @@ fn dnf_install_has_unpinned_packages(shell: &str) -> bool {
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053", "RDL3054",
-        "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062",
-        "RDL3063", "RDL4001", "RDL4005", "RDL4006",
+        "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053", "RDL3054", "RDL3055",
+        "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063",
+        "RDL4001", "RDL4005", "RDL4006",
     ]
 }
