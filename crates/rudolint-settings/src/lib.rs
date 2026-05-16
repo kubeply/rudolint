@@ -126,4 +126,48 @@ mod tests {
         assert_eq!(settings.config_path, Some(config.canonicalize().unwrap()));
         assert!(settings.config.ignores("RDL3000"));
     }
+
+    #[test]
+    fn snapshots_config_precedence_matrix() {
+        let temp = tempfile::TempDir::new().expect("temp dir should be created");
+        let nested = temp.path().join("service");
+        std::fs::create_dir(&nested).expect("nested dir should be created");
+        let discovered = temp.path().join(".rudolint.yaml");
+        let explicit = temp.path().join("explicit.yaml");
+
+        std::fs::write(&discovered, "ignore: [RDL3000\n")
+            .expect("invalid discovered config should be written");
+        std::fs::write(&explicit, "ignore:\n  - RDL3007\n")
+            .expect("explicit config should be written");
+
+        let explicit_settings = resolve_from_parts(Some(&explicit), false, vec![nested.clone()])
+            .expect("explicit config should win before discovery");
+        let no_config_settings = resolve_from_parts(None, true, vec![nested.clone()])
+            .expect("no-config should skip discovery");
+        let discovered_error = resolve_from_parts(None, false, vec![nested])
+            .expect_err("invalid discovered config should fail without override")
+            .to_string();
+
+        let snapshot = serde_json::json!({
+            "explicit_config": {
+                "path": explicit_settings
+                    .config_path
+                    .as_ref()
+                    .and_then(|path| path.file_name())
+                    .and_then(|name| name.to_str()),
+                "ignores_rdl3007": explicit_settings.config.ignores("RDL3007"),
+                "ignores_rdl3000": explicit_settings.config.ignores("RDL3000"),
+            },
+            "no_config": {
+                "path": no_config_settings
+                    .config_path
+                    .as_ref()
+                    .and_then(|path| path.file_name())
+                    .and_then(|name| name.to_str()),
+                "ignores_rdl3000": no_config_settings.config.ignores("RDL3000"),
+            },
+            "discovered_config_error": discovered_error.contains(".rudolint.yaml"),
+        });
+        insta::assert_json_snapshot!("config_precedence_matrix", snapshot);
+    }
 }

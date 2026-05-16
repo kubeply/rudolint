@@ -1,0 +1,146 @@
+---
+source: crates/rudolint-rules/tests/rule_fixtures.rs
+expression: snapshot
+---
+{
+  "config_filters": {
+    "ignore_rdl3000": [
+      {
+        "code": "RDL3007",
+        "severity": "warning"
+      },
+      {
+        "code": "RDK1001",
+        "severity": "warning"
+      },
+      {
+        "code": "RDK1003",
+        "severity": "info"
+      },
+      {
+        "code": "RDL3020",
+        "severity": "error"
+      },
+      {
+        "code": "RDL3025",
+        "severity": "warning"
+      },
+      {
+        "code": "RDL4003",
+        "severity": "warning"
+      }
+    ],
+    "severity_override_rdl3007": [
+      {
+        "code": "RDL3007",
+        "severity": "error"
+      },
+      {
+        "code": "RDL3000",
+        "severity": "error"
+      },
+      {
+        "code": "RDL3020",
+        "severity": "error"
+      },
+      {
+        "code": "RDL3025",
+        "severity": "warning"
+      },
+      {
+        "code": "RDL4003",
+        "severity": "warning"
+      }
+    ]
+  },
+  "implemented_catalog": {
+    "compat": [
+      "RDL1001",
+      "RDL3000",
+      "RDL3002",
+      "RDL3006",
+      "RDL3007",
+      "RDL3011",
+      "RDL3012",
+      "RDL3020",
+      "RDL3024",
+      "RDL3025",
+      "RDL4000",
+      "RDL4003",
+      "RDL4004"
+    ],
+    "default": [
+      "RDK1000",
+      "RDK1001",
+      "RDK1002",
+      "RDK1003",
+      "RDL1001",
+      "RDL3000",
+      "RDL3002",
+      "RDL3006",
+      "RDL3007",
+      "RDL3011",
+      "RDL3012",
+      "RDL3020",
+      "RDL3024",
+      "RDL3025",
+      "RDL4000",
+      "RDL4003",
+      "RDL4004"
+    ]
+  },
+  "profile_findings": {
+    "compat": [
+      {
+        "code": "RDL3007",
+        "severity": "warning"
+      },
+      {
+        "code": "RDL3000",
+        "severity": "error"
+      },
+      {
+        "code": "RDL3020",
+        "severity": "error"
+      },
+      {
+        "code": "RDL3025",
+        "severity": "warning"
+      },
+      {
+        "code": "RDL4003",
+        "severity": "warning"
+      }
+    ],
+    "default": [
+      {
+        "code": "RDL3007",
+        "severity": "warning"
+      },
+      {
+        "code": "RDL3000",
+        "severity": "error"
+      },
+      {
+        "code": "RDK1001",
+        "severity": "warning"
+      },
+      {
+        "code": "RDK1003",
+        "severity": "info"
+      },
+      {
+        "code": "RDL3020",
+        "severity": "error"
+      },
+      {
+        "code": "RDL3025",
+        "severity": "warning"
+      },
+      {
+        "code": "RDL4003",
+        "severity": "warning"
+      }
+    ]
+  }
+}
