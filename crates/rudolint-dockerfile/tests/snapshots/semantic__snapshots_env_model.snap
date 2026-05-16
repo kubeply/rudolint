@@ -1,0 +1,53 @@
+---
+source: crates/rudolint-dockerfile/tests/semantic.rs
+expression: "json!({\n    \"stages\":\n    scopes.stages.iter().map(|stage|\n    {\n        json!({\n            \"stage_index\": stage.stage_index, \"vars\":\n            env_values_json(&stage.vars), \"effective\":\n            env_values_json(&stage.effective),\n        })\n    }).collect::<Vec<_>>(), \"final_env\": env_values_json(&scopes.final_env),\n})"
+---
+{
+  "final_env": [
+    {
+      "name": "APP_HOME",
+      "value": "/app"
+    },
+    {
+      "name": "APP_ENV",
+      "value": "production"
+    },
+    {
+      "name": "PATH",
+      "value": "/usr/local/bin:$PATH"
+    }
+  ],
+  "stages": [
+    {
+      "effective": [
+        {
+          "name": "APP_HOME",
+          "value": "/app"
+        },
+        {
+          "name": "APP_ENV",
+          "value": "production"
+        },
+        {
+          "name": "PATH",
+          "value": "/usr/local/bin:$PATH"
+        }
+      ],
+      "stage_index": 0,
+      "vars": [
+        {
+          "name": "APP_HOME",
+          "value": "/app"
+        },
+        {
+          "name": "APP_ENV",
+          "value": "production"
+        },
+        {
+          "name": "PATH",
+          "value": "/usr/local/bin:$PATH"
+        }
+      ]
+    }
+  ]
+}
