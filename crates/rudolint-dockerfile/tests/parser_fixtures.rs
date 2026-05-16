@@ -1,5 +1,5 @@
 use rudolint_dockerfile::{
-    CopyKind, Dockerfile, EnvForm, Instruction, InstructionForm, parse_dockerfile,
+    CopyKind, Dockerfile, EnvForm, Instruction, InstructionForm, RecoveryKind, parse_dockerfile,
 };
 use rudolint_test::read_fixture;
 use serde_json::{Value, json};
@@ -26,6 +26,7 @@ fn snapshots_parser_matrix() {
         ("arg", "parser/arg/Dockerfile"),
         ("env", "parser/env/Dockerfile"),
         ("expose", "parser/expose/Dockerfile"),
+        ("recovery", "parser/recovery/Dockerfile"),
         ("healthcheck", "parser/healthcheck/Dockerfile"),
         ("run_mount", "parser/run-mount/Dockerfile"),
         ("from_platform", "parser/from-platform/Dockerfile"),
@@ -188,6 +189,16 @@ fn instruction_json(instruction: &Instruction) -> Value {
                         "protocol": port.protocol,
                     })
                 }).collect::<Vec<_>>(),
+            })
+        }),
+        "recovery": instruction.recovery.as_ref().map(|recovery| {
+            json!({
+                "kind": match recovery.kind {
+                    RecoveryKind::UnknownInstruction => "unknown_instruction",
+                    RecoveryKind::MalformedInstruction => "malformed_instruction",
+                },
+                "message": recovery.message,
+                "span": recovery.span,
             })
         }),
         "line": instruction.line,

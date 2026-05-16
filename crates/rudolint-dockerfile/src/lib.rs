@@ -3,6 +3,6 @@ mod parser;
 pub use parser::{
     ArgInstruction, CheckDirective, Comment, CopyInstruction, CopyKind, Dockerfile, EnvAssignment,
     EnvForm, EnvInstruction, EscapeDirective, ExposeInstruction, ExposedPort, FromInstruction,
-    HealthcheckInstruction, Heredoc, Instruction, InstructionForm, LineContinuation,
-    RunInstruction, ShellBody, SyntaxDirective, parse_dockerfile,
+    HealthcheckInstruction, Heredoc, Instruction, InstructionForm, LineContinuation, ParseRecovery,
+    RecoveryKind, RunInstruction, ShellBody, SyntaxDirective, parse_dockerfile,
 };

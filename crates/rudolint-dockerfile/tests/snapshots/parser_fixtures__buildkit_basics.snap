@@ -87,6 +87,7 @@ expression: document_json(&document)
         "start_column": 1,
         "start_line": 2
       },
+      "recovery": null,
       "run": null
     },
     {
@@ -158,6 +159,7 @@ expression: document_json(&document)
         "start_column": 1,
         "start_line": 3
       },
+      "recovery": null,
       "run": {
         "flags": [
           [
@@ -260,6 +262,7 @@ expression: document_json(&document)
         "start_column": 1,
         "start_line": 4
       },
+      "recovery": null,
       "run": {
         "flags": [],
         "mounts": [],
@@ -334,6 +337,7 @@ expression: document_json(&document)
         "start_column": 1,
         "start_line": 7
       },
+      "recovery": null,
       "run": null
     },
     {
@@ -406,6 +410,7 @@ expression: document_json(&document)
         "start_column": 1,
         "start_line": 8
       },
+      "recovery": null,
       "run": null
     }
   ],

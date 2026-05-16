@@ -69,13 +69,13 @@ expression: document_json(&document)
     },
     {
       "arg": null,
-      "args": "/app",
+      "args": "value",
       "args_span": {
-        "end_byte": 29,
-        "end_column": 13,
+        "end_byte": 32,
+        "end_column": 16,
         "end_line": 2,
-        "start_byte": 25,
-        "start_column": 9,
+        "start_byte": 27,
+        "start_column": 11,
         "start_line": 2
       },
       "continuations": [],
@@ -86,22 +86,22 @@ expression: document_json(&document)
       "form": {
         "kind": "shell",
         "span": {
-          "end_byte": 29,
-          "end_column": 13,
+          "end_byte": 32,
+          "end_column": 16,
           "end_line": 2,
-          "start_byte": 25,
-          "start_column": 9,
+          "start_byte": 27,
+          "start_column": 11,
           "start_line": 2
         },
-        "text": "/app"
+        "text": "value"
       },
       "from": null,
       "healthcheck": null,
       "heredocs": [],
-      "keyword": "WORKDIR",
+      "keyword": "FROBULATE",
       "keyword_span": {
-        "end_byte": 24,
-        "end_column": 8,
+        "end_byte": 26,
+        "end_column": 10,
         "end_line": 2,
         "start_byte": 17,
         "start_column": 1,
@@ -110,89 +110,37 @@ expression: document_json(&document)
       "line": 2,
       "mounts": [],
       "raw_span": {
-        "end_byte": 29,
-        "end_column": 13,
+        "end_byte": 32,
+        "end_column": 16,
         "end_line": 2,
         "start_byte": 17,
         "start_column": 1,
         "start_line": 2
       },
-      "recovery": null,
-      "run": null
-    },
-    {
-      "arg": null,
-      "args": ". /app",
-      "args_span": {
-        "end_byte": 41,
-        "end_column": 12,
-        "end_line": 3,
-        "start_byte": 35,
-        "start_column": 6,
-        "start_line": 3
-      },
-      "continuations": [],
-      "copy": {
-        "chmod": null,
-        "chown": null,
-        "destination": "/app",
-        "flags": [],
-        "from": null,
-        "kind": "copy",
-        "sources": [
-          "."
-        ]
-      },
-      "env": null,
-      "expose": null,
-      "flags": [],
-      "form": {
-        "kind": "shell",
+      "recovery": {
+        "kind": "unknown_instruction",
+        "message": "unknown instruction keyword `FROBULATE`",
         "span": {
-          "end_byte": 41,
-          "end_column": 12,
-          "end_line": 3,
-          "start_byte": 35,
-          "start_column": 6,
-          "start_line": 3
-        },
-        "text": ". /app"
+          "end_byte": 26,
+          "end_column": 10,
+          "end_line": 2,
+          "start_byte": 17,
+          "start_column": 1,
+          "start_line": 2
+        }
       },
-      "from": null,
-      "healthcheck": null,
-      "heredocs": [],
-      "keyword": "COPY",
-      "keyword_span": {
-        "end_byte": 34,
-        "end_column": 5,
-        "end_line": 3,
-        "start_byte": 30,
-        "start_column": 1,
-        "start_line": 3
-      },
-      "line": 3,
-      "mounts": [],
-      "raw_span": {
-        "end_byte": 41,
-        "end_column": 12,
-        "end_line": 3,
-        "start_byte": 30,
-        "start_column": 1,
-        "start_line": 3
-      },
-      "recovery": null,
       "run": null
     },
     {
       "arg": null,
-      "args": "[\"echo\", \"hello\"]",
+      "args": "value",
       "args_span": {
-        "end_byte": 63,
-        "end_column": 22,
-        "end_line": 4,
-        "start_byte": 46,
-        "start_column": 5,
-        "start_line": 4
+        "end_byte": 45,
+        "end_column": 13,
+        "end_line": 3,
+        "start_byte": 40,
+        "start_column": 8,
+        "start_line": 3
       },
       "continuations": [],
       "copy": null,
@@ -200,35 +148,51 @@ expression: document_json(&document)
       "expose": null,
       "flags": [],
       "form": {
-        "kind": "json",
-        "values": [
-          "echo",
-          "hello"
-        ]
+        "kind": "shell",
+        "span": {
+          "end_byte": 45,
+          "end_column": 13,
+          "end_line": 3,
+          "start_byte": 40,
+          "start_column": 8,
+          "start_line": 3
+        },
+        "text": "value"
       },
       "from": null,
       "healthcheck": null,
       "heredocs": [],
-      "keyword": "CMD",
+      "keyword": "123BAD",
       "keyword_span": {
-        "end_byte": 45,
-        "end_column": 4,
-        "end_line": 4,
-        "start_byte": 42,
+        "end_byte": 39,
+        "end_column": 7,
+        "end_line": 3,
+        "start_byte": 33,
         "start_column": 1,
-        "start_line": 4
+        "start_line": 3
       },
-      "line": 4,
+      "line": 3,
       "mounts": [],
       "raw_span": {
-        "end_byte": 63,
-        "end_column": 22,
-        "end_line": 4,
-        "start_byte": 42,
+        "end_byte": 45,
+        "end_column": 13,
+        "end_line": 3,
+        "start_byte": 33,
         "start_column": 1,
-        "start_line": 4
+        "start_line": 3
       },
-      "recovery": null,
+      "recovery": {
+        "kind": "malformed_instruction",
+        "message": "malformed instruction keyword `123BAD`",
+        "span": {
+          "end_byte": 39,
+          "end_column": 7,
+          "end_line": 3,
+          "start_byte": 33,
+          "start_column": 1,
+          "start_line": 3
+        }
+      },
       "run": null
     }
   ],

@@ -86,6 +86,7 @@ pub struct Instruction {
     pub arg: Option<ArgInstruction>,
     pub env: Option<EnvInstruction>,
     pub expose: Option<ExposeInstruction>,
+    pub recovery: Option<ParseRecovery>,
     pub line: usize,
     /// Source span covering the raw instruction text.
     pub raw_span: Span,
@@ -210,6 +211,19 @@ pub struct ExposeInstruction {
 pub struct ExposedPort {
     pub port: String,
     pub protocol: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ParseRecovery {
+    pub kind: RecoveryKind,
+    pub message: String,
+    pub span: Span,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RecoveryKind {
+    UnknownInstruction,
+    MalformedInstruction,
 }
 
 #[derive(Debug, Clone)]
@@ -405,8 +419,10 @@ fn parse_instruction(
 
     let Some(keyword_width) = trimmed.find(char::is_whitespace) else {
         let keyword_span = source_file.span(keyword_start, keyword_start + trimmed.len());
+        let keyword = trimmed.to_ascii_uppercase();
+        let recovery = classify_recovery(&keyword, keyword_span);
         return Ok(Some(Instruction {
-            keyword: trimmed.to_ascii_uppercase(),
+            keyword,
             keyword_span,
             args: String::new(),
             args_span: None,
@@ -428,6 +444,7 @@ fn parse_instruction(
             arg: None,
             env: None,
             expose: None,
+            recovery,
             line,
             raw_span,
             raw: raw.to_string(),
@@ -438,6 +455,7 @@ fn parse_instruction(
     let rest = &trimmed[keyword_width..];
     let keyword = keyword.to_ascii_uppercase();
     let keyword_span = source_file.span(keyword_start, keyword_start + keyword_width);
+    let recovery = classify_recovery(&keyword, keyword_span);
     let rest_leading_whitespace = rest.len() - rest.trim_start().len();
     let args_start = keyword_start + keyword_width + rest_leading_whitespace;
     let args = rest.trim().to_string();
@@ -482,10 +500,54 @@ fn parse_instruction(
         arg,
         env,
         expose,
+        recovery,
         line,
         raw_span,
         raw: raw.to_string(),
     }))
+}
+
+fn classify_recovery(keyword: &str, span: Span) -> Option<ParseRecovery> {
+    if !keyword
+        .chars()
+        .all(|character| character.is_ascii_alphabetic())
+    {
+        return Some(ParseRecovery {
+            kind: RecoveryKind::MalformedInstruction,
+            message: format!("malformed instruction keyword `{keyword}`"),
+            span,
+        });
+    }
+
+    if !matches!(
+        keyword,
+        "ADD"
+            | "ARG"
+            | "CMD"
+            | "COPY"
+            | "ENTRYPOINT"
+            | "ENV"
+            | "EXPOSE"
+            | "FROM"
+            | "HEALTHCHECK"
+            | "LABEL"
+            | "MAINTAINER"
+            | "ONBUILD"
+            | "RUN"
+            | "SHELL"
+            | "STOPSIGNAL"
+            | "USER"
+            | "VOLUME"
+            | "WORKDIR"
+    ) {
+        return Some(ParseRecovery {
+            kind: RecoveryKind::UnknownInstruction,
+            message: format!("unknown instruction keyword `{keyword}`"),
+            span,
+        });
+    }
+
+    None
 }
 
 fn parse_healthcheck(
