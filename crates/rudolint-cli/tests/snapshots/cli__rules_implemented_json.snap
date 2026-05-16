@@ -340,6 +340,12 @@ expression: normalized_json(&output)
     "summary": "validate SPDX license label values"
   },
   {
+    "code": "RDL3055",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "validate git hash label values"
+  },
+  {
     "code": "RDL4000",
     "severity": "error",
     "status": "implemented",
