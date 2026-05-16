@@ -179,9 +179,9 @@ expression: normalized_json(&output)
   },
   {
     "code": "RDL3026",
-    "severity": "warning",
-    "status": "planned",
-    "summary": "tracked for compatibility parity"
+    "severity": "error",
+    "status": "implemented",
+    "summary": "restrict FROM images to trusted registries"
   },
   {
     "code": "RDL3027",

@@ -15,7 +15,6 @@ pub struct RuleEngine {
 impl RuleEngine {
     pub fn new(profile: Profile, config: Config) -> Self {
         let policy = profile.policy();
-        let _trusted_registry_count = config.trusted_registries.len();
         Self {
             rules: catalog::implemented_rules(policy),
             policy,
@@ -31,12 +30,16 @@ impl RuleEngine {
             if self.config.ignores(info.code) {
                 continue;
             }
-            findings.extend(rule.check(document).into_iter().map(|mut finding| {
-                if let Some(severity) = self.config.severity_override(&finding.code) {
-                    finding.severity = severity;
-                }
-                finding
-            }));
+            findings.extend(
+                rule.check_with_config(document, &self.config)
+                    .into_iter()
+                    .map(|mut finding| {
+                        if let Some(severity) = self.config.severity_override(&finding.code) {
+                            finding.severity = severity;
+                        }
+                        finding
+                    }),
+            );
         }
         findings.retain(|finding| !is_suppressed(finding, &suppressions));
         findings.sort_by(|left, right| {

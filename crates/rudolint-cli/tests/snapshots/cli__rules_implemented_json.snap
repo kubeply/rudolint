@@ -178,6 +178,12 @@ expression: normalized_json(&output)
     "summary": "prefer JSON form for CMD and ENTRYPOINT"
   },
   {
+    "code": "RDL3026",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "restrict FROM images to trusted registries"
+  },
+  {
     "code": "RDL4000",
     "severity": "error",
     "status": "implemented",
