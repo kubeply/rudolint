@@ -760,6 +760,22 @@ fn snapshots_rdl3043_no_onbuild_trigger_fixture() {
 }
 
 #[test]
+fn snapshots_rdl3044_no_env_self_reference_fixture() {
+    let source = read_fixture("rules/RDL3044.no-env-self-reference/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDL3044")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdl3044_no_env_self_reference_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rdl4000_deprecated_maintainer_fixture() {
     let source = read_fixture("rules/RDL4000.deprecated-maintainer/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");

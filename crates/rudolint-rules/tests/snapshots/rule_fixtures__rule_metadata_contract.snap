@@ -500,6 +500,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3044",
+    "default_severity": "error",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3044.md",
+    "fix": "none",
+    "name": "no-env-self-reference",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "reject same-statement ENV references"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL4000",
     "default_severity": "error",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4000.md",

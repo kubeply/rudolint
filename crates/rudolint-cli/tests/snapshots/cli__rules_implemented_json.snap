@@ -274,6 +274,12 @@ expression: normalized_json(&output)
     "summary": "reject ONBUILD triggers for ONBUILD, FROM, or MAINTAINER"
   },
   {
+    "code": "RDL3044",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "reject same-statement ENV references"
+  },
+  {
     "code": "RDL4000",
     "severity": "error",
     "status": "implemented",

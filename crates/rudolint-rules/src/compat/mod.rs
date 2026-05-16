@@ -51,6 +51,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(PinDnfVersions),
         Box::new(PipNoCacheDir),
         Box::new(NoOnbuildTrigger),
+        Box::new(NoEnvSelfReference),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -1471,6 +1472,52 @@ impl Rule for NoOnbuildTrigger {
 }
 
 rule_metadata!(
+    NoEnvSelfReference,
+    "RDL3044",
+    "no-env-self-reference",
+    Severity::Error,
+    "reject same-statement ENV references"
+);
+
+impl Rule for NoEnvSelfReference {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        let mut known_variables = BTreeSet::new();
+        let mut findings = Vec::new();
+
+        for instruction in &doc.instructions {
+            if let Some(arg) = &instruction.arg {
+                known_variables.insert(arg.name.clone());
+            }
+
+            let Some(env) = &instruction.env else {
+                continue;
+            };
+
+            if env_references_same_statement_variable(env, &known_variables) {
+                findings.push(diagnostic(
+                    "RDL3044",
+                    Severity::Error,
+                    "do not refer to an environment variable within the same `ENV` statement where it is defined",
+                    instruction,
+                ));
+            }
+
+            known_variables.extend(
+                env.assignments
+                    .iter()
+                    .map(|assignment| assignment.name.clone()),
+            );
+        }
+
+        findings
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -1922,6 +1969,38 @@ fn onbuild_has_disallowed_trigger(args: &str) -> bool {
         tokens.next().map(|token| token.to_ascii_uppercase()),
         Some(trigger) if matches!(trigger.as_str(), "ONBUILD" | "FROM" | "MAINTAINER")
     )
+}
+
+fn env_references_same_statement_variable(
+    env: &rudolint_dockerfile::EnvInstruction,
+    known_variables: &BTreeSet<String>,
+) -> bool {
+    env.assignments
+        .iter()
+        .filter(|assignment| !known_variables.contains(&assignment.name))
+        .any(|assignment| {
+            env.assignments.iter().any(|candidate| {
+                shell_value_references_variable(&candidate.value, &assignment.name)
+            })
+        })
+}
+
+fn shell_value_references_variable(value: &str, name: &str) -> bool {
+    value.contains(&format!("${{{name}}}")) || contains_bare_shell_variable(value, name)
+}
+
+fn contains_bare_shell_variable(value: &str, name: &str) -> bool {
+    let needle = format!("${name}");
+    value.match_indices(&needle).any(|(index, _)| {
+        value[index + needle.len()..]
+            .chars()
+            .next()
+            .is_none_or(|character| !is_shell_variable_character(character))
+    })
+}
+
+fn is_shell_variable_character(character: char) -> bool {
+    character == '_' || character.is_ascii_alphanumeric()
 }
 
 fn apt_get_install_missing_yes(shell: &str) -> bool {
@@ -2741,8 +2820,8 @@ fn dnf_install_has_unpinned_packages(shell: &str) -> bool {
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3044", "RDL3045", "RDL3046", "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051",
-        "RDL3052", "RDL3053", "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059",
-        "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
+        "RDL3045", "RDL3046", "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052",
+        "RDL3053", "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060",
+        "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
     ]
 }
