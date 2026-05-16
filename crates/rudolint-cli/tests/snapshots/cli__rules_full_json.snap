@@ -269,9 +269,9 @@ expression: normalized_json(&output)
   },
   {
     "code": "RDL3043",
-    "severity": "warning",
-    "status": "planned",
-    "summary": "tracked for compatibility parity"
+    "severity": "error",
+    "status": "implemented",
+    "summary": "reject ONBUILD triggers for ONBUILD, FROM, or MAINTAINER"
   },
   {
     "code": "RDL3044",

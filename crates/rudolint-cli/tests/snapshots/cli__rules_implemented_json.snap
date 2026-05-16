@@ -268,6 +268,12 @@ expression: normalized_json(&output)
     "summary": "avoid pip cache directories"
   },
   {
+    "code": "RDL3043",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "reject ONBUILD triggers for ONBUILD, FROM, or MAINTAINER"
+  },
+  {
     "code": "RDL4000",
     "severity": "error",
     "status": "implemented",

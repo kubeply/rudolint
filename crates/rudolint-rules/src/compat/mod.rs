@@ -50,6 +50,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(DnfCleanAll),
         Box::new(PinDnfVersions),
         Box::new(PipNoCacheDir),
+        Box::new(NoOnbuildTrigger),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -1440,6 +1441,36 @@ impl Rule for PipNoCacheDir {
 }
 
 rule_metadata!(
+    NoOnbuildTrigger,
+    "RDL3043",
+    "no-onbuild-trigger",
+    Severity::Error,
+    "reject ONBUILD triggers for ONBUILD, FROM, or MAINTAINER"
+);
+
+impl Rule for NoOnbuildTrigger {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        doc.instructions
+            .iter()
+            .filter(|instruction| instruction.keyword == "ONBUILD")
+            .filter(|instruction| onbuild_has_disallowed_trigger(&instruction.args))
+            .map(|instruction| {
+                diagnostic(
+                    "RDL3043",
+                    Severity::Error,
+                    "`ONBUILD`, `FROM`, or `MAINTAINER` triggered from within `ONBUILD` instruction",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -1883,6 +1914,14 @@ fn has_pip_cache_mount(instruction: &Instruction) -> bool {
                 .iter()
                 .any(|(name, value)| name == "target" && value.contains(".cache/pip"))
     })
+}
+
+fn onbuild_has_disallowed_trigger(args: &str) -> bool {
+    let mut tokens = args.split_whitespace();
+    matches!(
+        tokens.next().map(|token| token.to_ascii_uppercase()),
+        Some(trigger) if matches!(trigger.as_str(), "ONBUILD" | "FROM" | "MAINTAINER")
+    )
 }
 
 fn apt_get_install_missing_yes(shell: &str) -> bool {
@@ -2702,8 +2741,8 @@ fn dnf_install_has_unpinned_packages(shell: &str) -> bool {
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3043", "RDL3044", "RDL3045", "RDL3046", "RDL3047", "RDL3048", "RDL3049", "RDL3050",
-        "RDL3051", "RDL3052", "RDL3053", "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058",
-        "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
+        "RDL3044", "RDL3045", "RDL3046", "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051",
+        "RDL3052", "RDL3053", "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059",
+        "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
     ]
 }

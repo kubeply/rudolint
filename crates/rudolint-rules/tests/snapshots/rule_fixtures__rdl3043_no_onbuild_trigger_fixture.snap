@@ -1,0 +1,70 @@
+---
+source: crates/rudolint-rules/tests/rule_fixtures.rs
+expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
+---
+[
+  {
+    "code": "RDL3043",
+    "help": null,
+    "labels": [],
+    "message": "`ONBUILD`, `FROM`, or `MAINTAINER` triggered from within `ONBUILD` instruction",
+    "path": "",
+    "primary_span": {
+      "end_byte": 0,
+      "end_column": 1,
+      "end_line": 4,
+      "start_byte": 0,
+      "start_column": 1,
+      "start_line": 4
+    },
+    "severity": "error"
+  },
+  {
+    "code": "RDL3043",
+    "help": null,
+    "labels": [],
+    "message": "`ONBUILD`, `FROM`, or `MAINTAINER` triggered from within `ONBUILD` instruction",
+    "path": "",
+    "primary_span": {
+      "end_byte": 0,
+      "end_column": 1,
+      "end_line": 5,
+      "start_byte": 0,
+      "start_column": 1,
+      "start_line": 5
+    },
+    "severity": "error"
+  },
+  {
+    "code": "RDL3043",
+    "help": null,
+    "labels": [],
+    "message": "`ONBUILD`, `FROM`, or `MAINTAINER` triggered from within `ONBUILD` instruction",
+    "path": "",
+    "primary_span": {
+      "end_byte": 0,
+      "end_column": 1,
+      "end_line": 6,
+      "start_byte": 0,
+      "start_column": 1,
+      "start_line": 6
+    },
+    "severity": "error"
+  },
+  {
+    "code": "RDL3043",
+    "help": null,
+    "labels": [],
+    "message": "`ONBUILD`, `FROM`, or `MAINTAINER` triggered from within `ONBUILD` instruction",
+    "path": "",
+    "primary_span": {
+      "end_byte": 0,
+      "end_column": 1,
+      "end_line": 7,
+      "start_byte": 0,
+      "start_column": 1,
+      "start_line": 7
+    },
+    "severity": "error"
+  }
+]

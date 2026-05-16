@@ -744,6 +744,22 @@ fn snapshots_rdl3042_pip_no_cache_dir_fixture() {
 }
 
 #[test]
+fn snapshots_rdl3043_no_onbuild_trigger_fixture() {
+    let source = read_fixture("rules/RDL3043.no-onbuild-trigger/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDL3043")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdl3043_no_onbuild_trigger_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rdl4000_deprecated_maintainer_fixture() {
     let source = read_fixture("rules/RDL4000.deprecated-maintainer/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");

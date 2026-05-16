@@ -489,6 +489,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3043",
+    "default_severity": "error",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3043.md",
+    "fix": "none",
+    "name": "no-onbuild-trigger",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "reject ONBUILD triggers for ONBUILD, FROM, or MAINTAINER"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL4000",
     "default_severity": "error",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4000.md",
