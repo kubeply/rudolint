@@ -219,6 +219,22 @@ fn snapshots_rdl3020_prefer_copy_fixture() {
 }
 
 #[test]
+fn snapshots_rdl3024_unique_stage_names_fixture() {
+    let source = read_fixture("rules/RDL3024.unique-stage-names/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDL3024")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdl3024_unique_stage_names_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rule_selection_matrix() {
     let source = read_fixture("rules/default-basic/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
