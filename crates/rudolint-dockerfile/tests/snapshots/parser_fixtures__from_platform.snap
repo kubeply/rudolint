@@ -50,6 +50,7 @@ expression: document_json(&document)
         "image": "alpine:3.20",
         "platform": "$BUILDPLATFORM"
       },
+      "healthcheck": null,
       "heredocs": [],
       "keyword": "FROM",
       "keyword_span": {
@@ -114,6 +115,7 @@ expression: document_json(&document)
         "image": "scratch",
         "platform": "$TARGETPLATFORM"
       },
+      "healthcheck": null,
       "heredocs": [],
       "keyword": "FROM",
       "keyword_span": {

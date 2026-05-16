@@ -40,6 +40,7 @@ expression: document_json(&document)
         "image": "alpine:3.20",
         "platform": null
       },
+      "healthcheck": null,
       "heredocs": [],
       "keyword": "FROM",
       "keyword_span": {
@@ -94,6 +95,7 @@ expression: document_json(&document)
         "image": "scratch",
         "platform": null
       },
+      "healthcheck": null,
       "heredocs": [],
       "keyword": "FROM",
       "keyword_span": {
@@ -162,6 +164,7 @@ expression: document_json(&document)
         "text": "--from=build /out/app /app"
       },
       "from": null,
+      "healthcheck": null,
       "heredocs": [],
       "keyword": "COPY",
       "keyword_span": {
@@ -238,6 +241,7 @@ expression: document_json(&document)
         "text": "--chown=1000:1000 --chmod=0755 bin/rudolint /usr/local/bin/rudolint"
       },
       "from": null,
+      "healthcheck": null,
       "heredocs": [],
       "keyword": "COPY",
       "keyword_span": {
@@ -296,6 +300,7 @@ expression: document_json(&document)
         "text": "https://example.com/archive.tar.gz /tmp/archive.tar.gz"
       },
       "from": null,
+      "healthcheck": null,
       "heredocs": [],
       "keyword": "ADD",
       "keyword_span": {

@@ -59,6 +59,7 @@ pub struct Instruction {
     pub from: Option<FromInstruction>,
     pub run: Option<RunInstruction>,
     pub copy: Option<CopyInstruction>,
+    pub healthcheck: Option<HealthcheckInstruction>,
     pub line: usize,
     pub raw_span: Span,
     pub raw: String,
@@ -126,6 +127,12 @@ pub struct CopyInstruction {
 pub enum CopyKind {
     Copy,
     Add,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HealthcheckInstruction {
+    pub flags: Vec<(String, String)>,
+    pub command: Option<ShellBody>,
 }
 
 #[derive(Debug, Clone)]
@@ -334,6 +341,7 @@ fn parse_instruction(
             from: None,
             run: None,
             copy: None,
+            healthcheck: None,
             line,
             raw_span,
             raw: raw.to_string(),
@@ -364,6 +372,8 @@ fn parse_instruction(
         (keyword == "RUN").then(|| parse_run(&args, args_start, &flags, &mounts, source_file));
     let copy =
         matches!(keyword.as_str(), "COPY" | "ADD").then(|| parse_copy(&keyword, &args, &flags));
+    let healthcheck = (keyword == "HEALTHCHECK")
+        .then(|| parse_healthcheck(&args, args_start, &flags, source_file));
     let heredocs = parse_heredocs(raw, start_byte, &keyword, source_file)?;
 
     Ok(Some(Instruction {
@@ -379,10 +389,29 @@ fn parse_instruction(
         from,
         run,
         copy,
+        healthcheck,
         line,
         raw_span,
         raw: raw.to_string(),
     }))
+}
+
+fn parse_healthcheck(
+    args: &str,
+    args_start: usize,
+    flags: &[(String, String)],
+    source_file: &SourceFile,
+) -> HealthcheckInstruction {
+    let (command, command_start) = strip_leading_flags(args, args_start);
+    let command = (!command.is_empty()).then(|| ShellBody {
+        text: command.to_string(),
+        span: source_file.span(command_start, command_start + command.len()),
+    });
+
+    HealthcheckInstruction {
+        flags: flags.to_vec(),
+        command,
+    }
 }
 
 fn parse_run(

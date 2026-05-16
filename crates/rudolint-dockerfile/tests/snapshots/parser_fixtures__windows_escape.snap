@@ -56,6 +56,7 @@ expression: document_json(&document)
         "image": "mcr.microsoft.com/windows/nanoserver:ltsc2022",
         "platform": null
       },
+      "healthcheck": null,
       "heredocs": [],
       "keyword": "FROM",
       "keyword_span": {
@@ -117,6 +118,7 @@ expression: document_json(&document)
         "text": "powershell -Command `\n    Write-Host \"hello\""
       },
       "from": null,
+      "healthcheck": null,
       "heredocs": [],
       "keyword": "RUN",
       "keyword_span": {

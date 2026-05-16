@@ -64,33 +64,76 @@ expression: document_json(&document)
       "run": null
     },
     {
-      "args": "[\"apk\", \"add\", \"curl\"]",
+      "args": "--interval=30s --timeout=3s --retries=3 CMD wget -qO- http://localhost/health || exit 1",
       "args_span": {
-        "end_byte": 43,
-        "end_column": 27,
+        "end_byte": 116,
+        "end_column": 100,
         "end_line": 2,
-        "start_byte": 21,
-        "start_column": 5,
+        "start_byte": 29,
+        "start_column": 13,
         "start_line": 2
       },
       "continuations": [],
       "copy": null,
-      "flags": [],
-      "form": {
-        "kind": "json",
-        "values": [
-          "apk",
-          "add",
-          "curl"
+      "flags": [
+        [
+          "interval",
+          "30s"
+        ],
+        [
+          "timeout",
+          "3s"
+        ],
+        [
+          "retries",
+          "3"
         ]
+      ],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 116,
+          "end_column": 100,
+          "end_line": 2,
+          "start_byte": 29,
+          "start_column": 13,
+          "start_line": 2
+        },
+        "text": "--interval=30s --timeout=3s --retries=3 CMD wget -qO- http://localhost/health || exit 1"
       },
       "from": null,
-      "healthcheck": null,
+      "healthcheck": {
+        "command": {
+          "span": {
+            "end_byte": 116,
+            "end_column": 100,
+            "end_line": 2,
+            "start_byte": 69,
+            "start_column": 53,
+            "start_line": 2
+          },
+          "text": "CMD wget -qO- http://localhost/health || exit 1"
+        },
+        "flags": [
+          [
+            "interval",
+            "30s"
+          ],
+          [
+            "timeout",
+            "3s"
+          ],
+          [
+            "retries",
+            "3"
+          ]
+        ]
+      },
       "heredocs": [],
-      "keyword": "RUN",
+      "keyword": "HEALTHCHECK",
       "keyword_span": {
-        "end_byte": 20,
-        "end_column": 4,
+        "end_byte": 28,
+        "end_column": 12,
         "end_line": 2,
         "start_byte": 17,
         "start_column": 1,
@@ -99,71 +142,72 @@ expression: document_json(&document)
       "line": 2,
       "mounts": [],
       "raw_span": {
-        "end_byte": 43,
-        "end_column": 27,
+        "end_byte": 116,
+        "end_column": 100,
         "end_line": 2,
         "start_byte": 17,
         "start_column": 1,
         "start_line": 2
       },
-      "run": {
-        "flags": [],
-        "mounts": [],
-        "network": null,
-        "security": null,
-        "shell": {
-          "span": {
-            "end_byte": 43,
-            "end_column": 27,
-            "end_line": 2,
-            "start_byte": 21,
-            "start_column": 5,
-            "start_line": 2
-          },
-          "text": "[\"apk\", \"add\", \"curl\"]"
-        }
-      }
+      "run": null
     },
     {
-      "args": "[\"sh\", \"-c\", \"echo hello\"]",
+      "args": "NONE",
       "args_span": {
-        "end_byte": 74,
-        "end_column": 31,
+        "end_byte": 133,
+        "end_column": 17,
         "end_line": 3,
-        "start_byte": 48,
-        "start_column": 5,
+        "start_byte": 129,
+        "start_column": 13,
         "start_line": 3
       },
       "continuations": [],
       "copy": null,
       "flags": [],
       "form": {
-        "kind": "json",
-        "values": [
-          "sh",
-          "-c",
-          "echo hello"
-        ]
+        "kind": "shell",
+        "span": {
+          "end_byte": 133,
+          "end_column": 17,
+          "end_line": 3,
+          "start_byte": 129,
+          "start_column": 13,
+          "start_line": 3
+        },
+        "text": "NONE"
       },
       "from": null,
-      "healthcheck": null,
+      "healthcheck": {
+        "command": {
+          "span": {
+            "end_byte": 133,
+            "end_column": 17,
+            "end_line": 3,
+            "start_byte": 129,
+            "start_column": 13,
+            "start_line": 3
+          },
+          "text": "NONE"
+        },
+        "flags": []
+      },
       "heredocs": [],
-      "keyword": "CMD",
+      "keyword": "HEALTHCHECK",
       "keyword_span": {
-        "end_byte": 47,
-        "end_column": 4,
+        "end_byte": 128,
+        "end_column": 12,
         "end_line": 3,
-        "start_byte": 44,
+        "start_byte": 117,
         "start_column": 1,
         "start_line": 3
       },
       "line": 3,
       "mounts": [],
       "raw_span": {
-        "end_byte": 74,
-        "end_column": 31,
+        "end_byte": 133,
+        "end_column": 17,
         "end_line": 3,
-        "start_byte": 44,
+        "start_byte": 117,
         "start_column": 1,
         "start_line": 3
       },

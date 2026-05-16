@@ -21,6 +21,7 @@ fn snapshots_parser_matrix() {
         ("windows_escape", "parser/windows-escape/Dockerfile"),
         ("json_form", "parser/json-form/Dockerfile"),
         ("invalid_json_form", "parser/invalid-json-form/Dockerfile"),
+        ("healthcheck", "parser/healthcheck/Dockerfile"),
         ("run_mount", "parser/run-mount/Dockerfile"),
         ("from_platform", "parser/from-platform/Dockerfile"),
         ("copy_from", "parser/copy-from/Dockerfile"),
@@ -141,6 +142,17 @@ fn instruction_json(instruction: &Instruction) -> Value {
                 "chmod": copy.chmod,
                 "sources": copy.sources,
                 "destination": copy.destination,
+            })
+        }),
+        "healthcheck": instruction.healthcheck.as_ref().map(|healthcheck| {
+            json!({
+                "flags": healthcheck.flags,
+                "command": healthcheck.command.as_ref().map(|command| {
+                    json!({
+                        "text": command.text,
+                        "span": command.span,
+                    })
+                }),
             })
         }),
         "line": instruction.line,
