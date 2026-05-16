@@ -31,6 +31,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(PreferCopy),
         Box::new(CopyMultipleDestinationSlash),
         Box::new(CopyFromPreviousStage),
+        Box::new(CopyFromOwnStage),
         Box::new(UniqueStageNames),
         Box::new(JsonEntrypoints),
         Box::new(DeprecatedMaintainer),
@@ -786,6 +787,51 @@ impl Rule for CopyFromPreviousStage {
 }
 
 rule_metadata!(
+    CopyFromOwnStage,
+    "RDL3023",
+    "copy-from-own-stage",
+    Severity::Error,
+    "forbid COPY --from references to the current stage"
+);
+
+impl Rule for CopyFromOwnStage {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        let mut current_alias = None::<String>;
+        let mut current_stage_index = None::<usize>;
+        let mut stage_count = 0usize;
+        let mut findings = Vec::new();
+
+        for instruction in &doc.instructions {
+            if instruction.keyword == "FROM" {
+                current_alias = instruction.stage_alias();
+                current_stage_index = Some(stage_count);
+                stage_count += 1;
+                continue;
+            }
+
+            if copy_from_references_current_stage(
+                instruction,
+                current_alias.as_deref(),
+                current_stage_index,
+            ) {
+                findings.push(diagnostic(
+                    "RDL3023",
+                    Severity::Error,
+                    "`COPY --from` cannot reference the current build stage",
+                    instruction,
+                ));
+            }
+        }
+
+        findings
+    }
+}
+
+rule_metadata!(
     UniqueStageNames,
     "RDL3024",
     "unique-stage-names",
@@ -1500,12 +1546,34 @@ fn copy_from_reference_is_unresolved(
         .map_or(true, |index| index >= stage_count.saturating_sub(1))
 }
 
+fn copy_from_references_current_stage(
+    instruction: &Instruction,
+    current_alias: Option<&str>,
+    current_stage_index: Option<usize>,
+) -> bool {
+    let Some(copy) = &instruction.copy else {
+        return false;
+    };
+    if copy.kind != CopyKind::Copy {
+        return false;
+    }
+    let Some(from) = &copy.from else {
+        return false;
+    };
+
+    current_alias.is_some_and(|alias| from.eq_ignore_ascii_case(alias))
+        || current_stage_index.is_some_and(|index| {
+            from.parse::<usize>()
+                .is_ok_and(|from_index| from_index == index)
+        })
+}
+
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3023", "RDL3026", "RDL3027", "RDL3028", "RDL3029", "RDL3030", "RDL3032", "RDL3033",
-        "RDL3034", "RDL3035", "RDL3036", "RDL3037", "RDL3038", "RDL3040", "RDL3041", "RDL3042",
-        "RDL3043", "RDL3044", "RDL3045", "RDL3046", "RDL3047", "RDL3048", "RDL3049", "RDL3050",
-        "RDL3051", "RDL3052", "RDL3053", "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058",
-        "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
+        "RDL3026", "RDL3027", "RDL3028", "RDL3029", "RDL3030", "RDL3032", "RDL3033", "RDL3034",
+        "RDL3035", "RDL3036", "RDL3037", "RDL3038", "RDL3040", "RDL3041", "RDL3042", "RDL3043",
+        "RDL3044", "RDL3045", "RDL3046", "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051",
+        "RDL3052", "RDL3053", "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059",
+        "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
     ]
 }

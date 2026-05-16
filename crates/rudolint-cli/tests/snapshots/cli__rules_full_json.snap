@@ -161,9 +161,9 @@ expression: normalized_json(&output)
   },
   {
     "code": "RDL3023",
-    "severity": "warning",
-    "status": "planned",
-    "summary": "tracked for compatibility parity"
+    "severity": "error",
+    "status": "implemented",
+    "summary": "forbid COPY --from references to the current stage"
   },
   {
     "code": "RDL3024",

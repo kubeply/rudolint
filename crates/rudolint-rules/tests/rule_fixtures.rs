@@ -443,6 +443,22 @@ fn snapshots_rdl3022_copy_from_previous_stage_fixture() {
 }
 
 #[test]
+fn snapshots_rdl3023_copy_from_own_stage_fixture() {
+    let source = read_fixture("rules/RDL3023.copy-from-own-stage/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDL3023")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdl3023_copy_from_own_stage_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rdl3024_unique_stage_names_fixture() {
     let source = read_fixture("rules/RDL3024.unique-stage-names/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
