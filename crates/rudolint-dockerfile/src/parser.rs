@@ -82,6 +82,7 @@ pub struct Instruction {
     pub from: Option<FromInstruction>,
     pub run: Option<RunInstruction>,
     pub copy: Option<CopyInstruction>,
+    pub healthcheck: Option<HealthcheckInstruction>,
     pub line: usize,
     /// Source span covering the raw instruction text.
     pub raw_span: Span,
@@ -165,6 +166,12 @@ pub struct CopyInstruction {
 pub enum CopyKind {
     Copy,
     Add,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HealthcheckInstruction {
+    pub flags: Vec<(String, String)>,
+    pub command: Option<ShellBody>,
 }
 
 #[derive(Debug, Clone)]
@@ -379,6 +386,7 @@ fn parse_instruction(
             from: None,
             run: None,
             copy: None,
+            healthcheck: None,
             line,
             raw_span,
             raw: raw.to_string(),
@@ -409,6 +417,8 @@ fn parse_instruction(
         (keyword == "RUN").then(|| parse_run(&args, args_start, &flags, &mounts, source_file));
     let copy =
         matches!(keyword.as_str(), "COPY" | "ADD").then(|| parse_copy(&keyword, &args, &flags));
+    let healthcheck = (keyword == "HEALTHCHECK")
+        .then(|| parse_healthcheck(&args, args_start, &flags, source_file));
     let heredocs = parse_heredocs(raw, start_byte, &keyword, source_file)?;
 
     Ok(Some(Instruction {
@@ -424,10 +434,55 @@ fn parse_instruction(
         from,
         run,
         copy,
+        healthcheck,
         line,
         raw_span,
         raw: raw.to_string(),
     }))
+}
+
+fn parse_healthcheck(
+    args: &str,
+    args_start: usize,
+    flags: &[(String, String)],
+    source_file: &SourceFile,
+) -> HealthcheckInstruction {
+    let (remaining, remaining_start) = strip_leading_flags(args, args_start);
+    let (command_text, command_start) = healthcheck_command_body(remaining, remaining_start);
+    let command = (!command_text.is_empty()).then(|| ShellBody {
+        text: command_text.to_string(),
+        span: source_file.span(command_start, command_start + command_text.len()),
+    });
+
+    HealthcheckInstruction {
+        flags: flags.to_vec(),
+        command,
+    }
+}
+
+fn healthcheck_command_body(command: &str, command_start: usize) -> (&str, usize) {
+    let trimmed = command.trim_start();
+    let start = command_start + command.len() - trimmed.len();
+    if trimmed.eq_ignore_ascii_case("NONE")
+        || trimmed.eq_ignore_ascii_case("CMD")
+        || trimmed.eq_ignore_ascii_case("CMD-SHELL")
+    {
+        return ("", start + trimmed.len());
+    }
+
+    for directive in ["CMD-SHELL", "CMD"] {
+        let Some(rest) = trimmed.get(directive.len()..) else {
+            continue;
+        };
+        if trimmed[..directive.len()].eq_ignore_ascii_case(directive)
+            && rest.starts_with(char::is_whitespace)
+        {
+            let body = rest.trim_start();
+            return (body, start + directive.len() + rest.len() - body.len());
+        }
+    }
+
+    ("", start)
 }
 
 fn parse_run(

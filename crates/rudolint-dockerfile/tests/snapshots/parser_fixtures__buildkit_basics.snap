@@ -1,6 +1,6 @@
 ---
 source: crates/rudolint-dockerfile/tests/parser_fixtures.rs
-assertion_line: 35
+assertion_line: 36
 expression: document_json(&document)
 ---
 {
@@ -64,6 +64,7 @@ expression: document_json(&document)
         "image": "alpine:3.20",
         "platform": "$BUILDPLATFORM"
       },
+      "healthcheck": null,
       "heredocs": [],
       "keyword": "FROM",
       "keyword_span": {
@@ -117,6 +118,7 @@ expression: document_json(&document)
         "text": "--mount=type=cache,target=/var/cache/apk apk add curl"
       },
       "from": null,
+      "healthcheck": null,
       "heredocs": [],
       "keyword": "RUN",
       "keyword_span": {
@@ -214,6 +216,7 @@ expression: document_json(&document)
         "text": "<<EOF\necho hello\nEOF"
       },
       "from": null,
+      "healthcheck": null,
       "heredocs": [
         {
           "body": "echo hello\n",
@@ -299,6 +302,7 @@ expression: document_json(&document)
         "image": "alpine:3.20",
         "platform": null
       },
+      "healthcheck": null,
       "heredocs": [],
       "keyword": "FROM",
       "keyword_span": {
@@ -367,6 +371,7 @@ expression: document_json(&document)
         "text": "--from=base /src /dst"
       },
       "from": null,
+      "healthcheck": null,
       "heredocs": [],
       "keyword": "COPY",
       "keyword_span": {

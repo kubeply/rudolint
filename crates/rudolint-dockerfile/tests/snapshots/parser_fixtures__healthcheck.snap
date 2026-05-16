@@ -1,5 +1,6 @@
 ---
 source: crates/rudolint-dockerfile/tests/parser_fixtures.rs
+assertion_line: 36
 expression: document_json(&document)
 ---
 {
@@ -64,37 +65,76 @@ expression: document_json(&document)
       "run": null
     },
     {
-      "args": "/app",
+      "args": "--interval=30s --timeout=3s --retries=3 CMD wget -qO- http://localhost/health || exit 1",
       "args_span": {
-        "end_byte": 29,
-        "end_column": 13,
+        "end_byte": 116,
+        "end_column": 100,
         "end_line": 2,
-        "start_byte": 25,
-        "start_column": 9,
+        "start_byte": 29,
+        "start_column": 13,
         "start_line": 2
       },
       "continuations": [],
       "copy": null,
-      "flags": [],
+      "flags": [
+        [
+          "interval",
+          "30s"
+        ],
+        [
+          "timeout",
+          "3s"
+        ],
+        [
+          "retries",
+          "3"
+        ]
+      ],
       "form": {
         "kind": "shell",
         "span": {
-          "end_byte": 29,
-          "end_column": 13,
+          "end_byte": 116,
+          "end_column": 100,
           "end_line": 2,
-          "start_byte": 25,
-          "start_column": 9,
+          "start_byte": 29,
+          "start_column": 13,
           "start_line": 2
         },
-        "text": "/app"
+        "text": "--interval=30s --timeout=3s --retries=3 CMD wget -qO- http://localhost/health || exit 1"
       },
       "from": null,
-      "healthcheck": null,
+      "healthcheck": {
+        "command": {
+          "span": {
+            "end_byte": 116,
+            "end_column": 100,
+            "end_line": 2,
+            "start_byte": 73,
+            "start_column": 57,
+            "start_line": 2
+          },
+          "text": "wget -qO- http://localhost/health || exit 1"
+        },
+        "flags": [
+          [
+            "interval",
+            "30s"
+          ],
+          [
+            "timeout",
+            "3s"
+          ],
+          [
+            "retries",
+            "3"
+          ]
+        ]
+      },
       "heredocs": [],
-      "keyword": "WORKDIR",
+      "keyword": "HEALTHCHECK",
       "keyword_span": {
-        "end_byte": 24,
-        "end_column": 8,
+        "end_byte": 28,
+        "end_column": 12,
         "end_line": 2,
         "start_byte": 17,
         "start_column": 1,
@@ -103,8 +143,8 @@ expression: document_json(&document)
       "line": 2,
       "mounts": [],
       "raw_span": {
-        "end_byte": 29,
-        "end_column": 13,
+        "end_byte": 116,
+        "end_column": 100,
         "end_line": 2,
         "start_byte": 17,
         "start_column": 1,
@@ -113,103 +153,114 @@ expression: document_json(&document)
       "run": null
     },
     {
-      "args": ". /app",
+      "args": "CMD-SHELL curl -f http://localhost/health || exit 1",
       "args_span": {
-        "end_byte": 41,
-        "end_column": 12,
+        "end_byte": 180,
+        "end_column": 64,
         "end_line": 3,
-        "start_byte": 35,
-        "start_column": 6,
+        "start_byte": 129,
+        "start_column": 13,
         "start_line": 3
       },
       "continuations": [],
-      "copy": {
-        "chmod": null,
-        "chown": null,
-        "destination": "/app",
-        "flags": [],
-        "from": null,
-        "kind": "copy",
-        "sources": [
-          "."
-        ]
-      },
+      "copy": null,
       "flags": [],
       "form": {
         "kind": "shell",
         "span": {
-          "end_byte": 41,
-          "end_column": 12,
+          "end_byte": 180,
+          "end_column": 64,
           "end_line": 3,
-          "start_byte": 35,
-          "start_column": 6,
+          "start_byte": 129,
+          "start_column": 13,
           "start_line": 3
         },
-        "text": ". /app"
+        "text": "CMD-SHELL curl -f http://localhost/health || exit 1"
       },
       "from": null,
-      "healthcheck": null,
+      "healthcheck": {
+        "command": {
+          "span": {
+            "end_byte": 180,
+            "end_column": 64,
+            "end_line": 3,
+            "start_byte": 139,
+            "start_column": 23,
+            "start_line": 3
+          },
+          "text": "curl -f http://localhost/health || exit 1"
+        },
+        "flags": []
+      },
       "heredocs": [],
-      "keyword": "COPY",
+      "keyword": "HEALTHCHECK",
       "keyword_span": {
-        "end_byte": 34,
-        "end_column": 5,
+        "end_byte": 128,
+        "end_column": 12,
         "end_line": 3,
-        "start_byte": 30,
+        "start_byte": 117,
         "start_column": 1,
         "start_line": 3
       },
       "line": 3,
       "mounts": [],
       "raw_span": {
-        "end_byte": 41,
-        "end_column": 12,
+        "end_byte": 180,
+        "end_column": 64,
         "end_line": 3,
-        "start_byte": 30,
+        "start_byte": 117,
         "start_column": 1,
         "start_line": 3
       },
       "run": null
     },
     {
-      "args": "[\"echo\", \"hello\"]",
+      "args": "NONE",
       "args_span": {
-        "end_byte": 63,
-        "end_column": 22,
+        "end_byte": 197,
+        "end_column": 17,
         "end_line": 4,
-        "start_byte": 46,
-        "start_column": 5,
+        "start_byte": 193,
+        "start_column": 13,
         "start_line": 4
       },
       "continuations": [],
       "copy": null,
       "flags": [],
       "form": {
-        "kind": "json",
-        "values": [
-          "echo",
-          "hello"
-        ]
+        "kind": "shell",
+        "span": {
+          "end_byte": 197,
+          "end_column": 17,
+          "end_line": 4,
+          "start_byte": 193,
+          "start_column": 13,
+          "start_line": 4
+        },
+        "text": "NONE"
       },
       "from": null,
-      "healthcheck": null,
+      "healthcheck": {
+        "command": null,
+        "flags": []
+      },
       "heredocs": [],
-      "keyword": "CMD",
+      "keyword": "HEALTHCHECK",
       "keyword_span": {
-        "end_byte": 45,
-        "end_column": 4,
+        "end_byte": 192,
+        "end_column": 12,
         "end_line": 4,
-        "start_byte": 42,
+        "start_byte": 181,
         "start_column": 1,
         "start_line": 4
       },
       "line": 4,
       "mounts": [],
       "raw_span": {
-        "end_byte": 63,
-        "end_column": 22,
+        "end_byte": 197,
+        "end_column": 17,
         "end_line": 4,
-        "start_byte": 42,
+        "start_byte": 181,
         "start_column": 1,
         "start_line": 4
       },

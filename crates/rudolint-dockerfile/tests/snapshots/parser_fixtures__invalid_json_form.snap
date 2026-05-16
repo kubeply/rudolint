@@ -40,6 +40,7 @@ expression: document_json(&document)
         "image": "alpine:3.20",
         "platform": null
       },
+      "healthcheck": null,
       "heredocs": [],
       "keyword": "FROM",
       "keyword_span": {
@@ -81,6 +82,7 @@ expression: document_json(&document)
         "raw": "[\"apk\", \"add\",]"
       },
       "from": null,
+      "healthcheck": null,
       "heredocs": [],
       "keyword": "RUN",
       "keyword_span": {
@@ -138,6 +140,7 @@ expression: document_json(&document)
         "raw": "[\"sh\", \"-c\", \"echo hello\""
       },
       "from": null,
+      "healthcheck": null,
       "heredocs": [],
       "keyword": "CMD",
       "keyword_span": {
