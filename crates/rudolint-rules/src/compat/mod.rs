@@ -5,10 +5,12 @@ use rudolint_diagnostics::{Finding, Severity};
 use rudolint_dockerfile::{Comment, Dockerfile};
 use rudolint_fix::{FixApplicability, FixPreview, TextEdit};
 use rudolint_policy::LegacySuppression;
+use rudolint_shell::detect_disallowed_container_commands;
 
 pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
     vec![
         Box::new(InlineIgnore),
+        Box::new(DisallowedContainerCommands),
         Box::new(AbsoluteWorkdir),
         Box::new(LastUserNotRoot),
         Box::new(ExplicitFromTag),
@@ -53,6 +55,43 @@ fn legacy_suppression_comment(comment: &Comment) -> Option<Finding> {
         "prefer native rudolint suppression comments over legacy external suppressions",
         comment.span,
     ))
+}
+
+rule_metadata!(
+    DisallowedContainerCommands,
+    "RDL3001",
+    "disallowed-container-commands",
+    Severity::Info,
+    "avoid commands that rarely make sense during Docker builds"
+);
+
+impl Rule for DisallowedContainerCommands {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        doc.instructions
+            .iter()
+            .filter(|instruction| instruction.keyword == "RUN")
+            .flat_map(|instruction| {
+                detect_disallowed_container_commands(&instruction.args)
+                    .into_iter()
+                    .map(|command| {
+                        diagnostic(
+                            "RDL3001",
+                            Severity::Info,
+                            format!(
+                                "avoid running `{}` in Docker build containers",
+                                command.as_str()
+                            ),
+                            instruction,
+                        )
+                    })
+                    .collect::<Vec<_>>()
+            })
+            .collect()
+    }
 }
 
 rule_metadata!(
@@ -554,12 +593,12 @@ fn normalized_add_source(source: &str) -> String {
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3001", "RDL3003", "RDL3004", "RDL3008", "RDL3009", "RDL3010", "RDL3013", "RDL3014",
-        "RDL3015", "RDL3016", "RDL3018", "RDL3019", "RDL3021", "RDL3022", "RDL3023", "RDL3026",
-        "RDL3027", "RDL3028", "RDL3029", "RDL3030", "RDL3032", "RDL3033", "RDL3034", "RDL3035",
-        "RDL3036", "RDL3037", "RDL3038", "RDL3040", "RDL3041", "RDL3042", "RDL3043", "RDL3044",
-        "RDL3045", "RDL3046", "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052",
-        "RDL3053", "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060",
-        "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
+        "RDL3003", "RDL3004", "RDL3008", "RDL3009", "RDL3010", "RDL3013", "RDL3014", "RDL3015",
+        "RDL3016", "RDL3018", "RDL3019", "RDL3021", "RDL3022", "RDL3023", "RDL3026", "RDL3027",
+        "RDL3028", "RDL3029", "RDL3030", "RDL3032", "RDL3033", "RDL3034", "RDL3035", "RDL3036",
+        "RDL3037", "RDL3038", "RDL3040", "RDL3041", "RDL3042", "RDL3043", "RDL3044", "RDL3045",
+        "RDL3046", "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053",
+        "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061",
+        "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
     ]
 }

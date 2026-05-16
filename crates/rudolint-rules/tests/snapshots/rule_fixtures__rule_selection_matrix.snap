@@ -57,6 +57,7 @@ expression: snapshot
     "compat": [
       "RDL1001",
       "RDL3000",
+      "RDL3001",
       "RDL3002",
       "RDL3006",
       "RDL3007",
@@ -76,6 +77,7 @@ expression: snapshot
       "RDK1003",
       "RDL1001",
       "RDL3000",
+      "RDL3001",
       "RDL3002",
       "RDL3006",
       "RDL3007",

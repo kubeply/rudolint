@@ -1,0 +1,58 @@
+---
+source: crates/rudolint-shell/src/lib.rs
+expression: values
+---
+[
+  {
+    "commands": [
+      "ssh"
+    ],
+    "shell": "ssh localhost"
+  },
+  {
+    "commands": [],
+    "shell": "apk add vim"
+  },
+  {
+    "commands": [
+      "vim"
+    ],
+    "shell": "cd /tmp && vim file"
+  },
+  {
+    "commands": [
+      "service"
+    ],
+    "shell": "FOO=bar /usr/bin/service nginx start"
+  },
+  {
+    "commands": [
+      "ps"
+    ],
+    "shell": "ps aux | grep nginx"
+  },
+  {
+    "commands": [],
+    "shell": "printf '%s' kill"
+  },
+  {
+    "commands": [
+      "mount",
+      "ifconfig"
+    ],
+    "shell": "mount -t proc proc /proc; ifconfig"
+  },
+  {
+    "commands": [
+      "mount",
+      "ifconfig"
+    ],
+    "shell": "mount -t proc proc /proc;ifconfig"
+  },
+  {
+    "commands": [
+      "vim"
+    ],
+    "shell": "vim file && /usr/bin/vim other"
+  }
+]

@@ -40,6 +40,12 @@ expression: normalized_json(&output)
     "summary": "require absolute WORKDIR paths"
   },
   {
+    "code": "RDL3001",
+    "severity": "info",
+    "status": "implemented",
+    "summary": "avoid commands that rarely make sense during Docker builds"
+  },
+  {
     "code": "RDL3002",
     "severity": "warning",
     "status": "implemented",

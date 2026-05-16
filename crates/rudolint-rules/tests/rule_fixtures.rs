@@ -71,6 +71,22 @@ fn snapshots_rdl1001_legacy_suppression_fixture() {
 }
 
 #[test]
+fn snapshots_rdl3001_disallowed_container_commands_fixture() {
+    let source = read_fixture("rules/RDL3001.disallowed-container-commands/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDL3001")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdl3001_disallowed_container_commands_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rdl3000_absolute_workdir_fixture() {
     let source = read_fixture("rules/RDL3000.absolute-workdir/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");

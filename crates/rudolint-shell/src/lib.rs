@@ -36,6 +36,48 @@ pub enum PackageManager {
     Go,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DisallowedContainerCommand {
+    /// OpenSSH client command.
+    Ssh,
+    /// Vim editor command.
+    Vim,
+    /// System shutdown command.
+    Shutdown,
+    /// Service manager command.
+    Service,
+    /// Process listing command.
+    Ps,
+    /// Memory usage command.
+    Free,
+    /// Interactive process monitor command.
+    Top,
+    /// Process signal command.
+    Kill,
+    /// Filesystem mount command.
+    Mount,
+    /// Legacy network interface command.
+    Ifconfig,
+}
+
+impl DisallowedContainerCommand {
+    /// Returns the command name as it appears in shell input.
+    pub fn as_str(self) -> &'static str {
+        match self {
+            DisallowedContainerCommand::Ssh => "ssh",
+            DisallowedContainerCommand::Vim => "vim",
+            DisallowedContainerCommand::Shutdown => "shutdown",
+            DisallowedContainerCommand::Service => "service",
+            DisallowedContainerCommand::Ps => "ps",
+            DisallowedContainerCommand::Free => "free",
+            DisallowedContainerCommand::Top => "top",
+            DisallowedContainerCommand::Kill => "kill",
+            DisallowedContainerCommand::Mount => "mount",
+            DisallowedContainerCommand::Ifconfig => "ifconfig",
+        }
+    }
+}
+
 impl PackageManager {
     /// Returns the canonical command name for this package manager.
     pub fn as_str(self) -> &'static str {
@@ -89,6 +131,126 @@ pub fn detect_package_managers(shell: &str) -> Vec<PackageManager> {
     managers
 }
 
+/// Detects commands that rarely make sense inside Docker build `RUN` steps.
+///
+/// The detector treats shell command separators as command boundaries and
+/// returns each detected command once, preserving first-seen order.
+pub fn detect_disallowed_container_commands(shell: &str) -> Vec<DisallowedContainerCommand> {
+    let mut commands = Vec::new();
+    let mut expect_command = true;
+
+    for raw_token in shell_tokens(shell) {
+        if raw_token.is_separator {
+            expect_command = true;
+            continue;
+        }
+
+        let token = raw_token
+            .text
+            .trim_matches(|character| matches!(character, '\'' | '"' | '(' | ')'))
+            .trim_matches(|character| matches!(character, ';' | '&' | '|'));
+
+        if token.is_empty() {
+            expect_command = true;
+            continue;
+        }
+
+        if expect_command {
+            if is_env_assignment(token) {
+                continue;
+            }
+
+            let command = token.rsplit('/').next().unwrap_or(token);
+            if let Some(command) = disallowed_container_command(command)
+                && !commands.contains(&command)
+            {
+                commands.push(command);
+            }
+            expect_command = false;
+        }
+    }
+
+    commands
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+struct ShellToken {
+    text: String,
+    is_separator: bool,
+}
+
+fn shell_tokens(shell: &str) -> Vec<ShellToken> {
+    let mut tokens = Vec::new();
+    let mut current = String::new();
+    let mut quote = None;
+
+    for character in shell.chars() {
+        if matches!(character, '\'' | '"') {
+            if quote == Some(character) {
+                quote = None;
+            } else if quote.is_none() {
+                quote = Some(character);
+            }
+            current.push(character);
+            continue;
+        }
+
+        if quote.is_none() && character.is_whitespace() {
+            push_shell_token(&mut tokens, &mut current, false);
+            continue;
+        }
+
+        if quote.is_none() && matches!(character, ';' | '&' | '|' | '(' | ')') {
+            push_shell_token(&mut tokens, &mut current, false);
+            push_shell_token(&mut tokens, &mut character.to_string(), true);
+            continue;
+        }
+
+        current.push(character);
+    }
+
+    push_shell_token(&mut tokens, &mut current, false);
+    tokens
+}
+
+fn push_shell_token(tokens: &mut Vec<ShellToken>, token: &mut String, is_separator: bool) {
+    if token.is_empty() {
+        return;
+    }
+
+    tokens.push(ShellToken {
+        text: std::mem::take(token),
+        is_separator,
+    });
+}
+
+fn is_env_assignment(token: &str) -> bool {
+    let Some((name, _)) = token.split_once('=') else {
+        return false;
+    };
+
+    !name.is_empty()
+        && name
+            .chars()
+            .all(|character| character == '_' || character.is_ascii_alphanumeric())
+}
+
+fn disallowed_container_command(command: &str) -> Option<DisallowedContainerCommand> {
+    match command {
+        "ssh" => Some(DisallowedContainerCommand::Ssh),
+        "vim" => Some(DisallowedContainerCommand::Vim),
+        "shutdown" => Some(DisallowedContainerCommand::Shutdown),
+        "service" => Some(DisallowedContainerCommand::Service),
+        "ps" => Some(DisallowedContainerCommand::Ps),
+        "free" => Some(DisallowedContainerCommand::Free),
+        "top" => Some(DisallowedContainerCommand::Top),
+        "kill" => Some(DisallowedContainerCommand::Kill),
+        "mount" => Some(DisallowedContainerCommand::Mount),
+        "ifconfig" => Some(DisallowedContainerCommand::Ifconfig),
+        _ => None,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -115,6 +277,35 @@ mod tests {
                     "package_managers": detect_package_managers(case)
                         .into_iter()
                         .map(PackageManager::as_str)
+                        .collect::<Vec<_>>(),
+                })
+            })
+            .collect::<Vec<_>>();
+
+        insta::assert_json_snapshot!(values);
+    }
+
+    #[test]
+    fn snapshots_disallowed_container_command_detection() {
+        let cases = [
+            "ssh localhost",
+            "apk add vim",
+            "cd /tmp && vim file",
+            "FOO=bar /usr/bin/service nginx start",
+            "ps aux | grep nginx",
+            "printf '%s' kill",
+            "mount -t proc proc /proc; ifconfig",
+            "mount -t proc proc /proc;ifconfig",
+            "vim file && /usr/bin/vim other",
+        ];
+        let values = cases
+            .iter()
+            .map(|case| {
+                json!({
+                    "shell": case,
+                    "commands": detect_disallowed_container_commands(case)
+                        .into_iter()
+                        .map(DisallowedContainerCommand::as_str)
                         .collect::<Vec<_>>(),
                 })
             })
