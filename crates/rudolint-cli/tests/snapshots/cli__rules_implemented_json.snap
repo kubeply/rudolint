@@ -214,6 +214,12 @@ expression: normalized_json(&output)
     "summary": "clean yum metadata after installs"
   },
   {
+    "code": "RDL3033",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "pin versions in yum install"
+  },
+  {
     "code": "RDL4000",
     "severity": "error",
     "status": "implemented",

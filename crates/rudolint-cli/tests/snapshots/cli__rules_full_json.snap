@@ -216,8 +216,8 @@ expression: normalized_json(&output)
   {
     "code": "RDL3033",
     "severity": "warning",
-    "status": "planned",
-    "summary": "tracked for compatibility parity"
+    "status": "implemented",
+    "summary": "pin versions in yum install"
   },
   {
     "code": "RDL3034",

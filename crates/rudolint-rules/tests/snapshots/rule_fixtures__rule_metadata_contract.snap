@@ -390,6 +390,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3033",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3033.md",
+    "fix": "none",
+    "name": "pin-yum-versions",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "pin versions in yum install"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL4000",
     "default_severity": "error",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4000.md",
