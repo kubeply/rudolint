@@ -1,0 +1,6 @@
+---
+source: crates/rudolint-cli/tests/cli.rs
+expression: output
+---
+FROM alpine:3.20
+LABEL org.opencontainers.image.authors="ops@example.com"
