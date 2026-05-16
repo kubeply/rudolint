@@ -71,7 +71,9 @@ fn document_json(document: &Dockerfile) -> Value {
 fn instruction_json(instruction: &Instruction) -> Value {
     json!({
         "keyword": instruction.keyword,
+        "keyword_span": instruction.keyword_span,
         "args": instruction.args,
+        "args_span": instruction.args_span,
         "flags": instruction.flags,
         "mounts": instruction.mounts.iter().map(|mount| {
             json!({
@@ -81,5 +83,6 @@ fn instruction_json(instruction: &Instruction) -> Value {
         }).collect::<Vec<_>>(),
         "heredocs": instruction.heredocs,
         "line": instruction.line,
+        "raw_span": instruction.raw_span,
     })
 }

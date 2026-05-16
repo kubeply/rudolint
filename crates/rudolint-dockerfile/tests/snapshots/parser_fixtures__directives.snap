@@ -55,11 +55,35 @@ expression: document_json(&document)
   "instructions": [
     {
       "args": "alpine:3.20",
+      "args_span": {
+        "end_byte": 91,
+        "end_column": 17,
+        "end_line": 4,
+        "start_byte": 80,
+        "start_column": 6,
+        "start_line": 4
+      },
       "flags": [],
       "heredocs": [],
       "keyword": "FROM",
+      "keyword_span": {
+        "end_byte": 79,
+        "end_column": 5,
+        "end_line": 4,
+        "start_byte": 75,
+        "start_column": 1,
+        "start_line": 4
+      },
       "line": 4,
-      "mounts": []
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 91,
+        "end_column": 17,
+        "end_line": 4,
+        "start_byte": 75,
+        "start_column": 1,
+        "start_line": 4
+      }
     }
   ],
   "syntax": {

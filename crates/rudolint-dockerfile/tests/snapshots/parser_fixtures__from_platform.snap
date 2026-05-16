@@ -10,6 +10,14 @@ expression: document_json(&document)
   "instructions": [
     {
       "args": "--platform=$BUILDPLATFORM alpine:3.20 AS build",
+      "args_span": {
+        "end_byte": 51,
+        "end_column": 52,
+        "end_line": 1,
+        "start_byte": 5,
+        "start_column": 6,
+        "start_line": 1
+      },
       "flags": [
         [
           "platform",
@@ -18,11 +26,35 @@ expression: document_json(&document)
       ],
       "heredocs": [],
       "keyword": "FROM",
+      "keyword_span": {
+        "end_byte": 4,
+        "end_column": 5,
+        "end_line": 1,
+        "start_byte": 0,
+        "start_column": 1,
+        "start_line": 1
+      },
       "line": 1,
-      "mounts": []
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 51,
+        "end_column": 52,
+        "end_line": 1,
+        "start_byte": 0,
+        "start_column": 1,
+        "start_line": 1
+      }
     },
     {
       "args": "--platform=$TARGETPLATFORM scratch",
+      "args_span": {
+        "end_byte": 91,
+        "end_column": 40,
+        "end_line": 2,
+        "start_byte": 57,
+        "start_column": 6,
+        "start_line": 2
+      },
       "flags": [
         [
           "platform",
@@ -31,8 +63,24 @@ expression: document_json(&document)
       ],
       "heredocs": [],
       "keyword": "FROM",
+      "keyword_span": {
+        "end_byte": 56,
+        "end_column": 5,
+        "end_line": 2,
+        "start_byte": 52,
+        "start_column": 1,
+        "start_line": 2
+      },
       "line": 2,
-      "mounts": []
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 91,
+        "end_column": 40,
+        "end_line": 2,
+        "start_byte": 52,
+        "start_column": 1,
+        "start_line": 2
+      }
     }
   ],
   "syntax": null
