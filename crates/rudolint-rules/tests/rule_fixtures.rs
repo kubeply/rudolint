@@ -282,6 +282,22 @@ fn snapshots_rdl3013_pin_pip_versions_fixture() {
 }
 
 #[test]
+fn snapshots_rdl3014_apt_get_install_assume_yes_fixture() {
+    let source = read_fixture("rules/RDL3014.apt-get-install-assume-yes/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDL3014")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdl3014_apt_get_install_assume_yes_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rdl3012_single_healthcheck_fixture() {
     let fixtures = [
         "RDL3012.no-healthcheck",
