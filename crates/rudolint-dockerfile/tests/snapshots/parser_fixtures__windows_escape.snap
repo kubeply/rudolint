@@ -74,7 +74,8 @@ expression: document_json(&document)
         "start_byte": 11,
         "start_column": 1,
         "start_line": 2
-      }
+      },
+      "run": null
     },
     {
       "args": "powershell -Command `\n    Write-Host \"hello\"",
@@ -133,6 +134,23 @@ expression: document_json(&document)
         "start_byte": 62,
         "start_column": 1,
         "start_line": 3
+      },
+      "run": {
+        "flags": [],
+        "mounts": [],
+        "network": null,
+        "security": null,
+        "shell": {
+          "span": {
+            "end_byte": 110,
+            "end_column": 23,
+            "end_line": 4,
+            "start_byte": 66,
+            "start_column": 5,
+            "start_line": 3
+          },
+          "text": "powershell -Command `\n    Write-Host \"hello\""
+        }
       }
     }
   ],

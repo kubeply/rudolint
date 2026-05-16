@@ -81,7 +81,8 @@ expression: document_json(&document)
         "start_byte": 31,
         "start_column": 1,
         "start_line": 2
-      }
+      },
+      "run": null
     },
     {
       "args": "--mount=type=cache,target=/var/cache/apk apk add curl",
@@ -146,6 +147,42 @@ expression: document_json(&document)
         "start_byte": 82,
         "start_column": 1,
         "start_line": 3
+      },
+      "run": {
+        "flags": [
+          [
+            "mount",
+            "type=cache,target=/var/cache/apk"
+          ]
+        ],
+        "mounts": [
+          {
+            "options": [
+              [
+                "type",
+                "cache"
+              ],
+              [
+                "target",
+                "/var/cache/apk"
+              ]
+            ],
+            "type": "cache"
+          }
+        ],
+        "network": null,
+        "security": null,
+        "shell": {
+          "span": {
+            "end_byte": 139,
+            "end_column": 58,
+            "end_line": 3,
+            "start_byte": 127,
+            "start_column": 46,
+            "start_line": 3
+          },
+          "text": "apk add curl"
+        }
       }
     },
     {
@@ -207,6 +244,23 @@ expression: document_json(&document)
         "start_byte": 140,
         "start_column": 1,
         "start_line": 4
+      },
+      "run": {
+        "flags": [],
+        "mounts": [],
+        "network": null,
+        "security": null,
+        "shell": {
+          "span": {
+            "end_byte": 164,
+            "end_column": 4,
+            "end_line": 6,
+            "start_byte": 144,
+            "start_column": 5,
+            "start_line": 4
+          },
+          "text": "<<EOF\necho hello\nEOF"
+        }
       }
     },
     {
@@ -258,7 +312,8 @@ expression: document_json(&document)
         "start_byte": 165,
         "start_column": 1,
         "start_line": 7
-      }
+      },
+      "run": null
     }
   ],
   "syntax": {

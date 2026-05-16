@@ -71,7 +71,8 @@ expression: document_json(&document)
         "start_byte": 31,
         "start_column": 1,
         "start_line": 2
-      }
+      },
+      "run": null
     },
     {
       "args": "--mount=type=cache,target=/var/cache/apk,sharing=locked apk add curl",
@@ -140,6 +141,127 @@ expression: document_json(&document)
         "start_byte": 48,
         "start_column": 1,
         "start_line": 3
+      },
+      "run": {
+        "flags": [
+          [
+            "mount",
+            "type=cache,target=/var/cache/apk,sharing=locked"
+          ]
+        ],
+        "mounts": [
+          {
+            "options": [
+              [
+                "type",
+                "cache"
+              ],
+              [
+                "target",
+                "/var/cache/apk"
+              ],
+              [
+                "sharing",
+                "locked"
+              ]
+            ],
+            "type": "cache"
+          }
+        ],
+        "network": null,
+        "security": null,
+        "shell": {
+          "span": {
+            "end_byte": 120,
+            "end_column": 73,
+            "end_line": 3,
+            "start_byte": 108,
+            "start_column": 61,
+            "start_line": 3
+          },
+          "text": "apk add curl"
+        }
+      }
+    },
+    {
+      "args": "--network=none --security=sandbox echo locked down",
+      "args_span": {
+        "end_byte": 175,
+        "end_column": 55,
+        "end_line": 4,
+        "start_byte": 125,
+        "start_column": 5,
+        "start_line": 4
+      },
+      "continuations": [],
+      "flags": [
+        [
+          "network",
+          "none"
+        ],
+        [
+          "security",
+          "sandbox"
+        ]
+      ],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 175,
+          "end_column": 55,
+          "end_line": 4,
+          "start_byte": 125,
+          "start_column": 5,
+          "start_line": 4
+        },
+        "text": "--network=none --security=sandbox echo locked down"
+      },
+      "from": null,
+      "heredocs": [],
+      "keyword": "RUN",
+      "keyword_span": {
+        "end_byte": 124,
+        "end_column": 4,
+        "end_line": 4,
+        "start_byte": 121,
+        "start_column": 1,
+        "start_line": 4
+      },
+      "line": 4,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 175,
+        "end_column": 55,
+        "end_line": 4,
+        "start_byte": 121,
+        "start_column": 1,
+        "start_line": 4
+      },
+      "run": {
+        "flags": [
+          [
+            "network",
+            "none"
+          ],
+          [
+            "security",
+            "sandbox"
+          ]
+        ],
+        "mounts": [],
+        "network": "none",
+        "security": "sandbox",
+        "shell": {
+          "span": {
+            "end_byte": 175,
+            "end_column": 55,
+            "end_line": 4,
+            "start_byte": 159,
+            "start_column": 39,
+            "start_line": 4
+          },
+          "text": "echo locked down"
+        }
       }
     }
   ],

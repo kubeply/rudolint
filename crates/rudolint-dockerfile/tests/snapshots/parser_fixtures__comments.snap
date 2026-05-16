@@ -83,7 +83,8 @@ expression: document_json(&document)
         "start_byte": 50,
         "start_column": 1,
         "start_line": 2
-      }
+      },
+      "run": null
     },
     {
       "args": "echo hello",
@@ -129,6 +130,23 @@ expression: document_json(&document)
         "start_byte": 86,
         "start_column": 1,
         "start_line": 5
+      },
+      "run": {
+        "flags": [],
+        "mounts": [],
+        "network": null,
+        "security": null,
+        "shell": {
+          "span": {
+            "end_byte": 100,
+            "end_column": 15,
+            "end_line": 5,
+            "start_byte": 90,
+            "start_column": 5,
+            "start_line": 5
+          },
+          "text": "echo hello"
+        }
       }
     }
   ],
