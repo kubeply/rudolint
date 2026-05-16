@@ -19,6 +19,7 @@ expression: document_json(&document)
         "start_line": 1
       },
       "continuations": [],
+      "copy": null,
       "flags": [],
       "form": {
         "kind": "shell",
@@ -72,6 +73,7 @@ expression: document_json(&document)
         "start_line": 2
       },
       "continuations": [],
+      "copy": null,
       "flags": [],
       "form": {
         "error": "trailing comma at line 1 column 15",
@@ -128,6 +130,7 @@ expression: document_json(&document)
         "start_line": 3
       },
       "continuations": [],
+      "copy": null,
       "flags": [],
       "form": {
         "error": "EOF while parsing a list at line 1 column 25",

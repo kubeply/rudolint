@@ -1,5 +1,6 @@
 ---
 source: crates/rudolint-dockerfile/tests/parser_fixtures.rs
+assertion_line: 35
 expression: document_json(&document)
 ---
 {
@@ -19,6 +20,7 @@ expression: document_json(&document)
         "start_line": 1
       },
       "continuations": [],
+      "copy": null,
       "flags": [],
       "form": {
         "kind": "shell",
@@ -72,6 +74,7 @@ expression: document_json(&document)
         "start_line": 2
       },
       "continuations": [],
+      "copy": null,
       "flags": [],
       "form": {
         "kind": "shell",
@@ -125,6 +128,22 @@ expression: document_json(&document)
         "start_line": 3
       },
       "continuations": [],
+      "copy": {
+        "chmod": null,
+        "chown": null,
+        "destination": "/app",
+        "flags": [
+          [
+            "from",
+            "build"
+          ]
+        ],
+        "from": "build",
+        "kind": "copy",
+        "sources": [
+          "/out/app"
+        ]
+      },
       "flags": [
         [
           "from",
@@ -163,6 +182,193 @@ expression: document_json(&document)
         "start_byte": 39,
         "start_column": 1,
         "start_line": 3
+      },
+      "run": null
+    },
+    {
+      "args": "--chown=1000:1000 --chmod=0755 bin/rudolint /usr/local/bin/rudolint",
+      "args_span": {
+        "end_byte": 143,
+        "end_column": 73,
+        "end_line": 4,
+        "start_byte": 76,
+        "start_column": 6,
+        "start_line": 4
+      },
+      "continuations": [],
+      "copy": {
+        "chmod": "0755",
+        "chown": "1000:1000",
+        "destination": "/usr/local/bin/rudolint",
+        "flags": [
+          [
+            "chown",
+            "1000:1000"
+          ],
+          [
+            "chmod",
+            "0755"
+          ]
+        ],
+        "from": null,
+        "kind": "copy",
+        "sources": [
+          "bin/rudolint"
+        ]
+      },
+      "flags": [
+        [
+          "chown",
+          "1000:1000"
+        ],
+        [
+          "chmod",
+          "0755"
+        ]
+      ],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 143,
+          "end_column": 73,
+          "end_line": 4,
+          "start_byte": 76,
+          "start_column": 6,
+          "start_line": 4
+        },
+        "text": "--chown=1000:1000 --chmod=0755 bin/rudolint /usr/local/bin/rudolint"
+      },
+      "from": null,
+      "heredocs": [],
+      "keyword": "COPY",
+      "keyword_span": {
+        "end_byte": 75,
+        "end_column": 5,
+        "end_line": 4,
+        "start_byte": 71,
+        "start_column": 1,
+        "start_line": 4
+      },
+      "line": 4,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 143,
+        "end_column": 73,
+        "end_line": 4,
+        "start_byte": 71,
+        "start_column": 1,
+        "start_line": 4
+      },
+      "run": null
+    },
+    {
+      "args": "[\"dir with spaces/file.txt\", \"/opt/dir with spaces/file.txt\"]",
+      "args_span": {
+        "end_byte": 210,
+        "end_column": 67,
+        "end_line": 5,
+        "start_byte": 149,
+        "start_column": 6,
+        "start_line": 5
+      },
+      "continuations": [],
+      "copy": {
+        "chmod": null,
+        "chown": null,
+        "destination": "/opt/dir with spaces/file.txt",
+        "flags": [],
+        "from": null,
+        "kind": "copy",
+        "sources": [
+          "dir with spaces/file.txt"
+        ]
+      },
+      "flags": [],
+      "form": {
+        "kind": "json",
+        "values": [
+          "dir with spaces/file.txt",
+          "/opt/dir with spaces/file.txt"
+        ]
+      },
+      "from": null,
+      "heredocs": [],
+      "keyword": "COPY",
+      "keyword_span": {
+        "end_byte": 148,
+        "end_column": 5,
+        "end_line": 5,
+        "start_byte": 144,
+        "start_column": 1,
+        "start_line": 5
+      },
+      "line": 5,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 210,
+        "end_column": 67,
+        "end_line": 5,
+        "start_byte": 144,
+        "start_column": 1,
+        "start_line": 5
+      },
+      "run": null
+    },
+    {
+      "args": "https://example.com/archive.tar.gz /tmp/archive.tar.gz",
+      "args_span": {
+        "end_byte": 269,
+        "end_column": 59,
+        "end_line": 6,
+        "start_byte": 215,
+        "start_column": 5,
+        "start_line": 6
+      },
+      "continuations": [],
+      "copy": {
+        "chmod": null,
+        "chown": null,
+        "destination": "/tmp/archive.tar.gz",
+        "flags": [],
+        "from": null,
+        "kind": "add",
+        "sources": [
+          "https://example.com/archive.tar.gz"
+        ]
+      },
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 269,
+          "end_column": 59,
+          "end_line": 6,
+          "start_byte": 215,
+          "start_column": 5,
+          "start_line": 6
+        },
+        "text": "https://example.com/archive.tar.gz /tmp/archive.tar.gz"
+      },
+      "from": null,
+      "heredocs": [],
+      "keyword": "ADD",
+      "keyword_span": {
+        "end_byte": 214,
+        "end_column": 4,
+        "end_line": 6,
+        "start_byte": 211,
+        "start_column": 1,
+        "start_line": 6
+      },
+      "line": 6,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 269,
+        "end_column": 59,
+        "end_line": 6,
+        "start_byte": 211,
+        "start_column": 1,
+        "start_line": 6
       },
       "run": null
     }

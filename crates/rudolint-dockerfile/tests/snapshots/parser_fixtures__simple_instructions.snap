@@ -19,6 +19,7 @@ expression: document_json(&document)
         "start_line": 1
       },
       "continuations": [],
+      "copy": null,
       "flags": [],
       "form": {
         "kind": "shell",
@@ -72,6 +73,7 @@ expression: document_json(&document)
         "start_line": 2
       },
       "continuations": [],
+      "copy": null,
       "flags": [],
       "form": {
         "kind": "shell",
@@ -119,6 +121,17 @@ expression: document_json(&document)
         "start_line": 3
       },
       "continuations": [],
+      "copy": {
+        "chmod": null,
+        "chown": null,
+        "destination": "/app",
+        "flags": [],
+        "from": null,
+        "kind": "copy",
+        "sources": [
+          "."
+        ]
+      },
       "flags": [],
       "form": {
         "kind": "shell",
@@ -166,6 +179,7 @@ expression: document_json(&document)
         "start_line": 4
       },
       "continuations": [],
+      "copy": null,
       "flags": [],
       "form": {
         "kind": "json",

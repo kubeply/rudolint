@@ -19,6 +19,7 @@ expression: document_json(&document)
         "start_line": 1
       },
       "continuations": [],
+      "copy": null,
       "flags": [],
       "form": {
         "kind": "shell",
@@ -72,6 +73,7 @@ expression: document_json(&document)
         "start_line": 2
       },
       "continuations": [],
+      "copy": null,
       "flags": [],
       "form": {
         "kind": "json",
@@ -131,6 +133,7 @@ expression: document_json(&document)
         "start_line": 3
       },
       "continuations": [],
+      "copy": null,
       "flags": [],
       "form": {
         "kind": "json",
