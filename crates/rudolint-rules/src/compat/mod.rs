@@ -65,6 +65,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(ValidGitHashLabels),
         Box::new(ValidSemverLabels),
         Box::new(MissingHealthcheck),
+        Box::new(ValidEmailLabels),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -2097,6 +2098,54 @@ impl Rule for MissingHealthcheck {
 }
 
 rule_metadata!(
+    ValidEmailLabels,
+    "RDL3058",
+    "valid-email-labels",
+    Severity::Warning,
+    "validate email label values"
+);
+
+impl Rule for ValidEmailLabels {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, _doc: &Dockerfile) -> Vec<Finding> {
+        Vec::new()
+    }
+
+    fn check_with_config(&self, doc: &Dockerfile, config: &Config) -> Vec<Finding> {
+        if config.label_schema.is_empty() {
+            return Vec::new();
+        }
+
+        doc.instructions
+            .iter()
+            .filter(|instruction| {
+                instruction.label.as_ref().is_some_and(|label| {
+                    label.pairs.iter().any(|pair| {
+                        config
+                            .label_schema
+                            .get(&pair.key)
+                            .is_some_and(|schema| schema == "email")
+                            && !docker_label_value_is_empty(&pair.value)
+                            && !is_valid_email_label_value(&pair.value)
+                    })
+                })
+            })
+            .map(|instruction| {
+                diagnostic(
+                    "RDL3058",
+                    Severity::Warning,
+                    "configured email label is not a valid email address",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -2856,6 +2905,11 @@ fn is_valid_git_hash_label_value(value: &str) -> bool {
 fn is_valid_semver_label_value(value: &str) -> bool {
     let value = value.trim_matches(|character| matches!(character, '\'' | '"'));
     semver::Version::parse(value).is_ok()
+}
+
+fn is_valid_email_label_value(value: &str) -> bool {
+    let value = value.trim_matches(|character| matches!(character, '\'' | '"'));
+    email_address::EmailAddress::is_valid(value)
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -3854,7 +3908,6 @@ fn dnf_install_has_unpinned_packages(shell: &str) -> bool {
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005",
-        "RDL4006",
+        "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
     ]
 }

@@ -358,6 +358,12 @@ expression: normalized_json(&output)
     "summary": "require HEALTHCHECK instructions"
   },
   {
+    "code": "RDL3058",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "validate email label values"
+  },
+  {
     "code": "RDL4000",
     "severity": "error",
     "status": "implemented",

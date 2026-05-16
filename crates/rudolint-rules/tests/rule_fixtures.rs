@@ -1093,6 +1093,35 @@ fn snapshots_rdl3057_missing_healthcheck_fixture() {
 }
 
 #[test]
+fn snapshots_rdl3058_valid_email_labels_fixture() {
+    let source = read_fixture("rules/RDL3058.valid-email-labels/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let config = Config {
+        label_schema: BTreeMap::from([
+            (
+                "org.opencontainers.image.authors".to_string(),
+                "email".to_string(),
+            ),
+            (
+                "org.opencontainers.image.title".to_string(),
+                "text".to_string(),
+            ),
+        ]),
+        ..Config::default()
+    };
+    let findings = RuleEngine::new(Profile::Default, config)
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDL3058")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdl3058_valid_email_labels_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rdl4000_deprecated_maintainer_fixture() {
     let source = read_fixture("rules/RDL4000.deprecated-maintainer/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
