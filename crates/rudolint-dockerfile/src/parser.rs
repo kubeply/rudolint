@@ -78,7 +78,7 @@ pub struct Instruction {
     pub continuations: Vec<LineContinuation>,
     pub flags: Vec<(String, String)>,
     pub mounts: Vec<Mount>,
-    pub heredocs: Vec<String>,
+    pub heredocs: Vec<Heredoc>,
     pub line: usize,
     /// Source span covering the raw instruction text.
     pub raw_span: Span,
@@ -114,6 +114,15 @@ pub struct Mount {
     pub options: Vec<(String, String)>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Heredoc {
+    pub delimiter: String,
+    pub quoted: bool,
+    pub target_instruction: String,
+    pub body: String,
+    pub body_span: Span,
+}
+
 #[derive(Debug, Clone)]
 pub struct ParserError {
     message: String,
@@ -141,18 +150,18 @@ pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
     let mut start_escape = '\\';
     let mut byte_offset = 0;
 
-    for (index, segment) in source.split_inclusive('\n').enumerate() {
+    let segments = source.split_inclusive('\n').collect::<Vec<_>>();
+    let mut index = 0;
+    while index < segments.len() {
+        let segment = segments[index];
         let line_number = index + 1;
-        let line = segment
-            .strip_suffix('\n')
-            .unwrap_or(segment)
-            .strip_suffix('\r')
-            .unwrap_or_else(|| segment.strip_suffix('\n').unwrap_or(segment));
+        let line = dockerfile_line(segment);
         let trimmed = line.trim();
 
         if current.is_empty() {
             if trimmed.is_empty() {
                 byte_offset += segment.len();
+                index += 1;
                 continue;
             }
             if trimmed.starts_with('#') {
@@ -181,6 +190,7 @@ pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
                     });
                 }
                 byte_offset += segment.len();
+                index += 1;
                 continue;
             }
             start_line = line_number;
@@ -195,6 +205,36 @@ pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
 
         if continues(line, start_escape) {
             byte_offset += segment.len();
+            index += 1;
+            continue;
+        }
+
+        let heredoc_delimiters = heredoc_delimiters(&current)?;
+        if !heredoc_delimiters.is_empty() {
+            byte_offset += segment.len();
+            index += 1;
+            for delimiter in heredoc_delimiters {
+                while index < segments.len() {
+                    let body_segment = segments[index];
+                    let body_line = dockerfile_line(body_segment);
+                    if !current.is_empty() {
+                        current.push('\n');
+                    }
+                    current.push_str(body_line);
+                    byte_offset += body_segment.len();
+                    index += 1;
+                    if body_line.trim() == delimiter {
+                        break;
+                    }
+                }
+            }
+
+            if let Some(instruction) =
+                parse_instruction(&current, start_line, start_byte, &source_file, start_escape)?
+            {
+                instructions.push(instruction);
+            }
+            current.clear();
             continue;
         }
 
@@ -205,6 +245,7 @@ pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
         }
         current.clear();
         byte_offset += segment.len();
+        index += 1;
     }
 
     if !current.trim().is_empty()
@@ -223,6 +264,14 @@ pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
         instructions,
         has_buildkit_features,
     })
+}
+
+fn dockerfile_line(segment: &str) -> &str {
+    segment
+        .strip_suffix('\n')
+        .unwrap_or(segment)
+        .strip_suffix('\r')
+        .unwrap_or_else(|| segment.strip_suffix('\n').unwrap_or(segment))
 }
 
 fn directive_value<'a>(comment: &'a str, name: &str) -> Option<&'a str> {
@@ -306,7 +355,7 @@ fn parse_instruction(
         .filter(|(name, _)| name == "mount")
         .filter_map(|(_, value)| parse_mount(value))
         .collect::<Vec<_>>();
-    let heredocs = parse_heredocs(raw)?;
+    let heredocs = parse_heredocs(raw, start_byte, &keyword, source_file)?;
 
     Ok(Some(Instruction {
         keyword,
@@ -407,7 +456,7 @@ fn parse_mount(value: &str) -> Option<Mount> {
     })
 }
 
-fn parse_heredocs(raw: &str) -> Result<Vec<String>, ParserError> {
+fn heredoc_delimiters(raw: &str) -> Result<Vec<String>, ParserError> {
     let re = Regex::new(r#"<<-?\s*['"]?([A-Za-z_][A-Za-z0-9_-]*)['"]?"#).map_err(|error| {
         ParserError {
             message: error.to_string(),
@@ -417,6 +466,57 @@ fn parse_heredocs(raw: &str) -> Result<Vec<String>, ParserError> {
         .captures_iter(raw)
         .filter_map(|captures| captures.get(1).map(|m| m.as_str().to_string()))
         .collect())
+}
+
+fn parse_heredocs(
+    raw: &str,
+    start_byte: usize,
+    target_instruction: &str,
+    source_file: &SourceFile,
+) -> Result<Vec<Heredoc>, ParserError> {
+    let re =
+        Regex::new(r#"(?P<prefix><<-?\s*)(?P<quote>['"]?)(?P<delimiter>[A-Za-z_][A-Za-z0-9_-]*)"#)
+            .map_err(|error| ParserError {
+                message: error.to_string(),
+            })?;
+
+    let mut heredocs = Vec::new();
+    for captures in re.captures_iter(raw) {
+        let Some(delimiter_match) = captures.name("delimiter") else {
+            continue;
+        };
+        let delimiter = delimiter_match.as_str();
+        let quoted = captures
+            .name("quote")
+            .is_some_and(|quote| !quote.as_str().is_empty());
+        let Some(opener) = captures.get(0) else {
+            continue;
+        };
+        let Some(body_start_relative) = raw[opener.end()..]
+            .find('\n')
+            .map(|index| opener.end() + index + 1)
+        else {
+            continue;
+        };
+        let closing_marker = format!("\n{delimiter}");
+        let closing_start_relative = raw[body_start_relative..]
+            .find(&closing_marker)
+            .map(|index| body_start_relative + index + 1)
+            .unwrap_or(raw.len());
+        let body = raw[body_start_relative..closing_start_relative].to_string();
+        heredocs.push(Heredoc {
+            delimiter: delimiter.to_string(),
+            quoted,
+            target_instruction: target_instruction.to_string(),
+            body,
+            body_span: source_file.span(
+                start_byte + body_start_relative,
+                start_byte + closing_start_relative,
+            ),
+        });
+    }
+
+    Ok(heredocs)
 }
 
 impl Instruction {

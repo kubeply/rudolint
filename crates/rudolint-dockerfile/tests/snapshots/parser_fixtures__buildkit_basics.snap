@@ -137,11 +137,11 @@ expression: document_json(&document)
       }
     },
     {
-      "args": "<<EOF",
+      "args": "<<EOF\necho hello\nEOF",
       "args_span": {
-        "end_byte": 149,
-        "end_column": 10,
-        "end_line": 4,
+        "end_byte": 164,
+        "end_column": 4,
+        "end_line": 6,
         "start_byte": 144,
         "start_column": 5,
         "start_line": 4
@@ -151,17 +151,30 @@ expression: document_json(&document)
       "form": {
         "kind": "shell",
         "span": {
-          "end_byte": 149,
-          "end_column": 10,
-          "end_line": 4,
+          "end_byte": 164,
+          "end_column": 4,
+          "end_line": 6,
           "start_byte": 144,
           "start_column": 5,
           "start_line": 4
         },
-        "text": "<<EOF"
+        "text": "<<EOF\necho hello\nEOF"
       },
       "heredocs": [
-        "EOF"
+        {
+          "body": "echo hello\n",
+          "body_span": {
+            "end_byte": 161,
+            "end_column": 1,
+            "end_line": 6,
+            "start_byte": 150,
+            "start_column": 1,
+            "start_line": 5
+          },
+          "delimiter": "EOF",
+          "quoted": false,
+          "target_instruction": "RUN"
+        }
       ],
       "keyword": "RUN",
       "keyword_span": {
@@ -175,86 +188,12 @@ expression: document_json(&document)
       "line": 4,
       "mounts": [],
       "raw_span": {
-        "end_byte": 149,
-        "end_column": 10,
-        "end_line": 4,
+        "end_byte": 164,
+        "end_column": 4,
+        "end_line": 6,
         "start_byte": 140,
         "start_column": 1,
         "start_line": 4
-      }
-    },
-    {
-      "args": "hello",
-      "args_span": {
-        "end_byte": 160,
-        "end_column": 11,
-        "end_line": 5,
-        "start_byte": 155,
-        "start_column": 6,
-        "start_line": 5
-      },
-      "continuations": [],
-      "flags": [],
-      "form": {
-        "kind": "shell",
-        "span": {
-          "end_byte": 160,
-          "end_column": 11,
-          "end_line": 5,
-          "start_byte": 155,
-          "start_column": 6,
-          "start_line": 5
-        },
-        "text": "hello"
-      },
-      "heredocs": [],
-      "keyword": "ECHO",
-      "keyword_span": {
-        "end_byte": 154,
-        "end_column": 5,
-        "end_line": 5,
-        "start_byte": 150,
-        "start_column": 1,
-        "start_line": 5
-      },
-      "line": 5,
-      "mounts": [],
-      "raw_span": {
-        "end_byte": 160,
-        "end_column": 11,
-        "end_line": 5,
-        "start_byte": 150,
-        "start_column": 1,
-        "start_line": 5
-      }
-    },
-    {
-      "args": "",
-      "args_span": null,
-      "continuations": [],
-      "flags": [],
-      "form": {
-        "kind": "empty"
-      },
-      "heredocs": [],
-      "keyword": "EOF",
-      "keyword_span": {
-        "end_byte": 164,
-        "end_column": 4,
-        "end_line": 6,
-        "start_byte": 161,
-        "start_column": 1,
-        "start_line": 6
-      },
-      "line": 6,
-      "mounts": [],
-      "raw_span": {
-        "end_byte": 164,
-        "end_column": 4,
-        "end_line": 6,
-        "start_byte": 161,
-        "start_column": 1,
-        "start_line": 6
       }
     },
     {
