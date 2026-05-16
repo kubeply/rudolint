@@ -5,10 +5,18 @@ expression: output
 [
   {
     "code": "RDL3007",
-    "column": 1,
-    "line": 1,
+    "help": null,
+    "labels": [],
     "message": "avoid mutable latest base image tags",
     "path": "$TEMP/Dockerfile",
+    "primary_span": {
+      "end_byte": 0,
+      "end_column": 1,
+      "end_line": 1,
+      "start_byte": 0,
+      "start_column": 1,
+      "start_line": 1
+    },
     "severity": "warning"
   }
 ]

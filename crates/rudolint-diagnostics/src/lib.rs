@@ -2,6 +2,7 @@ use std::fmt;
 use std::path::{Path, PathBuf};
 
 use clap::ValueEnum;
+use rudolint_source::Span;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, ValueEnum)]
@@ -47,8 +48,15 @@ pub struct Finding {
     pub severity: Severity,
     pub message: String,
     pub path: PathBuf,
-    pub line: usize,
-    pub column: usize,
+    pub primary_span: Span,
+    pub labels: Vec<DiagnosticLabel>,
+    pub help: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct DiagnosticLabel {
+    pub span: Span,
+    pub message: String,
 }
 
 impl Finding {
@@ -59,18 +67,49 @@ impl Finding {
         line: usize,
         column: usize,
     ) -> Self {
+        Self::with_span(code, severity, message, Span::point(line, column))
+    }
+
+    pub fn with_span(
+        code: impl Into<String>,
+        severity: Severity,
+        message: impl Into<String>,
+        primary_span: Span,
+    ) -> Self {
         Self {
             code: code.into(),
             severity,
             message: message.into(),
             path: PathBuf::new(),
-            line,
-            column,
+            primary_span,
+            labels: Vec::new(),
+            help: None,
         }
     }
 
     pub fn with_path(mut self, path: &Path) -> Self {
         self.path = path.to_path_buf();
+        self
+    }
+
+    pub fn line(&self) -> usize {
+        self.primary_span.start_line
+    }
+
+    pub fn column(&self) -> usize {
+        self.primary_span.start_column
+    }
+
+    pub fn with_help(mut self, help: impl Into<String>) -> Self {
+        self.help = Some(help.into());
+        self
+    }
+
+    pub fn with_label(mut self, span: Span, message: impl Into<String>) -> Self {
+        self.labels.push(DiagnosticLabel {
+            span,
+            message: message.into(),
+        });
         self
     }
 }

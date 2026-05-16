@@ -2,6 +2,8 @@
 
 use std::path::PathBuf;
 
+use serde::Serialize;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SourceFile {
     pub path: PathBuf,
@@ -106,7 +108,7 @@ pub struct SourceRange {
     pub end: SourcePosition,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 pub struct Span {
     pub start_byte: usize,
     pub end_byte: usize,
@@ -114,6 +116,19 @@ pub struct Span {
     pub start_column: usize,
     pub end_line: usize,
     pub end_column: usize,
+}
+
+impl Span {
+    pub fn point(line: usize, column: usize) -> Self {
+        Self {
+            start_byte: 0,
+            end_byte: 0,
+            start_line: line,
+            start_column: column,
+            end_line: line,
+            end_column: column,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

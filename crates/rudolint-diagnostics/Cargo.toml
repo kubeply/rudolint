@@ -8,4 +8,5 @@ repository.workspace = true
 
 [dependencies]
 clap.workspace = true
+rudolint-source = { path = "../rudolint-source" }
 serde.workspace = true
