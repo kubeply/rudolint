@@ -376,6 +376,12 @@ expression: normalized_json(&output)
     "summary": "clean yarn cache after yarn install"
   },
   {
+    "code": "RDL3061",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "require Dockerfiles to begin with FROM, ARG, or comments"
+  },
+  {
     "code": "RDL4000",
     "severity": "error",
     "status": "implemented",

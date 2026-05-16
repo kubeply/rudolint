@@ -687,6 +687,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3061",
+    "default_severity": "error",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3061.md",
+    "fix": "none",
+    "name": "instruction-order",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "require Dockerfiles to begin with FROM, ARG, or comments"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL4000",
     "default_severity": "error",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4000.md",
