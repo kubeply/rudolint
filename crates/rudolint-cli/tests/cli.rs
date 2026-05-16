@@ -390,8 +390,32 @@ fn fix_dry_run_reports_without_writing_files() {
 }
 
 #[test]
-fn fix_without_dry_run_exits_with_usage_error() {
-    rudolint_cmd().args(["check", "--fix"]).assert().code(2);
+fn fix_write_mode_reports_without_writing_when_no_fixes_exist() {
+    let temp = tempfile::TempDir::new().expect("temp dir should be created");
+    let dockerfile = temp.path().join("Dockerfile");
+    let original = "FROM alpine:latest\nWORKDIR app\n";
+    std::fs::write(&dockerfile, original).expect("Dockerfile should be written");
+
+    let output = rudolint_cmd()
+        .args(["check", "--fix"])
+        .arg(&dockerfile)
+        .assert()
+        .code(1)
+        .get_output()
+        .stdout
+        .clone();
+
+    assert_eq!(
+        std::fs::read_to_string(&dockerfile).expect("Dockerfile should still exist"),
+        original
+    );
+    let output = String::from_utf8(output).expect("stdout should be UTF-8");
+    let temp_path = temp
+        .path()
+        .to_str()
+        .expect("temp path should be valid UTF-8");
+    let output = output.replace(temp_path, "$TEMP");
+    insta::assert_snapshot!("fix_write_mode_human", output);
 }
 
 #[test]
