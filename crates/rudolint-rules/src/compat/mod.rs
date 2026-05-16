@@ -57,6 +57,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(WgetProgress),
         Box::new(ValidLabelKey),
         Box::new(MissingRequiredLabels),
+        Box::new(NoSuperfluousLabels),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -1732,6 +1733,50 @@ impl Rule for MissingRequiredLabels {
 }
 
 rule_metadata!(
+    NoSuperfluousLabels,
+    "RDL3050",
+    "no-superfluous-labels",
+    Severity::Info,
+    "reject labels outside the configured label schema"
+);
+
+impl Rule for NoSuperfluousLabels {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, _doc: &Dockerfile) -> Vec<Finding> {
+        Vec::new()
+    }
+
+    fn check_with_config(&self, doc: &Dockerfile, config: &Config) -> Vec<Finding> {
+        if !config.strict_labels {
+            return Vec::new();
+        }
+
+        doc.instructions
+            .iter()
+            .filter(|instruction| {
+                instruction.label.as_ref().is_some_and(|label| {
+                    label
+                        .pairs
+                        .iter()
+                        .any(|pair| !config.label_schema.contains_key(&pair.key))
+                })
+            })
+            .map(|instruction| {
+                diagnostic(
+                    "RDL3050",
+                    Severity::Info,
+                    "superfluous label(s) present",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -3241,8 +3286,7 @@ fn dnf_install_has_unpinned_packages(shell: &str) -> bool {
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3050", "RDL3051", "RDL3052", "RDL3053", "RDL3054", "RDL3055", "RDL3056", "RDL3057",
-        "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005",
-        "RDL4006",
+        "RDL3051", "RDL3052", "RDL3053", "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058",
+        "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
     ]
 }

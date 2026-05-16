@@ -30,6 +30,8 @@ pub struct Config {
     pub label_schema: BTreeMap<String, String>,
     /// BuildKit entitlements allowed by policy.
     #[serde(default)]
+    pub strict_labels: bool,
+    #[serde(default)]
     pub allow_entitlements: BTreeSet<String>,
     /// Rule ignores scoped to path patterns.
     #[serde(default)]
@@ -134,6 +136,7 @@ trusted-registries:
 label-schema:
   org.opencontainers.image.title: text
   org.opencontainers.image.source: url
+strict-labels: true
 allow-entitlements:
   - security.insecure
 per-file-ignores:
@@ -156,6 +159,7 @@ per-file-ignores:
             config.label_schema["org.opencontainers.image.source"],
             "url"
         );
+        assert!(config.strict_labels);
         assert!(config.allow_entitlements.contains("security.insecure"));
         assert!(config.per_file_ignores["fixtures/**"].contains("RDL3000"));
     }
