@@ -26,6 +26,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
 rule!(
     InlineIgnore,
     "RDL1001",
+    "legacy-external-suppression",
     Severity::Warning,
     "warn on legacy external linter suppression comments",
     |doc: &Dockerfile| {
@@ -49,6 +50,7 @@ fn legacy_suppression_comment(comment: &Comment) -> Option<Finding> {
 rule!(
     AbsoluteWorkdir,
     "RDL3000",
+    "absolute-workdir",
     Severity::Error,
     "require absolute WORKDIR paths",
     |doc: &Dockerfile| {
@@ -74,6 +76,7 @@ rule!(
 rule!(
     LastUserNotRoot,
     "RDL3002",
+    "final-user-not-root",
     Severity::Warning,
     "require the final USER to be non-root",
     |doc: &Dockerfile| {
@@ -102,6 +105,7 @@ rule!(
 rule!(
     ExplicitFromTag,
     "RDL3006",
+    "explicit-from-tag",
     Severity::Warning,
     "require explicit image tags in FROM",
     |doc: &Dockerfile| {
@@ -128,6 +132,7 @@ rule!(
 rule!(
     NoLatestTag,
     "RDL3007",
+    "no-latest-tag",
     Severity::Warning,
     "reject latest base image tags",
     |doc: &Dockerfile| {
@@ -154,6 +159,7 @@ rule!(
 rule!(
     ValidExposePort,
     "RDL3011",
+    "valid-expose-port",
     Severity::Error,
     "validate EXPOSE port numbers",
     |doc: &Dockerfile| {
@@ -185,6 +191,7 @@ rule!(
 rule!(
     SingleHealthcheck,
     "RDL3012",
+    "single-healthcheck",
     Severity::Error,
     "allow only one HEALTHCHECK instruction",
     |doc: &Dockerfile| duplicates(
@@ -199,6 +206,7 @@ rule!(
 rule!(
     PreferCopy,
     "RDL3020",
+    "prefer-copy",
     Severity::Error,
     "prefer COPY for plain local files",
     |doc: &Dockerfile| {
@@ -228,6 +236,7 @@ rule!(
 rule!(
     UniqueStageNames,
     "RDL3024",
+    "unique-stage-names",
     Severity::Error,
     "require unique multi-stage aliases",
     |doc: &Dockerfile| {
@@ -253,6 +262,7 @@ rule!(
 rule!(
     JsonEntrypoints,
     "RDL3025",
+    "json-entrypoints",
     Severity::Warning,
     "prefer JSON form for CMD and ENTRYPOINT",
     |doc: &Dockerfile| {
@@ -275,6 +285,7 @@ rule!(
 rule!(
     DeprecatedMaintainer,
     "RDL4000",
+    "deprecated-maintainer",
     Severity::Error,
     "reject deprecated MAINTAINER instructions",
     |doc: &Dockerfile| {
@@ -296,6 +307,7 @@ rule!(
 rule!(
     SingleCmd,
     "RDL4003",
+    "single-cmd",
     Severity::Warning,
     "allow only one CMD instruction",
     |doc: &Dockerfile| duplicates(
@@ -310,6 +322,7 @@ rule!(
 rule!(
     SingleEntrypoint,
     "RDL4004",
+    "single-entrypoint",
     Severity::Error,
     "allow only one ENTRYPOINT instruction",
     |doc: &Dockerfile| duplicates(

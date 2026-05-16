@@ -14,6 +14,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
 rule!(
     BuildkitSyntaxWhenFeaturesUsed,
     "RDK1000",
+    "buildkit-syntax-directive",
     Severity::Info,
     "require explicit syntax directive for BuildKit-only features",
     |doc: &Dockerfile| {
@@ -40,6 +41,7 @@ rule!(
 rule!(
     SecretLikeArgOrEnv,
     "RDK1001",
+    "secret-like-arg-or-env",
     Severity::Warning,
     "reject secret-like ARG and ENV names",
     |doc: &Dockerfile| {
@@ -96,6 +98,7 @@ fn has_secret_like_arg_or_env_name(keyword: &str, args: &str, secret_words: &[&s
 rule!(
     SecretInRun,
     "RDK1002",
+    "secret-in-run",
     Severity::Warning,
     "prefer BuildKit secret mounts for secret-consuming RUN steps",
     |doc: &Dockerfile| {
@@ -169,6 +172,7 @@ mod tests {
 rule!(
     CacheMountForPackageInstall,
     "RDK1003",
+    "cache-mount-for-package-install",
     Severity::Info,
     "prefer BuildKit cache mounts for package-manager caches",
     |doc: &Dockerfile| {

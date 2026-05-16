@@ -1,0 +1,193 @@
+---
+source: crates/rudolint-rules/tests/rule_fixtures.rs
+expression: metadata
+---
+[
+  {
+    "category": "buildkit",
+    "code": "RDK1000",
+    "default_severity": "info",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDK1000.md",
+    "fix": "none",
+    "name": "buildkit-syntax-directive",
+    "profile": "default",
+    "status": "implemented",
+    "summary": "require explicit syntax directive for BuildKit-only features"
+  },
+  {
+    "category": "buildkit",
+    "code": "RDK1001",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDK1001.md",
+    "fix": "none",
+    "name": "secret-like-arg-or-env",
+    "profile": "default",
+    "status": "implemented",
+    "summary": "reject secret-like ARG and ENV names"
+  },
+  {
+    "category": "buildkit",
+    "code": "RDK1002",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDK1002.md",
+    "fix": "none",
+    "name": "secret-in-run",
+    "profile": "default",
+    "status": "implemented",
+    "summary": "prefer BuildKit secret mounts for secret-consuming RUN steps"
+  },
+  {
+    "category": "buildkit",
+    "code": "RDK1003",
+    "default_severity": "info",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDK1003.md",
+    "fix": "none",
+    "name": "cache-mount-for-package-install",
+    "profile": "default",
+    "status": "implemented",
+    "summary": "prefer BuildKit cache mounts for package-manager caches"
+  },
+  {
+    "category": "compatibility",
+    "code": "RDL1001",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL1001.md",
+    "fix": "none",
+    "name": "legacy-external-suppression",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "warn on legacy external linter suppression comments"
+  },
+  {
+    "category": "compatibility",
+    "code": "RDL3000",
+    "default_severity": "error",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3000.md",
+    "fix": "none",
+    "name": "absolute-workdir",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "require absolute WORKDIR paths"
+  },
+  {
+    "category": "compatibility",
+    "code": "RDL3002",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3002.md",
+    "fix": "none",
+    "name": "final-user-not-root",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "require the final USER to be non-root"
+  },
+  {
+    "category": "compatibility",
+    "code": "RDL3006",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3006.md",
+    "fix": "none",
+    "name": "explicit-from-tag",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "require explicit image tags in FROM"
+  },
+  {
+    "category": "compatibility",
+    "code": "RDL3007",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3007.md",
+    "fix": "none",
+    "name": "no-latest-tag",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "reject latest base image tags"
+  },
+  {
+    "category": "compatibility",
+    "code": "RDL3011",
+    "default_severity": "error",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3011.md",
+    "fix": "none",
+    "name": "valid-expose-port",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "validate EXPOSE port numbers"
+  },
+  {
+    "category": "compatibility",
+    "code": "RDL3012",
+    "default_severity": "error",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3012.md",
+    "fix": "none",
+    "name": "single-healthcheck",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "allow only one HEALTHCHECK instruction"
+  },
+  {
+    "category": "compatibility",
+    "code": "RDL3020",
+    "default_severity": "error",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3020.md",
+    "fix": "none",
+    "name": "prefer-copy",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "prefer COPY for plain local files"
+  },
+  {
+    "category": "compatibility",
+    "code": "RDL3024",
+    "default_severity": "error",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3024.md",
+    "fix": "none",
+    "name": "unique-stage-names",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "require unique multi-stage aliases"
+  },
+  {
+    "category": "compatibility",
+    "code": "RDL3025",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3025.md",
+    "fix": "none",
+    "name": "json-entrypoints",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "prefer JSON form for CMD and ENTRYPOINT"
+  },
+  {
+    "category": "compatibility",
+    "code": "RDL4000",
+    "default_severity": "error",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4000.md",
+    "fix": "none",
+    "name": "deprecated-maintainer",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "reject deprecated MAINTAINER instructions"
+  },
+  {
+    "category": "compatibility",
+    "code": "RDL4003",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4003.md",
+    "fix": "none",
+    "name": "single-cmd",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "allow only one CMD instruction"
+  },
+  {
+    "category": "compatibility",
+    "code": "RDL4004",
+    "default_severity": "error",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4004.md",
+    "fix": "none",
+    "name": "single-entrypoint",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "allow only one ENTRYPOINT instruction"
+  }
+]

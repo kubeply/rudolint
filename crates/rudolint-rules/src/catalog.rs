@@ -1,5 +1,4 @@
-use crate::{Rule, RuleInfo, RuleStatus, buildkit, compat, shell};
-use rudolint_diagnostics::Severity;
+use crate::{Rule, RuleInfo, RuleMetadata, buildkit, compat, shell};
 use rudolint_policy::PolicyProfile;
 
 pub(crate) fn implemented_rules(profile: PolicyProfile) -> Vec<Box<dyn Rule>> {
@@ -19,21 +18,21 @@ pub(crate) fn catalog(profile: PolicyProfile) -> Vec<RuleInfo> {
         .collect::<Vec<_>>();
 
     if profile.includes_compatibility_rules() {
-        rules.extend(compat::planned_catalog().into_iter().map(|code| RuleInfo {
-            code,
-            severity: Severity::Warning,
-            summary: "tracked for compatibility parity",
-            status: RuleStatus::Planned,
-        }));
+        rules.extend(
+            compat::planned_catalog()
+                .into_iter()
+                .map(RuleMetadata::planned_compat)
+                .map(RuleInfo::from_metadata),
+        );
     }
 
     if profile.includes_shell_catalog() {
-        rules.extend(shell::catalog().into_iter().map(|code| RuleInfo {
-            code,
-            severity: Severity::Warning,
-            summary: "shell diagnostics delegated to the shell-analysis layer",
-            status: RuleStatus::External,
-        }));
+        rules.extend(
+            shell::catalog()
+                .into_iter()
+                .map(RuleMetadata::external_shell)
+                .map(RuleInfo::from_metadata),
+        );
     }
 
     rules.sort_by_key(|rule| rule.code);
