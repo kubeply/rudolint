@@ -280,6 +280,21 @@ fn emits_rules_json() {
 }
 
 #[test]
+fn explains_rule() {
+    rudolint_cmd()
+        .args(["explain", "RDL3007"])
+        .assert()
+        .success()
+        .stdout(predicates::str::contains("RDL3007"))
+        .stdout(predicates::str::contains("reject latest base image tags"));
+}
+
+#[test]
+fn unknown_explain_rule_exits_with_code_two() {
+    rudolint_cmd().args(["explain", "RDL9999"]).assert().code(2);
+}
+
+#[test]
 fn missing_input_exits_with_code_two() {
     let temp = TempDir::new().expect("temp dir should be created");
     let missing = temp.path().join("missing.Dockerfile");

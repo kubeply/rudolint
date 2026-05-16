@@ -70,6 +70,7 @@ rudolint check . --quiet
 rudolint check . --verbose
 rudolint check . --show-source
 rudolint rules --format json
+rudolint explain RDL3007
 ```
 
 Use stdin:

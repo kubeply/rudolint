@@ -25,6 +25,8 @@ pub enum Command {
     Check(CheckArgs),
     /// Print the rule catalog.
     Rules(RulesArgs),
+    /// Explain one rule.
+    Explain(ExplainArgs),
 }
 
 impl Default for Command {
@@ -110,6 +112,16 @@ pub struct RulesArgs {
     /// Only show rules implemented in this build.
     #[arg(long)]
     pub implemented: bool,
+}
+
+#[derive(Debug, Clone, Args)]
+pub struct ExplainArgs {
+    /// Rule code to explain.
+    pub rule: String,
+
+    /// Rule profile.
+    #[arg(long, value_enum, default_value_t = Profile::Default)]
+    pub profile: Profile,
 }
 
 #[derive(Debug, Clone, Copy, ValueEnum)]

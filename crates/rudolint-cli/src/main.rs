@@ -34,6 +34,7 @@ fn run() -> Result<ExitCode, AppError> {
     match cli.command.unwrap_or_default() {
         Command::Check(args) => run_check(args),
         Command::Rules(args) => run_rules(args),
+        Command::Explain(args) => run_explain(args),
     }
 }
 
@@ -190,6 +191,20 @@ fn run_version(json: bool) -> Result<ExitCode, AppError> {
     } else {
         println!("{} {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
     }
+    Ok(ExitCode::SUCCESS)
+}
+
+fn run_explain(args: cli::ExplainArgs) -> Result<ExitCode, AppError> {
+    let engine = RuleEngine::new(args.profile, Config::default());
+    let rule = engine
+        .catalog()
+        .into_iter()
+        .find(|rule| rule.code.eq_ignore_ascii_case(&args.rule))
+        .ok_or_else(|| AppError::usage(format!("unknown rule `{}`", args.rule)))?;
+
+    println!("{} {}", rule.code, rule.summary);
+    println!("severity: {}", rule.severity);
+    println!("status: {}", rule.status);
     Ok(ExitCode::SUCCESS)
 }
 
