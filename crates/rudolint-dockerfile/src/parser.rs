@@ -80,6 +80,7 @@ pub struct Instruction {
     pub mounts: Vec<Mount>,
     pub heredocs: Vec<Heredoc>,
     pub from: Option<FromInstruction>,
+    pub run: Option<RunInstruction>,
     pub line: usize,
     /// Source span covering the raw instruction text.
     pub raw_span: Span,
@@ -131,6 +132,21 @@ pub struct FromInstruction {
     pub alias: Option<String>,
     pub platform: Option<String>,
     pub flags: Vec<(String, String)>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RunInstruction {
+    pub flags: Vec<(String, String)>,
+    pub mounts: Vec<Mount>,
+    pub network: Option<String>,
+    pub security: Option<String>,
+    pub shell: Option<ShellBody>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ShellBody {
+    pub text: String,
+    pub span: Span,
 }
 
 #[derive(Debug, Clone)]
@@ -343,6 +359,7 @@ fn parse_instruction(
             mounts: Vec::new(),
             heredocs: Vec::new(),
             from: None,
+            run: None,
             line,
             raw_span,
             raw: raw.to_string(),
@@ -369,6 +386,8 @@ fn parse_instruction(
         .filter(|(name, _)| name == "mount")
         .filter_map(|(_, value)| parse_mount(value))
         .collect::<Vec<_>>();
+    let run =
+        (keyword == "RUN").then(|| parse_run(&args, args_start, &flags, &mounts, source_file));
     let heredocs = parse_heredocs(raw, start_byte, &keyword, source_file)?;
 
     Ok(Some(Instruction {
@@ -382,10 +401,59 @@ fn parse_instruction(
         mounts,
         heredocs,
         from,
+        run,
         line,
         raw_span,
         raw: raw.to_string(),
     }))
+}
+
+fn parse_run(
+    args: &str,
+    args_start: usize,
+    flags: &[(String, String)],
+    mounts: &[Mount],
+    source_file: &SourceFile,
+) -> RunInstruction {
+    let network = flags
+        .iter()
+        .find(|(name, _)| name == "network")
+        .map(|(_, value)| value.clone());
+    let security = flags
+        .iter()
+        .find(|(name, _)| name == "security")
+        .map(|(_, value)| value.clone());
+    let (shell_text, shell_start) = strip_leading_flags(args, args_start);
+    let shell = (!shell_text.is_empty()).then(|| ShellBody {
+        text: shell_text.to_string(),
+        span: source_file.span(shell_start, shell_start + shell_text.len()),
+    });
+
+    RunInstruction {
+        flags: flags.to_vec(),
+        mounts: mounts.to_vec(),
+        network,
+        security,
+        shell,
+    }
+}
+
+fn strip_leading_flags(args: &str, args_start: usize) -> (&str, usize) {
+    let mut remaining = args;
+    let mut offset = 0;
+    loop {
+        let trimmed = remaining.trim_start();
+        offset += remaining.len() - trimmed.len();
+        remaining = trimmed;
+        if !remaining.starts_with("--") {
+            return (remaining, args_start + offset);
+        }
+        let Some(width) = remaining.find(char::is_whitespace) else {
+            return ("", args_start + args.len());
+        };
+        offset += width;
+        remaining = &remaining[width..];
+    }
 }
 
 fn parse_from(args: &str, flags: &[(String, String)]) -> Option<FromInstruction> {

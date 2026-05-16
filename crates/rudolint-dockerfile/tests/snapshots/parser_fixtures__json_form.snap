@@ -58,7 +58,8 @@ expression: document_json(&document)
         "start_byte": 0,
         "start_column": 1,
         "start_line": 1
-      }
+      },
+      "run": null
     },
     {
       "args": "[\"apk\", \"add\", \"curl\"]",
@@ -100,6 +101,23 @@ expression: document_json(&document)
         "start_byte": 17,
         "start_column": 1,
         "start_line": 2
+      },
+      "run": {
+        "flags": [],
+        "mounts": [],
+        "network": null,
+        "security": null,
+        "shell": {
+          "span": {
+            "end_byte": 43,
+            "end_column": 27,
+            "end_line": 2,
+            "start_byte": 21,
+            "start_column": 5,
+            "start_line": 2
+          },
+          "text": "[\"apk\", \"add\", \"curl\"]"
+        }
       }
     },
     {
@@ -142,7 +160,8 @@ expression: document_json(&document)
         "start_byte": 44,
         "start_column": 1,
         "start_line": 3
-      }
+      },
+      "run": null
     }
   ],
   "syntax": null

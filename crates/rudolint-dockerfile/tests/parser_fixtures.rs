@@ -110,6 +110,25 @@ fn instruction_json(instruction: &Instruction) -> Value {
                 "flags": from.flags,
             })
         }),
+        "run": instruction.run.as_ref().map(|run| {
+            json!({
+                "flags": run.flags,
+                "mounts": run.mounts.iter().map(|mount| {
+                    json!({
+                        "type": mount.mount_type,
+                        "options": mount.options,
+                    })
+                }).collect::<Vec<_>>(),
+                "network": run.network,
+                "security": run.security,
+                "shell": run.shell.as_ref().map(|shell| {
+                    json!({
+                        "text": shell.text,
+                        "span": shell.span,
+                    })
+                }),
+            })
+        }),
         "line": instruction.line,
         "raw_span": instruction.raw_span,
     })

@@ -58,7 +58,8 @@ expression: document_json(&document)
         "start_byte": 0,
         "start_column": 1,
         "start_line": 1
-      }
+      },
+      "run": null
     },
     {
       "args": "/app",
@@ -104,7 +105,8 @@ expression: document_json(&document)
         "start_byte": 17,
         "start_column": 1,
         "start_line": 2
-      }
+      },
+      "run": null
     },
     {
       "args": ". /app",
@@ -150,7 +152,8 @@ expression: document_json(&document)
         "start_byte": 30,
         "start_column": 1,
         "start_line": 3
-      }
+      },
+      "run": null
     },
     {
       "args": "[\"echo\", \"hello\"]",
@@ -191,7 +194,8 @@ expression: document_json(&document)
         "start_byte": 42,
         "start_column": 1,
         "start_line": 4
-      }
+      },
+      "run": null
     }
   ],
   "syntax": null
