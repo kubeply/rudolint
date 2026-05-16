@@ -318,8 +318,8 @@ expression: normalized_json(&output)
   {
     "code": "RDL3051",
     "severity": "warning",
-    "status": "planned",
-    "summary": "tracked for compatibility parity"
+    "status": "implemented",
+    "summary": "reject empty configured label values"
   },
   {
     "code": "RDL3052",
