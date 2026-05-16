@@ -138,23 +138,33 @@ impl Rule for ExplicitFromTag {
     }
 
     fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
-        doc.instructions
+        let mut stage_aliases = BTreeSet::new();
+        let mut findings = Vec::new();
+
+        for instruction in doc
+            .instructions
             .iter()
             .filter(|instruction| instruction.keyword == "FROM")
-            .filter(|instruction| {
-                instruction.base_image().is_some_and(|image| {
-                    !image.contains('@') && !image.rsplit('/').next().unwrap_or("").contains(':')
-                })
-            })
-            .map(|instruction| {
-                diagnostic(
+        {
+            let Some(image) = instruction.base_image() else {
+                continue;
+            };
+
+            if image_needs_explicit_tag(image, &stage_aliases) {
+                findings.push(diagnostic(
                     "RDL3006",
                     Severity::Warning,
                     "base image should use an explicit tag or digest",
                     instruction,
-                )
-            })
-            .collect()
+                ));
+            }
+
+            if let Some(alias) = instruction.stage_alias() {
+                stage_aliases.insert(alias.to_ascii_lowercase());
+            }
+        }
+
+        findings
     }
 }
 
@@ -497,6 +507,17 @@ fn duplicates(
 fn is_windows_absolute(path: &str) -> bool {
     let bytes = path.as_bytes();
     bytes.len() >= 3 && bytes[0].is_ascii_alphabetic() && bytes[1] == b':' && bytes[2] == b'\\'
+}
+
+fn image_needs_explicit_tag(image: &str, stage_aliases: &BTreeSet<String>) -> bool {
+    if image == "scratch"
+        || image.contains('@')
+        || stage_aliases.contains(&image.to_ascii_lowercase())
+    {
+        return false;
+    }
+
+    !image.rsplit('/').next().unwrap_or("").contains(':')
 }
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
