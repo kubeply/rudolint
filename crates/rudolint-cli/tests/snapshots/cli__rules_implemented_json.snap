@@ -382,6 +382,12 @@ expression: normalized_json(&output)
     "summary": "require Dockerfiles to begin with FROM, ARG, or comments"
   },
   {
+    "code": "RDL3062",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "pin Go package versions"
+  },
+  {
     "code": "RDL4000",
     "severity": "error",
     "status": "implemented",

@@ -69,6 +69,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(ConsecutiveRun),
         Box::new(YarnCacheClean),
         Box::new(InstructionOrder),
+        Box::new(PinGoVersions),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -2256,6 +2257,37 @@ impl Rule for InstructionOrder {
 }
 
 rule_metadata!(
+    PinGoVersions,
+    "RDL3062",
+    "pin-go-versions",
+    Severity::Warning,
+    "pin Go package versions"
+);
+
+impl Rule for PinGoVersions {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        doc.instructions
+            .iter()
+            .filter(|instruction| {
+                instruction.keyword == "RUN" && go_package_command_has_unpinned_package(instruction)
+            })
+            .map(|instruction| {
+                diagnostic(
+                    "RDL3062",
+                    Severity::Warning,
+                    "pin versions in go package commands",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -3102,6 +3134,133 @@ fn has_yarn_cache_mount(instruction: &Instruction) -> bool {
 fn is_yarn_cache_target(value: &str) -> bool {
     let target = value.trim_end_matches('/');
     target == ".cache/yarn" || target.ends_with("/.cache/yarn") || target.contains("/.cache/yarn/")
+}
+
+fn go_package_command_has_unpinned_package(instruction: &Instruction) -> bool {
+    let Some(shell) = instruction.run.as_ref().and_then(|run| run.shell.as_ref()) else {
+        return false;
+    };
+
+    detect_command_invocations(&shell.text)
+        .iter()
+        .flat_map(go_packages_from_invocation)
+        .any(|package| !go_package_has_pinned_version(package))
+}
+
+fn go_packages_from_invocation(invocation: &rudolint_shell::ShellCommandInvocation) -> Vec<&str> {
+    if invocation.command != "go" {
+        return Vec::new();
+    }
+
+    let args = invocation
+        .arguments
+        .iter()
+        .map(String::as_str)
+        .collect::<Vec<_>>();
+
+    let Some(command_index) = go_next_non_option_operand_index(&args, 0) else {
+        return Vec::new();
+    };
+
+    if args.get(command_index) == Some(&"run") {
+        return go_non_option_operands(&args, command_index + 1)
+            .into_iter()
+            .take(1)
+            .collect();
+    }
+
+    if matches!(args.get(command_index), Some(&"install" | &"get")) {
+        return go_non_option_operands(&args, command_index + 1)
+            .into_iter()
+            .filter(|argument| *argument != "tool")
+            .collect();
+    }
+
+    Vec::new()
+}
+
+fn go_non_option_operands<'a>(args: &[&'a str], start: usize) -> Vec<&'a str> {
+    let mut operands = Vec::new();
+    let mut index = start;
+
+    while let Some(operand_index) = go_next_non_option_operand_index(args, index) {
+        operands.push(args[operand_index]);
+        index = operand_index + 1;
+    }
+
+    operands
+}
+
+fn go_next_non_option_operand_index(args: &[&str], start: usize) -> Option<usize> {
+    let mut index = start;
+
+    while index < args.len() {
+        let argument = args[index];
+        if argument == "\\" {
+            index += 1;
+            continue;
+        }
+
+        if argument.starts_with('-') {
+            let option_name = argument.split_once('=').map_or(argument, |(name, _)| name);
+            if argument.find('=').is_none() && go_option_takes_value(option_name) {
+                let mut value_index = index + 1;
+                while args.get(value_index).is_some_and(|value| *value == "\\") {
+                    value_index += 1;
+                }
+
+                if args
+                    .get(value_index)
+                    .is_some_and(|value| !value.starts_with('-'))
+                {
+                    index = value_index;
+                }
+            }
+        } else {
+            return Some(index);
+        }
+        index += 1;
+    }
+
+    None
+}
+
+fn go_package_has_pinned_version(package: &str) -> bool {
+    go_package_is_local_path(package)
+        || go_package_version(package)
+            .is_some_and(|version| !version.is_empty() && !matches!(version, "latest" | "none"))
+}
+
+fn go_package_is_local_path(package: &str) -> bool {
+    package == "."
+        || package.starts_with('/')
+        || package.starts_with('.')
+        || package.ends_with(".go")
+}
+
+fn go_option_takes_value(option: &str) -> bool {
+    matches!(
+        option,
+        "-C" | "-asmflags"
+            | "-buildmode"
+            | "-compiler"
+            | "-exec"
+            | "-gccgoflags"
+            | "-gcflags"
+            | "-installsuffix"
+            | "-ldflags"
+            | "-mod"
+            | "-modfile"
+            | "-overlay"
+            | "-p"
+            | "-pkgdir"
+            | "-tags"
+            | "-toolexec"
+    )
+}
+
+fn go_package_version(package: &str) -> Option<&str> {
+    package.rsplit_once('@').map(|(_, version)| version)
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -4099,5 +4258,5 @@ fn dnf_install_has_unpinned_packages(shell: &str) -> bool {
 }
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
-    vec!["RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006"]
+    vec!["RDL3063", "RDL4001", "RDL4005", "RDL4006"]
 }

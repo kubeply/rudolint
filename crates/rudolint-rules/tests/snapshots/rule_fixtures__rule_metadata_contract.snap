@@ -698,6 +698,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3062",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3062.md",
+    "fix": "none",
+    "name": "pin-go-versions",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "pin Go package versions"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL4000",
     "default_severity": "error",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4000.md",
