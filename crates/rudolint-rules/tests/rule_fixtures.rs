@@ -260,6 +260,31 @@ fn snapshots_rdl3025_json_entrypoints_fixture() {
 }
 
 #[test]
+fn snapshots_rdl4000_deprecated_maintainer_fixture() {
+    let source = read_fixture("rules/RDL4000.deprecated-maintainer/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let engine = RuleEngine::new(Profile::Default, Config::default());
+    let findings = engine
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDL4000")
+        .collect::<Vec<_>>();
+    let fixes = engine
+        .fixes(&document)
+        .into_iter()
+        .filter(|fix| fix.title == "replace MAINTAINER with OCI authors label")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdl4000_deprecated_maintainer_fixture",
+        serde_json::json!({
+            "findings": findings,
+            "fixes": fixes,
+        })
+    );
+}
+
+#[test]
 fn snapshots_rule_selection_matrix() {
     let source = read_fixture("rules/default-basic/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
