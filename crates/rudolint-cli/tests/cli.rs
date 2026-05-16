@@ -175,8 +175,12 @@ fn findings_exit_with_code_one() {
 
 #[test]
 fn missing_input_exits_with_code_two() {
+    let temp = TempDir::new().expect("temp dir should be created");
+    let missing = temp.path().join("missing.Dockerfile");
+
     rudolint_cmd()
-        .args(["check", "missing.Dockerfile"])
+        .args(["check"])
+        .arg(&missing)
         .assert()
         .code(2);
 }
