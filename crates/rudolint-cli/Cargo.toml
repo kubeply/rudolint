@@ -13,6 +13,7 @@ ignore.workspace = true
 rudolint-config.workspace = true
 rudolint-diagnostics.workspace = true
 rudolint-dockerfile.workspace = true
+rudolint-fix.workspace = true
 rudolint-output.workspace = true
 rudolint-rules.workspace = true
 rudolint-settings.workspace = true

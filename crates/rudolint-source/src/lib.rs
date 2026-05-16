@@ -165,10 +165,14 @@ impl Span {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// One-based line, column, and length for fix edits.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 pub struct SourceSpan {
+    /// One-based line number.
     pub line: usize,
+    /// One-based column counted in Unicode scalar values.
     pub column: usize,
+    /// Length of the affected span in columns.
     pub length: usize,
 }
 

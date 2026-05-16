@@ -419,6 +419,21 @@ fn fix_write_mode_reports_without_writing_when_no_fixes_exist() {
 }
 
 #[test]
+fn fix_dry_run_json_includes_fix_envelope() {
+    let output = rudolint_cmd()
+        .args(["check", "--fix", "--dry-run", "--format", "json"])
+        .write_stdin("FROM alpine:latest\nWORKDIR app\n")
+        .assert()
+        .code(1)
+        .get_output()
+        .stdout
+        .clone();
+
+    let output = String::from_utf8(output).expect("stdout should be UTF-8");
+    insta::assert_json_snapshot!("fix_dry_run_json", normalized_json(&output));
+}
+
+#[test]
 fn emits_rules_json() {
     let output = rudolint_cmd()
         .args(["rules", "--implemented", "--format", "json"])

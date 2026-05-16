@@ -511,6 +511,7 @@ dependencies = [
  "rudolint-config",
  "rudolint-diagnostics",
  "rudolint-dockerfile",
+ "rudolint-fix",
  "rudolint-output",
  "rudolint-rules",
  "rudolint-settings",
@@ -570,6 +571,7 @@ version = "0.1.0"
 dependencies = [
  "insta",
  "rudolint-source",
+ "serde",
 ]
 
 [[package]]
@@ -593,6 +595,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "rudolint-diagnostics",
+ "rudolint-fix",
  "serde_json",
 ]
 

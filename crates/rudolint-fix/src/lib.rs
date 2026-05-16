@@ -3,9 +3,10 @@
 use std::fmt::Write;
 
 use rudolint_source::SourceSpan;
+use serde::Serialize;
 
 /// A source edit that can be previewed or applied.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct TextEdit {
     /// Span affected by the edit, or insertion point for insertions.
     pub span: SourceSpan,
@@ -62,7 +63,8 @@ impl TextEdit {
 }
 
 /// The operation performed by a [`TextEdit`].
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(tag = "type", rename_all = "kebab-case")]
 pub enum EditKind {
     /// Replace the associated span with `replacement`.
     Replace { replacement: String },
@@ -73,7 +75,7 @@ pub enum EditKind {
 }
 
 /// A pair of edits that cannot be applied together without ordering ambiguity.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct EditConflict {
     /// First conflicting edit.
     pub first: TextEdit,
@@ -116,7 +118,8 @@ fn edits_conflict(left: &TextEdit, right: &TextEdit) -> bool {
 }
 
 /// Describes whether a suggested [`FixPreview`] can be applied automatically.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(tag = "type", rename_all = "kebab-case")]
 pub enum FixApplicability {
     /// The edits can be applied automatically and reversed from source control.
     Safe,
@@ -160,7 +163,8 @@ impl FixApplicability {
 }
 
 /// Reason-free applicability classification.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "kebab-case")]
 pub enum FixApplicabilityKind {
     /// Safe automatic fix.
     Safe,
@@ -182,7 +186,7 @@ impl FixApplicabilityKind {
 }
 
 /// Human-facing preview of a suggested fix.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct FixPreview {
     /// Short description of the fix.
     pub title: String,
