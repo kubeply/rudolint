@@ -36,6 +36,10 @@ expression: document_json(&document)
       },
       "continuations": [],
       "flags": [],
+      "form": {
+        "kind": "shell",
+        "value": "mcr.microsoft.com/windows/nanoserver:ltsc2022"
+      },
       "heredocs": [],
       "keyword": "FROM",
       "keyword_span": {
@@ -82,6 +86,10 @@ expression: document_json(&document)
         }
       ],
       "flags": [],
+      "form": {
+        "kind": "shell",
+        "value": "powershell -Command `\n    Write-Host \"hello\""
+      },
       "heredocs": [],
       "keyword": "RUN",
       "keyword_span": {

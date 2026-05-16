@@ -51,6 +51,7 @@ pub struct Instruction {
     pub keyword_span: Span,
     pub args: String,
     pub args_span: Option<Span>,
+    pub form: InstructionForm,
     pub continuations: Vec<LineContinuation>,
     pub flags: Vec<(String, String)>,
     pub mounts: Vec<Mount>,
@@ -58,6 +59,13 @@ pub struct Instruction {
     pub line: usize,
     pub raw_span: Span,
     pub raw: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum InstructionForm {
+    Empty,
+    Json(Vec<String>),
+    Shell(String),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -224,6 +232,7 @@ fn parse_instruction(
             keyword_span,
             args: String::new(),
             args_span: None,
+            form: InstructionForm::Empty,
             continuations: parse_continuations(raw, line, start_byte, escape, source_file),
             flags: Vec::new(),
             mounts: Vec::new(),
@@ -243,6 +252,7 @@ fn parse_instruction(
     let args = rest.trim().to_string();
     let args_span =
         (!args.is_empty()).then(|| source_file.span(args_start, args_start + args.len()));
+    let form = parse_instruction_form(&args);
     let continuations = parse_continuations(raw, line, start_byte, escape, source_file);
     let flags = parse_flags(&args);
     let mounts = flags
@@ -257,6 +267,7 @@ fn parse_instruction(
         keyword_span,
         args,
         args_span,
+        form,
         continuations,
         flags,
         mounts,
@@ -265,6 +276,20 @@ fn parse_instruction(
         raw_span,
         raw: raw.to_string(),
     }))
+}
+
+fn parse_instruction_form(args: &str) -> InstructionForm {
+    if args.is_empty() {
+        return InstructionForm::Empty;
+    }
+
+    if args.starts_with('[')
+        && let Ok(values) = serde_json::from_str::<Vec<String>>(args)
+    {
+        return InstructionForm::Json(values);
+    }
+
+    InstructionForm::Shell(args.to_string())
 }
 
 fn parse_flags(args: &str) -> Vec<(String, String)> {

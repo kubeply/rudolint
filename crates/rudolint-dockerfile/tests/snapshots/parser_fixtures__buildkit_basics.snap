@@ -38,6 +38,10 @@ expression: document_json(&document)
           "$BUILDPLATFORM"
         ]
       ],
+      "form": {
+        "kind": "shell",
+        "value": "--platform=$BUILDPLATFORM alpine:3.20 AS base"
+      },
       "heredocs": [],
       "keyword": "FROM",
       "keyword_span": {
@@ -76,6 +80,10 @@ expression: document_json(&document)
           "type=cache,target=/var/cache/apk"
         ]
       ],
+      "form": {
+        "kind": "shell",
+        "value": "--mount=type=cache,target=/var/cache/apk apk add curl"
+      },
       "heredocs": [],
       "keyword": "RUN",
       "keyword_span": {
@@ -123,6 +131,10 @@ expression: document_json(&document)
       },
       "continuations": [],
       "flags": [],
+      "form": {
+        "kind": "shell",
+        "value": "<<EOF"
+      },
       "heredocs": [
         "EOF"
       ],
@@ -158,6 +170,10 @@ expression: document_json(&document)
       },
       "continuations": [],
       "flags": [],
+      "form": {
+        "kind": "shell",
+        "value": "hello"
+      },
       "heredocs": [],
       "keyword": "ECHO",
       "keyword_span": {
@@ -184,6 +200,9 @@ expression: document_json(&document)
       "args_span": null,
       "continuations": [],
       "flags": [],
+      "form": {
+        "kind": "empty"
+      },
       "heredocs": [],
       "keyword": "EOF",
       "keyword_span": {
@@ -222,6 +241,10 @@ expression: document_json(&document)
           "base"
         ]
       ],
+      "form": {
+        "kind": "shell",
+        "value": "--from=base /src /dst"
+      },
       "heredocs": [],
       "keyword": "COPY",
       "keyword_span": {

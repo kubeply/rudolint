@@ -20,6 +20,10 @@ expression: document_json(&document)
       },
       "continuations": [],
       "flags": [],
+      "form": {
+        "kind": "shell",
+        "value": "alpine:3.20 AS build"
+      },
       "heredocs": [],
       "keyword": "FROM",
       "keyword_span": {
@@ -53,6 +57,10 @@ expression: document_json(&document)
       },
       "continuations": [],
       "flags": [],
+      "form": {
+        "kind": "shell",
+        "value": "scratch"
+      },
       "heredocs": [],
       "keyword": "FROM",
       "keyword_span": {
@@ -91,6 +99,10 @@ expression: document_json(&document)
           "build"
         ]
       ],
+      "form": {
+        "kind": "shell",
+        "value": "--from=build /out/app /app"
+      },
       "heredocs": [],
       "keyword": "COPY",
       "keyword_span": {

@@ -20,6 +20,10 @@ expression: document_json(&document)
       },
       "continuations": [],
       "flags": [],
+      "form": {
+        "kind": "shell",
+        "value": "alpine:3.20"
+      },
       "heredocs": [],
       "keyword": "FROM",
       "keyword_span": {
@@ -78,6 +82,10 @@ expression: document_json(&document)
         }
       ],
       "flags": [],
+      "form": {
+        "kind": "shell",
+        "value": "apk add \\\n    curl \\\n    git"
+      },
       "heredocs": [],
       "keyword": "RUN",
       "keyword_span": {

@@ -46,26 +46,30 @@ expression: document_json(&document)
       }
     },
     {
-      "args": "/app",
+      "args": "[\"apk\", \"add\", \"curl\"]",
       "args_span": {
-        "end_byte": 29,
-        "end_column": 13,
+        "end_byte": 43,
+        "end_column": 27,
         "end_line": 2,
-        "start_byte": 25,
-        "start_column": 9,
+        "start_byte": 21,
+        "start_column": 5,
         "start_line": 2
       },
       "continuations": [],
       "flags": [],
       "form": {
-        "kind": "shell",
-        "value": "/app"
+        "kind": "json",
+        "values": [
+          "apk",
+          "add",
+          "curl"
+        ]
       },
       "heredocs": [],
-      "keyword": "WORKDIR",
+      "keyword": "RUN",
       "keyword_span": {
-        "end_byte": 24,
-        "end_column": 8,
+        "end_byte": 20,
+        "end_column": 4,
         "end_line": 2,
         "start_byte": 17,
         "start_column": 1,
@@ -74,8 +78,8 @@ expression: document_json(&document)
       "line": 2,
       "mounts": [],
       "raw_span": {
-        "end_byte": 29,
-        "end_column": 13,
+        "end_byte": 43,
+        "end_column": 27,
         "end_line": 2,
         "start_byte": 17,
         "start_column": 1,
@@ -83,80 +87,44 @@ expression: document_json(&document)
       }
     },
     {
-      "args": ". /app",
+      "args": "[\"sh\", \"-c\", \"echo hello\"]",
       "args_span": {
-        "end_byte": 41,
-        "end_column": 12,
+        "end_byte": 74,
+        "end_column": 31,
         "end_line": 3,
-        "start_byte": 35,
-        "start_column": 6,
-        "start_line": 3
-      },
-      "continuations": [],
-      "flags": [],
-      "form": {
-        "kind": "shell",
-        "value": ". /app"
-      },
-      "heredocs": [],
-      "keyword": "COPY",
-      "keyword_span": {
-        "end_byte": 34,
-        "end_column": 5,
-        "end_line": 3,
-        "start_byte": 30,
-        "start_column": 1,
-        "start_line": 3
-      },
-      "line": 3,
-      "mounts": [],
-      "raw_span": {
-        "end_byte": 41,
-        "end_column": 12,
-        "end_line": 3,
-        "start_byte": 30,
-        "start_column": 1,
-        "start_line": 3
-      }
-    },
-    {
-      "args": "[\"echo\", \"hello\"]",
-      "args_span": {
-        "end_byte": 63,
-        "end_column": 22,
-        "end_line": 4,
-        "start_byte": 46,
+        "start_byte": 48,
         "start_column": 5,
-        "start_line": 4
+        "start_line": 3
       },
       "continuations": [],
       "flags": [],
       "form": {
         "kind": "json",
         "values": [
-          "echo",
-          "hello"
+          "sh",
+          "-c",
+          "echo hello"
         ]
       },
       "heredocs": [],
       "keyword": "CMD",
       "keyword_span": {
-        "end_byte": 45,
+        "end_byte": 47,
         "end_column": 4,
-        "end_line": 4,
-        "start_byte": 42,
+        "end_line": 3,
+        "start_byte": 44,
         "start_column": 1,
-        "start_line": 4
+        "start_line": 3
       },
-      "line": 4,
+      "line": 3,
       "mounts": [],
       "raw_span": {
-        "end_byte": 63,
-        "end_column": 22,
-        "end_line": 4,
-        "start_byte": 42,
+        "end_byte": 74,
+        "end_column": 31,
+        "end_line": 3,
+        "start_byte": 44,
         "start_column": 1,
-        "start_line": 4
+        "start_line": 3
       }
     }
   ],
