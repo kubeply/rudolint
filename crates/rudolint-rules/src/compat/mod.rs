@@ -1,4 +1,4 @@
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 
 use crate::{Rule, RuleInfo, metadata::diagnostic, metadata::rule_metadata};
 use rudolint_config::Config;
@@ -49,6 +49,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(DnfInstallAssumeYes),
         Box::new(DnfCleanAll),
         Box::new(PinDnfVersions),
+        Box::new(PipNoCacheDir),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -1353,6 +1354,69 @@ impl Rule for PinDnfVersions {
 }
 
 rule_metadata!(
+    PipNoCacheDir,
+    "RDL3042",
+    "pip-no-cache-dir",
+    Severity::Warning,
+    "avoid pip cache directories"
+);
+
+impl Rule for PipNoCacheDir {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        let mut findings = Vec::new();
+        let mut stage_no_cache = BTreeMap::new();
+        let mut current_stage = None;
+        let mut pip_no_cache_dir = false;
+
+        for instruction in &doc.instructions {
+            match instruction.keyword.as_str() {
+                "FROM" => {
+                    if let Some(from) = &instruction.from {
+                        pip_no_cache_dir =
+                            stage_no_cache.get(&from.image).copied().unwrap_or_default();
+                        let stage = from.alias.clone().unwrap_or_else(|| from.image.clone());
+                        stage_no_cache.insert(stage.clone(), pip_no_cache_dir);
+                        current_stage = Some(stage);
+                    }
+                }
+                "ENV"
+                    if instruction.env.as_ref().is_some_and(|env| {
+                        env.assignments.iter().any(|assignment| {
+                            assignment.name == "PIP_NO_CACHE_DIR"
+                                && pip_no_cache_dir_truthy(&assignment.value)
+                        })
+                    }) =>
+                {
+                    pip_no_cache_dir = true;
+                    if let Some(stage) = &current_stage {
+                        stage_no_cache.insert(stage.clone(), true);
+                    }
+                }
+                "RUN"
+                    if !pip_no_cache_dir
+                        && !has_pip_cache_mount(instruction)
+                        && pip_install_missing_no_cache_dir(&instruction.args) =>
+                {
+                    findings.push(diagnostic(
+                        "RDL3042",
+                        Severity::Warning,
+                        "avoid pip cache directories by using `pip install --no-cache-dir`",
+                        instruction,
+                    ));
+                }
+                _ => {}
+            }
+        }
+
+        findings
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -1598,6 +1662,71 @@ fn pip_install_has_unpinned_packages(shell: &str) -> bool {
                 })
                 .any(|package| !package.contains("=="))
         })
+}
+
+fn pip_install_missing_no_cache_dir(shell: &str) -> bool {
+    if shell_sets_pip_no_cache_dir(shell) {
+        return false;
+    }
+
+    detect_command_invocations(shell)
+        .into_iter()
+        .any(|invocation| {
+            pip_install_arguments(&invocation).is_some_and(pip_args_missing_no_cache_dir)
+        })
+}
+
+fn shell_sets_pip_no_cache_dir(shell: &str) -> bool {
+    shell
+        .split_whitespace()
+        .filter_map(|token| token.split_once('='))
+        .any(|(name, value)| name == "PIP_NO_CACHE_DIR" && pip_no_cache_dir_truthy(value))
+}
+
+fn pip_install_arguments(invocation: &rudolint_shell::ShellCommandInvocation) -> Option<&[String]> {
+    if matches!(invocation.command.as_str(), "pip" | "pip3") {
+        return Some(&invocation.arguments);
+    }
+
+    if invocation.command.starts_with("python")
+        && invocation
+            .arguments
+            .windows(2)
+            .any(|window| window[0] == "-m" && window[1] == "pip")
+    {
+        let pip_index = invocation
+            .arguments
+            .windows(2)
+            .position(|window| window[0] == "-m" && window[1] == "pip")?
+            + 2;
+        return Some(&invocation.arguments[pip_index..]);
+    }
+
+    None
+}
+
+fn pip_args_missing_no_cache_dir(arguments: &[String]) -> bool {
+    arguments.iter().any(|argument| argument == "install")
+        && !arguments
+            .iter()
+            .any(|argument| argument == "--no-cache-dir")
+}
+
+fn pip_no_cache_dir_truthy(value: &str) -> bool {
+    matches!(
+        value.trim_matches(|character| matches!(character, '\'' | '"')),
+        "1" | "true" | "True" | "TRUE" | "on" | "On" | "ON" | "yes" | "Yes" | "YES"
+    )
+}
+
+fn has_pip_cache_mount(instruction: &Instruction) -> bool {
+    instruction.mounts.iter().any(|mount| {
+        matches!(mount.mount_type.as_str(), "cache" | "tmpfs")
+            && mount
+                .options
+                .iter()
+                .any(|(name, value)| name == "target" && value.contains(".cache/pip"))
+    })
 }
 
 fn apt_get_install_missing_yes(shell: &str) -> bool {
@@ -2024,9 +2153,8 @@ fn dnf_install_has_unpinned_packages(shell: &str) -> bool {
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3042", "RDL3043", "RDL3044", "RDL3045", "RDL3046", "RDL3047", "RDL3048", "RDL3049",
-        "RDL3050", "RDL3051", "RDL3052", "RDL3053", "RDL3054", "RDL3055", "RDL3056", "RDL3057",
-        "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005",
-        "RDL4006",
+        "RDL3043", "RDL3044", "RDL3045", "RDL3046", "RDL3047", "RDL3048", "RDL3049", "RDL3050",
+        "RDL3051", "RDL3052", "RDL3053", "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058",
+        "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
     ]
 }
