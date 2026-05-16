@@ -184,3 +184,26 @@ fn missing_input_exits_with_code_two() {
         .assert()
         .code(2);
 }
+
+#[test]
+fn emits_json_version() {
+    let output = rudolint_cmd()
+        .args(["--version", "--json"])
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+
+    let output = String::from_utf8(output).expect("stdout should be UTF-8");
+    insta::assert_json_snapshot!("version_json", normalized_json(&output));
+}
+
+#[test]
+fn emits_plain_version() {
+    rudolint_cmd()
+        .arg("--version")
+        .assert()
+        .success()
+        .stdout(predicates::str::contains("rudolint 0.1.0"));
+}

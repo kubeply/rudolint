@@ -27,6 +27,9 @@ fn main() -> ExitCode {
 
 fn run() -> Result<ExitCode, AppError> {
     let cli = Cli::parse();
+    if cli.version {
+        return run_version(cli.json);
+    }
     match cli.command.unwrap_or_default() {
         Command::Check(args) => run_check(args),
         Command::Rules(args) => run_rules(args),
@@ -120,6 +123,21 @@ fn run_rules(args: cli::RulesArgs) -> Result<ExitCode, AppError> {
             "{:<8} {:<8} {:<12} {}",
             rule.code, rule.severity, rule.status, rule.summary
         );
+    }
+    Ok(ExitCode::SUCCESS)
+}
+
+fn run_version(json: bool) -> Result<ExitCode, AppError> {
+    if json {
+        println!(
+            "{}",
+            serde_json::json!({
+                "name": env!("CARGO_PKG_NAME"),
+                "version": env!("CARGO_PKG_VERSION"),
+            })
+        );
+    } else {
+        println!("{} {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
     }
     Ok(ExitCode::SUCCESS)
 }
