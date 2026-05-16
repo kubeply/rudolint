@@ -1,6 +1,86 @@
 //! BuildKit frontend, mount, entitlement, and Buildx semantic analysis.
 
+use rudolint_dockerfile::{Dockerfile, Mount};
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Frontend {
     pub image: String,
+    pub version: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BuildkitFeatures {
+    pub frontend: Option<Frontend>,
+    pub mounts: Vec<Mount>,
+    pub heredoc_count: usize,
+    pub network_modes: Vec<String>,
+    pub security_modes: Vec<String>,
+}
+
+pub fn analyze(document: &Dockerfile) -> BuildkitFeatures {
+    let frontend = document.syntax.as_ref().map(|syntax| Frontend {
+        image: syntax.image.clone(),
+        version: syntax
+            .image
+            .rsplit_once(':')
+            .map(|(_, version)| version.to_string()),
+    });
+    let mut mounts = Vec::new();
+    let mut heredoc_count = 0;
+    let mut network_modes = Vec::new();
+    let mut security_modes = Vec::new();
+
+    for instruction in &document.instructions {
+        mounts.extend(instruction.mounts.clone());
+        heredoc_count += instruction.heredocs.len();
+        if let Some(run) = &instruction.run {
+            if let Some(network) = &run.network {
+                network_modes.push(network.clone());
+            }
+            if let Some(security) = &run.security {
+                security_modes.push(security.clone());
+            }
+        }
+    }
+
+    BuildkitFeatures {
+        frontend,
+        mounts,
+        heredoc_count,
+        network_modes,
+        security_modes,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rudolint_dockerfile::parse_dockerfile;
+    use rudolint_test::read_fixture;
+    use serde_json::json;
+
+    #[test]
+    fn snapshots_buildkit_features() {
+        let source = read_fixture("parser/buildkit-basics/Dockerfile");
+        let document = parse_dockerfile(&source).expect("fixture should parse");
+        let features = analyze(&document);
+
+        insta::assert_json_snapshot!(json!({
+            "frontend": features.frontend.as_ref().map(|frontend| {
+                json!({
+                    "image": frontend.image,
+                    "version": frontend.version,
+                })
+            }),
+            "mounts": features.mounts.iter().map(|mount| {
+                json!({
+                    "type": mount.mount_type,
+                    "options": mount.options,
+                })
+            }).collect::<Vec<_>>(),
+            "heredoc_count": features.heredoc_count,
+            "network_modes": features.network_modes,
+            "security_modes": features.security_modes,
+        }));
+    }
 }

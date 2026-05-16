@@ -526,7 +526,10 @@ version = "0.1.0"
 name = "rudolint-buildkit"
 version = "0.1.0"
 dependencies = [
+ "insta",
  "rudolint-dockerfile",
+ "rudolint-test",
+ "serde_json",
 ]
 
 [[package]]
