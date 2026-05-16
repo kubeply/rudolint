@@ -2,3 +2,6 @@ FROM alpine:3.20
 RUN <<EOF
 echo hello
 EOF
+RUN <<'SCRIPT'
+echo quoted
+SCRIPT

@@ -92,7 +92,15 @@ fn instruction_json(instruction: &Instruction) -> Value {
                 "options": mount.options,
             })
         }).collect::<Vec<_>>(),
-        "heredocs": instruction.heredocs,
+        "heredocs": instruction.heredocs.iter().map(|heredoc| {
+            json!({
+                "delimiter": heredoc.delimiter,
+                "quoted": heredoc.quoted,
+                "target_instruction": heredoc.target_instruction,
+                "body": heredoc.body,
+                "body_span": heredoc.body_span,
+            })
+        }).collect::<Vec<_>>(),
         "line": instruction.line,
         "raw_span": instruction.raw_span,
     })
