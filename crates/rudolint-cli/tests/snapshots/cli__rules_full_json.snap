@@ -330,8 +330,8 @@ expression: normalized_json(&output)
   {
     "code": "RDL3053",
     "severity": "warning",
-    "status": "planned",
-    "summary": "tracked for compatibility parity"
+    "status": "implemented",
+    "summary": "validate RFC3339 label values"
   },
   {
     "code": "RDL3054",
