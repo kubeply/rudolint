@@ -25,6 +25,7 @@ expression: document_json(&document)
   "has_buildkit_features": false,
   "instructions": [
     {
+      "arg": null,
       "args": "mcr.microsoft.com/windows/nanoserver:ltsc2022",
       "args_span": {
         "end_byte": 61,
@@ -80,6 +81,7 @@ expression: document_json(&document)
       "run": null
     },
     {
+      "arg": null,
       "args": "powershell -Command `\n    Write-Host \"hello\"",
       "args_span": {
         "end_byte": 110,

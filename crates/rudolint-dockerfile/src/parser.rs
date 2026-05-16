@@ -60,6 +60,7 @@ pub struct Instruction {
     pub run: Option<RunInstruction>,
     pub copy: Option<CopyInstruction>,
     pub healthcheck: Option<HealthcheckInstruction>,
+    pub arg: Option<ArgInstruction>,
     pub line: usize,
     pub raw_span: Span,
     pub raw: String,
@@ -133,6 +134,12 @@ pub enum CopyKind {
 pub struct HealthcheckInstruction {
     pub flags: Vec<(String, String)>,
     pub command: Option<ShellBody>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ArgInstruction {
+    pub name: String,
+    pub default: Option<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -342,6 +349,7 @@ fn parse_instruction(
             run: None,
             copy: None,
             healthcheck: None,
+            arg: None,
             line,
             raw_span,
             raw: raw.to_string(),
@@ -374,6 +382,7 @@ fn parse_instruction(
         matches!(keyword.as_str(), "COPY" | "ADD").then(|| parse_copy(&keyword, &args, &flags));
     let healthcheck = (keyword == "HEALTHCHECK")
         .then(|| parse_healthcheck(&args, args_start, &flags, source_file));
+    let arg = (keyword == "ARG").then(|| parse_arg(&args)).flatten();
     let heredocs = parse_heredocs(raw, start_byte, &keyword, source_file)?;
 
     Ok(Some(Instruction {
@@ -390,6 +399,7 @@ fn parse_instruction(
         run,
         copy,
         healthcheck,
+        arg,
         line,
         raw_span,
         raw: raw.to_string(),
@@ -412,6 +422,20 @@ fn parse_healthcheck(
         flags: flags.to_vec(),
         command,
     }
+}
+
+fn parse_arg(args: &str) -> Option<ArgInstruction> {
+    let trimmed = args.trim();
+    if trimmed.is_empty() {
+        return None;
+    }
+    let (name, default) = trimmed
+        .split_once('=')
+        .map_or((trimmed, None), |(name, value)| (name, Some(value)));
+    Some(ArgInstruction {
+        name: name.to_string(),
+        default: default.map(str::to_string),
+    })
 }
 
 fn parse_run(

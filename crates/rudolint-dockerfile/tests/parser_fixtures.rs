@@ -21,6 +21,7 @@ fn snapshots_parser_matrix() {
         ("windows_escape", "parser/windows-escape/Dockerfile"),
         ("json_form", "parser/json-form/Dockerfile"),
         ("invalid_json_form", "parser/invalid-json-form/Dockerfile"),
+        ("arg", "parser/arg/Dockerfile"),
         ("healthcheck", "parser/healthcheck/Dockerfile"),
         ("run_mount", "parser/run-mount/Dockerfile"),
         ("from_platform", "parser/from-platform/Dockerfile"),
@@ -153,6 +154,12 @@ fn instruction_json(instruction: &Instruction) -> Value {
                         "span": command.span,
                     })
                 }),
+            })
+        }),
+        "arg": instruction.arg.as_ref().map(|arg| {
+            json!({
+                "name": arg.name,
+                "default": arg.default,
             })
         }),
         "line": instruction.line,
