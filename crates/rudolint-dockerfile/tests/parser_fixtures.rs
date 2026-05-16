@@ -52,6 +52,13 @@ fn document_json(document: &Dockerfile) -> Value {
                 "line": check.line,
             })
         }).collect::<Vec<_>>(),
+        "comments": document.comments.iter().map(|comment| {
+            json!({
+                "text": comment.text,
+                "line": comment.line,
+                "span": comment.span,
+            })
+        }).collect::<Vec<_>>(),
         "has_buildkit_features": document.has_buildkit_features,
         "instructions": document
             .instructions

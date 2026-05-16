@@ -8,6 +8,7 @@ repository.workspace = true
 
 [dependencies]
 regex.workspace = true
+rudolint-source = { path = "../rudolint-source" }
 
 [dev-dependencies]
 insta.workspace = true

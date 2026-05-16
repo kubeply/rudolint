@@ -1,6 +1,7 @@
 use std::fmt;
 
 use regex::Regex;
+use rudolint_source::{SourceFile, Span};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Dockerfile {
@@ -9,6 +10,7 @@ pub struct Dockerfile {
     pub escape: Option<EscapeDirective>,
     /// Dockerfile `# check=` parser directives, in source order.
     pub checks: Vec<CheckDirective>,
+    pub comments: Vec<Comment>,
     pub instructions: Vec<Instruction>,
     pub has_buildkit_features: bool,
 }
@@ -35,6 +37,13 @@ pub struct CheckDirective {
     pub value: String,
     /// One-based source line where the directive appears.
     pub line: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Comment {
+    pub text: String,
+    pub line: usize,
+    pub span: Span,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -68,22 +77,36 @@ impl fmt::Display for ParserError {
 impl std::error::Error for ParserError {}
 
 pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
+    let source_file = SourceFile::new("Dockerfile", source);
     let mut syntax = None;
     let mut escape = None;
     let mut checks = Vec::new();
+    let mut comments = Vec::new();
     let mut instructions = Vec::new();
     let mut current = String::new();
     let mut start_line = 0;
+    let mut byte_offset = 0;
 
-    for (index, line) in source.lines().enumerate() {
+    for (index, segment) in source.split_inclusive('\n').enumerate() {
         let line_number = index + 1;
+        let line = segment
+            .strip_suffix('\n')
+            .unwrap_or(segment)
+            .strip_suffix('\r')
+            .unwrap_or_else(|| segment.strip_suffix('\n').unwrap_or(segment));
         let trimmed = line.trim();
 
         if current.is_empty() {
             if trimmed.is_empty() {
+                byte_offset += segment.len();
                 continue;
             }
             if trimmed.starts_with('#') {
+                comments.push(Comment {
+                    text: trimmed.to_string(),
+                    line: line_number,
+                    span: source_file.span(byte_offset, byte_offset + line.len()),
+                });
                 if let Some(value) = directive_value(trimmed, "syntax") {
                     syntax = Some(SyntaxDirective {
                         image: value.trim().to_string(),
@@ -102,6 +125,7 @@ pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
                         line: line_number,
                     });
                 }
+                byte_offset += segment.len();
                 continue;
             }
             start_line = line_number;
@@ -113,6 +137,7 @@ pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
         current.push_str(line);
 
         if continues(line) {
+            byte_offset += segment.len();
             continue;
         }
 
@@ -120,6 +145,7 @@ pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
             instructions.push(instruction);
         }
         current.clear();
+        byte_offset += segment.len();
     }
 
     if !current.trim().is_empty()
@@ -133,6 +159,7 @@ pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
         syntax,
         escape,
         checks,
+        comments,
         instructions,
         has_buildkit_features,
     })

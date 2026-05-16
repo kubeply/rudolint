@@ -4,6 +4,20 @@ expression: document_json(&document)
 ---
 {
   "checks": [],
+  "comments": [
+    {
+      "line": 1,
+      "span": {
+        "end_byte": 30,
+        "end_column": 31,
+        "end_line": 1,
+        "start_byte": 0,
+        "start_column": 1,
+        "start_line": 1
+      },
+      "text": "# syntax=docker/dockerfile:1.7"
+    }
+  ],
   "escape": null,
   "has_buildkit_features": true,
   "instructions": [
