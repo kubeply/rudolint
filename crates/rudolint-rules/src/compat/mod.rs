@@ -17,6 +17,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(NoSudo),
         Box::new(ExplicitFromTag),
         Box::new(NoLatestTag),
+        Box::new(PinAptGetInstallVersions),
         Box::new(ValidExposePort),
         Box::new(SingleHealthcheck),
         Box::new(PreferCopy),
@@ -321,6 +322,36 @@ impl Rule for NoLatestTag {
                     "RDL3007",
                     Severity::Warning,
                     "avoid mutable latest base image tags",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+rule_metadata!(
+    PinAptGetInstallVersions,
+    "RDL3008",
+    "pin-apt-get-install-versions",
+    Severity::Warning,
+    "pin versions in apt-get install"
+);
+
+impl Rule for PinAptGetInstallVersions {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        doc.instructions
+            .iter()
+            .filter(|instruction| instruction.keyword == "RUN")
+            .filter(|instruction| apt_get_install_has_unpinned_packages(&instruction.args))
+            .map(|instruction| {
+                diagnostic(
+                    "RDL3008",
+                    Severity::Warning,
+                    "pin versions in apt-get install",
                     instruction,
                 )
             })
@@ -670,14 +701,36 @@ fn is_archive_source(source: &str) -> bool {
     .any(|suffix| source.ends_with(suffix))
 }
 
+fn apt_get_install_has_unpinned_packages(shell: &str) -> bool {
+    detect_command_invocations(shell)
+        .into_iter()
+        .filter(|invocation| invocation.command == "apt-get")
+        .any(|invocation| {
+            let Some(install_index) = invocation
+                .arguments
+                .iter()
+                .position(|argument| argument == "install")
+            else {
+                return false;
+            };
+
+            invocation
+                .arguments
+                .iter()
+                .skip(install_index + 1)
+                .filter(|argument| !argument.starts_with('-'))
+                .any(|package| !package.contains('='))
+        })
+}
+
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3008", "RDL3009", "RDL3010", "RDL3013", "RDL3014", "RDL3015", "RDL3016", "RDL3018",
-        "RDL3019", "RDL3021", "RDL3022", "RDL3023", "RDL3026", "RDL3027", "RDL3028", "RDL3029",
-        "RDL3030", "RDL3032", "RDL3033", "RDL3034", "RDL3035", "RDL3036", "RDL3037", "RDL3038",
-        "RDL3040", "RDL3041", "RDL3042", "RDL3043", "RDL3044", "RDL3045", "RDL3046", "RDL3047",
-        "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053", "RDL3054", "RDL3055",
-        "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063",
-        "RDL4001", "RDL4005", "RDL4006",
+        "RDL3009", "RDL3010", "RDL3013", "RDL3014", "RDL3015", "RDL3016", "RDL3018", "RDL3019",
+        "RDL3021", "RDL3022", "RDL3023", "RDL3026", "RDL3027", "RDL3028", "RDL3029", "RDL3030",
+        "RDL3032", "RDL3033", "RDL3034", "RDL3035", "RDL3036", "RDL3037", "RDL3038", "RDL3040",
+        "RDL3041", "RDL3042", "RDL3043", "RDL3044", "RDL3045", "RDL3046", "RDL3047", "RDL3048",
+        "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053", "RDL3054", "RDL3055", "RDL3056",
+        "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001",
+        "RDL4005", "RDL4006",
     ]
 }

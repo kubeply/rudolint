@@ -76,6 +76,12 @@ expression: normalized_json(&output)
     "summary": "reject latest base image tags"
   },
   {
+    "code": "RDL3008",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "pin versions in apt-get install"
+  },
+  {
     "code": "RDL3011",
     "severity": "error",
     "status": "implemented",
