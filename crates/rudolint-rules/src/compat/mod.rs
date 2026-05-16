@@ -67,6 +67,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(MissingHealthcheck),
         Box::new(ValidEmailLabels),
         Box::new(ConsecutiveRun),
+        Box::new(YarnCacheClean),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -2188,6 +2189,37 @@ impl Rule for ConsecutiveRun {
 }
 
 rule_metadata!(
+    YarnCacheClean,
+    "RDL3060",
+    "yarn-cache-clean",
+    Severity::Info,
+    "clean yarn cache after yarn install"
+);
+
+impl Rule for YarnCacheClean {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        doc.instructions
+            .iter()
+            .filter(|instruction| {
+                instruction.keyword == "RUN" && yarn_install_missing_cache_clean(instruction)
+            })
+            .map(|instruction| {
+                diagnostic(
+                    "RDL3060",
+                    Severity::Info,
+                    "`yarn cache clean` missing after `yarn install` was run",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -2976,6 +3008,64 @@ fn shell_command_count(instruction: &Instruction) -> usize {
         .as_ref()
         .and_then(|run| run.shell.as_ref())
         .map_or(0, |shell| detect_command_invocations(&shell.text).len())
+}
+
+fn yarn_install_missing_cache_clean(instruction: &Instruction) -> bool {
+    if has_yarn_cache_mount(instruction) {
+        return false;
+    }
+
+    let Some(shell) = instruction.run.as_ref().and_then(|run| run.shell.as_ref()) else {
+        return false;
+    };
+
+    let invocations = detect_command_invocations(&shell.text);
+    invocations
+        .iter()
+        .enumerate()
+        .filter(|(_, invocation)| command_has_args(invocation, "yarn", &["install"]))
+        .any(|(install_index, _)| {
+            !invocations
+                .iter()
+                .enumerate()
+                .any(|(clean_index, invocation)| {
+                    clean_index > install_index
+                        && command_has_args(invocation, "yarn", &["cache", "clean"])
+                })
+        })
+}
+
+fn command_has_args(
+    invocation: &rudolint_shell::ShellCommandInvocation,
+    command: &str,
+    expected: &[&str],
+) -> bool {
+    if expected.is_empty() {
+        return invocation.command == command;
+    }
+
+    invocation.command == command
+        && invocation.arguments.windows(expected.len()).any(|window| {
+            window
+                .iter()
+                .map(String::as_str)
+                .eq(expected.iter().copied())
+        })
+}
+
+fn has_yarn_cache_mount(instruction: &Instruction) -> bool {
+    instruction.mounts.iter().any(|mount| {
+        matches!(mount.mount_type.as_str(), "cache" | "tmpfs")
+            && mount
+                .options
+                .iter()
+                .any(|(name, value)| name == "target" && is_yarn_cache_target(value))
+    })
+}
+
+fn is_yarn_cache_target(value: &str) -> bool {
+    let target = value.trim_end_matches('/');
+    target == ".cache/yarn" || target.ends_with("/.cache/yarn") || target.contains("/.cache/yarn/")
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -3974,6 +4064,6 @@ fn dnf_install_has_unpinned_packages(shell: &str) -> bool {
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
+        "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
     ]
 }

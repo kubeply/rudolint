@@ -676,6 +676,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3060",
+    "default_severity": "info",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3060.md",
+    "fix": "none",
+    "name": "yarn-cache-clean",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "clean yarn cache after yarn install"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL4000",
     "default_severity": "error",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4000.md",
