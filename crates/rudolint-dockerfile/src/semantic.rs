@@ -63,18 +63,27 @@ pub struct CopyOperation {
     pub from: Option<String>,
 }
 
+/// Multi-platform build configuration extracted from a Dockerfile.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct MultiPlatformFacts {
+    /// Global `TARGETPLATFORM` ARG default, if declared before the first stage.
     pub targetplatform: Option<String>,
+    /// Global `BUILDPLATFORM` ARG default, if declared before the first stage.
     pub buildplatform: Option<String>,
+    /// Global `TARGETARCH` ARG value, if declared or inferred.
     pub targetarch: Option<String>,
+    /// Global `TARGETOS` ARG value, if declared or inferred.
     pub targetos: Option<String>,
+    /// Per-stage platform overrides from `FROM --platform=...` declarations.
     pub stage_platforms: Vec<StagePlatform>,
 }
 
+/// Platform override declared for a Dockerfile stage.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct StagePlatform {
+    /// Zero-based Dockerfile stage number.
     pub stage_index: usize,
+    /// Platform string passed to the `FROM --platform=` flag.
     pub platform: String,
 }
 
@@ -218,6 +227,7 @@ pub fn multi_platform_facts(document: &Dockerfile) -> MultiPlatformFacts {
         arg_scopes
             .global
             .iter()
+            .rev()
             .find(|arg| arg.name == name)
             .and_then(|arg| arg.default.clone())
     };

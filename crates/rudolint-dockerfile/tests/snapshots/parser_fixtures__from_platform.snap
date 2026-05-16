@@ -10,13 +10,13 @@ expression: document_json(&document)
   "instructions": [
     {
       "arg": {
-        "default": "linux/amd64",
+        "default": "linux/386",
         "name": "TARGETPLATFORM"
       },
-      "args": "TARGETPLATFORM=linux/amd64",
+      "args": "TARGETPLATFORM=linux/386",
       "args_span": {
-        "end_byte": 30,
-        "end_column": 31,
+        "end_byte": 28,
+        "end_column": 29,
         "end_line": 1,
         "start_byte": 4,
         "start_column": 5,
@@ -30,14 +30,14 @@ expression: document_json(&document)
       "form": {
         "kind": "shell",
         "span": {
-          "end_byte": 30,
-          "end_column": 31,
+          "end_byte": 28,
+          "end_column": 29,
           "end_line": 1,
           "start_byte": 4,
           "start_column": 5,
           "start_line": 1
         },
-        "text": "TARGETPLATFORM=linux/amd64"
+        "text": "TARGETPLATFORM=linux/386"
       },
       "from": null,
       "healthcheck": null,
@@ -54,12 +54,68 @@ expression: document_json(&document)
       "line": 1,
       "mounts": [],
       "raw_span": {
-        "end_byte": 30,
-        "end_column": 31,
+        "end_byte": 28,
+        "end_column": 29,
         "end_line": 1,
         "start_byte": 0,
         "start_column": 1,
         "start_line": 1
+      },
+      "recovery": null,
+      "run": null
+    },
+    {
+      "arg": {
+        "default": "linux/amd64",
+        "name": "TARGETPLATFORM"
+      },
+      "args": "TARGETPLATFORM=linux/amd64",
+      "args_span": {
+        "end_byte": 59,
+        "end_column": 31,
+        "end_line": 2,
+        "start_byte": 33,
+        "start_column": 5,
+        "start_line": 2
+      },
+      "continuations": [],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 59,
+          "end_column": 31,
+          "end_line": 2,
+          "start_byte": 33,
+          "start_column": 5,
+          "start_line": 2
+        },
+        "text": "TARGETPLATFORM=linux/amd64"
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "ARG",
+      "keyword_span": {
+        "end_byte": 32,
+        "end_column": 4,
+        "end_line": 2,
+        "start_byte": 29,
+        "start_column": 1,
+        "start_line": 2
+      },
+      "line": 2,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 59,
+        "end_column": 31,
+        "end_line": 2,
+        "start_byte": 29,
+        "start_column": 1,
+        "start_line": 2
       },
       "recovery": null,
       "run": null
@@ -71,12 +127,12 @@ expression: document_json(&document)
       },
       "args": "BUILDPLATFORM=linux/arm64",
       "args_span": {
-        "end_byte": 60,
+        "end_byte": 89,
         "end_column": 30,
-        "end_line": 2,
-        "start_byte": 35,
+        "end_line": 3,
+        "start_byte": 64,
         "start_column": 5,
-        "start_line": 2
+        "start_line": 3
       },
       "continuations": [],
       "copy": null,
@@ -86,12 +142,12 @@ expression: document_json(&document)
       "form": {
         "kind": "shell",
         "span": {
-          "end_byte": 60,
+          "end_byte": 89,
           "end_column": 30,
-          "end_line": 2,
-          "start_byte": 35,
+          "end_line": 3,
+          "start_byte": 64,
           "start_column": 5,
-          "start_line": 2
+          "start_line": 3
         },
         "text": "BUILDPLATFORM=linux/arm64"
       },
@@ -100,22 +156,22 @@ expression: document_json(&document)
       "heredocs": [],
       "keyword": "ARG",
       "keyword_span": {
-        "end_byte": 34,
+        "end_byte": 63,
         "end_column": 4,
-        "end_line": 2,
-        "start_byte": 31,
+        "end_line": 3,
+        "start_byte": 60,
         "start_column": 1,
-        "start_line": 2
+        "start_line": 3
       },
-      "line": 2,
+      "line": 3,
       "mounts": [],
       "raw_span": {
-        "end_byte": 60,
+        "end_byte": 89,
         "end_column": 30,
-        "end_line": 2,
-        "start_byte": 31,
+        "end_line": 3,
+        "start_byte": 60,
         "start_column": 1,
-        "start_line": 2
+        "start_line": 3
       },
       "recovery": null,
       "run": null
@@ -127,12 +183,12 @@ expression: document_json(&document)
       },
       "args": "TARGETARCH=amd64",
       "args_span": {
-        "end_byte": 81,
+        "end_byte": 110,
         "end_column": 21,
-        "end_line": 3,
-        "start_byte": 65,
+        "end_line": 4,
+        "start_byte": 94,
         "start_column": 5,
-        "start_line": 3
+        "start_line": 4
       },
       "continuations": [],
       "copy": null,
@@ -142,12 +198,12 @@ expression: document_json(&document)
       "form": {
         "kind": "shell",
         "span": {
-          "end_byte": 81,
+          "end_byte": 110,
           "end_column": 21,
-          "end_line": 3,
-          "start_byte": 65,
+          "end_line": 4,
+          "start_byte": 94,
           "start_column": 5,
-          "start_line": 3
+          "start_line": 4
         },
         "text": "TARGETARCH=amd64"
       },
@@ -156,22 +212,22 @@ expression: document_json(&document)
       "heredocs": [],
       "keyword": "ARG",
       "keyword_span": {
-        "end_byte": 64,
+        "end_byte": 93,
         "end_column": 4,
-        "end_line": 3,
-        "start_byte": 61,
+        "end_line": 4,
+        "start_byte": 90,
         "start_column": 1,
-        "start_line": 3
+        "start_line": 4
       },
-      "line": 3,
+      "line": 4,
       "mounts": [],
       "raw_span": {
-        "end_byte": 81,
+        "end_byte": 110,
         "end_column": 21,
-        "end_line": 3,
-        "start_byte": 61,
+        "end_line": 4,
+        "start_byte": 90,
         "start_column": 1,
-        "start_line": 3
+        "start_line": 4
       },
       "recovery": null,
       "run": null
@@ -183,12 +239,12 @@ expression: document_json(&document)
       },
       "args": "TARGETOS=linux",
       "args_span": {
-        "end_byte": 100,
+        "end_byte": 129,
         "end_column": 19,
-        "end_line": 4,
-        "start_byte": 86,
+        "end_line": 5,
+        "start_byte": 115,
         "start_column": 5,
-        "start_line": 4
+        "start_line": 5
       },
       "continuations": [],
       "copy": null,
@@ -198,12 +254,12 @@ expression: document_json(&document)
       "form": {
         "kind": "shell",
         "span": {
-          "end_byte": 100,
+          "end_byte": 129,
           "end_column": 19,
-          "end_line": 4,
-          "start_byte": 86,
+          "end_line": 5,
+          "start_byte": 115,
           "start_column": 5,
-          "start_line": 4
+          "start_line": 5
         },
         "text": "TARGETOS=linux"
       },
@@ -212,22 +268,22 @@ expression: document_json(&document)
       "heredocs": [],
       "keyword": "ARG",
       "keyword_span": {
-        "end_byte": 85,
+        "end_byte": 114,
         "end_column": 4,
-        "end_line": 4,
-        "start_byte": 82,
+        "end_line": 5,
+        "start_byte": 111,
         "start_column": 1,
-        "start_line": 4
+        "start_line": 5
       },
-      "line": 4,
+      "line": 5,
       "mounts": [],
       "raw_span": {
-        "end_byte": 100,
+        "end_byte": 129,
         "end_column": 19,
-        "end_line": 4,
-        "start_byte": 82,
+        "end_line": 5,
+        "start_byte": 111,
         "start_column": 1,
-        "start_line": 4
+        "start_line": 5
       },
       "recovery": null,
       "run": null
@@ -236,12 +292,12 @@ expression: document_json(&document)
       "arg": null,
       "args": "--platform=$BUILDPLATFORM alpine:3.20 AS build",
       "args_span": {
-        "end_byte": 152,
+        "end_byte": 181,
         "end_column": 52,
-        "end_line": 5,
-        "start_byte": 106,
+        "end_line": 6,
+        "start_byte": 135,
         "start_column": 6,
-        "start_line": 5
+        "start_line": 6
       },
       "continuations": [],
       "copy": null,
@@ -256,12 +312,12 @@ expression: document_json(&document)
       "form": {
         "kind": "shell",
         "span": {
-          "end_byte": 152,
+          "end_byte": 181,
           "end_column": 52,
-          "end_line": 5,
-          "start_byte": 106,
+          "end_line": 6,
+          "start_byte": 135,
           "start_column": 6,
-          "start_line": 5
+          "start_line": 6
         },
         "text": "--platform=$BUILDPLATFORM alpine:3.20 AS build"
       },
@@ -281,22 +337,22 @@ expression: document_json(&document)
       "heredocs": [],
       "keyword": "FROM",
       "keyword_span": {
-        "end_byte": 105,
+        "end_byte": 134,
         "end_column": 5,
-        "end_line": 5,
-        "start_byte": 101,
+        "end_line": 6,
+        "start_byte": 130,
         "start_column": 1,
-        "start_line": 5
+        "start_line": 6
       },
-      "line": 5,
+      "line": 6,
       "mounts": [],
       "raw_span": {
-        "end_byte": 152,
+        "end_byte": 181,
         "end_column": 52,
-        "end_line": 5,
-        "start_byte": 101,
+        "end_line": 6,
+        "start_byte": 130,
         "start_column": 1,
-        "start_line": 5
+        "start_line": 6
       },
       "recovery": null,
       "run": null
@@ -305,12 +361,12 @@ expression: document_json(&document)
       "arg": null,
       "args": "--platform=$TARGETPLATFORM scratch@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       "args_span": {
-        "end_byte": 264,
+        "end_byte": 293,
         "end_column": 112,
-        "end_line": 6,
-        "start_byte": 158,
+        "end_line": 7,
+        "start_byte": 187,
         "start_column": 6,
-        "start_line": 6
+        "start_line": 7
       },
       "continuations": [],
       "copy": null,
@@ -325,12 +381,12 @@ expression: document_json(&document)
       "form": {
         "kind": "shell",
         "span": {
-          "end_byte": 264,
+          "end_byte": 293,
           "end_column": 112,
-          "end_line": 6,
-          "start_byte": 158,
+          "end_line": 7,
+          "start_byte": 187,
           "start_column": 6,
-          "start_line": 6
+          "start_line": 7
         },
         "text": "--platform=$TARGETPLATFORM scratch@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
       },
@@ -350,22 +406,22 @@ expression: document_json(&document)
       "heredocs": [],
       "keyword": "FROM",
       "keyword_span": {
-        "end_byte": 157,
+        "end_byte": 186,
         "end_column": 5,
-        "end_line": 6,
-        "start_byte": 153,
+        "end_line": 7,
+        "start_byte": 182,
         "start_column": 1,
-        "start_line": 6
+        "start_line": 7
       },
-      "line": 6,
+      "line": 7,
       "mounts": [],
       "raw_span": {
-        "end_byte": 264,
+        "end_byte": 293,
         "end_column": 112,
-        "end_line": 6,
-        "start_byte": 153,
+        "end_line": 7,
+        "start_byte": 182,
         "start_column": 1,
-        "start_line": 6
+        "start_line": 7
       },
       "recovery": null,
       "run": null
