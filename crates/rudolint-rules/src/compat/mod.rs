@@ -25,6 +25,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(PinPipVersions),
         Box::new(AptGetInstallAssumeYes),
         Box::new(AptGetNoInstallRecommends),
+        Box::new(PinNpmVersions),
         Box::new(PreferCopy),
         Box::new(UniqueStageNames),
         Box::new(JsonEntrypoints),
@@ -582,6 +583,36 @@ impl Rule for AptGetNoInstallRecommends {
 }
 
 rule_metadata!(
+    PinNpmVersions,
+    "RDL3016",
+    "pin-npm-versions",
+    Severity::Warning,
+    "pin versions in npm install"
+);
+
+impl Rule for PinNpmVersions {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        doc.instructions
+            .iter()
+            .filter(|instruction| instruction.keyword == "RUN")
+            .filter(|instruction| npm_install_has_unpinned_packages(&instruction.args))
+            .map(|instruction| {
+                diagnostic(
+                    "RDL3016",
+                    Severity::Warning,
+                    "pin versions in npm install",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+rule_metadata!(
     PreferCopy,
     "RDL3020",
     "prefer-copy",
@@ -1081,13 +1112,116 @@ fn apt_get_subcommand_index(arguments: &[String]) -> Option<usize> {
     None
 }
 
+fn npm_install_has_unpinned_packages(shell: &str) -> bool {
+    detect_command_invocations(shell)
+        .into_iter()
+        .filter(|invocation| invocation.command == "npm")
+        .any(|invocation| {
+            let Some(install_index) = npm_subcommand_index(&invocation.arguments) else {
+                return false;
+            };
+            if !matches!(
+                invocation.arguments[install_index].as_str(),
+                "install" | "i" | "add"
+            ) {
+                return false;
+            }
+
+            let mut expect_option_value = false;
+            for argument in invocation.arguments.iter().skip(install_index + 1) {
+                if argument == "\\" {
+                    continue;
+                }
+
+                if expect_option_value {
+                    expect_option_value = false;
+                    continue;
+                }
+
+                if npm_install_option_takes_value(argument) {
+                    expect_option_value = true;
+                    continue;
+                }
+
+                if argument.starts_with('-') {
+                    continue;
+                }
+
+                if argument.contains("://") || argument.starts_with("git+") {
+                    continue;
+                }
+
+                if !npm_package_has_version(argument) {
+                    return true;
+                }
+            }
+
+            false
+        })
+}
+
+fn npm_package_has_version(package: &str) -> bool {
+    let search_start = usize::from(package.starts_with('@'));
+    package[search_start..]
+        .rfind('@')
+        .is_some_and(|index| search_start + index + 1 < package.len())
+}
+
+fn npm_subcommand_index(arguments: &[String]) -> Option<usize> {
+    let mut expect_option_value = false;
+    for (index, argument) in arguments.iter().enumerate() {
+        if argument == "\\" {
+            continue;
+        }
+
+        if expect_option_value {
+            expect_option_value = false;
+            continue;
+        }
+
+        if npm_install_option_takes_value(argument) {
+            expect_option_value = true;
+            continue;
+        }
+
+        if argument.starts_with('-') {
+            continue;
+        }
+
+        return Some(index);
+    }
+
+    None
+}
+
+fn npm_install_option_takes_value(argument: &str) -> bool {
+    matches!(
+        argument,
+        "-w" | "--workspace"
+            | "--registry"
+            | "--scope"
+            | "--cache"
+            | "--globalconfig"
+            | "--init-module"
+            | "--install-strategy"
+            | "--local-address"
+            | "--loglevel"
+            | "--omit"
+            | "--only"
+            | "--prefix"
+            | "--save-prefix"
+            | "--tag"
+            | "--userconfig"
+    )
+}
+
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3016", "RDL3018", "RDL3019", "RDL3021", "RDL3022", "RDL3023", "RDL3026", "RDL3027",
-        "RDL3028", "RDL3029", "RDL3030", "RDL3032", "RDL3033", "RDL3034", "RDL3035", "RDL3036",
-        "RDL3037", "RDL3038", "RDL3040", "RDL3041", "RDL3042", "RDL3043", "RDL3044", "RDL3045",
-        "RDL3046", "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053",
-        "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061",
-        "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
+        "RDL3018", "RDL3019", "RDL3021", "RDL3022", "RDL3023", "RDL3026", "RDL3027", "RDL3028",
+        "RDL3029", "RDL3030", "RDL3032", "RDL3033", "RDL3034", "RDL3035", "RDL3036", "RDL3037",
+        "RDL3038", "RDL3040", "RDL3041", "RDL3042", "RDL3043", "RDL3044", "RDL3045", "RDL3046",
+        "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053", "RDL3054",
+        "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062",
+        "RDL3063", "RDL4001", "RDL4005", "RDL4006",
     ]
 }

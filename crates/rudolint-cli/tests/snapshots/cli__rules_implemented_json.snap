@@ -124,6 +124,12 @@ expression: normalized_json(&output)
     "summary": "avoid recommended packages in apt-get install"
   },
   {
+    "code": "RDL3016",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "pin versions in npm install"
+  },
+  {
     "code": "RDL3020",
     "severity": "error",
     "status": "implemented",

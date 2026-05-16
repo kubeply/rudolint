@@ -225,6 +225,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3016",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3016.md",
+    "fix": "none",
+    "name": "pin-npm-versions",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "pin versions in npm install"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL3020",
     "default_severity": "error",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3020.md",

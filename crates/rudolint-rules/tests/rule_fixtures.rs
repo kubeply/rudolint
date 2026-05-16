@@ -347,6 +347,22 @@ fn snapshots_rdl3015_apt_get_no_install_recommends_fixture() {
 }
 
 #[test]
+fn snapshots_rdl3016_pin_npm_versions_fixture() {
+    let source = read_fixture("rules/RDL3016.pin-npm-versions/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDL3016")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdl3016_pin_npm_versions_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rdl3020_prefer_copy_fixture() {
     let source = read_fixture("rules/RDL3020.prefer-copy/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
