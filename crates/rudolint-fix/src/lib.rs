@@ -5,9 +5,55 @@ use std::fmt::Write;
 use rudolint_source::SourceSpan;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Fix {
+pub struct TextEdit {
     pub span: SourceSpan,
-    pub replacement: String,
+    pub kind: EditKind,
+}
+
+impl TextEdit {
+    pub fn replace(span: SourceSpan, replacement: impl Into<String>) -> Self {
+        Self {
+            span,
+            kind: EditKind::Replace {
+                replacement: replacement.into(),
+            },
+        }
+    }
+
+    pub fn insert(line: usize, column: usize, content: impl Into<String>) -> Self {
+        Self {
+            span: SourceSpan {
+                line,
+                column,
+                length: 0,
+            },
+            kind: EditKind::Insert {
+                content: content.into(),
+            },
+        }
+    }
+
+    pub fn delete(span: SourceSpan) -> Self {
+        Self {
+            span,
+            kind: EditKind::Delete,
+        }
+    }
+
+    pub fn replacement_text(&self) -> &str {
+        match &self.kind {
+            EditKind::Replace { replacement } => replacement,
+            EditKind::Insert { content } => content,
+            EditKind::Delete => "",
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum EditKind {
+    Replace { replacement: String },
+    Insert { content: String },
+    Delete,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -21,7 +67,7 @@ pub enum FixApplicability {
 pub struct FixPreview {
     pub title: String,
     pub applicability: FixApplicability,
-    pub edits: Vec<Fix>,
+    pub edits: Vec<TextEdit>,
 }
 
 impl FixPreview {
@@ -42,11 +88,29 @@ impl FixPreview {
         }
         let _ = writeln!(output, "edits:");
         for edit in &self.edits {
-            let _ = writeln!(
-                output,
-                "- line: {}, column: {}, length: {}, replacement: {:?}",
-                edit.span.line, edit.span.column, edit.span.length, edit.replacement
-            );
+            match &edit.kind {
+                EditKind::Replace { replacement } => {
+                    let _ = writeln!(
+                        output,
+                        "- replace: line {}, column {}, length {}, with {:?}",
+                        edit.span.line, edit.span.column, edit.span.length, replacement
+                    );
+                }
+                EditKind::Insert { content } => {
+                    let _ = writeln!(
+                        output,
+                        "- insert: line {}, column {}, content {:?}",
+                        edit.span.line, edit.span.column, content
+                    );
+                }
+                EditKind::Delete => {
+                    let _ = writeln!(
+                        output,
+                        "- delete: line {}, column {}, length {}",
+                        edit.span.line, edit.span.column, edit.span.length
+                    );
+                }
+            }
         }
         output
     }
@@ -61,17 +125,43 @@ mod tests {
         let preview = FixPreview {
             title: "replace latest tag".to_string(),
             applicability: FixApplicability::Safe,
-            edits: vec![Fix {
-                span: SourceSpan {
+            edits: vec![TextEdit::replace(
+                SourceSpan {
                     line: 1,
                     column: 13,
                     length: 6,
                 },
-                replacement: "3.20".to_string(),
-            }],
+                "3.20",
+            )],
         };
 
         insta::assert_snapshot!("safe_fix_preview", preview.render());
+    }
+
+    #[test]
+    fn snapshots_edit_primitives() {
+        let preview = FixPreview {
+            title: "edit primitive matrix".to_string(),
+            applicability: FixApplicability::Manual,
+            edits: vec![
+                TextEdit::replace(
+                    SourceSpan {
+                        line: 1,
+                        column: 6,
+                        length: 6,
+                    },
+                    "3.20",
+                ),
+                TextEdit::insert(1, 1, "# syntax=docker/dockerfile:1\n"),
+                TextEdit::delete(SourceSpan {
+                    line: 4,
+                    column: 1,
+                    length: 12,
+                }),
+            ],
+        };
+
+        insta::assert_snapshot!("edit_primitives", preview.render());
     }
 
     #[test]
