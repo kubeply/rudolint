@@ -1,0 +1,20 @@
+---
+source: crates/rudolint-dockerfile/tests/semantic.rs
+expression: "json!({\n    \"targetplatform\": facts.targetplatform, \"buildplatform\":\n    facts.buildplatform, \"targetarch\": facts.targetarch, \"targetos\":\n    facts.targetos, \"stage_platforms\":\n    facts.stage_platforms.iter().map(|platform|\n    {\n        json!({\n            \"stage_index\": platform.stage_index, \"platform\":\n            platform.platform,\n        })\n    }).collect::<Vec<_>>(),\n})"
+---
+{
+  "buildplatform": "linux/arm64",
+  "stage_platforms": [
+    {
+      "platform": "$BUILDPLATFORM",
+      "stage_index": 0
+    },
+    {
+      "platform": "$TARGETPLATFORM",
+      "stage_index": 1
+    }
+  ],
+  "targetarch": "amd64",
+  "targetos": "linux",
+  "targetplatform": "linux/amd64"
+}
