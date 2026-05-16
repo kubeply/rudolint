@@ -69,6 +69,10 @@ pub struct CheckArgs {
     /// Suppress diagnostic output while preserving exit status.
     #[arg(long)]
     pub quiet: bool,
+
+    /// Print a short run summary to stderr.
+    #[arg(long)]
+    pub verbose: bool,
 }
 
 impl Default for CheckArgs {
@@ -83,6 +87,7 @@ impl Default for CheckArgs {
             exit_zero: false,
             stdin_filename: PathBuf::from("<stdin>"),
             quiet: false,
+            verbose: false,
         }
     }
 }

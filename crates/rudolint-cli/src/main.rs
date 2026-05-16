@@ -79,6 +79,7 @@ fn run_check(args: cli::CheckArgs) -> Result<ExitCode, AppError> {
     };
     let engine = RuleEngine::new(args.profile, config);
     let inputs = resolve_inputs(&args.paths)?;
+    let input_count = if inputs.is_empty() { 1 } else { inputs.len() };
     let mut findings = Vec::new();
 
     if inputs.is_empty() {
@@ -107,6 +108,13 @@ fn run_check(args: cli::CheckArgs) -> Result<ExitCode, AppError> {
             })?,
         };
         print!("{rendered}");
+    }
+
+    if args.verbose {
+        eprintln!(
+            "checked {input_count} Dockerfile(s), emitted {} finding(s)",
+            findings.len()
+        );
     }
 
     if args.exit_zero {
