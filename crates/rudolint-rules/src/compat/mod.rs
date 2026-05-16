@@ -37,6 +37,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(JsonEntrypoints),
         Box::new(TrustedRegistries),
         Box::new(UseAptGet),
+        Box::new(PinGemVersions),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -981,6 +982,36 @@ impl Rule for UseAptGet {
 }
 
 rule_metadata!(
+    PinGemVersions,
+    "RDL3028",
+    "pin-gem-versions",
+    Severity::Warning,
+    "pin versions in gem install"
+);
+
+impl Rule for PinGemVersions {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        doc.instructions
+            .iter()
+            .filter(|instruction| instruction.keyword == "RUN")
+            .filter(|instruction| gem_install_has_unpinned_packages(&instruction.args))
+            .map(|instruction| {
+                diagnostic(
+                    "RDL3028",
+                    Severity::Warning,
+                    "pin versions in gem install",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -1435,12 +1466,44 @@ fn shell_uses_apt(shell: &str) -> bool {
         .any(|invocation| invocation.command == "apt")
 }
 
+fn gem_install_has_unpinned_packages(shell: &str) -> bool {
+    detect_command_invocations(shell)
+        .into_iter()
+        .filter(|invocation| invocation.command == "gem")
+        .any(|invocation| {
+            let Some(install_index) = invocation
+                .arguments
+                .iter()
+                .position(|argument| argument == "install")
+            else {
+                return false;
+            };
+
+            let arguments = invocation
+                .arguments
+                .iter()
+                .skip(install_index + 1)
+                .collect::<Vec<_>>();
+            if arguments.iter().any(|argument| {
+                matches!(argument.as_str(), "-v" | "--version")
+                    || argument.starts_with("--version=")
+            }) {
+                return false;
+            }
+
+            arguments
+                .into_iter()
+                .filter(|argument| !argument.starts_with('-'))
+                .any(|package| !package.contains(':'))
+        })
+}
+
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3028", "RDL3029", "RDL3030", "RDL3032", "RDL3033", "RDL3034", "RDL3035", "RDL3036",
-        "RDL3037", "RDL3038", "RDL3040", "RDL3041", "RDL3042", "RDL3043", "RDL3044", "RDL3045",
-        "RDL3046", "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053",
-        "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061",
-        "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
+        "RDL3029", "RDL3030", "RDL3032", "RDL3033", "RDL3034", "RDL3035", "RDL3036", "RDL3037",
+        "RDL3038", "RDL3040", "RDL3041", "RDL3042", "RDL3043", "RDL3044", "RDL3045", "RDL3046",
+        "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053", "RDL3054",
+        "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062",
+        "RDL3063", "RDL4001", "RDL4005", "RDL4006",
     ]
 }

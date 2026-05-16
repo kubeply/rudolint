@@ -190,6 +190,12 @@ expression: normalized_json(&output)
     "summary": "prefer apt-get or apt-cache over apt"
   },
   {
+    "code": "RDL3028",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "pin versions in gem install"
+  },
+  {
     "code": "RDL4000",
     "severity": "error",
     "status": "implemented",
