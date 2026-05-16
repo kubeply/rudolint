@@ -709,6 +709,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3063",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3063.md",
+    "fix": "none",
+    "name": "reserved-stage-name",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "avoid reserved stage names"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL4000",
     "default_severity": "error",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4000.md",

@@ -388,6 +388,12 @@ expression: normalized_json(&output)
     "summary": "pin Go package versions"
   },
   {
+    "code": "RDL3063",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "avoid reserved stage names"
+  },
+  {
     "code": "RDL4000",
     "severity": "error",
     "status": "implemented",

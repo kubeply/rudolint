@@ -70,6 +70,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(YarnCacheClean),
         Box::new(InstructionOrder),
         Box::new(PinGoVersions),
+        Box::new(ReservedStageName),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -2235,6 +2236,41 @@ impl Rule for PinGoVersions {
 }
 
 rule_metadata!(
+    ReservedStageName,
+    "RDL3063",
+    "reserved-stage-name",
+    Severity::Warning,
+    "avoid reserved stage names"
+);
+
+impl Rule for ReservedStageName {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        doc.instructions
+            .iter()
+            .filter(|instruction| {
+                instruction
+                    .from
+                    .as_ref()
+                    .and_then(|from| from.alias.as_deref())
+                    .is_some_and(|alias| matches!(alias, "scratch" | "context"))
+            })
+            .map(|instruction| {
+                diagnostic(
+                    "RDL3063",
+                    Severity::Warning,
+                    "stage name should not be a reserved word",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -3557,5 +3593,5 @@ fn dnf_install_has_unpinned_packages(shell: &str) -> bool {
 }
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
-    vec!["RDL3063", "RDL4001", "RDL4005", "RDL4006"]
+    vec!["RDL4001", "RDL4005", "RDL4006"]
 }
