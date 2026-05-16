@@ -10,7 +10,7 @@ use anyhow::Context;
 use clap::Parser;
 use ignore::WalkBuilder;
 
-use crate::cli::{Cli, Command, OutputFormat};
+use crate::cli::{Cli, Command, OutputFormat, RulesOutputFormat};
 use rudolint_config::Config;
 use rudolint_diagnostics::Finding;
 use rudolint_dockerfile::parse_dockerfile;
@@ -140,14 +140,40 @@ fn run_check(args: cli::CheckArgs) -> Result<ExitCode, AppError> {
 
 fn run_rules(args: cli::RulesArgs) -> Result<ExitCode, AppError> {
     let engine = RuleEngine::new(args.profile, Config::default());
-    for rule in engine.catalog() {
-        if args.implemented && rule.status != RuleStatus::Implemented {
-            continue;
+    let rules = engine
+        .catalog()
+        .into_iter()
+        .filter(|rule| !args.implemented || rule.status == RuleStatus::Implemented)
+        .collect::<Vec<_>>();
+
+    match args.format {
+        RulesOutputFormat::Text => {
+            for rule in rules {
+                println!(
+                    "{:<8} {:<8} {:<12} {}",
+                    rule.code, rule.severity, rule.status, rule.summary
+                );
+            }
         }
-        println!(
-            "{:<8} {:<8} {:<12} {}",
-            rule.code, rule.severity, rule.status, rule.summary
-        );
+        RulesOutputFormat::Json => {
+            let rules = rules
+                .into_iter()
+                .map(|rule| {
+                    serde_json::json!({
+                        "code": rule.code,
+                        "severity": rule.severity,
+                        "summary": rule.summary,
+                        "status": rule.status.to_string(),
+                    })
+                })
+                .collect::<Vec<_>>();
+            println!(
+                "{}",
+                serde_json::to_string_pretty(&rules).map_err(|error| {
+                    AppError::internal(format!("failed to render rule catalog JSON: {error}"))
+                })?
+            );
+        }
     }
     Ok(ExitCode::SUCCESS)
 }

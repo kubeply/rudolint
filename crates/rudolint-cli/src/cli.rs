@@ -103,9 +103,19 @@ pub struct RulesArgs {
     #[arg(long, value_enum, default_value_t = Profile::Default)]
     pub profile: Profile,
 
+    /// Output format.
+    #[arg(long, value_enum, default_value_t = RulesOutputFormat::Text)]
+    pub format: RulesOutputFormat,
+
     /// Only show rules implemented in this build.
     #[arg(long)]
     pub implemented: bool,
+}
+
+#[derive(Debug, Clone, Copy, ValueEnum)]
+pub enum RulesOutputFormat {
+    Text,
+    Json,
 }
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
