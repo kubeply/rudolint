@@ -1227,6 +1227,22 @@ fn snapshots_rdl4000_deprecated_maintainer_fixture() {
 }
 
 #[test]
+fn snapshots_rdl4001_either_wget_or_curl_fixture() {
+    let source = read_fixture("rules/RDL4001.either-wget-or-curl/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDL4001")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdl4001_either_wget_or_curl_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rdl4003_cmd_cardinality_fixture() {
     let fixtures = [
         "RDL4003.no-cmd",

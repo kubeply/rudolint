@@ -72,6 +72,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(PinGoVersions),
         Box::new(ReservedStageName),
         Box::new(DeprecatedMaintainer),
+        Box::new(EitherWgetOrCurl),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
     ]
@@ -2382,6 +2383,60 @@ impl Rule for DeprecatedMaintainer {
 }
 
 rule_metadata!(
+    EitherWgetOrCurl,
+    "RDL4001",
+    "either-wget-or-curl",
+    Severity::Warning,
+    "use either wget or curl in a stage"
+);
+
+impl Rule for EitherWgetOrCurl {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        let mut seen_curl = false;
+        let mut seen_wget = false;
+        let mut mixed_tools_reported = false;
+        let mut findings = Vec::new();
+
+        for instruction in &doc.instructions {
+            if instruction.keyword == "FROM" {
+                seen_curl = false;
+                seen_wget = false;
+                mixed_tools_reported = false;
+                continue;
+            }
+
+            if instruction.keyword != "RUN" {
+                continue;
+            }
+
+            let commands = download_commands(instruction);
+            if commands.is_empty() {
+                continue;
+            }
+
+            seen_curl |= commands.contains(&"curl");
+            seen_wget |= commands.contains(&"wget");
+
+            if seen_curl && seen_wget && !mixed_tools_reported {
+                findings.push(diagnostic(
+                    "RDL4001",
+                    Severity::Warning,
+                    "either use wget or curl but not both",
+                    instruction,
+                ));
+                mixed_tools_reported = true;
+            }
+        }
+
+        findings
+    }
+}
+
+rule_metadata!(
     SingleCmd,
     "RDL4003",
     "single-cmd",
@@ -3300,6 +3355,21 @@ fn go_option_takes_value(option: &str) -> bool {
 
 fn go_package_version(package: &str) -> Option<&str> {
     package.rsplit_once('@').map(|(_, version)| version)
+}
+
+fn download_commands(instruction: &Instruction) -> BTreeSet<&'static str> {
+    let Some(shell) = instruction.run.as_ref().and_then(|run| run.shell.as_ref()) else {
+        return BTreeSet::new();
+    };
+
+    detect_command_invocations(&shell.text)
+        .iter()
+        .filter_map(|invocation| match invocation.command.as_str() {
+            "curl" => Some("curl"),
+            "wget" => Some("wget"),
+            _ => None,
+        })
+        .collect()
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -4297,5 +4367,5 @@ fn dnf_install_has_unpinned_packages(shell: &str) -> bool {
 }
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
-    vec!["RDL4001", "RDL4005", "RDL4006"]
+    vec!["RDL4005", "RDL4006"]
 }

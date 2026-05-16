@@ -400,6 +400,12 @@ expression: normalized_json(&output)
     "summary": "reject deprecated MAINTAINER instructions"
   },
   {
+    "code": "RDL4001",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "use either wget or curl in a stage"
+  },
+  {
     "code": "RDL4003",
     "severity": "warning",
     "status": "implemented",

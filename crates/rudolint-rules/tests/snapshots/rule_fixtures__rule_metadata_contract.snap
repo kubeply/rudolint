@@ -731,6 +731,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL4001",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4001.md",
+    "fix": "none",
+    "name": "either-wget-or-curl",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "use either wget or curl in a stage"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL4003",
     "default_severity": "warning",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4003.md",
