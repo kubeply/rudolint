@@ -48,6 +48,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(PinZypperVersions),
         Box::new(DnfInstallAssumeYes),
         Box::new(DnfCleanAll),
+        Box::new(PinDnfVersions),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -1333,6 +1334,36 @@ impl Rule for DnfCleanAll {
 }
 
 rule_metadata!(
+    PinDnfVersions,
+    "RDL3041",
+    "pin-dnf-versions",
+    Severity::Warning,
+    "pin versions in dnf install"
+);
+
+impl Rule for PinDnfVersions {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        doc.instructions
+            .iter()
+            .filter(|instruction| instruction.keyword == "RUN")
+            .filter(|instruction| dnf_install_has_unpinned_packages(&instruction.args))
+            .map(|instruction| {
+                diagnostic(
+                    "RDL3041",
+                    Severity::Warning,
+                    "pin versions in dnf install",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -2435,11 +2466,52 @@ fn dnf_install_missing_clean_all(shell: &str) -> bool {
     last_install_index.is_some() && !has_clean_after_last_install
 }
 
+fn dnf_install_has_unpinned_packages(shell: &str) -> bool {
+    detect_command_invocations(shell)
+        .into_iter()
+        .filter(|invocation| invocation.command == "dnf")
+        .any(|invocation| {
+            let Some(install_index) = dnf_subcommand_index(&invocation.arguments) else {
+                return false;
+            };
+            if invocation.arguments[install_index] != "install" {
+                return false;
+            }
+
+            let mut expect_option_value = false;
+            for argument in invocation.arguments.iter().skip(install_index + 1) {
+                if argument == "\\" {
+                    continue;
+                }
+
+                if expect_option_value {
+                    expect_option_value = false;
+                    continue;
+                }
+
+                if yum_option_takes_value(argument) {
+                    expect_option_value = true;
+                    continue;
+                }
+
+                if argument.starts_with('-') {
+                    continue;
+                }
+
+                if !rpm_package_has_version(argument) {
+                    return true;
+                }
+            }
+
+            false
+        })
+}
+
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3041", "RDL3042", "RDL3043", "RDL3044", "RDL3045", "RDL3046", "RDL3047", "RDL3048",
-        "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053", "RDL3054", "RDL3055", "RDL3056",
-        "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001",
-        "RDL4005", "RDL4006",
+        "RDL3042", "RDL3043", "RDL3044", "RDL3045", "RDL3046", "RDL3047", "RDL3048", "RDL3049",
+        "RDL3050", "RDL3051", "RDL3052", "RDL3053", "RDL3054", "RDL3055", "RDL3056", "RDL3057",
+        "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005",
+        "RDL4006",
     ]
 }

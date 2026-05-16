@@ -258,8 +258,8 @@ expression: normalized_json(&output)
   {
     "code": "RDL3041",
     "severity": "warning",
-    "status": "planned",
-    "summary": "tracked for compatibility parity"
+    "status": "implemented",
+    "summary": "pin versions in dnf install"
   },
   {
     "code": "RDL3042",
