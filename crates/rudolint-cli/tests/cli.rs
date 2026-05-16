@@ -229,6 +229,16 @@ fn stdin_filename_changes_display_path() {
 }
 
 #[test]
+fn quiet_suppresses_output_but_preserves_failure() {
+    rudolint_cmd()
+        .args(["check", "--quiet", "--failure-threshold", "error"])
+        .write_stdin("FROM alpine:latest\nWORKDIR app\n")
+        .assert()
+        .code(1)
+        .stdout("");
+}
+
+#[test]
 fn missing_input_exits_with_code_two() {
     let temp = TempDir::new().expect("temp dir should be created");
     let missing = temp.path().join("missing.Dockerfile");

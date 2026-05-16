@@ -66,6 +66,7 @@ rudolint rules --implemented
 rudolint check . --exit-zero
 rudolint check . --no-config
 rudolint check --stdin-filename Dockerfile --format json < Dockerfile
+rudolint check . --quiet
 ```
 
 Use stdin:
