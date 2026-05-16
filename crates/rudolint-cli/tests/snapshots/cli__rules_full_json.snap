@@ -156,8 +156,8 @@ expression: normalized_json(&output)
   {
     "code": "RDL3022",
     "severity": "warning",
-    "status": "planned",
-    "summary": "tracked for compatibility parity"
+    "status": "implemented",
+    "summary": "require COPY --from references to resolve to previous build stages"
   },
   {
     "code": "RDL3023",
