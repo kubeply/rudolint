@@ -5,6 +5,11 @@ pub struct ShellProgram {
     pub source: String,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ShellCommandInvocation {
+    pub command: String,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PackageManager {
     AptGet,
@@ -101,6 +106,13 @@ pub fn detect_package_managers(shell: &str) -> Vec<PackageManager> {
 }
 
 pub fn detect_disallowed_container_commands(shell: &str) -> Vec<DisallowedContainerCommand> {
+    detect_command_invocations(shell)
+        .into_iter()
+        .filter_map(|invocation| disallowed_container_command(&invocation.command))
+        .collect()
+}
+
+pub fn detect_command_invocations(shell: &str) -> Vec<ShellCommandInvocation> {
     let mut commands = Vec::new();
     let mut expect_command = true;
 
@@ -127,9 +139,9 @@ pub fn detect_disallowed_container_commands(shell: &str) -> Vec<DisallowedContai
             }
 
             let command = token.rsplit('/').next().unwrap_or(token);
-            if let Some(command) = disallowed_container_command(command) {
-                commands.push(command);
-            }
+            commands.push(ShellCommandInvocation {
+                command: command.to_string(),
+            });
             expect_command = false;
         }
 
@@ -222,6 +234,31 @@ mod tests {
                     "commands": detect_disallowed_container_commands(case)
                         .into_iter()
                         .map(DisallowedContainerCommand::as_str)
+                        .collect::<Vec<_>>(),
+                })
+            })
+            .collect::<Vec<_>>();
+
+        insta::assert_json_snapshot!(values);
+    }
+
+    #[test]
+    fn snapshots_command_invocation_detection() {
+        let cases = [
+            "cd /tmp && make",
+            "apk add vim",
+            "FOO=bar /usr/bin/service nginx start",
+            "printf '%s' cd",
+            "mount -t proc proc /proc; ifconfig",
+        ];
+        let values = cases
+            .iter()
+            .map(|case| {
+                json!({
+                    "shell": case,
+                    "commands": detect_command_invocations(case)
+                        .into_iter()
+                        .map(|invocation| invocation.command)
                         .collect::<Vec<_>>(),
                 })
             })

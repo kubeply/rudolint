@@ -54,8 +54,8 @@ expression: normalized_json(&output)
   {
     "code": "RDL3003",
     "severity": "warning",
-    "status": "planned",
-    "summary": "tracked for compatibility parity"
+    "status": "implemented",
+    "summary": "prefer WORKDIR over RUN cd"
   },
   {
     "code": "RDL3004",

@@ -93,6 +93,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3003",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3003.md",
+    "fix": "none",
+    "name": "use-workdir-for-cd",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "prefer WORKDIR over RUN cd"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL3006",
     "default_severity": "warning",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3006.md",

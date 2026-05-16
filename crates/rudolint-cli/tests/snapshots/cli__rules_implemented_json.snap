@@ -52,6 +52,12 @@ expression: normalized_json(&output)
     "summary": "require the final USER to be non-root"
   },
   {
+    "code": "RDL3003",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "prefer WORKDIR over RUN cd"
+  },
+  {
     "code": "RDL3006",
     "severity": "warning",
     "status": "implemented",
