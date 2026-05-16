@@ -159,6 +159,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3010",
+    "default_severity": "info",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3010.md",
+    "fix": "none",
+    "name": "use-add-for-archives",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "use ADD for extracting local archives"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL3011",
     "default_severity": "error",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3011.md",
