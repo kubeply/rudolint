@@ -79,6 +79,14 @@ pub struct CheckArgs {
     /// Include source excerpts in human output.
     #[arg(long)]
     pub show_source: bool,
+
+    /// Enable autofix planning.
+    #[arg(long)]
+    pub fix: bool,
+
+    /// Print the planned autofix output without writing files.
+    #[arg(long, requires = "fix")]
+    pub dry_run: bool,
 }
 
 impl Default for CheckArgs {
@@ -95,6 +103,8 @@ impl Default for CheckArgs {
             quiet: false,
             verbose: false,
             show_source: false,
+            fix: false,
+            dry_run: false,
         }
     }
 }
