@@ -51,6 +51,17 @@ pub struct Comment {
     pub span: Span,
 }
 
+/// Line-continuation escape marker within an instruction.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct LineContinuation {
+    /// One-based source line containing the continuation marker.
+    pub line: usize,
+    /// Escape character used for the continuation.
+    pub escape: char,
+    /// Source span covering the continuation escape marker.
+    pub span: Span,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Instruction {
     /// Uppercase Dockerfile instruction keyword.
@@ -61,6 +72,8 @@ pub struct Instruction {
     pub args: String,
     /// Source span covering the instruction arguments, when present.
     pub args_span: Option<Span>,
+    /// Line-continuation markers used by this instruction.
+    pub continuations: Vec<LineContinuation>,
     pub flags: Vec<(String, String)>,
     pub mounts: Vec<Mount>,
     pub heredocs: Vec<String>,
@@ -217,6 +230,7 @@ fn parse_instruction(
             keyword_span,
             args: String::new(),
             args_span: None,
+            continuations: parse_continuations(raw, line, start_byte, source_file),
             flags: Vec::new(),
             mounts: Vec::new(),
             heredocs: Vec::new(),
@@ -235,6 +249,7 @@ fn parse_instruction(
     let args = rest.trim().to_string();
     let args_span =
         (!args.is_empty()).then(|| source_file.span(args_start, args_start + args.len()));
+    let continuations = parse_continuations(raw, line, start_byte, source_file);
     let flags = parse_flags(&args);
     let mounts = flags
         .iter()
@@ -248,6 +263,7 @@ fn parse_instruction(
         keyword_span,
         args,
         args_span,
+        continuations,
         flags,
         mounts,
         heredocs,
@@ -267,6 +283,28 @@ fn parse_flags(args: &str) -> Vec<(String, String)> {
         flags.push((name.to_string(), value.trim_matches('"').to_string()));
     }
     flags
+}
+
+fn parse_continuations(
+    raw: &str,
+    start_line: usize,
+    start_byte: usize,
+    source_file: &SourceFile,
+) -> Vec<LineContinuation> {
+    let mut continuations = Vec::new();
+    let mut line_start_byte = start_byte;
+    for (line_index, line) in raw.split('\n').enumerate() {
+        if continues(line) {
+            let continuation_byte = line_start_byte + line.trim_end().len() - 1;
+            continuations.push(LineContinuation {
+                line: start_line + line_index,
+                escape: '\\',
+                span: source_file.span(continuation_byte, continuation_byte + 1),
+            });
+        }
+        line_start_byte += line.len() + 1;
+    }
+    continuations
 }
 
 fn parse_mount(value: &str) -> Option<Mount> {

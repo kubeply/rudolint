@@ -32,6 +32,7 @@ expression: document_json(&document)
         "start_column": 6,
         "start_line": 2
       },
+      "continuations": [],
       "flags": [
         [
           "platform",
@@ -69,6 +70,7 @@ expression: document_json(&document)
         "start_column": 5,
         "start_line": 3
       },
+      "continuations": [],
       "flags": [
         [
           "mount",
@@ -120,6 +122,7 @@ expression: document_json(&document)
         "start_column": 5,
         "start_line": 4
       },
+      "continuations": [],
       "flags": [],
       "heredocs": [
         "EOF"
@@ -154,6 +157,7 @@ expression: document_json(&document)
         "start_column": 6,
         "start_line": 5
       },
+      "continuations": [],
       "flags": [],
       "heredocs": [],
       "keyword": "ECHO",
@@ -179,6 +183,7 @@ expression: document_json(&document)
     {
       "args": "",
       "args_span": null,
+      "continuations": [],
       "flags": [],
       "heredocs": [],
       "keyword": "EOF",
@@ -211,6 +216,7 @@ expression: document_json(&document)
         "start_column": 6,
         "start_line": 7
       },
+      "continuations": [],
       "flags": [],
       "heredocs": [],
       "keyword": "FROM",
@@ -243,6 +249,7 @@ expression: document_json(&document)
         "start_column": 6,
         "start_line": 8
       },
+      "continuations": [],
       "flags": [
         [
           "from",

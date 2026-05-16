@@ -43,6 +43,7 @@ expression: document_json(&document)
         "start_column": 6,
         "start_line": 2
       },
+      "continuations": [],
       "flags": [],
       "heredocs": [],
       "keyword": "FROM",
@@ -75,6 +76,7 @@ expression: document_json(&document)
         "start_column": 5,
         "start_line": 5
       },
+      "continuations": [],
       "flags": [],
       "heredocs": [],
       "keyword": "RUN",

@@ -63,6 +63,7 @@ expression: document_json(&document)
         "start_column": 6,
         "start_line": 4
       },
+      "continuations": [],
       "flags": [],
       "heredocs": [],
       "keyword": "FROM",
