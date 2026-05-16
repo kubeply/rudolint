@@ -48,6 +48,13 @@ expression: document_json(&document)
         },
         "text": "mcr.microsoft.com/windows/nanoserver:ltsc2022"
       },
+      "from": {
+        "alias": null,
+        "digest": null,
+        "flags": [],
+        "image": "mcr.microsoft.com/windows/nanoserver:ltsc2022",
+        "platform": null
+      },
       "heredocs": [],
       "keyword": "FROM",
       "keyword_span": {
@@ -106,6 +113,7 @@ expression: document_json(&document)
         },
         "text": "powershell -Command `\n    Write-Host \"hello\""
       },
+      "from": null,
       "heredocs": [],
       "keyword": "RUN",
       "keyword_span": {

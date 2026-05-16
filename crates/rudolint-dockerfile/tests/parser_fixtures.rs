@@ -101,6 +101,15 @@ fn instruction_json(instruction: &Instruction) -> Value {
                 "body_span": heredoc.body_span,
             })
         }).collect::<Vec<_>>(),
+        "from": instruction.from.as_ref().map(|from| {
+            json!({
+                "image": from.image,
+                "digest": from.digest,
+                "alias": from.alias,
+                "platform": from.platform,
+                "flags": from.flags,
+            })
+        }),
         "line": instruction.line,
         "raw_span": instruction.raw_span,
     })

@@ -32,6 +32,13 @@ expression: document_json(&document)
         },
         "text": "alpine:3.20"
       },
+      "from": {
+        "alias": null,
+        "digest": null,
+        "flags": [],
+        "image": "alpine:3.20",
+        "platform": null
+      },
       "heredocs": [],
       "keyword": "FROM",
       "keyword_span": {
@@ -77,6 +84,7 @@ expression: document_json(&document)
         },
         "text": "<<EOF\necho hello\nEOF"
       },
+      "from": null,
       "heredocs": [
         {
           "body": "echo hello\n",
@@ -137,6 +145,7 @@ expression: document_json(&document)
         },
         "text": "<<'SCRIPT'\necho quoted\nSCRIPT"
       },
+      "from": null,
       "heredocs": [
         {
           "body": "echo quoted\n",
