@@ -40,17 +40,23 @@ impl SourceFile {
     }
 }
 
-/// Byte-offset index for mapping source offsets to line and column positions.
+/// Byte-offset index for mapping source offsets to line and character columns.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LineIndex {
     line_starts: Vec<usize>,
-    text: String,
+    character_starts: Vec<usize>,
 }
 
 impl LineIndex {
     /// Builds a line index from UTF-8 source text.
     pub fn new(text: &str) -> Self {
         let mut line_starts = vec![0];
+        let mut character_starts = Vec::new();
+        for (index, character) in text.char_indices() {
+            if character != '\r' {
+                character_starts.push(index);
+            }
+        }
         for (index, byte) in text.bytes().enumerate() {
             if byte == b'\n' {
                 line_starts.push(index + 1);
@@ -58,11 +64,11 @@ impl LineIndex {
         }
         Self {
             line_starts,
-            text: text.to_string(),
+            character_starts,
         }
     }
 
-    /// Maps a byte offset to a one-based line and byte-column position.
+    /// Maps a byte offset to a one-based line and character-column position.
     pub fn position(&self, byte: usize) -> SourcePosition {
         let line_index = match self.line_starts.binary_search(&byte) {
             Ok(index) => index,
@@ -98,20 +104,20 @@ impl LineIndex {
     }
 
     fn column(&self, line_start: usize, byte: usize) -> usize {
-        self.text[line_start..byte]
-            .chars()
-            .filter(|character| *character != '\r')
-            .count()
-            + 1
+        let before_byte = self.character_starts.partition_point(|start| *start < byte);
+        let before_line = self
+            .character_starts
+            .partition_point(|start| *start < line_start);
+        before_byte.saturating_sub(before_line) + 1
     }
 }
 
-/// One-based line and byte-column position for a source byte offset.
+/// One-based line and character-column position for a source byte offset.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SourcePosition {
     /// One-based line number.
     pub line: usize,
-    /// One-based byte column within the line.
+    /// One-based column within the line, counted in Unicode scalar values.
     pub column: usize,
     /// Zero-based byte offset in the source text.
     pub byte: usize,
@@ -231,6 +237,21 @@ mod tests {
                 start_column: 1,
                 end_line: 2,
                 end_column: 4,
+            }
+        );
+    }
+
+    #[test]
+    fn handles_offsets_inside_utf8_scalars_without_panicking() {
+        let file = SourceFile::new("Dockerfile", "LABEL name=\"café\"\n");
+        let inside = file.text.find('é').expect("fixture contains accent") + 1;
+
+        assert_eq!(
+            file.line_index.position(inside),
+            SourcePosition {
+                line: 1,
+                column: 17,
+                byte: inside,
             }
         );
     }
