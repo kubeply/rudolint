@@ -3,7 +3,7 @@ use std::fs;
 use std::path::PathBuf;
 
 use rudolint_config::Config;
-use rudolint_rules::{Profile, RuleEngine, RuleStatus};
+use rudolint_rules::{FixAvailability, Profile, RuleEngine, RuleStatus};
 
 #[test]
 fn catalog_codes_are_unique_and_have_metadata() {
@@ -46,6 +46,47 @@ fn implemented_rules_and_docs_are_synchronized() {
             catalog.iter().any(|rule| rule.code == code),
             "{code} docs do not match a catalog rule"
         );
+    }
+}
+
+#[test]
+fn implemented_rule_docs_declare_fix_availability() {
+    let catalog = RuleEngine::new(Profile::Default, Config::default()).catalog();
+    let docs_dir = workspace_root().join("docs/rules");
+
+    for rule in catalog
+        .iter()
+        .filter(|rule| rule.status == RuleStatus::Implemented)
+    {
+        let docs = fs::read_to_string(docs_dir.join(format!("{}.md", rule.code)))
+            .unwrap_or_else(|error| panic!("failed to read docs for {}: {error}", rule.code));
+        let autofix_line = docs
+            .lines()
+            .find(|line| line.trim_start().starts_with("- Autofix:"))
+            .unwrap_or_else(|| panic!("{} docs must declare autofix behavior", rule.code));
+        assert!(
+            !autofix_line.contains("Autofix: none yet"),
+            "{} docs must include a no-fix rationale instead of a placeholder",
+            rule.code
+        );
+
+        match rule.metadata.fix {
+            FixAvailability::Safe => assert!(
+                autofix_line.contains("safe automatic"),
+                "{} safe fix docs must say safe automatic",
+                rule.code
+            ),
+            FixAvailability::Manual => assert!(
+                autofix_line.contains("manual"),
+                "{} manual fix docs must say manual",
+                rule.code
+            ),
+            FixAvailability::None => assert!(
+                autofix_line.contains("no safe automatic fix"),
+                "{} no-fix docs must include a rationale",
+                rule.code
+            ),
+        }
     }
 }
 
