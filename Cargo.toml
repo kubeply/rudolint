@@ -16,6 +16,7 @@ members = [
     "crates/rudolint-shell",
     "crates/rudolint-source",
     "crates/rudolint-test",
+    "crates/xtask",
 ]
 resolver = "3"
 

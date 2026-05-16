@@ -23,6 +23,8 @@ small and boring so each part can be tested independently.
 - `rudolint-source`: source text, spans, comments, and edit ranges.
 - `rudolint-test`: shared test-only fixture, snapshot, normalization, and CLI
   helpers.
+- `xtask`: repository maintenance commands that do not ship in the runtime
+  binary.
 
 ## Parser
 
@@ -72,3 +74,9 @@ editor/LSP responses. Renderers must not change rule behavior.
 `rudolint-test` owns shared test helpers. It is a dev-only crate for fixture
 paths, snapshot normalization, CLI invocation helpers, oracle normalization,
 and fix-preview rendering. Production crates must not depend on it.
+
+## Maintenance
+
+`xtask` owns repository maintenance workflows such as refreshing compatibility
+oracle metadata. It is a workspace utility and must not be part of the
+`rudolint` runtime path.

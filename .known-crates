@@ -14,3 +14,4 @@ rudolint-settings
 rudolint-shell
 rudolint-source
 rudolint-test
+xtask

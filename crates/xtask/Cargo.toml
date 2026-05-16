@@ -1,0 +1,11 @@
+[package]
+name = "xtask"
+version.workspace = true
+edition.workspace = true
+description = "Repository maintenance tasks for rudolint"
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[dependencies]
+serde_json.workspace = true

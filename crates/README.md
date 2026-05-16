@@ -22,6 +22,8 @@ output rendering, and CLI orchestration can evolve independently.
 - `rudolint-shell` owns shell parsing and `RUN` command analysis.
 - `rudolint-source` owns source text, spans, comments, and edit ranges.
 - `rudolint-test` owns shared test-only fixture, snapshot, and CLI helpers.
+- `xtask` owns repository maintenance commands that should not ship in the
+  runtime binary.
 
 ## Dependency Direction
 
@@ -50,6 +52,9 @@ rudolint-fix
 
 test crates and integration tests
   -> rudolint-test
+
+maintenance workflows
+  -> xtask
 ```
 
 Keep `rudolint-source`, `rudolint-diagnostics`, and `rudolint-dockerfile`
