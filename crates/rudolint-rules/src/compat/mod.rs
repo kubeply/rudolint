@@ -66,6 +66,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(ValidSemverLabels),
         Box::new(MissingHealthcheck),
         Box::new(ValidEmailLabels),
+        Box::new(ConsecutiveRun),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -2146,6 +2147,47 @@ impl Rule for ValidEmailLabels {
 }
 
 rule_metadata!(
+    ConsecutiveRun,
+    "RDL3059",
+    "consecutive-run",
+    Severity::Info,
+    "combine consecutive RUN instructions"
+);
+
+impl Rule for ConsecutiveRun {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        let mut previous_run: Option<&Instruction> = None;
+        let mut findings = Vec::new();
+
+        for instruction in &doc.instructions {
+            if instruction.keyword != "RUN" {
+                previous_run = None;
+                continue;
+            }
+
+            if let Some(previous) = previous_run
+                && consecutive_run_instructions_should_be_combined(previous, instruction)
+            {
+                findings.push(diagnostic(
+                    "RDL3059",
+                    Severity::Info,
+                    "combine consecutive RUN instructions to reduce image layers",
+                    instruction,
+                ));
+            }
+
+            previous_run = Some(instruction);
+        }
+
+        findings
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -2910,6 +2952,30 @@ fn is_valid_semver_label_value(value: &str) -> bool {
 fn is_valid_email_label_value(value: &str) -> bool {
     let value = value.trim_matches(|character| matches!(character, '\'' | '"'));
     email_address::EmailAddress::is_valid(value)
+}
+
+fn consecutive_run_instructions_should_be_combined(
+    previous: &Instruction,
+    current: &Instruction,
+) -> bool {
+    let Some(previous_run) = previous.run.as_ref() else {
+        return false;
+    };
+    let Some(current_run) = current.run.as_ref() else {
+        return false;
+    };
+
+    previous_run.flags == current_run.flags
+        && shell_command_count(previous) <= 2
+        && shell_command_count(current) <= 2
+}
+
+fn shell_command_count(instruction: &Instruction) -> usize {
+    instruction
+        .run
+        .as_ref()
+        .and_then(|run| run.shell.as_ref())
+        .map_or(0, |shell| detect_command_invocations(&shell.text).len())
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -3908,6 +3974,6 @@ fn dnf_install_has_unpinned_packages(shell: &str) -> bool {
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
+        "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
     ]
 }

@@ -364,6 +364,12 @@ expression: normalized_json(&output)
     "summary": "validate email label values"
   },
   {
+    "code": "RDL3059",
+    "severity": "info",
+    "status": "implemented",
+    "summary": "combine consecutive RUN instructions"
+  },
+  {
     "code": "RDL4000",
     "severity": "error",
     "status": "implemented",
