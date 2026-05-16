@@ -251,9 +251,9 @@ expression: normalized_json(&output)
   },
   {
     "code": "RDL3040",
-    "severity": "warning",
-    "status": "planned",
-    "summary": "tracked for compatibility parity"
+    "severity": "info",
+    "status": "implemented",
+    "summary": "clean dnf metadata after installs"
   },
   {
     "code": "RDL3041",

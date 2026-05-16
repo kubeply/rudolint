@@ -696,6 +696,22 @@ fn snapshots_rdl3038_dnf_install_assume_yes_fixture() {
 }
 
 #[test]
+fn snapshots_rdl3040_dnf_clean_all_fixture() {
+    let source = read_fixture("rules/RDL3040.dnf-clean-all/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDL3040")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdl3040_dnf_clean_all_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rdl4000_deprecated_maintainer_fixture() {
     let source = read_fixture("rules/RDL4000.deprecated-maintainer/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
