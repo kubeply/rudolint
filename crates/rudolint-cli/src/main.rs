@@ -14,6 +14,7 @@ use crate::cli::{Cli, Command, OutputFormat, RulesOutputFormat};
 use rudolint_config::Config;
 use rudolint_diagnostics::Finding;
 use rudolint_dockerfile::parse_dockerfile;
+use rudolint_fix::FixPreview;
 use rudolint_rules::{RuleEngine, RuleStatus};
 use rudolint_settings::resolve_from_parts;
 
@@ -86,6 +87,7 @@ fn run_check(args: cli::CheckArgs) -> Result<ExitCode, AppError> {
     let input_count = if inputs.is_empty() { 1 } else { inputs.len() };
     let mut findings = Vec::new();
     let mut sources = BTreeMap::new();
+    let fixes = Vec::<FixPreview>::new();
 
     if inputs.is_empty() {
         let mut source = String::new();
@@ -107,9 +109,17 @@ fn run_check(args: cli::CheckArgs) -> Result<ExitCode, AppError> {
     if !args.quiet {
         let mut rendered = match args.format {
             OutputFormat::Human => rudolint_output::human(&findings),
-            OutputFormat::Json => rudolint_output::json(&findings).map_err(|error| {
-                AppError::internal(format!("failed to render JSON output: {error}"))
-            })?,
+            OutputFormat::Json => {
+                if args.fix {
+                    rudolint_output::json_with_fixes(&findings, &fixes).map_err(|error| {
+                        AppError::internal(format!("failed to render JSON output: {error}"))
+                    })?
+                } else {
+                    rudolint_output::json(&findings).map_err(|error| {
+                        AppError::internal(format!("failed to render JSON output: {error}"))
+                    })?
+                }
+            }
             OutputFormat::Sarif => rudolint_output::sarif(&findings).map_err(|error| {
                 AppError::internal(format!("failed to render SARIF output: {error}"))
             })?,

@@ -9,4 +9,5 @@ repository.workspace = true
 [dependencies]
 anyhow.workspace = true
 rudolint-diagnostics.workspace = true
+rudolint-fix.workspace = true
 serde_json.workspace = true

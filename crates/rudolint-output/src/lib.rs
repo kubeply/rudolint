@@ -1,5 +1,6 @@
 use anyhow::Result;
 use rudolint_diagnostics::Finding;
+use rudolint_fix::FixPreview;
 use serde_json::json;
 
 pub fn human(findings: &[Finding]) -> String {
@@ -24,6 +25,16 @@ pub fn human(findings: &[Finding]) -> String {
 
 pub fn json(findings: &[Finding]) -> Result<String> {
     Ok(format!("{}\n", serde_json::to_string_pretty(findings)?))
+}
+
+pub fn json_with_fixes(findings: &[Finding], fixes: &[FixPreview]) -> Result<String> {
+    Ok(format!(
+        "{}\n",
+        serde_json::to_string_pretty(&json!({
+            "findings": findings,
+            "fixes": fixes,
+        }))?
+    ))
 }
 
 pub fn sarif(findings: &[Finding]) -> Result<String> {

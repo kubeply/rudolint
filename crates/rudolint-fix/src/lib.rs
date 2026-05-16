@@ -3,8 +3,9 @@
 use std::fmt::Write;
 
 use rudolint_source::SourceSpan;
+use serde::Serialize;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct TextEdit {
     pub span: SourceSpan,
     pub kind: EditKind,
@@ -53,14 +54,15 @@ impl TextEdit {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(tag = "type", rename_all = "kebab-case")]
 pub enum EditKind {
     Replace { replacement: String },
     Insert { content: String },
     Delete,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct EditConflict {
     pub first: TextEdit,
     pub second: TextEdit,
@@ -98,7 +100,8 @@ fn edits_conflict(left: &TextEdit, right: &TextEdit) -> bool {
     left_start < right_end && right_start < left_end
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(tag = "type", rename_all = "kebab-case")]
 pub enum FixApplicability {
     Safe,
     Manual,
@@ -133,7 +136,8 @@ impl FixApplicability {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "kebab-case")]
 pub enum FixApplicabilityKind {
     Safe,
     Manual,
@@ -150,7 +154,7 @@ impl FixApplicabilityKind {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct FixPreview {
     pub title: String,
     pub applicability: FixApplicability,
