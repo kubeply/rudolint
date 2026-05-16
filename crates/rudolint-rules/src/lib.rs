@@ -13,6 +13,7 @@ use rudolint_dockerfile::Dockerfile;
 use rudolint_policy::PolicyProfile;
 
 pub use engine::RuleEngine;
+pub use metadata::{FixAvailability, RuleCategory, RuleMetadata};
 
 #[derive(Debug, Clone, Copy, Default, ValueEnum)]
 pub enum Profile {
@@ -61,6 +62,19 @@ pub struct RuleInfo {
     pub severity: Severity,
     pub summary: &'static str,
     pub status: RuleStatus,
+    pub metadata: RuleMetadata,
+}
+
+impl RuleInfo {
+    pub fn from_metadata(metadata: RuleMetadata) -> Self {
+        Self {
+            code: metadata.code,
+            severity: metadata.default_severity,
+            summary: metadata.summary,
+            status: metadata.status,
+            metadata,
+        }
+    }
 }
 
 pub trait Rule: Send + Sync {

@@ -94,6 +94,32 @@ fn snapshots_rule_selection_matrix() {
     insta::assert_json_snapshot!("rule_selection_matrix", snapshot);
 }
 
+#[test]
+fn snapshots_rule_metadata_contract() {
+    let engine = RuleEngine::new(Profile::Default, Config::default());
+    let metadata = engine
+        .catalog()
+        .into_iter()
+        .filter(|rule| rule.status == RuleStatus::Implemented)
+        .map(|rule| {
+            let metadata = rule.metadata;
+            serde_json::json!({
+                "code": metadata.code,
+                "name": metadata.name,
+                "summary": metadata.summary,
+                "default_severity": metadata.default_severity,
+                "profile": metadata.profile.as_str(),
+                "category": metadata.category.as_str(),
+                "status": metadata.status.to_string(),
+                "docs_url": metadata.docs_url,
+                "fix": metadata.fix.as_str(),
+            })
+        })
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!("rule_metadata_contract", metadata);
+}
+
 fn finding_codes(findings: &[Finding]) -> Vec<serde_json::Value> {
     findings
         .iter()
