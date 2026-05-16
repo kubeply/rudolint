@@ -65,6 +65,7 @@ rudolint check . --format sarif > rudolint.sarif
 rudolint rules --implemented
 rudolint check . --exit-zero
 rudolint check . --no-config
+rudolint check --stdin-filename Dockerfile --format json < Dockerfile
 ```
 
 Use stdin:

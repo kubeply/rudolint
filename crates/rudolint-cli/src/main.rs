@@ -86,7 +86,7 @@ fn run_check(args: cli::CheckArgs) -> Result<ExitCode, AppError> {
         io::stdin().read_to_string(&mut source).map_err(|error| {
             AppError::usage(format!("failed to read Dockerfile from stdin: {error}"))
         })?;
-        findings.extend(lint_source(Path::new("<stdin>"), &source, &engine)?);
+        findings.extend(lint_source(&args.stdin_filename, &source, &engine)?);
     } else {
         for path in inputs {
             let source = fs::read_to_string(&path).map_err(|error| {
