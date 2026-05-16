@@ -74,13 +74,22 @@ impl AppError {
 }
 
 fn run_check(args: cli::CheckArgs) -> Result<ExitCode, AppError> {
+    let inputs = resolve_inputs(&args.paths)?;
     let config = if args.no_config {
         Config::default()
     } else {
-        Config::load(args.config.as_deref())?
+        let starts = if inputs.is_empty() {
+            if args.paths.is_empty() {
+                Vec::new()
+            } else {
+                args.paths.clone()
+            }
+        } else {
+            inputs.clone()
+        };
+        Config::load_discovered(args.config.as_deref(), &starts)?
     };
     let engine = RuleEngine::new(args.profile, config);
-    let inputs = resolve_inputs(&args.paths)?;
     let input_count = if inputs.is_empty() { 1 } else { inputs.len() };
     let mut findings = Vec::new();
     let mut sources = BTreeMap::new();
