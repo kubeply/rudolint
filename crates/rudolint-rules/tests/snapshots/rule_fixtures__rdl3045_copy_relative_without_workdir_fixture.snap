@@ -1,0 +1,54 @@
+---
+source: crates/rudolint-rules/tests/rule_fixtures.rs
+expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
+---
+[
+  {
+    "code": "RDL3045",
+    "help": null,
+    "labels": [],
+    "message": "`COPY` to a relative destination without `WORKDIR` set",
+    "path": "",
+    "primary_span": {
+      "end_byte": 0,
+      "end_column": 1,
+      "end_line": 2,
+      "start_byte": 0,
+      "start_column": 1,
+      "start_line": 2
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "RDL3045",
+    "help": null,
+    "labels": [],
+    "message": "`COPY` to a relative destination without `WORKDIR` set",
+    "path": "",
+    "primary_span": {
+      "end_byte": 0,
+      "end_column": 1,
+      "end_line": 13,
+      "start_byte": 0,
+      "start_column": 1,
+      "start_line": 13
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "RDL3045",
+    "help": null,
+    "labels": [],
+    "message": "`COPY` to a relative destination without `WORKDIR` set",
+    "path": "",
+    "primary_span": {
+      "end_byte": 0,
+      "end_column": 1,
+      "end_line": 21,
+      "start_byte": 0,
+      "start_column": 1,
+      "start_line": 21
+    },
+    "severity": "warning"
+  }
+]

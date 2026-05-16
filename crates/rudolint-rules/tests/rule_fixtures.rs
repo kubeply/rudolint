@@ -776,6 +776,22 @@ fn snapshots_rdl3044_no_env_self_reference_fixture() {
 }
 
 #[test]
+fn snapshots_rdl3045_copy_relative_without_workdir_fixture() {
+    let source = read_fixture("rules/RDL3045.copy-relative-without-workdir/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDL3045")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdl3045_copy_relative_without_workdir_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rdl4000_deprecated_maintainer_fixture() {
     let source = read_fixture("rules/RDL4000.deprecated-maintainer/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");

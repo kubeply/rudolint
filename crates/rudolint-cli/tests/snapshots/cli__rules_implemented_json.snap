@@ -280,6 +280,12 @@ expression: normalized_json(&output)
     "summary": "reject same-statement ENV references"
   },
   {
+    "code": "RDL3045",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "avoid COPY to relative destinations without WORKDIR"
+  },
+  {
     "code": "RDL4000",
     "severity": "error",
     "status": "implemented",

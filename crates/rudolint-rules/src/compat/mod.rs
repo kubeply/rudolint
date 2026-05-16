@@ -52,6 +52,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(PipNoCacheDir),
         Box::new(NoOnbuildTrigger),
         Box::new(NoEnvSelfReference),
+        Box::new(CopyRelativeWithoutWorkdir),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -1518,6 +1519,88 @@ impl Rule for NoEnvSelfReference {
 }
 
 rule_metadata!(
+    CopyRelativeWithoutWorkdir,
+    "RDL3045",
+    "copy-relative-without-workdir",
+    Severity::Warning,
+    "avoid COPY to relative destinations without WORKDIR"
+);
+
+impl Rule for CopyRelativeWithoutWorkdir {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        let mut alias_to_stage = BTreeMap::new();
+        let mut stage_workdir = BTreeMap::new();
+        let mut current_stage = None;
+        let mut workdir_set = false;
+        let mut stage_idx = 0usize;
+        let mut findings = Vec::new();
+
+        for instruction in &doc.instructions {
+            match instruction.keyword.as_str() {
+                "FROM" => {
+                    if let Some(from) = &instruction.from {
+                        let inherited_stage = from
+                            .image
+                            .parse::<usize>()
+                            .ok()
+                            .map(|index| format!("__stage_{index}"))
+                            .or_else(|| {
+                                alias_to_stage
+                                    .get(&from.image.to_ascii_lowercase())
+                                    .cloned()
+                            });
+
+                        workdir_set = inherited_stage
+                            .as_ref()
+                            .and_then(|stage| stage_workdir.get(stage))
+                            .copied()
+                            .unwrap_or_default();
+
+                        let stage_key = format!("__stage_{stage_idx}");
+                        stage_workdir.insert(stage_key.clone(), workdir_set);
+
+                        if let Some(alias) = &from.alias {
+                            alias_to_stage.insert(alias.to_ascii_lowercase(), stage_key.clone());
+                        }
+
+                        current_stage = Some(stage_key);
+                        stage_idx += 1;
+                    }
+                }
+                "WORKDIR" => {
+                    workdir_set = true;
+                    if let Some(stage) = &current_stage {
+                        stage_workdir.insert(stage.clone(), true);
+                    }
+                }
+                "COPY"
+                    if !workdir_set
+                        && instruction.copy.as_ref().is_some_and(|copy| {
+                            copy.destination
+                                .as_deref()
+                                .is_some_and(is_relative_copy_destination)
+                        }) =>
+                {
+                    findings.push(diagnostic(
+                        "RDL3045",
+                        Severity::Warning,
+                        "`COPY` to a relative destination without `WORKDIR` set",
+                        instruction,
+                    ));
+                }
+                _ => {}
+            }
+        }
+
+        findings
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -2001,6 +2084,13 @@ fn contains_bare_shell_variable(value: &str, name: &str) -> bool {
 
 fn is_shell_variable_character(character: char) -> bool {
     character == '_' || character.is_ascii_alphanumeric()
+}
+
+fn is_relative_copy_destination(destination: &str) -> bool {
+    let destination = destination.trim_matches(|character| matches!(character, '\'' | '"'));
+    !destination.starts_with('/')
+        && !destination.starts_with('$')
+        && !is_windows_absolute(destination)
 }
 
 fn apt_get_install_missing_yes(shell: &str) -> bool {
@@ -2820,8 +2910,8 @@ fn dnf_install_has_unpinned_packages(shell: &str) -> bool {
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3045", "RDL3046", "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052",
-        "RDL3053", "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060",
-        "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
+        "RDL3046", "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052", "RDL3053",
+        "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060", "RDL3061",
+        "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
     ]
 }

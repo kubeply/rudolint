@@ -113,6 +113,7 @@ expression: snapshot
       "RDL3042",
       "RDL3043",
       "RDL3044",
+      "RDL3045",
       "RDL4000",
       "RDL4003",
       "RDL4004"
@@ -164,6 +165,7 @@ expression: snapshot
       "RDL3042",
       "RDL3043",
       "RDL3044",
+      "RDL3045",
       "RDL4000",
       "RDL4003",
       "RDL4004"
