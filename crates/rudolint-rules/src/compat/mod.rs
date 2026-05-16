@@ -69,6 +69,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(ConsecutiveRun),
         Box::new(YarnCacheClean),
         Box::new(InstructionOrder),
+        Box::new(PinGoVersions),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -2203,6 +2204,37 @@ impl Rule for InstructionOrder {
 }
 
 rule_metadata!(
+    PinGoVersions,
+    "RDL3062",
+    "pin-go-versions",
+    Severity::Warning,
+    "pin Go package versions"
+);
+
+impl Rule for PinGoVersions {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        doc.instructions
+            .iter()
+            .filter(|instruction| {
+                instruction.keyword == "RUN" && go_package_command_has_unpinned_package(instruction)
+            })
+            .map(|instruction| {
+                diagnostic(
+                    "RDL3062",
+                    Severity::Warning,
+                    "pin versions in go package commands",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -2906,6 +2938,61 @@ fn has_yarn_cache_mount(instruction: &Instruction) -> bool {
     })
 }
 
+fn go_package_command_has_unpinned_package(instruction: &Instruction) -> bool {
+    let Some(shell) = instruction.run.as_ref().and_then(|run| run.shell.as_ref()) else {
+        return false;
+    };
+
+    detect_command_invocations(&shell.text)
+        .iter()
+        .flat_map(go_packages_from_invocation)
+        .any(|package| !go_package_has_pinned_version(package))
+}
+
+fn go_packages_from_invocation(invocation: &rudolint_shell::ShellCommandInvocation) -> Vec<&str> {
+    if invocation.command != "go" {
+        return Vec::new();
+    }
+
+    let args = invocation
+        .arguments
+        .iter()
+        .filter(|argument| !argument.starts_with('-'))
+        .map(String::as_str)
+        .collect::<Vec<_>>();
+
+    if args.first() == Some(&"run") {
+        return args
+            .iter()
+            .enumerate()
+            .filter_map(|(index, argument)| (*argument != "run" && index <= 1).then_some(*argument))
+            .collect();
+    }
+
+    if matches!(args.first(), Some(&"install" | &"get")) {
+        return args
+            .into_iter()
+            .filter(|argument| !matches!(*argument, "install" | "get" | "tool"))
+            .collect();
+    }
+
+    Vec::new()
+}
+
+fn go_package_has_pinned_version(package: &str) -> bool {
+    go_package_is_local_path(package)
+        || (package.contains('@')
+            && !matches!(go_package_version(package), Some("latest" | "none")))
+}
+
+fn go_package_is_local_path(package: &str) -> bool {
+    package == "." || package.starts_with('/') || package.starts_with('.')
+}
+
+fn go_package_version(package: &str) -> Option<&str> {
+    package.rsplit_once('@').map(|(_, version)| version)
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 struct HealthcheckStage {
     source: String,
@@ -3470,5 +3557,5 @@ fn dnf_install_has_unpinned_packages(shell: &str) -> bool {
 }
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
-    vec!["RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006"]
+    vec!["RDL3063", "RDL4001", "RDL4005", "RDL4006"]
 }
