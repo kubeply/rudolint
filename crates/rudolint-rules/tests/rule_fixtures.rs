@@ -170,6 +170,39 @@ fn snapshots_rdl3011_valid_expose_port_fixture() {
 }
 
 #[test]
+fn snapshots_rdl3012_healthcheck_cardinality_fixture() {
+    let fixtures = [
+        "RDL3012.no-healthcheck",
+        "RDL3012.single-healthcheck-cmd",
+        "RDL3012.single-healthcheck-none",
+        "RDL3012.duplicate-healthcheck",
+    ];
+
+    let cases = fixtures
+        .into_iter()
+        .map(|fixture| {
+            let source = read_fixture(format!("rules/{fixture}/Dockerfile"));
+            let document = parse_dockerfile(&source).expect("fixture should parse");
+            let findings = RuleEngine::new(Profile::Default, Config::default())
+                .lint(&document)
+                .into_iter()
+                .filter(|finding| finding.code == "RDL3012")
+                .collect::<Vec<_>>();
+
+            serde_json::json!({
+                "fixture": fixture,
+                "findings": findings,
+            })
+        })
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdl3012_healthcheck_cardinality_fixture",
+        serde_json::to_value(&cases).expect("cases should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rule_selection_matrix() {
     let source = read_fixture("rules/default-basic/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
