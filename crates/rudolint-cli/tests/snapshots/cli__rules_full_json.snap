@@ -114,8 +114,8 @@ expression: normalized_json(&output)
   {
     "code": "RDL3014",
     "severity": "warning",
-    "status": "planned",
-    "summary": "tracked for compatibility parity"
+    "status": "implemented",
+    "summary": "use -y with apt-get install"
   },
   {
     "code": "RDL3015",

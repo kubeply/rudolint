@@ -203,6 +203,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3014",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3014.md",
+    "fix": "none",
+    "name": "apt-get-install-assume-yes",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "use -y with apt-get install"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL3020",
     "default_severity": "error",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3020.md",

@@ -112,6 +112,12 @@ expression: normalized_json(&output)
     "summary": "pin versions in pip install"
   },
   {
+    "code": "RDL3014",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "use -y with apt-get install"
+  },
+  {
     "code": "RDL3020",
     "severity": "error",
     "status": "implemented",
