@@ -22,7 +22,15 @@ expression: document_json(&document)
       "flags": [],
       "form": {
         "kind": "shell",
-        "value": "alpine:3.20"
+        "span": {
+          "end_byte": 16,
+          "end_column": 17,
+          "end_line": 1,
+          "start_byte": 5,
+          "start_column": 6,
+          "start_line": 1
+        },
+        "text": "alpine:3.20"
       },
       "heredocs": [],
       "keyword": "FROM",
@@ -59,7 +67,15 @@ expression: document_json(&document)
       "flags": [],
       "form": {
         "kind": "shell",
-        "value": "<<EOF"
+        "span": {
+          "end_byte": 26,
+          "end_column": 10,
+          "end_line": 2,
+          "start_byte": 21,
+          "start_column": 5,
+          "start_line": 2
+        },
+        "text": "<<EOF"
       },
       "heredocs": [
         "EOF"
@@ -98,7 +114,15 @@ expression: document_json(&document)
       "flags": [],
       "form": {
         "kind": "shell",
-        "value": "hello"
+        "span": {
+          "end_byte": 37,
+          "end_column": 11,
+          "end_line": 3,
+          "start_byte": 32,
+          "start_column": 6,
+          "start_line": 3
+        },
+        "text": "hello"
       },
       "heredocs": [],
       "keyword": "ECHO",

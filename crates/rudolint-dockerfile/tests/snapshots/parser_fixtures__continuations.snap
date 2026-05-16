@@ -22,7 +22,15 @@ expression: document_json(&document)
       "flags": [],
       "form": {
         "kind": "shell",
-        "value": "alpine:3.20"
+        "span": {
+          "end_byte": 16,
+          "end_column": 17,
+          "end_line": 1,
+          "start_byte": 5,
+          "start_column": 6,
+          "start_line": 1
+        },
+        "text": "alpine:3.20"
       },
       "heredocs": [],
       "keyword": "FROM",
@@ -84,7 +92,15 @@ expression: document_json(&document)
       "flags": [],
       "form": {
         "kind": "shell",
-        "value": "apk add \\\n    curl \\\n    git"
+        "span": {
+          "end_byte": 49,
+          "end_column": 8,
+          "end_line": 4,
+          "start_byte": 21,
+          "start_column": 5,
+          "start_line": 2
+        },
+        "text": "apk add \\\n    curl \\\n    git"
       },
       "heredocs": [],
       "keyword": "RUN",

@@ -1,6 +1,6 @@
 ---
 source: crates/rudolint-dockerfile/tests/parser_fixtures.rs
-assertion_line: 34
+assertion_line: 35
 expression: document_json(&document)
 ---
 {
@@ -41,7 +41,15 @@ expression: document_json(&document)
       ],
       "form": {
         "kind": "shell",
-        "value": "--platform=$BUILDPLATFORM alpine:3.20 AS base"
+        "span": {
+          "end_byte": 81,
+          "end_column": 51,
+          "end_line": 2,
+          "start_byte": 36,
+          "start_column": 6,
+          "start_line": 2
+        },
+        "text": "--platform=$BUILDPLATFORM alpine:3.20 AS base"
       },
       "heredocs": [],
       "keyword": "FROM",
@@ -83,7 +91,15 @@ expression: document_json(&document)
       ],
       "form": {
         "kind": "shell",
-        "value": "--mount=type=cache,target=/var/cache/apk apk add curl"
+        "span": {
+          "end_byte": 139,
+          "end_column": 58,
+          "end_line": 3,
+          "start_byte": 86,
+          "start_column": 5,
+          "start_line": 3
+        },
+        "text": "--mount=type=cache,target=/var/cache/apk apk add curl"
       },
       "heredocs": [],
       "keyword": "RUN",
@@ -134,7 +150,15 @@ expression: document_json(&document)
       "flags": [],
       "form": {
         "kind": "shell",
-        "value": "<<EOF"
+        "span": {
+          "end_byte": 149,
+          "end_column": 10,
+          "end_line": 4,
+          "start_byte": 144,
+          "start_column": 5,
+          "start_line": 4
+        },
+        "text": "<<EOF"
       },
       "heredocs": [
         "EOF"
@@ -173,7 +197,15 @@ expression: document_json(&document)
       "flags": [],
       "form": {
         "kind": "shell",
-        "value": "hello"
+        "span": {
+          "end_byte": 160,
+          "end_column": 11,
+          "end_line": 5,
+          "start_byte": 155,
+          "start_column": 6,
+          "start_line": 5
+        },
+        "text": "hello"
       },
       "heredocs": [],
       "keyword": "ECHO",
@@ -239,7 +271,15 @@ expression: document_json(&document)
       "flags": [],
       "form": {
         "kind": "shell",
-        "value": "alpine:3.20 AS final"
+        "span": {
+          "end_byte": 190,
+          "end_column": 26,
+          "end_line": 7,
+          "start_byte": 170,
+          "start_column": 6,
+          "start_line": 7
+        },
+        "text": "alpine:3.20 AS final"
       },
       "heredocs": [],
       "keyword": "FROM",
@@ -281,7 +321,15 @@ expression: document_json(&document)
       ],
       "form": {
         "kind": "shell",
-        "value": "--from=base /src /dst"
+        "span": {
+          "end_byte": 217,
+          "end_column": 27,
+          "end_line": 8,
+          "start_byte": 196,
+          "start_column": 6,
+          "start_line": 8
+        },
+        "text": "--from=base /src /dst"
       },
       "heredocs": [],
       "keyword": "COPY",

@@ -22,7 +22,15 @@ expression: document_json(&document)
       "flags": [],
       "form": {
         "kind": "shell",
-        "value": "alpine:3.20"
+        "span": {
+          "end_byte": 16,
+          "end_column": 17,
+          "end_line": 1,
+          "start_byte": 5,
+          "start_column": 6,
+          "start_line": 1
+        },
+        "text": "alpine:3.20"
       },
       "heredocs": [],
       "keyword": "FROM",
@@ -59,7 +67,15 @@ expression: document_json(&document)
       "flags": [],
       "form": {
         "kind": "shell",
-        "value": "/app"
+        "span": {
+          "end_byte": 29,
+          "end_column": 13,
+          "end_line": 2,
+          "start_byte": 25,
+          "start_column": 9,
+          "start_line": 2
+        },
+        "text": "/app"
       },
       "heredocs": [],
       "keyword": "WORKDIR",
@@ -96,7 +112,15 @@ expression: document_json(&document)
       "flags": [],
       "form": {
         "kind": "shell",
-        "value": ". /app"
+        "span": {
+          "end_byte": 41,
+          "end_column": 12,
+          "end_line": 3,
+          "start_byte": 35,
+          "start_column": 6,
+          "start_line": 3
+        },
+        "text": ". /app"
       },
       "heredocs": [],
       "keyword": "COPY",

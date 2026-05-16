@@ -100,7 +100,12 @@ pub enum InstructionForm {
         error: String,
     },
     /// Instruction uses shell form.
-    Shell(String),
+    Shell {
+        /// Shell-form argument text.
+        text: String,
+        /// Source span covering the shell-form argument text.
+        span: Span,
+    },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -293,7 +298,7 @@ fn parse_instruction(
     let args = rest.trim().to_string();
     let args_span =
         (!args.is_empty()).then(|| source_file.span(args_start, args_start + args.len()));
-    let form = parse_instruction_form(&args);
+    let form = parse_instruction_form(&args, args_span);
     let continuations = parse_continuations(raw, line, start_byte, source_file, escape_character);
     let flags = parse_flags(&args);
     let mounts = flags
@@ -319,10 +324,14 @@ fn parse_instruction(
     }))
 }
 
-fn parse_instruction_form(args: &str) -> InstructionForm {
+fn parse_instruction_form(args: &str, args_span: Option<Span>) -> InstructionForm {
     if args.is_empty() {
         return InstructionForm::Empty;
     }
+
+    let Some(span) = args_span else {
+        return InstructionForm::Empty;
+    };
 
     if args.starts_with('[') {
         return match serde_json::from_str::<Vec<String>>(args) {
@@ -334,7 +343,10 @@ fn parse_instruction_form(args: &str) -> InstructionForm {
         };
     }
 
-    InstructionForm::Shell(args.to_string())
+    InstructionForm::Shell {
+        text: args.to_string(),
+        span,
+    }
 }
 
 fn parse_flags(args: &str) -> Vec<(String, String)> {
