@@ -74,6 +74,13 @@ fn instruction_json(instruction: &Instruction) -> Value {
         "keyword_span": instruction.keyword_span,
         "args": instruction.args,
         "args_span": instruction.args_span,
+        "continuations": instruction.continuations.iter().map(|continuation| {
+            json!({
+                "line": continuation.line,
+                "escape": continuation.escape.to_string(),
+                "span": continuation.span,
+            })
+        }).collect::<Vec<_>>(),
         "flags": instruction.flags,
         "mounts": instruction.mounts.iter().map(|mount| {
             json!({
