@@ -280,6 +280,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3022",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3022.md",
+    "fix": "none",
+    "name": "copy-from-previous-stage",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "require COPY --from references to resolve to previous build stages"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL3024",
     "default_severity": "error",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3024.md",

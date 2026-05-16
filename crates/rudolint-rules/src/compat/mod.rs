@@ -30,6 +30,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(ApkAddNoCache),
         Box::new(PreferCopy),
         Box::new(CopyMultipleDestinationSlash),
+        Box::new(CopyFromPreviousStage),
         Box::new(UniqueStageNames),
         Box::new(JsonEntrypoints),
         Box::new(DeprecatedMaintainer),
@@ -740,6 +741,51 @@ impl Rule for CopyMultipleDestinationSlash {
 }
 
 rule_metadata!(
+    CopyFromPreviousStage,
+    "RDL3022",
+    "copy-from-previous-stage",
+    Severity::Warning,
+    "require COPY --from references to resolve to previous build stages"
+);
+
+impl Rule for CopyFromPreviousStage {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        let mut previous_aliases = BTreeSet::new();
+        let mut current_alias = None;
+        let mut stage_count = 0usize;
+        let mut findings = Vec::new();
+
+        for instruction in &doc.instructions {
+            if instruction.keyword == "FROM" {
+                if let Some(alias) = current_alias.take() {
+                    previous_aliases.insert(alias);
+                }
+                stage_count += 1;
+                current_alias = instruction
+                    .stage_alias()
+                    .map(|alias| alias.to_ascii_lowercase());
+                continue;
+            }
+
+            if copy_from_reference_is_unresolved(instruction, &previous_aliases, stage_count) {
+                findings.push(diagnostic(
+                    "RDL3022",
+                    Severity::Warning,
+                    "`COPY --from` should reference a previously defined `FROM` alias",
+                    instruction,
+                ));
+            }
+        }
+
+        findings
+    }
+}
+
+rule_metadata!(
     UniqueStageNames,
     "RDL3024",
     "unique-stage-names",
@@ -1429,13 +1475,37 @@ fn copy_multiple_sources_without_directory_destination(instruction: &Instruction
             .is_some_and(|destination| !destination.ends_with('/'))
 }
 
+fn copy_from_reference_is_unresolved(
+    instruction: &Instruction,
+    aliases: &BTreeSet<String>,
+    stage_count: usize,
+) -> bool {
+    let Some(copy) = &instruction.copy else {
+        return false;
+    };
+    if copy.kind != CopyKind::Copy {
+        return false;
+    }
+    let Some(from) = &copy.from else {
+        return false;
+    };
+    let last_segment = from.rsplit('/').next().unwrap_or(from);
+    if last_segment.contains(':') || last_segment.contains('@') {
+        return false;
+    }
+    if aliases.contains(&from.to_ascii_lowercase()) {
+        return false;
+    }
+    from.parse::<usize>()
+        .map_or(true, |index| index >= stage_count.saturating_sub(1))
+}
+
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3022", "RDL3023", "RDL3026", "RDL3027", "RDL3028", "RDL3029", "RDL3030", "RDL3032",
-        "RDL3033", "RDL3034", "RDL3035", "RDL3036", "RDL3037", "RDL3038", "RDL3040", "RDL3041",
-        "RDL3042", "RDL3043", "RDL3044", "RDL3045", "RDL3046", "RDL3047", "RDL3048", "RDL3049",
-        "RDL3050", "RDL3051", "RDL3052", "RDL3053", "RDL3054", "RDL3055", "RDL3056", "RDL3057",
-        "RDL3058", "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005",
-        "RDL4006",
+        "RDL3023", "RDL3026", "RDL3027", "RDL3028", "RDL3029", "RDL3030", "RDL3032", "RDL3033",
+        "RDL3034", "RDL3035", "RDL3036", "RDL3037", "RDL3038", "RDL3040", "RDL3041", "RDL3042",
+        "RDL3043", "RDL3044", "RDL3045", "RDL3046", "RDL3047", "RDL3048", "RDL3049", "RDL3050",
+        "RDL3051", "RDL3052", "RDL3053", "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058",
+        "RDL3059", "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
     ]
 }
