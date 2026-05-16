@@ -49,6 +49,20 @@ pub struct EnvValue {
     pub value: String,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CopyGraph {
+    pub operations: Vec<CopyOperation>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CopyOperation {
+    pub instruction_index: usize,
+    pub kind: crate::CopyKind,
+    pub sources: Vec<String>,
+    pub destination: Option<String>,
+    pub from: Option<String>,
+}
+
 pub fn stages(document: &Dockerfile) -> Vec<Stage> {
     let from_indexes = document
         .instructions
@@ -161,4 +175,24 @@ fn collapse_env(values: &[EnvValue]) -> Vec<EnvValue> {
         }
     }
     collapsed
+}
+
+pub fn copy_graph(document: &Dockerfile) -> CopyGraph {
+    let operations = document
+        .instructions
+        .iter()
+        .enumerate()
+        .filter_map(|(index, instruction)| {
+            let copy = instruction.copy.as_ref()?;
+            Some(CopyOperation {
+                instruction_index: index,
+                kind: copy.kind,
+                sources: copy.sources.clone(),
+                destination: copy.destination.clone(),
+                from: copy.from.clone(),
+            })
+        })
+        .collect();
+
+    CopyGraph { operations }
 }

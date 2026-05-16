@@ -1,4 +1,4 @@
-use rudolint_dockerfile::{arg_scopes, env_scopes, parse_dockerfile, stages};
+use rudolint_dockerfile::{CopyKind, arg_scopes, copy_graph, env_scopes, parse_dockerfile, stages};
 use rudolint_test::read_fixture;
 use serde_json::json;
 
@@ -86,4 +86,30 @@ fn env_values_json(values: &[rudolint_dockerfile::EnvValue]) -> Vec<serde_json::
             })
         })
         .collect()
+}
+
+#[test]
+fn snapshots_copy_graph() {
+    let source = read_fixture("parser/copy-from/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let graph = copy_graph(&document);
+
+    insta::assert_json_snapshot!(
+        graph
+            .operations
+            .iter()
+            .map(|operation| {
+                json!({
+                    "instruction_index": operation.instruction_index,
+                    "kind": match operation.kind {
+                        CopyKind::Copy => "copy",
+                        CopyKind::Add => "add",
+                    },
+                    "sources": operation.sources,
+                    "destination": operation.destination,
+                    "from": operation.from,
+                })
+            })
+            .collect::<Vec<_>>()
+    );
 }
