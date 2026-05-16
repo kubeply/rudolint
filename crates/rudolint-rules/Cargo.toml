@@ -15,6 +15,7 @@ rudolint-fix.workspace = true
 rudolint-policy.workspace = true
 rudolint-shell.workspace = true
 rudolint-source.workspace = true
+spdx.workspace = true
 
 [dev-dependencies]
 insta.workspace = true

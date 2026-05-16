@@ -610,6 +610,17 @@ expression: metadata
   },
   {
     "category": "compatibility",
+    "code": "RDL3054",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3054.md",
+    "fix": "none",
+    "name": "valid-spdx-labels",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "validate SPDX license label values"
+  },
+  {
+    "category": "compatibility",
     "code": "RDL4000",
     "default_severity": "error",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4000.md",
