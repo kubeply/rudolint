@@ -8,3 +8,8 @@ repository.workspace = true
 
 [dependencies]
 regex.workspace = true
+
+[dev-dependencies]
+insta.workspace = true
+rudolint-test.workspace = true
+serde_json.workspace = true

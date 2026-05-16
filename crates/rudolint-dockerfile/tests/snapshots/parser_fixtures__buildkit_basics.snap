@@ -1,0 +1,92 @@
+---
+source: crates/rudolint-dockerfile/tests/parser_fixtures.rs
+expression: document_json(&document)
+---
+{
+  "has_buildkit_features": true,
+  "instructions": [
+    {
+      "args": "--platform=$BUILDPLATFORM alpine:3.20 AS base",
+      "flags": [
+        [
+          "platform",
+          "$BUILDPLATFORM"
+        ]
+      ],
+      "heredocs": [],
+      "keyword": "FROM",
+      "line": 2,
+      "mounts": []
+    },
+    {
+      "args": "--mount=type=cache,target=/var/cache/apk apk add curl",
+      "flags": [
+        [
+          "mount",
+          "type=cache,target=/var/cache/apk"
+        ]
+      ],
+      "heredocs": [],
+      "keyword": "RUN",
+      "line": 3,
+      "mounts": [
+        {
+          "options": [
+            [
+              "type",
+              "cache"
+            ],
+            [
+              "target",
+              "/var/cache/apk"
+            ]
+          ],
+          "type": "cache"
+        }
+      ]
+    },
+    {
+      "args": "<<EOF",
+      "flags": [],
+      "heredocs": [
+        "EOF"
+      ],
+      "keyword": "RUN",
+      "line": 4,
+      "mounts": []
+    },
+    {
+      "args": "hello",
+      "flags": [],
+      "heredocs": [],
+      "keyword": "ECHO",
+      "line": 5,
+      "mounts": []
+    },
+    {
+      "args": "",
+      "flags": [],
+      "heredocs": [],
+      "keyword": "EOF",
+      "line": 6,
+      "mounts": []
+    },
+    {
+      "args": "--from=base /src /dst",
+      "flags": [
+        [
+          "from",
+          "base"
+        ]
+      ],
+      "heredocs": [],
+      "keyword": "COPY",
+      "line": 7,
+      "mounts": []
+    }
+  ],
+  "syntax": {
+    "image": "docker/dockerfile:1.7",
+    "line": 1
+  }
+}

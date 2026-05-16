@@ -549,7 +549,10 @@ dependencies = [
 name = "rudolint-dockerfile"
 version = "0.1.0"
 dependencies = [
+ "insta",
  "regex",
+ "rudolint-test",
+ "serde_json",
 ]
 
 [[package]]
