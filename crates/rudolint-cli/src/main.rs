@@ -96,16 +96,18 @@ fn run_check(args: cli::CheckArgs) -> Result<ExitCode, AppError> {
         }
     }
 
-    let rendered = match args.format {
-        OutputFormat::Human => rudolint_output::human(&findings),
-        OutputFormat::Json => rudolint_output::json(&findings).map_err(|error| {
-            AppError::internal(format!("failed to render JSON output: {error}"))
-        })?,
-        OutputFormat::Sarif => rudolint_output::sarif(&findings).map_err(|error| {
-            AppError::internal(format!("failed to render SARIF output: {error}"))
-        })?,
-    };
-    print!("{rendered}");
+    if !args.quiet {
+        let rendered = match args.format {
+            OutputFormat::Human => rudolint_output::human(&findings),
+            OutputFormat::Json => rudolint_output::json(&findings).map_err(|error| {
+                AppError::internal(format!("failed to render JSON output: {error}"))
+            })?,
+            OutputFormat::Sarif => rudolint_output::sarif(&findings).map_err(|error| {
+                AppError::internal(format!("failed to render SARIF output: {error}"))
+            })?,
+        };
+        print!("{rendered}");
+    }
 
     if args.exit_zero {
         return Ok(ExitCode::SUCCESS);

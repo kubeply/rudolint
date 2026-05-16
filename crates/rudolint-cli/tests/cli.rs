@@ -215,6 +215,16 @@ fn stdin_filename_changes_display_path() {
 }
 
 #[test]
+fn quiet_suppresses_output_but_preserves_failure() {
+    rudolint_cmd()
+        .args(["check", "--quiet", "--failure-threshold", "error"])
+        .write_stdin("FROM alpine:latest\nWORKDIR app\n")
+        .assert()
+        .code(1)
+        .stdout("");
+}
+
+#[test]
 fn missing_input_exits_with_code_two() {
     rudolint_cmd()
         .args(["check", "missing.Dockerfile"])
