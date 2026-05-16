@@ -632,6 +632,22 @@ fn snapshots_rdl3034_zypper_install_assume_yes_fixture() {
 }
 
 #[test]
+fn snapshots_rdl3035_no_zypper_dist_upgrade_fixture() {
+    let source = read_fixture("rules/RDL3035.no-zypper-dist-upgrade/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDL3035")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdl3035_no_zypper_dist_upgrade_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rdl4000_deprecated_maintainer_fixture() {
     let source = read_fixture("rules/RDL4000.deprecated-maintainer/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");

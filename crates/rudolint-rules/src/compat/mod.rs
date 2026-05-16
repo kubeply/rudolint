@@ -43,6 +43,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(YumCleanAll),
         Box::new(PinYumVersions),
         Box::new(ZypperInstallAssumeYes),
+        Box::new(NoZypperDistUpgrade),
         Box::new(DeprecatedMaintainer),
         Box::new(SingleCmd),
         Box::new(SingleEntrypoint),
@@ -1178,6 +1179,36 @@ impl Rule for ZypperInstallAssumeYes {
 }
 
 rule_metadata!(
+    NoZypperDistUpgrade,
+    "RDL3035",
+    "no-zypper-dist-upgrade",
+    Severity::Warning,
+    "avoid zypper dist-upgrade"
+);
+
+impl Rule for NoZypperDistUpgrade {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        doc.instructions
+            .iter()
+            .filter(|instruction| instruction.keyword == "RUN")
+            .filter(|instruction| shell_uses_zypper_dist_upgrade(&instruction.args))
+            .map(|instruction| {
+                diagnostic(
+                    "RDL3035",
+                    Severity::Warning,
+                    "avoid `zypper dist-upgrade` in Docker builds",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+rule_metadata!(
     DeprecatedMaintainer,
     "RDL4000",
     "deprecated-maintainer",
@@ -2169,11 +2200,22 @@ fn zypper_option_takes_value(argument: &str) -> bool {
     )
 }
 
+fn shell_uses_zypper_dist_upgrade(shell: &str) -> bool {
+    detect_command_invocations(shell)
+        .into_iter()
+        .filter(|invocation| invocation.command == "zypper")
+        .any(|invocation| {
+            zypper_subcommand_index(&invocation.arguments).is_some_and(|index| {
+                matches!(invocation.arguments[index].as_str(), "dist-upgrade" | "dup")
+            })
+        })
+}
+
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RDL3035", "RDL3036", "RDL3037", "RDL3038", "RDL3040", "RDL3041", "RDL3042", "RDL3043",
-        "RDL3044", "RDL3045", "RDL3046", "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051",
-        "RDL3052", "RDL3053", "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059",
-        "RDL3060", "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
+        "RDL3036", "RDL3037", "RDL3038", "RDL3040", "RDL3041", "RDL3042", "RDL3043", "RDL3044",
+        "RDL3045", "RDL3046", "RDL3047", "RDL3048", "RDL3049", "RDL3050", "RDL3051", "RDL3052",
+        "RDL3053", "RDL3054", "RDL3055", "RDL3056", "RDL3057", "RDL3058", "RDL3059", "RDL3060",
+        "RDL3061", "RDL3062", "RDL3063", "RDL4001", "RDL4005", "RDL4006",
     ]
 }

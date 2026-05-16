@@ -226,6 +226,12 @@ expression: normalized_json(&output)
     "summary": "use a non-interactive flag with zypper install"
   },
   {
+    "code": "RDL3035",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "avoid zypper dist-upgrade"
+  },
+  {
     "code": "RDL4000",
     "severity": "error",
     "status": "implemented",
