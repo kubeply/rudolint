@@ -1,6 +1,6 @@
 ---
 source: crates/rudolint-dockerfile/tests/parser_fixtures.rs
-assertion_line: 36
+assertion_line: 37
 expression: document_json(&document)
 ---
 {
@@ -23,6 +23,7 @@ expression: document_json(&document)
   "has_buildkit_features": true,
   "instructions": [
     {
+      "arg": null,
       "args": "--platform=$BUILDPLATFORM alpine:3.20 AS base",
       "args_span": {
         "end_byte": 81,
@@ -88,6 +89,7 @@ expression: document_json(&document)
       "run": null
     },
     {
+      "arg": null,
       "args": "--mount=type=cache,target=/var/cache/apk apk add curl",
       "args_span": {
         "end_byte": 139,
@@ -191,6 +193,7 @@ expression: document_json(&document)
       }
     },
     {
+      "arg": null,
       "args": "<<EOF\necho hello\nEOF",
       "args_span": {
         "end_byte": 164,
@@ -271,6 +274,7 @@ expression: document_json(&document)
       }
     },
     {
+      "arg": null,
       "args": "alpine:3.20 AS final",
       "args_span": {
         "end_byte": 190,
@@ -326,6 +330,7 @@ expression: document_json(&document)
       "run": null
     },
     {
+      "arg": null,
       "args": "--from=base /src /dst",
       "args_span": {
         "end_byte": 217,

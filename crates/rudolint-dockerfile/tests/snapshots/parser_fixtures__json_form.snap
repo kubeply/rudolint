@@ -9,6 +9,7 @@ expression: document_json(&document)
   "has_buildkit_features": false,
   "instructions": [
     {
+      "arg": null,
       "args": "alpine:3.20",
       "args_span": {
         "end_byte": 16,
@@ -64,6 +65,7 @@ expression: document_json(&document)
       "run": null
     },
     {
+      "arg": null,
       "args": "[\"apk\", \"add\", \"curl\"]",
       "args_span": {
         "end_byte": 43,
@@ -125,6 +127,7 @@ expression: document_json(&document)
       }
     },
     {
+      "arg": null,
       "args": "[\"sh\", \"-c\", \"echo hello\"]",
       "args_span": {
         "end_byte": 74,

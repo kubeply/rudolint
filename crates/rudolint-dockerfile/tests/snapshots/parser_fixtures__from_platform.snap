@@ -9,6 +9,7 @@ expression: document_json(&document)
   "has_buildkit_features": false,
   "instructions": [
     {
+      "arg": null,
       "args": "--platform=$BUILDPLATFORM alpine:3.20 AS build",
       "args_span": {
         "end_byte": 51,
@@ -74,6 +75,7 @@ expression: document_json(&document)
       "run": null
     },
     {
+      "arg": null,
       "args": "--platform=$TARGETPLATFORM scratch@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       "args_span": {
         "end_byte": 163,

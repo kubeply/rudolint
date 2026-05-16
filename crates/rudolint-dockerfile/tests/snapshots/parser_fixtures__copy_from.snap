@@ -1,6 +1,6 @@
 ---
 source: crates/rudolint-dockerfile/tests/parser_fixtures.rs
-assertion_line: 36
+assertion_line: 37
 expression: document_json(&document)
 ---
 {
@@ -10,6 +10,7 @@ expression: document_json(&document)
   "has_buildkit_features": false,
   "instructions": [
     {
+      "arg": null,
       "args": "alpine:3.20 AS build",
       "args_span": {
         "end_byte": 25,
@@ -65,6 +66,7 @@ expression: document_json(&document)
       "run": null
     },
     {
+      "arg": null,
       "args": "scratch",
       "args_span": {
         "end_byte": 38,
@@ -120,6 +122,7 @@ expression: document_json(&document)
       "run": null
     },
     {
+      "arg": null,
       "args": "--from=build /out/app /app",
       "args_span": {
         "end_byte": 70,
@@ -189,6 +192,7 @@ expression: document_json(&document)
       "run": null
     },
     {
+      "arg": null,
       "args": "--chown=1000:1000 --chmod=0755 bin/rudolint /usr/local/bin/rudolint",
       "args_span": {
         "end_byte": 143,
@@ -266,6 +270,7 @@ expression: document_json(&document)
       "run": null
     },
     {
+      "arg": null,
       "args": "[\"dir with spaces/file.txt\", \"/opt/dir with spaces/file.txt\"]",
       "args_span": {
         "end_byte": 210,
@@ -320,6 +325,7 @@ expression: document_json(&document)
       "run": null
     },
     {
+      "arg": null,
       "args": "https://example.com/archive.tar.gz /tmp/archive.tar.gz",
       "args_span": {
         "end_byte": 269,

@@ -9,6 +9,7 @@ expression: document_json(&document)
   "has_buildkit_features": true,
   "instructions": [
     {
+      "arg": null,
       "args": "alpine:3.20",
       "args_span": {
         "end_byte": 16,
@@ -64,6 +65,7 @@ expression: document_json(&document)
       "run": null
     },
     {
+      "arg": null,
       "args": "<<EOF\necho hello\nEOF",
       "args_span": {
         "end_byte": 41,
@@ -144,6 +146,7 @@ expression: document_json(&document)
       }
     },
     {
+      "arg": null,
       "args": "<<'SCRIPT'\necho quoted\nSCRIPT",
       "args_span": {
         "end_byte": 75,

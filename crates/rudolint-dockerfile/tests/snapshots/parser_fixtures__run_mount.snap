@@ -22,6 +22,7 @@ expression: document_json(&document)
   "has_buildkit_features": true,
   "instructions": [
     {
+      "arg": null,
       "args": "alpine:3.20",
       "args_span": {
         "end_byte": 47,
@@ -77,6 +78,7 @@ expression: document_json(&document)
       "run": null
     },
     {
+      "arg": null,
       "args": "--mount=type=cache,target=/var/cache/apk,sharing=locked apk add curl",
       "args_span": {
         "end_byte": 120,
@@ -188,6 +190,7 @@ expression: document_json(&document)
       }
     },
     {
+      "arg": null,
       "args": "--network=none --security=sandbox echo locked down",
       "args_span": {
         "end_byte": 175,
