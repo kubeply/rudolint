@@ -8,3 +8,6 @@ repository.workspace = true
 
 [dependencies]
 rudolint-source.workspace = true
+
+[dev-dependencies]
+insta.workspace = true

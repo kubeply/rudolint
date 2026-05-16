@@ -1,0 +1,8 @@
+---
+source: crates/rudolint-fix/src/lib.rs
+expression: preview.render()
+---
+title: replace latest tag
+applicability: safe
+edits:
+- line: 1, column: 13, length: 6, replacement: "3.20"

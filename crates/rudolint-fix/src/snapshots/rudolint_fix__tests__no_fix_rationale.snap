@@ -1,0 +1,8 @@
+---
+source: crates/rudolint-fix/src/lib.rs
+expression: preview.render()
+---
+title: secret-like build argument
+applicability: not-available
+reason: cannot infer the correct secret mount without build context
+edits:
