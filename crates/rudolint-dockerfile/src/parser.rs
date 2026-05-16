@@ -106,6 +106,7 @@ pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
     let source_file = SourceFile::new("Dockerfile", source);
     let mut syntax = None;
     let mut escape = None;
+    let mut escape_character = '\\';
     let mut checks = Vec::new();
     let mut comments = Vec::new();
     let mut instructions = Vec::new();
@@ -141,6 +142,7 @@ pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
                     });
                 } else if let Some(value) = directive_value(trimmed, "escape") {
                     if let Some(character) = value.trim().chars().next() {
+                        escape_character = character;
                         escape = Some(EscapeDirective {
                             character,
                             line: line_number,
@@ -164,14 +166,18 @@ pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
         }
         current.push_str(line);
 
-        if continues(line) {
+        if continues(line, escape_character) {
             byte_offset += segment.len();
             continue;
         }
 
-        if let Some(instruction) =
-            parse_instruction(&current, start_line, start_byte, &source_file)?
-        {
+        if let Some(instruction) = parse_instruction(
+            &current,
+            start_line,
+            start_byte,
+            &source_file,
+            escape_character,
+        )? {
             instructions.push(instruction);
         }
         current.clear();
@@ -179,8 +185,13 @@ pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
     }
 
     if !current.trim().is_empty()
-        && let Some(instruction) =
-            parse_instruction(&current, start_line, start_byte, &source_file)?
+        && let Some(instruction) = parse_instruction(
+            &current,
+            start_line,
+            start_byte,
+            &source_file,
+            escape_character,
+        )?
     {
         instructions.push(instruction);
     }
@@ -204,9 +215,11 @@ fn directive_value<'a>(comment: &'a str, name: &str) -> Option<&'a str> {
         .then_some(value.trim())
 }
 
-fn continues(line: &str) -> bool {
+fn continues(line: &str, escape_character: char) -> bool {
     let trimmed = line.trim_end();
-    trimmed.ends_with('\\') && !trimmed.ends_with("\\\\")
+    let mut chars = trimmed.chars().rev();
+    matches!(chars.next(), Some(character) if character == escape_character)
+        && !matches!(chars.next(), Some(character) if character == escape_character)
 }
 
 fn parse_instruction(
@@ -214,6 +227,7 @@ fn parse_instruction(
     line: usize,
     start_byte: usize,
     source_file: &SourceFile,
+    escape_character: char,
 ) -> Result<Option<Instruction>, ParserError> {
     let trimmed = raw.trim_start();
     if trimmed.is_empty() || trimmed.starts_with('#') {
@@ -230,7 +244,13 @@ fn parse_instruction(
             keyword_span,
             args: String::new(),
             args_span: None,
-            continuations: parse_continuations(raw, line, start_byte, source_file),
+            continuations: parse_continuations(
+                raw,
+                line,
+                start_byte,
+                source_file,
+                escape_character,
+            ),
             flags: Vec::new(),
             mounts: Vec::new(),
             heredocs: Vec::new(),
@@ -249,7 +269,7 @@ fn parse_instruction(
     let args = rest.trim().to_string();
     let args_span =
         (!args.is_empty()).then(|| source_file.span(args_start, args_start + args.len()));
-    let continuations = parse_continuations(raw, line, start_byte, source_file);
+    let continuations = parse_continuations(raw, line, start_byte, source_file, escape_character);
     let flags = parse_flags(&args);
     let mounts = flags
         .iter()
@@ -290,16 +310,21 @@ fn parse_continuations(
     start_line: usize,
     start_byte: usize,
     source_file: &SourceFile,
+    escape_character: char,
 ) -> Vec<LineContinuation> {
     let mut continuations = Vec::new();
     let mut line_start_byte = start_byte;
     for (line_index, line) in raw.split('\n').enumerate() {
-        if continues(line) {
-            let continuation_byte = line_start_byte + line.trim_end().len() - 1;
+        if continues(line, escape_character) {
+            let continuation_byte =
+                line_start_byte + line.trim_end().len() - escape_character.len_utf8();
             continuations.push(LineContinuation {
                 line: start_line + line_index,
-                escape: '\\',
-                span: source_file.span(continuation_byte, continuation_byte + 1),
+                escape: escape_character,
+                span: source_file.span(
+                    continuation_byte,
+                    continuation_byte + escape_character.len_utf8(),
+                ),
             });
         }
         line_start_byte += line.len() + 1;
@@ -402,5 +427,19 @@ FROM alpine:3.20
         assert_eq!(doc.syntax.unwrap().image, "docker/dockerfile:1.7");
         assert_eq!(doc.escape.unwrap().character, '`');
         assert_eq!(doc.checks[0].value, "skip=JSONArgsRecommended");
+    }
+
+    #[test]
+    fn parses_custom_escape_line_continuations() {
+        let doc = parse_dockerfile(
+            r#"# escape=`
+RUN echo hello `
+  && echo world
+"#,
+        )
+        .unwrap();
+
+        assert_eq!(doc.instructions[0].continuations[0].escape, '`');
+        assert_eq!(doc.instructions[0].continuations[0].line, 2);
     }
 }
