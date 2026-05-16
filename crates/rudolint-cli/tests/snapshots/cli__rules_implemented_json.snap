@@ -286,6 +286,12 @@ expression: normalized_json(&output)
     "summary": "avoid COPY to relative destinations without WORKDIR"
   },
   {
+    "code": "RDL3046",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "use no-log-init with high useradd UIDs"
+  },
+  {
     "code": "RDL4000",
     "severity": "error",
     "status": "implemented",
