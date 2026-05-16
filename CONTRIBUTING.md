@@ -39,7 +39,7 @@ Once snapshots are added, CI and local validation should run them with updates
 disabled:
 
 ```bash
-INSTA_UPDATE=never cargo test --all-targets --all-features --locked
+INSTA_UPDATE=no cargo test --all-targets --all-features --locked
 ```
 
 During iteration, prefer targeted tests:

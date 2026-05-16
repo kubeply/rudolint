@@ -171,7 +171,7 @@ Goal: keep every pull request trustworthy while the implementation grows.
    - `actionlint`
 3. Add `cargo test --doc --locked` once crate docs contain examples.
 4. Add a snapshot consistency check with:
-   `INSTA_UPDATE=never cargo test --all-targets --all-features --locked`.
+   `INSTA_UPDATE=no cargo test --all-targets --all-features --locked`.
 5. Add `cargo-insta` to the documented local toolchain once reviewing and
    accepting snapshots becomes common.
 6. Add a separate benchmark smoke job that builds benchmark code but does not

@@ -18,7 +18,7 @@ env:
   CARGO_INCREMENTAL: "0"
   CARGO_TERM_COLOR: always
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
-  INSTA_UPDATE: never
+  INSTA_UPDATE: "no"
 
 jobs:
   quality:
