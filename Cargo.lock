@@ -596,9 +596,12 @@ name = "rudolint-rules"
 version = "0.1.0"
 dependencies = [
  "clap",
+ "insta",
  "rudolint-config",
  "rudolint-diagnostics",
  "rudolint-dockerfile",
+ "rudolint-test",
+ "serde_json",
 ]
 
 [[package]]

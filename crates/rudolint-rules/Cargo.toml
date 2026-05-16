@@ -11,3 +11,8 @@ clap.workspace = true
 rudolint-config.workspace = true
 rudolint-diagnostics.workspace = true
 rudolint-dockerfile.workspace = true
+
+[dev-dependencies]
+insta.workspace = true
+rudolint-test.workspace = true
+serde_json.workspace = true
