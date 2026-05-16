@@ -52,3 +52,20 @@ jobs:
 
       - name: Check dependencies
         uses: EmbarkStudios/cargo-deny-action@v2
+
+  benchmark-smoke:
+    name: benchmark smoke
+    runs-on: depot-ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+
+      - name: Check benchmark support
+        run: cargo check -p rudolint-bench --all-targets --locked
