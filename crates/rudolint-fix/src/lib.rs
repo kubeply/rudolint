@@ -54,6 +54,11 @@ impl TextEdit {
             EditKind::Delete => "",
         }
     }
+
+    /// Returns the exclusive end column for the edited span.
+    pub fn end_column(&self) -> usize {
+        self.span.column + self.span.length
+    }
 }
 
 /// The operation performed by a [`TextEdit`].
@@ -65,6 +70,49 @@ pub enum EditKind {
     Insert { content: String },
     /// Delete the associated span.
     Delete,
+}
+
+/// A pair of edits that cannot be applied together without ordering ambiguity.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct EditConflict {
+    /// First conflicting edit.
+    pub first: TextEdit,
+    /// Second conflicting edit.
+    pub second: TextEdit,
+}
+
+/// Returns all conflicting edit pairs from `edits`.
+pub fn detect_conflicts(edits: &[TextEdit]) -> Vec<EditConflict> {
+    let mut conflicts = Vec::new();
+    for (left_index, left) in edits.iter().enumerate() {
+        for right in edits.iter().skip(left_index + 1) {
+            if edits_conflict(left, right) {
+                conflicts.push(EditConflict {
+                    first: left.clone(),
+                    second: right.clone(),
+                });
+            }
+        }
+    }
+    conflicts
+}
+
+fn edits_conflict(left: &TextEdit, right: &TextEdit) -> bool {
+    if left.span.line != right.span.line {
+        return false;
+    }
+
+    let left_start = left.span.column;
+    let left_end = left.end_column();
+    let right_start = right.span.column;
+    let right_end = right.end_column();
+
+    match (left.span.length == 0, right.span.length == 0) {
+        (true, true) => left_start == right_start,
+        (true, false) => right_start <= left_start && left_start < right_end,
+        (false, true) => left_start <= right_start && right_start < left_end,
+        (false, false) => left_start < right_end && right_start < left_end,
+    }
 }
 
 /// Describes whether a suggested [`FixPreview`] can be applied automatically.
@@ -186,6 +234,71 @@ mod tests {
         };
 
         insta::assert_snapshot!("edit_primitives", preview.render());
+    }
+
+    #[test]
+    fn detects_overlapping_edit_conflicts() {
+        let edits = vec![
+            TextEdit::replace(
+                SourceSpan {
+                    line: 1,
+                    column: 5,
+                    length: 4,
+                },
+                "FROM",
+            ),
+            TextEdit::delete(SourceSpan {
+                line: 1,
+                column: 7,
+                length: 3,
+            }),
+            TextEdit::insert(2, 1, "# syntax=docker/dockerfile:1\n"),
+        ];
+
+        let conflicts = detect_conflicts(&edits);
+
+        assert_eq!(conflicts.len(), 1);
+        assert_eq!(conflicts[0].first, edits[0]);
+        assert_eq!(conflicts[0].second, edits[1]);
+    }
+
+    #[test]
+    fn allows_adjacent_edits_and_detects_same_position_inserts() {
+        let adjacent = vec![
+            TextEdit::replace(
+                SourceSpan {
+                    line: 1,
+                    column: 1,
+                    length: 4,
+                },
+                "COPY",
+            ),
+            TextEdit::delete(SourceSpan {
+                line: 1,
+                column: 5,
+                length: 3,
+            }),
+        ];
+        assert!(detect_conflicts(&adjacent).is_empty());
+
+        let insert_at_span_start = vec![
+            TextEdit::insert(1, 1, "# prefix\n"),
+            TextEdit::replace(
+                SourceSpan {
+                    line: 1,
+                    column: 1,
+                    length: 4,
+                },
+                "COPY",
+            ),
+        ];
+        assert_eq!(detect_conflicts(&insert_at_span_start).len(), 1);
+
+        let inserts = vec![
+            TextEdit::insert(1, 1, "# first\n"),
+            TextEdit::insert(1, 1, "# second\n"),
+        ];
+        assert_eq!(detect_conflicts(&inserts).len(), 1);
     }
 
     #[test]
