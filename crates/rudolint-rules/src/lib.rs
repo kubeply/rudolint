@@ -6,6 +6,7 @@ use clap::ValueEnum;
 use rudolint_config::Config;
 use rudolint_diagnostics::{Finding, Severity};
 use rudolint_dockerfile::Dockerfile;
+use rudolint_policy::PolicyProfile;
 
 #[derive(Debug, Clone, Copy, Default, ValueEnum)]
 pub enum Profile {
@@ -14,6 +15,21 @@ pub enum Profile {
     Default,
     /// Emit only diagnostics intended to match established Dockerfile rule IDs.
     Compat,
+}
+
+impl From<Profile> for PolicyProfile {
+    fn from(profile: Profile) -> Self {
+        match profile {
+            Profile::Default => Self::Default,
+            Profile::Compat => Self::Compat,
+        }
+    }
+}
+
+impl Profile {
+    pub fn policy(self) -> PolicyProfile {
+        self.into()
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -48,16 +64,17 @@ pub trait Rule: Send + Sync {
 
 pub struct RuleEngine {
     rules: Vec<Box<dyn Rule>>,
-    profile: Profile,
+    policy: PolicyProfile,
     config: Config,
 }
 
 impl RuleEngine {
     pub fn new(profile: Profile, config: Config) -> Self {
+        let policy = profile.policy();
         let _trusted_registry_count = config.trusted_registries.len();
         Self {
-            rules: core::implemented_rules(profile),
-            profile,
+            rules: core::implemented_rules(policy),
+            policy,
             config,
         }
     }
@@ -87,6 +104,6 @@ impl RuleEngine {
     }
 
     pub fn catalog(&self) -> Vec<RuleInfo> {
-        core::catalog(self.profile)
+        core::catalog(self.policy)
     }
 }
