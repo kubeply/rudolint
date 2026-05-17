@@ -1339,6 +1339,22 @@ fn snapshots_rdl4006_pipefail_before_pipe_fixture() {
 }
 
 #[test]
+fn snapshots_rdk1004_secret_mount_copied_to_layer_fixture() {
+    let source = read_fixture("rules/RDK1004.secret-mount-copied-to-layer/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDK1004")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdk1004_secret_mount_copied_to_layer_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rule_selection_matrix() {
     let source = read_fixture("rules/default-basic/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");

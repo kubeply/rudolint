@@ -1,5 +1,6 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 1420
 expression: metadata
 ---
 [
@@ -46,6 +47,17 @@ expression: metadata
     "profile": "default",
     "status": "implemented",
     "summary": "prefer BuildKit cache mounts for package-manager caches"
+  },
+  {
+    "category": "buildkit",
+    "code": "RDK1004",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDK1004.md",
+    "fix": "none",
+    "name": "secret-mount-copied-to-layer",
+    "profile": "default",
+    "status": "implemented",
+    "summary": "avoid copying BuildKit secret mount contents into image layers"
   },
   {
     "category": "compatibility",

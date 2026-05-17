@@ -1,5 +1,6 @@
 ---
 source: crates/rudolint-cli/tests/cli.rs
+assertion_line: 563
 expression: normalized_json(&output)
 ---
 [
@@ -26,6 +27,12 @@ expression: normalized_json(&output)
     "severity": "info",
     "status": "implemented",
     "summary": "prefer BuildKit cache mounts for package-manager caches"
+  },
+  {
+    "code": "RDK1004",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "avoid copying BuildKit secret mount contents into image layers"
   },
   {
     "code": "RDL1001",

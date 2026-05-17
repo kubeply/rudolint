@@ -1,7 +1,8 @@
 use crate::{Rule, RuleInfo, metadata::diagnostic, metadata::rule_metadata};
 use rudolint_diagnostics::{Finding, Severity};
-use rudolint_dockerfile::Dockerfile;
+use rudolint_dockerfile::{Dockerfile, Mount};
 use rudolint_fix::{FixApplicability, FixPreview, TextEdit};
+use rudolint_shell::{ShellCommandInvocation, detect_command_invocations};
 
 pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
     vec![
@@ -9,6 +10,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(SecretLikeArgOrEnv),
         Box::new(SecretInRun),
         Box::new(CacheMountForPackageInstall),
+        Box::new(SecretMountCopiedToLayer),
     ]
 }
 
@@ -164,7 +166,11 @@ impl Rule for SecretInRun {
 
 #[cfg(test)]
 mod tests {
-    use super::has_secret_like_arg_or_env_name;
+    use super::{
+        has_secret_like_arg_or_env_name, invocation_copies_secret, path_is_at_or_under,
+        source_operands,
+    };
+    use rudolint_shell::ShellCommandInvocation;
 
     const SECRET_WORDS: &[&str] = &["SECRET", "TOKEN", "PASSWORD", "PRIVATE_KEY", "ACCESS_KEY"];
 
@@ -201,6 +207,81 @@ mod tests {
             "NAME TOKEN",
             SECRET_WORDS
         ));
+    }
+
+    #[test]
+    fn secret_copy_detection_uses_source_operands_only() {
+        let secret_targets = vec!["/run/secrets/api_token".to_string()];
+
+        assert!(invocation_copies_secret(
+            &ShellCommandInvocation {
+                command: "install".to_string(),
+                arguments: vec![
+                    "-m".to_string(),
+                    "0600".to_string(),
+                    "/run/secrets/api_token".to_string(),
+                    "/app/token".to_string(),
+                ],
+            },
+            &secret_targets,
+        ));
+        assert!(invocation_copies_secret(
+            &ShellCommandInvocation {
+                command: "cp".to_string(),
+                arguments: vec![
+                    "-t".to_string(),
+                    "/app".to_string(),
+                    "/run/secrets/api_token".to_string(),
+                ],
+            },
+            &secret_targets,
+        ));
+        assert!(!invocation_copies_secret(
+            &ShellCommandInvocation {
+                command: "cp".to_string(),
+                arguments: vec![
+                    "/tmp/source".to_string(),
+                    "/run/secrets/api_token".to_string(),
+                ],
+            },
+            &secret_targets,
+        ));
+        assert!(path_is_at_or_under(
+            "/run/secrets/api_token",
+            "/run/secrets/api_token"
+        ));
+        assert!(!path_is_at_or_under(
+            "/run/secrets/api_token.bak",
+            "/run/secrets/api_token"
+        ));
+    }
+
+    #[test]
+    fn source_operand_detection_handles_target_directory_flags() {
+        assert_eq!(
+            source_operands(
+                "cp",
+                &["-t".to_string(), "/app".to_string(), "secret".to_string()]
+            ),
+            vec!["secret"]
+        );
+        assert_eq!(
+            source_operands(
+                "install",
+                &[
+                    "-m".to_string(),
+                    "0600".to_string(),
+                    "--target-directory".to_string(),
+                    "/app".to_string(),
+                    "secret".to_string(),
+                ],
+            ),
+            vec!["secret"]
+        );
+        assert_eq!(
+            source_operands("rsync", &["secret".to_string(), "/app".to_string()]),
+            vec!["secret"]
+        );
     }
 }
 
@@ -243,4 +324,145 @@ impl Rule for CacheMountForPackageInstall {
             })
             .collect()
     }
+}
+
+rule_metadata!(
+    SecretMountCopiedToLayer,
+    "RDK1004",
+    "secret-mount-copied-to-layer",
+    Severity::Warning,
+    "avoid copying BuildKit secret mount contents into image layers"
+);
+
+impl Rule for SecretMountCopiedToLayer {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        doc.instructions
+            .iter()
+            .filter(|instruction| instruction.keyword == "RUN")
+            .filter(|instruction| {
+                let secret_targets = instruction
+                    .mounts
+                    .iter()
+                    .filter(|mount| mount.mount_type == "secret")
+                    .filter_map(secret_mount_target)
+                    .collect::<Vec<_>>();
+
+                instruction
+                    .run
+                    .as_ref()
+                    .and_then(|run| run.shell.as_ref())
+                    .is_some_and(|shell| {
+                        !secret_targets.is_empty()
+                            && detect_command_invocations(&shell.text)
+                                .iter()
+                                .any(|invocation| {
+                                    invocation_copies_secret(invocation, &secret_targets)
+                                })
+                    })
+            })
+            .map(|instruction| {
+                diagnostic(
+                    "RDK1004",
+                    Severity::Warning,
+                    "secret mount contents appear to be copied into the image layer",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+fn secret_mount_target(mount: &Mount) -> Option<String> {
+    let option = |name: &str| {
+        mount
+            .options
+            .iter()
+            .find_map(|(key, value)| (key == name && !value.is_empty()).then(|| value.clone()))
+    };
+
+    option("target")
+        .or_else(|| option("dst"))
+        .or_else(|| option("destination"))
+        .or_else(|| option("id").map(|id| format!("/run/secrets/{id}")))
+        .filter(|target| target != "/")
+}
+
+fn invocation_copies_secret(
+    invocation: &ShellCommandInvocation,
+    secret_targets: &[String],
+) -> bool {
+    if !matches!(invocation.command.as_str(), "cp" | "install" | "rsync") {
+        return false;
+    }
+
+    source_operands(&invocation.command, &invocation.arguments)
+        .into_iter()
+        .any(|operand| {
+            secret_targets
+                .iter()
+                .any(|target| path_is_at_or_under(operand, target))
+        })
+}
+
+fn source_operands<'a>(command: &str, arguments: &'a [String]) -> Vec<&'a str> {
+    let mut operands = Vec::new();
+    let mut target_directory = false;
+    let mut skip_next = false;
+    let mut end_of_options = false;
+
+    for argument in arguments {
+        if skip_next {
+            skip_next = false;
+            continue;
+        }
+
+        if end_of_options {
+            operands.push(argument.as_str());
+            continue;
+        }
+
+        match argument.as_str() {
+            "--" => {
+                end_of_options = true;
+            }
+            "-t" | "--target-directory" if matches!(command, "cp" | "install") => {
+                target_directory = true;
+                skip_next = true;
+            }
+            "--target-directory" if command == "rsync" => {
+                skip_next = true;
+            }
+            "-m" | "--mode" | "-o" | "--owner" | "-g" | "--group" if command == "install" => {
+                skip_next = true;
+            }
+            _ if argument.starts_with("--target-directory=")
+                && matches!(command, "cp" | "install") =>
+            {
+                target_directory = true;
+            }
+            _ if argument.starts_with('-') => {}
+            _ => operands.push(argument.as_str()),
+        }
+    }
+
+    if target_directory {
+        operands
+    } else {
+        let source_count = operands.len().saturating_sub(1);
+        operands.into_iter().take(source_count).collect()
+    }
+}
+
+fn path_is_at_or_under(path: &str, target: &str) -> bool {
+    let path = path.trim_end_matches('/');
+    let target = target.trim_end_matches('/');
+
+    path == target
+        || path
+            .strip_prefix(target)
+            .is_some_and(|suffix| suffix.starts_with('/'))
 }
