@@ -65,6 +65,12 @@ expression: normalized_json(&output)
     "summary": "avoid host architecture detection in multi-platform builds"
   },
   {
+    "code": "RDK1010",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "require a new enough Dockerfile frontend for used syntax"
+  },
+  {
     "code": "RDL1001",
     "severity": "warning",
     "status": "implemented",

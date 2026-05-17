@@ -19,6 +19,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(CacheMountSafeSharing),
         Box::new(BuildkitEntitlementRequiresOptIn),
         Box::new(MultiPlatformHostArchitecture),
+        Box::new(FrontendVersionSupportsSyntax),
     ]
 }
 
@@ -1248,4 +1249,227 @@ fn invocation_uses_host_architecture_probe(invocation: &ShellCommandInvocation) 
             .any(|argument| argument == "--print-arch"),
         _ => false,
     }
+}
+
+rule_metadata!(
+    FrontendVersionSupportsSyntax,
+    "RDK1010",
+    "frontend-version-supports-syntax",
+    Severity::Warning,
+    "require a new enough Dockerfile frontend for used syntax"
+);
+
+impl Rule for FrontendVersionSupportsSyntax {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        let Some(frontend) = doc
+            .syntax
+            .as_ref()
+            .and_then(|syntax| parse_pinned_frontend_version(&syntax.image))
+        else {
+            return Vec::new();
+        };
+
+        doc.instructions
+            .iter()
+            .flat_map(|instruction| {
+                frontend_requirements(instruction)
+                    .into_iter()
+                    .filter(|requirement| frontend_version_is_too_old(frontend, requirement))
+                    .map(|requirement| {
+                        diagnostic(
+                            "RDK1010",
+                            Severity::Warning,
+                            format!(
+                                "{} requires Dockerfile frontend {}, but syntax directive pins {}",
+                                requirement.feature,
+                                requirement.version.display(),
+                                frontend.display(),
+                            ),
+                            instruction,
+                        )
+                    })
+            })
+            .collect()
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct FrontendVersion {
+    major: u16,
+    minor: Option<u16>,
+    patch: Option<u16>,
+    labs: bool,
+}
+
+impl FrontendVersion {
+    fn display(self) -> String {
+        let mut version = self.major.to_string();
+        if let Some(minor) = self.minor {
+            version.push('.');
+            version.push_str(&minor.to_string());
+        }
+        if let Some(patch) = self.patch {
+            version.push('.');
+            version.push_str(&patch.to_string());
+        }
+        if self.labs {
+            version.push_str("-labs");
+        }
+        version
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct FrontendRequirement {
+    feature: &'static str,
+    version: FrontendVersion,
+}
+
+impl FrontendRequirement {
+    const fn stable(feature: &'static str, major: u16, minor: u16) -> Self {
+        Self {
+            feature,
+            version: FrontendVersion {
+                major,
+                minor: Some(minor),
+                patch: None,
+                labs: false,
+            },
+        }
+    }
+
+    const fn labs(feature: &'static str, major: u16, minor: u16) -> Self {
+        Self {
+            feature,
+            version: FrontendVersion {
+                major,
+                minor: Some(minor),
+                patch: None,
+                labs: true,
+            },
+        }
+    }
+}
+
+fn parse_pinned_frontend_version(image: &str) -> Option<FrontendVersion> {
+    let (_, tag) = image.rsplit_once(':')?;
+    let (version, labs) = tag
+        .strip_suffix("-labs")
+        .map_or((tag, false), |version| (version, true));
+    let parts = version.split('.').collect::<Vec<_>>();
+    if parts.len() < 2 || parts.len() > 3 {
+        return None;
+    }
+
+    Some(FrontendVersion {
+        major: parts.first()?.parse().ok()?,
+        minor: Some(parts.get(1)?.parse().ok()?),
+        patch: parts.get(2).and_then(|patch| patch.parse().ok()),
+        labs,
+    })
+}
+
+fn frontend_requirements(instruction: &Instruction) -> Vec<FrontendRequirement> {
+    let mut requirements = Vec::new();
+
+    if !instruction.heredocs.is_empty() {
+        requirements.push(FrontendRequirement::stable(
+            "Dockerfile here-document syntax",
+            1,
+            4,
+        ));
+    }
+
+    match instruction.keyword.as_str() {
+        "RUN" => {
+            for (name, _) in &instruction.flags {
+                match name.as_str() {
+                    "device" => {
+                        requirements.push(FrontendRequirement::labs("RUN --device", 1, 14));
+                    }
+                    "mount" => {
+                        requirements.push(FrontendRequirement::stable("RUN --mount", 1, 2));
+                    }
+                    "network" => {
+                        requirements.push(FrontendRequirement::stable("RUN --network", 1, 3));
+                    }
+                    "security" => {
+                        requirements.push(FrontendRequirement::stable("RUN --security", 1, 20));
+                    }
+                    _ => {}
+                }
+            }
+        }
+        "ADD" => {
+            for (name, _) in &instruction.flags {
+                match name.as_str() {
+                    "keep-git-dir" => {
+                        requirements.push(FrontendRequirement::stable("ADD --keep-git-dir", 1, 1));
+                    }
+                    "checksum" => {
+                        requirements.push(FrontendRequirement::stable("ADD --checksum", 1, 6));
+                    }
+                    "chmod" => {
+                        requirements.push(FrontendRequirement::stable("ADD --chmod", 1, 2));
+                    }
+                    "link" => {
+                        requirements.push(FrontendRequirement::stable("ADD --link", 1, 4));
+                    }
+                    "unpack" => {
+                        requirements.push(FrontendRequirement::stable("ADD --unpack", 1, 17));
+                    }
+                    "exclude" => {
+                        requirements.push(FrontendRequirement::stable("ADD --exclude", 1, 19));
+                    }
+                    _ => {}
+                }
+            }
+        }
+        "COPY" => {
+            for (name, _) in &instruction.flags {
+                match name.as_str() {
+                    "chmod" => {
+                        requirements.push(FrontendRequirement::stable("COPY --chmod", 1, 2));
+                    }
+                    "link" => {
+                        requirements.push(FrontendRequirement::stable("COPY --link", 1, 4));
+                    }
+                    "parents" => {
+                        requirements.push(FrontendRequirement::stable("COPY --parents", 1, 20));
+                    }
+                    "exclude" => {
+                        requirements.push(FrontendRequirement::stable("COPY --exclude", 1, 19));
+                    }
+                    _ => {}
+                }
+            }
+        }
+        _ => {}
+    }
+
+    requirements
+}
+
+fn frontend_version_is_too_old(
+    frontend: FrontendVersion,
+    requirement: &FrontendRequirement,
+) -> bool {
+    if requirement.version.labs && !frontend.labs {
+        return true;
+    }
+    if frontend.major != requirement.version.major {
+        return frontend.major < requirement.version.major;
+    }
+
+    let frontend_minor = frontend.minor.unwrap_or_default();
+    let required_minor = requirement.version.minor.unwrap_or_default();
+    if frontend_minor != required_minor {
+        return frontend_minor < required_minor;
+    }
+
+    frontend.patch.unwrap_or_default() < requirement.version.patch.unwrap_or_default()
 }

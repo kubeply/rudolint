@@ -1,6 +1,6 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
-assertion_line: 1523
+assertion_line: 1556
 expression: metadata
 ---
 [
@@ -113,6 +113,17 @@ expression: metadata
     "profile": "default",
     "status": "implemented",
     "summary": "avoid host architecture detection in multi-platform builds"
+  },
+  {
+    "category": "buildkit",
+    "code": "RDK1010",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDK1010.md",
+    "fix": "none",
+    "name": "frontend-version-supports-syntax",
+    "profile": "default",
+    "status": "implemented",
+    "summary": "require a new enough Dockerfile frontend for used syntax"
   },
   {
     "category": "compatibility",

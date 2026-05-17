@@ -1458,6 +1458,39 @@ fn snapshots_rdk1009_multi_platform_host_architecture_fixture() {
 }
 
 #[test]
+fn snapshots_rdk1010_frontend_version_supports_syntax_fixture() {
+    let source = read_fixture("rules/RDK1010.frontend-version-supports-syntax/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDK1010")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdk1010_frontend_version_supports_syntax_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
+fn rdk1010_allows_floating_frontend_tag() {
+    let source = r#"# syntax=docker/dockerfile:1
+FROM alpine:3.20
+RUN --security=sandbox true
+COPY --parents src/file /dst/
+"#;
+    let document = parse_dockerfile(source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDK1010")
+        .collect::<Vec<_>>();
+
+    assert!(findings.is_empty());
+}
+
+#[test]
 fn snapshots_rule_selection_matrix() {
     let source = read_fixture("rules/default-basic/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");

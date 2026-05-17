@@ -1,0 +1,87 @@
+---
+source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 1470
+expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
+---
+[
+  {
+    "code": "RDK1010",
+    "help": null,
+    "labels": [],
+    "message": "RUN --security requires Dockerfile frontend 1.20, but syntax directive pins 1.3",
+    "path": "",
+    "primary_span": {
+      "end_byte": 0,
+      "end_column": 1,
+      "end_line": 7,
+      "start_byte": 0,
+      "start_column": 1,
+      "start_line": 7
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "RDK1010",
+    "help": null,
+    "labels": [],
+    "message": "Dockerfile here-document syntax requires Dockerfile frontend 1.4, but syntax directive pins 1.3",
+    "path": "",
+    "primary_span": {
+      "end_byte": 0,
+      "end_column": 1,
+      "end_line": 8,
+      "start_byte": 0,
+      "start_column": 1,
+      "start_line": 8
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "RDK1010",
+    "help": null,
+    "labels": [],
+    "message": "COPY --link requires Dockerfile frontend 1.4, but syntax directive pins 1.3",
+    "path": "",
+    "primary_span": {
+      "end_byte": 0,
+      "end_column": 1,
+      "end_line": 12,
+      "start_byte": 0,
+      "start_column": 1,
+      "start_line": 12
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "RDK1010",
+    "help": null,
+    "labels": [],
+    "message": "COPY --parents requires Dockerfile frontend 1.20, but syntax directive pins 1.3",
+    "path": "",
+    "primary_span": {
+      "end_byte": 0,
+      "end_column": 1,
+      "end_line": 13,
+      "start_byte": 0,
+      "start_column": 1,
+      "start_line": 13
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "RDK1010",
+    "help": null,
+    "labels": [],
+    "message": "ADD --checksum requires Dockerfile frontend 1.6, but syntax directive pins 1.3",
+    "path": "",
+    "primary_span": {
+      "end_byte": 0,
+      "end_column": 1,
+      "end_line": 14,
+      "start_byte": 0,
+      "start_column": 1,
+      "start_line": 14
+    },
+    "severity": "warning"
+  }
+]
