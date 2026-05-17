@@ -282,6 +282,24 @@ mod tests {
             source_operands("rsync", &["secret".to_string(), "/app".to_string()]),
             vec!["secret"]
         );
+        assert_eq!(
+            source_operands(
+                "rsync",
+                &["--target-directory=/app".to_string(), "secret".to_string()]
+            ),
+            vec!["secret"]
+        );
+        assert_eq!(
+            source_operands(
+                "rsync",
+                &[
+                    "--target-directory".to_string(),
+                    "/app".to_string(),
+                    "secret".to_string()
+                ]
+            ),
+            vec!["secret"]
+        );
     }
 }
 
@@ -434,13 +452,14 @@ fn source_operands<'a>(command: &str, arguments: &'a [String]) -> Vec<&'a str> {
                 skip_next = true;
             }
             "--target-directory" if command == "rsync" => {
+                target_directory = true;
                 skip_next = true;
             }
             "-m" | "--mode" | "-o" | "--owner" | "-g" | "--group" if command == "install" => {
                 skip_next = true;
             }
             _ if argument.starts_with("--target-directory=")
-                && matches!(command, "cp" | "install") =>
+                && matches!(command, "cp" | "install" | "rsync") =>
             {
                 target_directory = true;
             }
