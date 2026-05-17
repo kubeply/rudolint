@@ -169,7 +169,7 @@ impl Rule for SecretInRun {
 mod tests {
     use super::{
         has_secret_like_arg_or_env_name, invocation_copies_secret, path_is_at_or_under,
-        source_operands,
+        shell_wrapper_command, source_operands,
     };
     use rudolint_shell::ShellCommandInvocation;
 
@@ -392,6 +392,14 @@ mod tests {
             ),
             vec!["secret"]
         );
+    }
+
+    #[test]
+    fn ssh_scope_detection_accepts_path_qualified_shell_wrappers() {
+        assert!(shell_wrapper_command("sh"));
+        assert!(shell_wrapper_command("/bin/sh"));
+        assert!(shell_wrapper_command("/usr/bin/bash"));
+        assert!(!shell_wrapper_command("git"));
     }
 }
 
@@ -885,5 +893,6 @@ fn ssh_mount_scope_is_broad(shell: &str) -> bool {
 }
 
 fn shell_wrapper_command(command: &str) -> bool {
-    matches!(command, "sh" | "bash" | "dash" | "ash" | "zsh")
+    let wrapper_name = command.rsplit('/').next().unwrap_or(command);
+    matches!(wrapper_name, "sh" | "bash" | "dash" | "ash" | "zsh")
 }
