@@ -10,5 +10,6 @@ echo hello
 EOF
 
 COPY --link src/ /dst/
+COPY --chmod=+x src/tool /usr/local/bin/tool
 COPY --parents src/file /dst/
 ADD --checksum=sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa https://example.invalid/archive.tar.gz /tmp/archive.tar.gz

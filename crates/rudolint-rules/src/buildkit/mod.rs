@@ -176,8 +176,9 @@ impl Rule for SecretInRun {
 #[cfg(test)]
 mod tests {
     use super::{
-        has_secret_like_arg_or_env_name, invocation_copies_secret, parse_pinned_frontend_version,
-        path_is_at_or_under, shell_wrapper_command, source_operands,
+        chmod_value_is_symbolic, has_secret_like_arg_or_env_name, invocation_copies_secret,
+        is_official_dockerfile_frontend, parse_pinned_frontend_version, path_is_at_or_under,
+        shell_wrapper_command, source_operands,
     };
     use rudolint_shell::ShellCommandInvocation;
 
@@ -421,6 +422,21 @@ mod tests {
 
         assert!(parse_pinned_frontend_version("docker/dockerfile:1").is_none());
         assert!(parse_pinned_frontend_version("docker/dockerfile:1.2.bad").is_none());
+    }
+
+    #[test]
+    fn frontend_version_rule_gates_official_frontends_and_symbolic_chmod() {
+        assert!(is_official_dockerfile_frontend("docker/dockerfile:1.20"));
+        assert!(is_official_dockerfile_frontend(
+            "docker.io/docker/dockerfile:1.20@sha256:abcdef"
+        ));
+        assert!(!is_official_dockerfile_frontend(
+            "registry.example.com/custom/dockerfile:1.20"
+        ));
+
+        assert!(!chmod_value_is_symbolic("0755"));
+        assert!(chmod_value_is_symbolic("+x"));
+        assert!(chmod_value_is_symbolic("u=rwX,go=rX"));
     }
 }
 
@@ -1281,6 +1297,7 @@ impl Rule for FrontendVersionSupportsSyntax {
         let Some(frontend) = doc
             .syntax
             .as_ref()
+            .filter(|syntax| is_official_dockerfile_frontend(&syntax.image))
             .and_then(|syntax| parse_pinned_frontend_version(&syntax.image))
         else {
             return Vec::new();
@@ -1368,6 +1385,23 @@ impl FrontendRequirement {
     }
 }
 
+fn is_official_dockerfile_frontend(image: &str) -> bool {
+    let reference = image
+        .split_once('@')
+        .map_or(image, |(reference, _)| reference);
+    let Some((name, _)) = reference.rsplit_once(':') else {
+        return false;
+    };
+
+    matches!(
+        name,
+        "docker/dockerfile"
+            | "docker.io/docker/dockerfile"
+            | "index.docker.io/docker/dockerfile"
+            | "registry-1.docker.io/docker/dockerfile"
+    )
+}
+
 fn parse_pinned_frontend_version(image: &str) -> Option<FrontendVersion> {
     let reference = image
         .split_once('@')
@@ -1428,7 +1462,7 @@ fn frontend_requirements(instruction: &Instruction) -> Vec<FrontendRequirement> 
             }
         }
         "ADD" => {
-            for (name, _) in &instruction.flags {
+            for (name, value) in &instruction.flags {
                 match name.as_str() {
                     "keep-git-dir" => {
                         requirements.push(FrontendRequirement::stable("ADD --keep-git-dir", 1, 1));
@@ -1437,7 +1471,7 @@ fn frontend_requirements(instruction: &Instruction) -> Vec<FrontendRequirement> 
                         requirements.push(FrontendRequirement::stable("ADD --checksum", 1, 6));
                     }
                     "chmod" => {
-                        requirements.push(FrontendRequirement::stable("ADD --chmod", 1, 2));
+                        requirements.push(chmod_frontend_requirement("ADD --chmod", value));
                     }
                     "link" => {
                         requirements.push(FrontendRequirement::stable("ADD --link", 1, 4));
@@ -1453,10 +1487,10 @@ fn frontend_requirements(instruction: &Instruction) -> Vec<FrontendRequirement> 
             }
         }
         "COPY" => {
-            for (name, _) in &instruction.flags {
+            for (name, value) in &instruction.flags {
                 match name.as_str() {
                     "chmod" => {
-                        requirements.push(FrontendRequirement::stable("COPY --chmod", 1, 2));
+                        requirements.push(chmod_frontend_requirement("COPY --chmod", value));
                     }
                     "link" => {
                         requirements.push(FrontendRequirement::stable("COPY --link", 1, 4));
@@ -1475,6 +1509,23 @@ fn frontend_requirements(instruction: &Instruction) -> Vec<FrontendRequirement> 
     }
 
     requirements
+}
+
+fn chmod_frontend_requirement(feature: &'static str, value: &str) -> FrontendRequirement {
+    if chmod_value_is_symbolic(value) {
+        FrontendRequirement::stable(feature, 1, 14)
+    } else {
+        FrontendRequirement::stable(feature, 1, 2)
+    }
+}
+
+fn chmod_value_is_symbolic(value: &str) -> bool {
+    value.chars().any(|character| {
+        matches!(
+            character,
+            '+' | '-' | '=' | 'u' | 'g' | 'o' | 'a' | 'r' | 'w' | 'x' | 'X' | 's' | 't'
+        )
+    })
 }
 
 fn frontend_version_is_too_old(
