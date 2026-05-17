@@ -876,7 +876,7 @@ impl Rule for SshMountCommandScope {
                 diagnostic(
                     "RDK1005",
                     Severity::Warning,
-                    "SSH mount is available to more than one RUN command scope",
+                    "SSH mount scope is broader than a single command invocation",
                     instruction,
                 )
             })

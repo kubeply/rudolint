@@ -8,7 +8,7 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "code": "RDK1005",
     "help": null,
     "labels": [],
-    "message": "SSH mount is available to more than one RUN command scope",
+    "message": "SSH mount scope is broader than a single command invocation",
     "path": "",
     "primary_span": {
       "end_byte": 0,
@@ -24,7 +24,7 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "code": "RDK1005",
     "help": null,
     "labels": [],
-    "message": "SSH mount is available to more than one RUN command scope",
+    "message": "SSH mount scope is broader than a single command invocation",
     "path": "",
     "primary_span": {
       "end_byte": 0,
@@ -40,7 +40,7 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "code": "RDK1005",
     "help": null,
     "labels": [],
-    "message": "SSH mount is available to more than one RUN command scope",
+    "message": "SSH mount scope is broader than a single command invocation",
     "path": "",
     "primary_span": {
       "end_byte": 0,
