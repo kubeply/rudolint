@@ -10,35 +10,29 @@ project-local.
 
 - `RDL1001`
 - `RDL3000`
-- `RDL3002`
-- `RDL3006`
-- `RDL3007`
-- `RDL3011`
-- `RDL3012`
-- `RDL3020`
-- `RDL3024`
-- `RDL3025`
-- `RDL4000`
-- `RDL4003`
-- `RDL4004`
-
-## Planned Compatibility Rules
-
 - `RDL3001`
+- `RDL3002`
 - `RDL3003`
 - `RDL3004`
+- `RDL3006`
+- `RDL3007`
 - `RDL3008`
 - `RDL3009`
 - `RDL3010`
+- `RDL3011`
+- `RDL3012`
 - `RDL3013`
 - `RDL3014`
 - `RDL3015`
 - `RDL3016`
 - `RDL3018`
 - `RDL3019`
+- `RDL3020`
 - `RDL3021`
 - `RDL3022`
 - `RDL3023`
+- `RDL3024`
+- `RDL3025`
 - `RDL3026`
 - `RDL3027`
 - `RDL3028`
@@ -75,9 +69,17 @@ project-local.
 - `RDL3061`
 - `RDL3062`
 - `RDL3063`
+- `RDL4000`
 - `RDL4001`
+- `RDL4003`
+- `RDL4004`
 - `RDL4005`
 - `RDL4006`
+
+## Planned Compatibility Rules
+
+No compatibility rules are currently planned in this roadmap. New compatibility
+IDs should be added here when they are intentionally tracked.
 
 ## Planned Shell Rules
 

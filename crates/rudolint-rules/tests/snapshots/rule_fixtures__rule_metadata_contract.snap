@@ -772,5 +772,16 @@ expression: metadata
     "profile": "compat",
     "status": "implemented",
     "summary": "use SHELL to change the default shell"
+  },
+  {
+    "category": "compatibility",
+    "code": "RDL4006",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4006.md",
+    "fix": "none",
+    "name": "pipefail-before-pipe",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "set pipefail before RUN instructions with pipes"
   }
 ]

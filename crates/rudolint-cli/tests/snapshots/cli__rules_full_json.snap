@@ -426,8 +426,8 @@ expression: normalized_json(&output)
   {
     "code": "RDL4006",
     "severity": "warning",
-    "status": "planned",
-    "summary": "tracked for compatibility parity"
+    "status": "implemented",
+    "summary": "set pipefail before RUN instructions with pipes"
   },
   {
     "code": "RSC1000",
