@@ -246,6 +246,17 @@ mod tests {
             },
             &secret_targets,
         ));
+        assert!(invocation_copies_secret(
+            &ShellCommandInvocation {
+                command: "cp".to_string(),
+                arguments: vec![
+                    "-r".to_string(),
+                    "/run/secrets".to_string(),
+                    "/app/secrets".to_string(),
+                ],
+            },
+            &secret_targets,
+        ));
         assert!(path_is_at_or_under(
             "/run/secrets/api_token",
             "/run/secrets/api_token"
@@ -290,12 +301,41 @@ mod tests {
             vec!["secret"]
         );
         assert_eq!(
+            source_operands("cp", &["-t/app".to_string(), "secret".to_string()]),
+            vec!["secret"]
+        );
+        assert_eq!(
             source_operands(
                 "rsync",
                 &[
                     "--target-directory".to_string(),
                     "/app".to_string(),
                     "secret".to_string()
+                ]
+            ),
+            vec!["secret"]
+        );
+        assert_eq!(
+            source_operands(
+                "rsync",
+                &[
+                    "--files-from".to_string(),
+                    "/run/secrets/list".to_string(),
+                    "src/".to_string(),
+                    "/dest/".to_string(),
+                ]
+            ),
+            vec!["src/"]
+        );
+        assert_eq!(
+            source_operands(
+                "install",
+                &[
+                    "--owner=root".to_string(),
+                    "--group".to_string(),
+                    "root".to_string(),
+                    "secret".to_string(),
+                    "/dest".to_string(),
                 ]
             ),
             vec!["secret"]
@@ -420,9 +460,9 @@ fn invocation_copies_secret(
     source_operands(&invocation.command, &invocation.arguments)
         .into_iter()
         .any(|operand| {
-            secret_targets
-                .iter()
-                .any(|target| path_is_at_or_under(operand, target))
+            secret_targets.iter().any(|target| {
+                path_is_at_or_under(operand, target) || path_is_at_or_under(target, operand)
+            })
         })
 }
 
@@ -443,25 +483,19 @@ fn source_operands<'a>(command: &str, arguments: &'a [String]) -> Vec<&'a str> {
             continue;
         }
 
+        if let Some(behavior) = option_behavior(command, argument) {
+            if behavior.target_directory {
+                target_directory = true;
+            }
+            if behavior.skip_next {
+                skip_next = true;
+            }
+            continue;
+        }
+
         match argument.as_str() {
             "--" => {
                 end_of_options = true;
-            }
-            "-t" | "--target-directory" if matches!(command, "cp" | "install") => {
-                target_directory = true;
-                skip_next = true;
-            }
-            "--target-directory" if command == "rsync" => {
-                target_directory = true;
-                skip_next = true;
-            }
-            "-m" | "--mode" | "-o" | "--owner" | "-g" | "--group" if command == "install" => {
-                skip_next = true;
-            }
-            _ if argument.starts_with("--target-directory=")
-                && matches!(command, "cp" | "install" | "rsync") =>
-            {
-                target_directory = true;
             }
             _ if argument.starts_with('-') => {}
             _ => operands.push(argument.as_str()),
@@ -474,6 +508,102 @@ fn source_operands<'a>(command: &str, arguments: &'a [String]) -> Vec<&'a str> {
         let source_count = operands.len().saturating_sub(1);
         operands.into_iter().take(source_count).collect()
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct OptionBehavior {
+    skip_next: bool,
+    target_directory: bool,
+}
+
+fn option_behavior(command: &str, argument: &str) -> Option<OptionBehavior> {
+    let (name, has_inline_value) = option_name_and_value_form(argument);
+
+    let takes_value = match command {
+        "cp" => matches!(
+            name,
+            "-S" | "--suffix" | "-t" | "--target-directory" | "--context"
+        ),
+        "install" => matches!(
+            name,
+            "-g" | "--group"
+                | "-m"
+                | "--mode"
+                | "-o"
+                | "--owner"
+                | "-S"
+                | "--suffix"
+                | "-t"
+                | "--target-directory"
+                | "--context"
+                | "--strip-program"
+        ),
+        "rsync" => matches!(
+            name,
+            "-B" | "--block-size"
+                | "-e"
+                | "--rsh"
+                | "-f"
+                | "--filter"
+                | "-M"
+                | "--remote-option"
+                | "--files-from"
+                | "--exclude-from"
+                | "--include-from"
+                | "--address"
+                | "--backup-dir"
+                | "--bwlimit"
+                | "--checksum-choice"
+                | "--chmod"
+                | "--chown"
+                | "--compare-dest"
+                | "--compress-choice"
+                | "--compress-level"
+                | "--contimeout"
+                | "--copy-dest"
+                | "--debug"
+                | "--groupmap"
+                | "--info"
+                | "--link-dest"
+                | "--log-file"
+                | "--log-file-format"
+                | "--max-size"
+                | "--min-size"
+                | "--modify-window"
+                | "--out-format"
+                | "--partial-dir"
+                | "--port"
+                | "--rsync-path"
+                | "--sockopts"
+                | "--suffix"
+                | "--target-directory"
+                | "--timeout"
+                | "--usermap"
+        ),
+        _ => false,
+    };
+
+    let target_directory = matches!(
+        (command, name),
+        ("cp" | "install" | "rsync", "-t" | "--target-directory")
+    );
+
+    (takes_value || target_directory).then_some(OptionBehavior {
+        skip_next: takes_value && !has_inline_value,
+        target_directory,
+    })
+}
+
+fn option_name_and_value_form(argument: &str) -> (&str, bool) {
+    if let Some((name, _)) = argument.split_once('=') {
+        return (name, true);
+    }
+
+    if argument.starts_with('-') && !argument.starts_with("--") && argument.len() > 2 {
+        return (&argument[..2], true);
+    }
+
+    (argument, false)
 }
 
 fn path_is_at_or_under(path: &str, target: &str) -> bool {
