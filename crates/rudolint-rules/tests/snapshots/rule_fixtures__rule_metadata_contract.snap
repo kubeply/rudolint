@@ -1,6 +1,6 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
-assertion_line: 1452
+assertion_line: 1468
 expression: metadata
 ---
 [
@@ -80,6 +80,17 @@ expression: metadata
     "profile": "default",
     "status": "implemented",
     "summary": "require stable cache mount ids in multi-stage builds"
+  },
+  {
+    "category": "buildkit",
+    "code": "RDK1007",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDK1007.md",
+    "fix": "none",
+    "name": "cache-mount-safe-sharing",
+    "profile": "default",
+    "status": "implemented",
+    "summary": "require safe cache mount sharing for lock-based package managers"
   },
   {
     "category": "compatibility",

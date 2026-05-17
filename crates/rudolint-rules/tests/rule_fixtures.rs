@@ -1387,6 +1387,22 @@ fn snapshots_rdk1006_cache_mount_stable_id_fixture() {
 }
 
 #[test]
+fn snapshots_rdk1007_cache_mount_safe_sharing_fixture() {
+    let source = read_fixture("rules/RDK1007.cache-mount-safe-sharing/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDK1007")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdk1007_cache_mount_safe_sharing_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rule_selection_matrix() {
     let source = read_fixture("rules/default-basic/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");

@@ -47,6 +47,12 @@ expression: normalized_json(&output)
     "summary": "require stable cache mount ids in multi-stage builds"
   },
   {
+    "code": "RDK1007",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "require safe cache mount sharing for lock-based package managers"
+  },
+  {
     "code": "RDL1001",
     "severity": "warning",
     "status": "implemented",

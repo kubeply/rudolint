@@ -1,6 +1,6 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
-assertion_line: 1426
+assertion_line: 1442
 expression: snapshot
 ---
 {
@@ -148,6 +148,7 @@ expression: snapshot
       "RDK1004",
       "RDK1005",
       "RDK1006",
+      "RDK1007",
       "RDL1001",
       "RDL3000",
       "RDL3001",
