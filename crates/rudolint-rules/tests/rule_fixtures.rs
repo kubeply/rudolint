@@ -1442,6 +1442,22 @@ fn snapshots_rdk1008_entitlement_opt_in_config_fixture() {
 }
 
 #[test]
+fn snapshots_rdk1009_multi_platform_host_architecture_fixture() {
+    let source = read_fixture("rules/RDK1009.multi-platform-host-architecture/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDK1009")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdk1009_multi_platform_host_architecture_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rule_selection_matrix() {
     let source = read_fixture("rules/default-basic/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");

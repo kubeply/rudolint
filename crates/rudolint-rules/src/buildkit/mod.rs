@@ -1,7 +1,7 @@
 use crate::{Rule, RuleInfo, metadata::diagnostic, metadata::rule_metadata};
 use rudolint_config::Config;
 use rudolint_diagnostics::{Finding, Severity};
-use rudolint_dockerfile::{Dockerfile, Instruction, Mount};
+use rudolint_dockerfile::{Dockerfile, Instruction, Mount, multi_platform_facts};
 use rudolint_fix::{FixApplicability, FixPreview, TextEdit};
 use rudolint_shell::{
     PackageManager, ShellCommandInvocation, detect_command_invocations, detect_package_managers,
@@ -18,6 +18,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(CacheMountStableId),
         Box::new(CacheMountSafeSharing),
         Box::new(BuildkitEntitlementRequiresOptIn),
+        Box::new(MultiPlatformHostArchitecture),
     ]
 }
 
@@ -1092,4 +1093,159 @@ fn missing_buildkit_entitlements(instruction: &Instruction, config: &Config) -> 
     }
 
     entitlements
+}
+
+rule_metadata!(
+    MultiPlatformHostArchitecture,
+    "RDK1009",
+    "multi-platform-host-architecture",
+    Severity::Warning,
+    "avoid host architecture detection in multi-platform builds"
+);
+
+impl Rule for MultiPlatformHostArchitecture {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        if !has_multi_platform_intent(doc) {
+            return Vec::new();
+        }
+
+        let final_from_index = doc
+            .instructions
+            .iter()
+            .rposition(|instruction| instruction.keyword == "FROM");
+
+        doc.instructions
+            .iter()
+            .enumerate()
+            .filter(|(index, instruction)| {
+                final_stage_uses_build_platform(final_from_index, *index, instruction)
+                    || run_uses_host_architecture_probe(instruction)
+            })
+            .map(|(_, instruction)| {
+                diagnostic(
+                    "RDK1009",
+                    Severity::Warning,
+                    "multi-platform build should use target platform variables instead of host architecture",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+fn has_multi_platform_intent(doc: &Dockerfile) -> bool {
+    let facts = multi_platform_facts(doc);
+    facts.targetplatform.is_some()
+        || facts.buildplatform.is_some()
+        || facts.targetarch.is_some()
+        || facts.targetos.is_some()
+        || facts
+            .stage_platforms
+            .iter()
+            .any(|stage| platform_references_buildx_variable(&stage.platform))
+        || doc.instructions.iter().any(|instruction| {
+            instruction.arg.as_ref().is_some_and(|arg| {
+                matches!(
+                    arg.name.as_str(),
+                    "TARGETPLATFORM" | "BUILDPLATFORM" | "TARGETARCH" | "TARGETOS"
+                )
+            })
+        })
+}
+
+fn platform_references_buildx_variable(platform: &str) -> bool {
+    [
+        "$TARGETPLATFORM",
+        "${TARGETPLATFORM}",
+        "$BUILDPLATFORM",
+        "${BUILDPLATFORM}",
+    ]
+    .iter()
+    .any(|variable| platform.contains(variable))
+}
+
+fn final_stage_uses_build_platform(
+    final_from_index: Option<usize>,
+    index: usize,
+    instruction: &Instruction,
+) -> bool {
+    final_from_index == Some(index)
+        && instruction
+            .from
+            .as_ref()
+            .and_then(|from| from.platform.as_deref())
+            .is_some_and(platform_references_build_platform)
+}
+
+fn platform_references_build_platform(platform: &str) -> bool {
+    ["$BUILDPLATFORM", "${BUILDPLATFORM}"]
+        .iter()
+        .any(|variable| platform.contains(variable))
+}
+
+fn run_uses_host_architecture_probe(instruction: &Instruction) -> bool {
+    instruction
+        .run
+        .as_ref()
+        .and_then(|run| run.shell.as_ref())
+        .is_some_and(|shell| {
+            !shell_references_target_platform(&shell.text)
+                && (shell_contains_host_architecture_probe(&shell.text)
+                    || detect_command_invocations(&shell.text)
+                        .iter()
+                        .any(invocation_uses_host_architecture_probe))
+        })
+}
+
+fn shell_references_target_platform(shell: &str) -> bool {
+    [
+        "$TARGETARCH",
+        "${TARGETARCH}",
+        "$TARGETPLATFORM",
+        "${TARGETPLATFORM}",
+        "$TARGETOS",
+        "${TARGETOS}",
+    ]
+    .iter()
+    .any(|variable| shell.contains(variable))
+}
+
+fn shell_contains_host_architecture_probe(shell: &str) -> bool {
+    [
+        "uname -m",
+        "uname -p",
+        "uname -i",
+        "uname --machine",
+        "uname --processor",
+        "uname --hardware-platform",
+        "dpkg --print-architecture",
+        "apk --print-arch",
+    ]
+    .iter()
+    .any(|probe| shell.contains(probe))
+}
+
+fn invocation_uses_host_architecture_probe(invocation: &ShellCommandInvocation) -> bool {
+    match invocation.command.as_str() {
+        "arch" => true,
+        "uname" => invocation.arguments.iter().any(|argument| {
+            matches!(
+                argument.as_str(),
+                "-m" | "-p" | "-i" | "--machine" | "--processor" | "--hardware-platform"
+            )
+        }),
+        "dpkg" => invocation
+            .arguments
+            .iter()
+            .any(|argument| argument == "--print-architecture"),
+        "apk" => invocation
+            .arguments
+            .iter()
+            .any(|argument| argument == "--print-arch"),
+        _ => false,
+    }
 }

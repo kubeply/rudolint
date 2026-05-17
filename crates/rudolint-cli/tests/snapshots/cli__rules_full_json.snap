@@ -59,6 +59,12 @@ expression: normalized_json(&output)
     "summary": "require config opt-in for BuildKit network and security entitlements"
   },
   {
+    "code": "RDK1009",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "avoid host architecture detection in multi-platform builds"
+  },
+  {
     "code": "RDL1001",
     "severity": "warning",
     "status": "implemented",

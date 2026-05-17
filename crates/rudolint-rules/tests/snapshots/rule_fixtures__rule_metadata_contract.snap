@@ -1,6 +1,6 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
-assertion_line: 1507
+assertion_line: 1523
 expression: metadata
 ---
 [
@@ -102,6 +102,17 @@ expression: metadata
     "profile": "default",
     "status": "implemented",
     "summary": "require config opt-in for BuildKit network and security entitlements"
+  },
+  {
+    "category": "buildkit",
+    "code": "RDK1009",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDK1009.md",
+    "fix": "none",
+    "name": "multi-platform-host-architecture",
+    "profile": "default",
+    "status": "implemented",
+    "summary": "avoid host architecture detection in multi-platform builds"
   },
   {
     "category": "compatibility",

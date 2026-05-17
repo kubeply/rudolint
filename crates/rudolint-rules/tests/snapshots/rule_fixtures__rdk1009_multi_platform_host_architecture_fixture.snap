@@ -1,0 +1,55 @@
+---
+source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 1454
+expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
+---
+[
+  {
+    "code": "RDK1009",
+    "help": null,
+    "labels": [],
+    "message": "multi-platform build should use target platform variables instead of host architecture",
+    "path": "",
+    "primary_span": {
+      "end_byte": 0,
+      "end_column": 1,
+      "end_line": 6,
+      "start_byte": 0,
+      "start_column": 1,
+      "start_line": 6
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "RDK1009",
+    "help": null,
+    "labels": [],
+    "message": "multi-platform build should use target platform variables instead of host architecture",
+    "path": "",
+    "primary_span": {
+      "end_byte": 0,
+      "end_column": 1,
+      "end_line": 7,
+      "start_byte": 0,
+      "start_column": 1,
+      "start_line": 7
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "RDK1009",
+    "help": null,
+    "labels": [],
+    "message": "multi-platform build should use target platform variables instead of host architecture",
+    "path": "",
+    "primary_span": {
+      "end_byte": 0,
+      "end_column": 1,
+      "end_line": 13,
+      "start_byte": 0,
+      "start_column": 1,
+      "start_line": 13
+    },
+    "severity": "warning"
+  }
+]
