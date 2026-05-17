@@ -3471,16 +3471,23 @@ fn shell_instruction_handles_pipes(instruction: &Instruction) -> bool {
             let Some(shell) = parts.first().map(String::as_str) else {
                 return false;
             };
+            let shell = normalized_shell_executable(shell);
 
-            shell_is_non_posix(shell)
-                || (shell_supports_pipefail(shell)
+            shell_is_non_posix(&shell)
+                || (shell_supports_pipefail(&shell)
                     && parts
                         .windows(2)
                         .any(|window| window[0] == "-o" && window[1] == "pipefail"))
         }
         InstructionForm::Shell { text, .. } => {
-            shell_is_non_posix(text)
-                || (shell_supports_pipefail(text)
+            let shell = text
+                .split_whitespace()
+                .next()
+                .map(normalized_shell_executable)
+                .unwrap_or_default();
+
+            shell_is_non_posix(&shell)
+                || (shell_supports_pipefail(&shell)
                     && text
                         .split_whitespace()
                         .collect::<Vec<_>>()
@@ -3491,19 +3498,25 @@ fn shell_instruction_handles_pipes(instruction: &Instruction) -> bool {
     }
 }
 
+fn normalized_shell_executable(shell: &str) -> String {
+    shell
+        .trim_matches('"')
+        .trim_matches('\'')
+        .rsplit(['/', '\\'])
+        .next()
+        .unwrap_or(shell)
+        .to_ascii_lowercase()
+}
+
 fn shell_is_non_posix(shell: &str) -> bool {
-    matches!(shell, "powershell" | "pwsh" | "cmd" | "cmd.exe")
-        || shell.ends_with("/powershell")
-        || shell.ends_with("/pwsh")
-        || shell.ends_with("/cmd")
-        || shell.ends_with("/cmd.exe")
+    matches!(
+        shell,
+        "powershell" | "powershell.exe" | "pwsh" | "pwsh.exe" | "cmd" | "cmd.exe"
+    )
 }
 
 fn shell_supports_pipefail(shell: &str) -> bool {
-    matches!(shell, "bash" | "zsh" | "ash")
-        || shell.ends_with("/bash")
-        || shell.ends_with("/zsh")
-        || shell.ends_with("/ash")
+    matches!(shell, "bash" | "bash.exe" | "zsh" | "zsh.exe" | "ash")
 }
 
 fn run_has_pipe(instruction: &Instruction) -> bool {
