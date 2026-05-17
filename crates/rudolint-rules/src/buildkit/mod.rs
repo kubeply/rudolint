@@ -345,6 +345,10 @@ mod tests {
             vec!["secret"]
         );
         assert_eq!(
+            source_operands("cp", &["-rt/app".to_string(), "secret".to_string()]),
+            vec!["secret"]
+        );
+        assert_eq!(
             source_operands(
                 "cp",
                 &["-rt".to_string(), "/app".to_string(), "secret".to_string()]
@@ -692,12 +696,8 @@ fn short_option_behavior(command: &str, argument: &str) -> OptionBehavior {
             't' => "-t",
             _ => "",
         };
-        let remaining_inline = char_indices.peek().is_some_and(|(next, _)| {
-            flags[*next..]
-                .chars()
-                .any(|character| !character.is_alphabetic())
-        });
-        let has_inline_value = char_indices.peek().is_some() && remaining_inline;
+        let has_inline_value =
+            char_indices.peek().is_some() && short_flag_takes_value(command, name);
         let flag_behavior = short_flag_behavior(command, name, has_inline_value);
         behavior.target_directory |= flag_behavior.target_directory;
         behavior.directory_mode |= flag_behavior.directory_mode;
@@ -714,16 +714,20 @@ fn short_option_behavior(command: &str, argument: &str) -> OptionBehavior {
 }
 
 fn short_flag_behavior(command: &str, name: &str, has_inline_value: bool) -> OptionBehavior {
-    let takes_value = match command {
-        "cp" => matches!(name, "-S" | "-t"),
-        "install" => matches!(name, "-g" | "-m" | "-o" | "-S" | "-t"),
-        "rsync" => matches!(name, "-B" | "-e" | "-f" | "-M"),
-        _ => false,
-    };
+    let takes_value = short_flag_takes_value(command, name);
     let mut behavior = OptionBehavior::value_argument(takes_value, has_inline_value);
     behavior.target_directory = matches!((command, name), ("cp" | "install", "-t"));
     behavior.directory_mode = matches!((command, name), ("install", "-d"));
     behavior
+}
+
+fn short_flag_takes_value(command: &str, name: &str) -> bool {
+    match command {
+        "cp" => matches!(name, "-S" | "-t"),
+        "install" => matches!(name, "-g" | "-m" | "-o" | "-S" | "-t"),
+        "rsync" => matches!(name, "-B" | "-e" | "-f" | "-M"),
+        _ => false,
+    }
 }
 
 fn copies_directory_contents(command: &str, arguments: &[String]) -> bool {
@@ -802,12 +806,8 @@ fn short_recursive_behavior(command: &str, argument: &str) -> RecursiveBehavior 
             't' => "-t",
             _ => "",
         };
-        let remaining_inline = char_indices.peek().is_some_and(|(next, _)| {
-            flags[*next..]
-                .chars()
-                .any(|character| !character.is_alphabetic())
-        });
-        let has_inline_value = char_indices.peek().is_some() && remaining_inline;
+        let has_inline_value =
+            char_indices.peek().is_some() && short_flag_takes_value(command, name);
         let flag_behavior = short_flag_behavior(command, name, has_inline_value);
         if has_inline_value || flag_behavior.skip_next {
             return RecursiveBehavior {
