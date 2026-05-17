@@ -986,21 +986,41 @@ impl Rule for CacheMountSafeSharing {
 }
 
 fn run_uses_lock_based_package_manager_with_shared_cache(instruction: &Instruction) -> bool {
-    let uses_lock_based_package_manager = instruction
+    let detected_lock_managers = instruction
         .run
         .as_ref()
         .and_then(|run| run.shell.as_ref())
-        .is_some_and(|shell| {
+        .map(|shell| {
             detect_package_managers(&shell.text)
                 .into_iter()
-                .any(package_manager_needs_locked_cache)
-        });
+                .filter(|manager| package_manager_needs_locked_cache(*manager))
+                .collect::<Vec<_>>()
+        })
+        .unwrap_or_default();
 
-    uses_lock_based_package_manager
+    !detected_lock_managers.is_empty()
         && instruction.mounts.iter().any(|mount| {
             mount.mount_type == "cache"
+                && cache_mount_matches_lock_manager(mount, &detected_lock_managers)
                 && matches!(mount_option(mount, "sharing"), None | Some("shared"))
         })
+}
+
+fn cache_mount_matches_lock_manager(mount: &Mount, managers: &[PackageManager]) -> bool {
+    let target = mount_option(mount, "target")
+        .or_else(|| mount_option(mount, "dst"))
+        .or_else(|| mount_option(mount, "destination"));
+
+    target.is_some_and(|target| {
+        managers.iter().any(|manager| match manager {
+            PackageManager::Apt | PackageManager::AptGet => {
+                target.starts_with("/var/cache/apt") || target.starts_with("/var/lib/apt")
+            }
+            PackageManager::Dnf | PackageManager::Microdnf => target.starts_with("/var/cache/dnf"),
+            PackageManager::Yum => target.starts_with("/var/cache/yum"),
+            _ => false,
+        })
+    })
 }
 
 fn package_manager_needs_locked_cache(manager: PackageManager) -> bool {
