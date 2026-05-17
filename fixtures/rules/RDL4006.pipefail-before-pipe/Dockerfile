@@ -13,3 +13,8 @@ RUN wget -qO- https://example.com | tar xz
 FROM mcr.microsoft.com/powershell:latest AS powershell
 SHELL ["pwsh", "-Command"]
 RUN Invoke-WebRequest https://example.com | Out-Null
+
+FROM alpine:3.20 AS quoted
+RUN echo 'a|b'
+RUN echo "a|b"
+RUN echo a\|b

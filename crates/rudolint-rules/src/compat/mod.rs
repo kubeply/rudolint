@@ -3511,15 +3511,55 @@ fn run_has_pipe(instruction: &Instruction) -> bool {
         .run
         .as_ref()
         .and_then(|run| run.shell.as_ref())
-        .is_some_and(|shell| shell.text.split_whitespace().any(shell_token_has_pipe))
+        .is_some_and(|shell| shell_text_has_pipeline_operator(&shell.text))
 }
 
-fn shell_token_has_pipe(token: &str) -> bool {
-    token.as_bytes().iter().enumerate().any(|(index, byte)| {
-        *byte == b'|'
-            && (index == 0 || token.as_bytes().get(index - 1) != Some(&b'|'))
-            && token.as_bytes().get(index + 1) != Some(&b'|')
-    })
+fn shell_text_has_pipeline_operator(text: &str) -> bool {
+    let bytes = text.as_bytes();
+    let mut index = 0usize;
+    let mut in_single_quote = false;
+    let mut in_double_quote = false;
+    let mut escaped = false;
+
+    while index < bytes.len() {
+        let byte = bytes[index];
+
+        if escaped {
+            escaped = false;
+            index += 1;
+            continue;
+        }
+
+        if byte == b'\\' && !in_single_quote {
+            escaped = true;
+            index += 1;
+            continue;
+        }
+
+        if byte == b'\'' && !in_double_quote {
+            in_single_quote = !in_single_quote;
+            index += 1;
+            continue;
+        }
+
+        if byte == b'"' && !in_single_quote {
+            in_double_quote = !in_double_quote;
+            index += 1;
+            continue;
+        }
+
+        if !in_single_quote && !in_double_quote && byte == b'|' {
+            let previous_is_pipe = index > 0 && bytes[index - 1] == b'|';
+            let next_is_pipe = index + 1 < bytes.len() && bytes[index + 1] == b'|';
+            if !previous_is_pipe && !next_is_pipe {
+                return true;
+            }
+        }
+
+        index += 1;
+    }
+
+    false
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
