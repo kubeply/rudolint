@@ -239,6 +239,24 @@ mod tests {
         assert!(!invocation_copies_secret(
             &ShellCommandInvocation {
                 command: "cp".to_string(),
+                arguments: vec!["/run/secrets".to_string(), "/app/secrets".to_string(),],
+            },
+            &secret_targets,
+        ));
+        assert!(!invocation_copies_secret(
+            &ShellCommandInvocation {
+                command: "install".to_string(),
+                arguments: vec![
+                    "-d".to_string(),
+                    "/run/secrets".to_string(),
+                    "/app/secrets".to_string(),
+                ],
+            },
+            &secret_targets,
+        ));
+        assert!(!invocation_copies_secret(
+            &ShellCommandInvocation {
+                command: "cp".to_string(),
                 arguments: vec![
                     "/tmp/source".to_string(),
                     "/run/secrets/api_token".to_string(),
@@ -302,6 +320,13 @@ mod tests {
         );
         assert_eq!(
             source_operands("cp", &["-t/app".to_string(), "secret".to_string()]),
+            vec!["secret"]
+        );
+        assert_eq!(
+            source_operands(
+                "cp",
+                &["-rt".to_string(), "/app".to_string(), "secret".to_string()]
+            ),
             vec!["secret"]
         );
         assert_eq!(
@@ -457,11 +482,15 @@ fn invocation_copies_secret(
         return false;
     }
 
+    let copies_directory_contents =
+        copies_directory_contents(&invocation.command, &invocation.arguments);
+
     source_operands(&invocation.command, &invocation.arguments)
         .into_iter()
         .any(|operand| {
             secret_targets.iter().any(|target| {
-                path_is_at_or_under(operand, target) || path_is_at_or_under(target, operand)
+                path_is_at_or_under(operand, target)
+                    || (copies_directory_contents && path_is_at_or_under(target, operand))
             })
         })
 }
@@ -469,6 +498,7 @@ fn invocation_copies_secret(
 fn source_operands<'a>(command: &str, arguments: &'a [String]) -> Vec<&'a str> {
     let mut operands = Vec::new();
     let mut target_directory = false;
+    let mut directory_mode = false;
     let mut skip_next = false;
     let mut end_of_options = false;
 
@@ -483,26 +513,29 @@ fn source_operands<'a>(command: &str, arguments: &'a [String]) -> Vec<&'a str> {
             continue;
         }
 
-        if let Some(behavior) = option_behavior(command, argument) {
-            if behavior.target_directory {
-                target_directory = true;
-            }
-            if behavior.skip_next {
-                skip_next = true;
-            }
-            continue;
-        }
-
         match argument.as_str() {
             "--" => {
                 end_of_options = true;
             }
-            _ if argument.starts_with('-') => {}
+            _ if argument.starts_with("--") => {
+                let behavior = long_option_behavior(command, argument);
+                target_directory |= behavior.target_directory;
+                directory_mode |= behavior.directory_mode;
+                skip_next = behavior.skip_next;
+            }
+            _ if argument.starts_with('-') => {
+                let behavior = short_option_behavior(command, argument);
+                target_directory |= behavior.target_directory;
+                directory_mode |= behavior.directory_mode;
+                skip_next = behavior.skip_next;
+            }
             _ => operands.push(argument.as_str()),
         }
     }
 
-    if target_directory {
+    if directory_mode {
+        Vec::new()
+    } else if target_directory {
         operands
     } else {
         let source_count = operands.len().saturating_sub(1);
@@ -514,10 +547,23 @@ fn source_operands<'a>(command: &str, arguments: &'a [String]) -> Vec<&'a str> {
 struct OptionBehavior {
     skip_next: bool,
     target_directory: bool,
+    directory_mode: bool,
 }
 
-fn option_behavior(command: &str, argument: &str) -> Option<OptionBehavior> {
-    let (name, has_inline_value) = option_name_and_value_form(argument);
+impl OptionBehavior {
+    fn value_argument(takes_value: bool, has_inline_value: bool) -> Self {
+        Self {
+            skip_next: takes_value && !has_inline_value,
+            target_directory: false,
+            directory_mode: false,
+        }
+    }
+}
+
+fn long_option_behavior(command: &str, argument: &str) -> OptionBehavior {
+    let (name, has_inline_value) = argument
+        .split_once('=')
+        .map_or((argument, false), |(name, _)| (name, true));
 
     let takes_value = match command {
         "cp" => matches!(
@@ -585,25 +631,95 @@ fn option_behavior(command: &str, argument: &str) -> Option<OptionBehavior> {
 
     let target_directory = matches!(
         (command, name),
-        ("cp" | "install" | "rsync", "-t" | "--target-directory")
+        ("cp" | "install" | "rsync", "--target-directory")
     );
+    let directory_mode = matches!((command, name), ("install", "--directory"));
 
-    (takes_value || target_directory).then_some(OptionBehavior {
+    OptionBehavior {
         skip_next: takes_value && !has_inline_value,
         target_directory,
-    })
+        directory_mode,
+    }
 }
 
-fn option_name_and_value_form(argument: &str) -> (&str, bool) {
-    if let Some((name, _)) = argument.split_once('=') {
-        return (name, true);
+fn short_option_behavior(command: &str, argument: &str) -> OptionBehavior {
+    let mut behavior = OptionBehavior {
+        skip_next: false,
+        target_directory: false,
+        directory_mode: false,
+    };
+
+    let flags = argument
+        .strip_prefix('-')
+        .expect("short option should start with '-'");
+    let mut char_indices = flags.char_indices().peekable();
+    while let Some((_, flag)) = char_indices.next() {
+        let name = match flag {
+            'a' => "-a",
+            'B' => "-B",
+            'd' => "-d",
+            'e' => "-e",
+            'f' => "-f",
+            'g' => "-g",
+            'm' => "-m",
+            'M' => "-M",
+            'o' => "-o",
+            'r' => "-r",
+            'R' => "-R",
+            'S' => "-S",
+            't' => "-t",
+            _ => "",
+        };
+        let remaining_inline = char_indices.peek().is_some_and(|(next, _)| {
+            flags[*next..]
+                .chars()
+                .any(|character| !character.is_alphabetic())
+        });
+        let has_inline_value = char_indices.peek().is_some() && remaining_inline;
+        let flag_behavior = short_flag_behavior(command, name, has_inline_value);
+        behavior.target_directory |= flag_behavior.target_directory;
+        behavior.directory_mode |= flag_behavior.directory_mode;
+        behavior.skip_next |= flag_behavior.skip_next;
+        if has_inline_value {
+            break;
+        }
+        if flag_behavior.skip_next {
+            break;
+        }
     }
 
-    if argument.starts_with('-') && !argument.starts_with("--") && argument.len() > 2 {
-        return (&argument[..2], true);
-    }
+    behavior
+}
 
-    (argument, false)
+fn short_flag_behavior(command: &str, name: &str, has_inline_value: bool) -> OptionBehavior {
+    let takes_value = match command {
+        "cp" => matches!(name, "-S" | "-t"),
+        "install" => matches!(name, "-g" | "-m" | "-o" | "-S" | "-t"),
+        "rsync" => matches!(name, "-B" | "-e" | "-f" | "-M"),
+        _ => false,
+    };
+    let mut behavior = OptionBehavior::value_argument(takes_value, has_inline_value);
+    behavior.target_directory = matches!((command, name), ("cp" | "install", "-t"));
+    behavior.directory_mode = matches!((command, name), ("install", "-d"));
+    behavior
+}
+
+fn copies_directory_contents(command: &str, arguments: &[String]) -> bool {
+    match command {
+        "cp" | "rsync" => arguments.iter().any(|argument| {
+            if argument.starts_with("--") {
+                let name = argument
+                    .split_once('=')
+                    .map_or(argument.as_str(), |(name, _)| name);
+                matches!(name, "--archive" | "--recursive")
+            } else if let Some(flags) = argument.strip_prefix('-') {
+                flags.chars().any(|flag| matches!(flag, 'a' | 'r' | 'R'))
+            } else {
+                false
+            }
+        }),
+        _ => false,
+    }
 }
 
 fn path_is_at_or_under(path: &str, target: &str) -> bool {
