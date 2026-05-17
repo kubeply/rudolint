@@ -245,6 +245,28 @@ mod tests {
         ));
         assert!(!invocation_copies_secret(
             &ShellCommandInvocation {
+                command: "cp".to_string(),
+                arguments: vec![
+                    "-t/var".to_string(),
+                    "/run/secrets".to_string(),
+                    "/app/secrets".to_string(),
+                ],
+            },
+            &secret_targets,
+        ));
+        assert!(!invocation_copies_secret(
+            &ShellCommandInvocation {
+                command: "rsync".to_string(),
+                arguments: vec![
+                    "-R".to_string(),
+                    "/run/secrets".to_string(),
+                    "/app/secrets".to_string(),
+                ],
+            },
+            &secret_targets,
+        ));
+        assert!(!invocation_copies_secret(
+            &ShellCommandInvocation {
                 command: "install".to_string(),
                 arguments: vec![
                     "-d".to_string(),
@@ -649,9 +671,9 @@ fn short_option_behavior(command: &str, argument: &str) -> OptionBehavior {
         directory_mode: false,
     };
 
-    let flags = argument
-        .strip_prefix('-')
-        .expect("short option should start with '-'");
+    let Some(flags) = argument.strip_prefix('-') else {
+        return behavior;
+    };
     let mut char_indices = flags.char_indices().peekable();
     while let Some((_, flag)) = char_indices.next() {
         let name = match flag {
@@ -705,20 +727,99 @@ fn short_flag_behavior(command: &str, name: &str, has_inline_value: bool) -> Opt
 }
 
 fn copies_directory_contents(command: &str, arguments: &[String]) -> bool {
-    match command {
-        "cp" | "rsync" => arguments.iter().any(|argument| {
-            if argument.starts_with("--") {
-                let name = argument
-                    .split_once('=')
-                    .map_or(argument.as_str(), |(name, _)| name);
-                matches!(name, "--archive" | "--recursive")
-            } else if let Some(flags) = argument.strip_prefix('-') {
-                flags.chars().any(|flag| matches!(flag, 'a' | 'r' | 'R'))
-            } else {
-                false
+    if !matches!(command, "cp" | "rsync") {
+        return false;
+    }
+
+    let mut skip_next = false;
+    for argument in arguments {
+        if skip_next {
+            skip_next = false;
+            continue;
+        }
+
+        if argument == "--" {
+            return false;
+        }
+
+        if argument.starts_with("--") {
+            let name = argument
+                .split_once('=')
+                .map_or(argument.as_str(), |(name, _)| name);
+            if matches!(name, "--archive" | "--recursive") {
+                return true;
             }
-        }),
-        _ => false,
+            skip_next = long_option_behavior(command, argument).skip_next;
+            continue;
+        }
+
+        if argument.starts_with('-') {
+            let behavior = short_recursive_behavior(command, argument);
+            if behavior.recursive {
+                return true;
+            }
+            skip_next = behavior.skip_next;
+        }
+    }
+
+    false
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct RecursiveBehavior {
+    recursive: bool,
+    skip_next: bool,
+}
+
+fn short_recursive_behavior(command: &str, argument: &str) -> RecursiveBehavior {
+    let Some(flags) = argument.strip_prefix('-') else {
+        return RecursiveBehavior {
+            recursive: false,
+            skip_next: false,
+        };
+    };
+
+    let mut char_indices = flags.char_indices().peekable();
+    while let Some((_, flag)) = char_indices.next() {
+        let recursive = match command {
+            "cp" => matches!(flag, 'a' | 'r' | 'R'),
+            "rsync" => matches!(flag, 'a' | 'r'),
+            _ => false,
+        };
+        if recursive {
+            return RecursiveBehavior {
+                recursive: true,
+                skip_next: false,
+            };
+        }
+
+        let name = match flag {
+            'B' => "-B",
+            'e' => "-e",
+            'f' => "-f",
+            'M' => "-M",
+            'S' => "-S",
+            't' => "-t",
+            _ => "",
+        };
+        let remaining_inline = char_indices.peek().is_some_and(|(next, _)| {
+            flags[*next..]
+                .chars()
+                .any(|character| !character.is_alphabetic())
+        });
+        let has_inline_value = char_indices.peek().is_some() && remaining_inline;
+        let flag_behavior = short_flag_behavior(command, name, has_inline_value);
+        if has_inline_value || flag_behavior.skip_next {
+            return RecursiveBehavior {
+                recursive: false,
+                skip_next: flag_behavior.skip_next,
+            };
+        }
+    }
+
+    RecursiveBehavior {
+        recursive: false,
+        skip_next: false,
     }
 }
 
