@@ -11,6 +11,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(SecretInRun),
         Box::new(CacheMountForPackageInstall),
         Box::new(SecretMountCopiedToLayer),
+        Box::new(SshMountCommandScope),
     ]
 }
 
@@ -831,4 +832,58 @@ fn path_is_at_or_under(path: &str, target: &str) -> bool {
         || path
             .strip_prefix(target)
             .is_some_and(|suffix| suffix.starts_with('/'))
+}
+
+rule_metadata!(
+    SshMountCommandScope,
+    "RDK1005",
+    "ssh-mount-command-scope",
+    Severity::Warning,
+    "scope BuildKit SSH mounts to the command that needs the agent"
+);
+
+impl Rule for SshMountCommandScope {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        doc.instructions
+            .iter()
+            .filter(|instruction| instruction.keyword == "RUN")
+            .filter(|instruction| {
+                instruction
+                    .mounts
+                    .iter()
+                    .any(|mount| mount.mount_type == "ssh")
+            })
+            .filter(|instruction| {
+                instruction
+                    .run
+                    .as_ref()
+                    .and_then(|run| run.shell.as_ref())
+                    .is_some_and(|shell| ssh_mount_scope_is_broad(&shell.text))
+            })
+            .map(|instruction| {
+                diagnostic(
+                    "RDK1005",
+                    Severity::Warning,
+                    "SSH mount is available to more than one RUN command scope",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+fn ssh_mount_scope_is_broad(shell: &str) -> bool {
+    let invocations = detect_command_invocations(shell);
+    invocations.len() > 1
+        || invocations
+            .first()
+            .is_some_and(|invocation| shell_wrapper_command(&invocation.command))
+}
+
+fn shell_wrapper_command(command: &str) -> bool {
+    matches!(command, "sh" | "bash" | "dash" | "ash" | "zsh")
 }

@@ -1,6 +1,6 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
-assertion_line: 1420
+assertion_line: 1436
 expression: metadata
 ---
 [
@@ -58,6 +58,17 @@ expression: metadata
     "profile": "default",
     "status": "implemented",
     "summary": "avoid copying BuildKit secret mount contents into image layers"
+  },
+  {
+    "category": "buildkit",
+    "code": "RDK1005",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDK1005.md",
+    "fix": "none",
+    "name": "ssh-mount-command-scope",
+    "profile": "default",
+    "status": "implemented",
+    "summary": "scope BuildKit SSH mounts to the command that needs the agent"
   },
   {
     "category": "compatibility",

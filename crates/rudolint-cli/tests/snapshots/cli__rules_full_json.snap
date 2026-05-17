@@ -35,6 +35,12 @@ expression: normalized_json(&output)
     "summary": "avoid copying BuildKit secret mount contents into image layers"
   },
   {
+    "code": "RDK1005",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "scope BuildKit SSH mounts to the command that needs the agent"
+  },
+  {
     "code": "RDL1001",
     "severity": "warning",
     "status": "implemented",
