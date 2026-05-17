@@ -1403,6 +1403,45 @@ fn snapshots_rdk1007_cache_mount_safe_sharing_fixture() {
 }
 
 #[test]
+fn snapshots_rdk1008_entitlement_opt_in_fixture() {
+    let source = read_fixture("rules/RDK1008.entitlement-opt-in/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDK1008")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdk1008_entitlement_opt_in_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
+fn snapshots_rdk1008_entitlement_opt_in_config_fixture() {
+    let source = read_fixture("rules/RDK1008.entitlement-opt-in/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let config = Config {
+        allow_entitlements: BTreeSet::from([
+            "network.host".to_string(),
+            "security.insecure".to_string(),
+        ]),
+        ..Config::default()
+    };
+    let findings = RuleEngine::new(Profile::Default, config)
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDK1008")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdk1008_entitlement_opt_in_config_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rule_selection_matrix() {
     let source = read_fixture("rules/default-basic/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");

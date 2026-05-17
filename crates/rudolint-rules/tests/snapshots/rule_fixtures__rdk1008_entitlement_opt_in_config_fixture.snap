@@ -1,0 +1,6 @@
+---
+source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 1438
+expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
+---
+[]

@@ -1,4 +1,5 @@
 use crate::{Rule, RuleInfo, metadata::diagnostic, metadata::rule_metadata};
+use rudolint_config::Config;
 use rudolint_diagnostics::{Finding, Severity};
 use rudolint_dockerfile::{Dockerfile, Instruction, Mount};
 use rudolint_fix::{FixApplicability, FixPreview, TextEdit};
@@ -16,6 +17,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(SshMountCommandScope),
         Box::new(CacheMountStableId),
         Box::new(CacheMountSafeSharing),
+        Box::new(BuildkitEntitlementRequiresOptIn),
     ]
 }
 
@@ -1032,4 +1034,62 @@ fn package_manager_needs_locked_cache(manager: PackageManager) -> bool {
             | PackageManager::Yum
             | PackageManager::Microdnf
     )
+}
+
+rule_metadata!(
+    BuildkitEntitlementRequiresOptIn,
+    "RDK1008",
+    "buildkit-entitlement-opt-in",
+    Severity::Warning,
+    "require config opt-in for BuildKit network and security entitlements"
+);
+
+impl Rule for BuildkitEntitlementRequiresOptIn {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        self.check_with_config(doc, &Config::default())
+    }
+
+    fn check_with_config(&self, doc: &Dockerfile, config: &Config) -> Vec<Finding> {
+        doc.instructions
+            .iter()
+            .filter(|instruction| instruction.keyword == "RUN")
+            .flat_map(|instruction| {
+                missing_buildkit_entitlements(instruction, config)
+                    .into_iter()
+                    .map(|entitlement| {
+                        diagnostic(
+                            "RDK1008",
+                            Severity::Warning,
+                            format!(
+                                "BuildKit entitlement {entitlement} requires allow-entitlements opt-in"
+                            ),
+                            instruction,
+                        )
+                    })
+            })
+            .collect()
+    }
+}
+
+fn missing_buildkit_entitlements(instruction: &Instruction, config: &Config) -> Vec<&'static str> {
+    let Some(run) = instruction.run.as_ref() else {
+        return Vec::new();
+    };
+
+    let mut entitlements = Vec::new();
+    if run.network.as_deref() == Some("host") && !config.allow_entitlements.contains("network.host")
+    {
+        entitlements.push("network.host");
+    }
+    if run.security.as_deref() == Some("insecure")
+        && !config.allow_entitlements.contains("security.insecure")
+    {
+        entitlements.push("security.insecure");
+    }
+
+    entitlements
 }

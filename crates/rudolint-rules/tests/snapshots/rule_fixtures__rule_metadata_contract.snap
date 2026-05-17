@@ -1,6 +1,6 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
-assertion_line: 1468
+assertion_line: 1507
 expression: metadata
 ---
 [
@@ -91,6 +91,17 @@ expression: metadata
     "profile": "default",
     "status": "implemented",
     "summary": "require safe cache mount sharing for lock-based package managers"
+  },
+  {
+    "category": "buildkit",
+    "code": "RDK1008",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDK1008.md",
+    "fix": "none",
+    "name": "buildkit-entitlement-opt-in",
+    "profile": "default",
+    "status": "implemented",
+    "summary": "require config opt-in for BuildKit network and security entitlements"
   },
   {
     "category": "compatibility",

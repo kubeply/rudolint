@@ -53,6 +53,12 @@ expression: normalized_json(&output)
     "summary": "require safe cache mount sharing for lock-based package managers"
   },
   {
+    "code": "RDK1008",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "require config opt-in for BuildKit network and security entitlements"
+  },
+  {
     "code": "RDL1001",
     "severity": "warning",
     "status": "implemented",
