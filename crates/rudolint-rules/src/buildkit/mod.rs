@@ -176,8 +176,8 @@ impl Rule for SecretInRun {
 #[cfg(test)]
 mod tests {
     use super::{
-        has_secret_like_arg_or_env_name, invocation_copies_secret, path_is_at_or_under,
-        shell_wrapper_command, source_operands,
+        has_secret_like_arg_or_env_name, invocation_copies_secret, parse_pinned_frontend_version,
+        path_is_at_or_under, shell_wrapper_command, source_operands,
     };
     use rudolint_shell::ShellCommandInvocation;
 
@@ -408,6 +408,19 @@ mod tests {
         assert!(shell_wrapper_command("/bin/sh"));
         assert!(shell_wrapper_command("/usr/bin/bash"));
         assert!(!shell_wrapper_command("git"));
+    }
+
+    #[test]
+    fn frontend_version_parser_handles_digests_and_rejects_invalid_patches() {
+        let version =
+            parse_pinned_frontend_version("docker/dockerfile:1.20@sha256:abcdef").unwrap();
+        assert_eq!(version.display(), "1.20");
+
+        let version = parse_pinned_frontend_version("docker/dockerfile:1.14-labs").unwrap();
+        assert_eq!(version.display(), "1.14-labs");
+
+        assert!(parse_pinned_frontend_version("docker/dockerfile:1").is_none());
+        assert!(parse_pinned_frontend_version("docker/dockerfile:1.2.bad").is_none());
     }
 }
 
@@ -1356,7 +1369,10 @@ impl FrontendRequirement {
 }
 
 fn parse_pinned_frontend_version(image: &str) -> Option<FrontendVersion> {
-    let (_, tag) = image.rsplit_once(':')?;
+    let reference = image
+        .split_once('@')
+        .map_or(image, |(reference, _)| reference);
+    let (_, tag) = reference.rsplit_once(':')?;
     let (version, labs) = tag
         .strip_suffix("-labs")
         .map_or((tag, false), |version| (version, true));
@@ -1365,10 +1381,17 @@ fn parse_pinned_frontend_version(image: &str) -> Option<FrontendVersion> {
         return None;
     }
 
+    let major = parts.first()?.parse().ok()?;
+    let minor = parts.get(1)?.parse().ok()?;
+    let patch = match parts.get(2) {
+        Some(patch) => Some(patch.parse().ok()?),
+        None => None,
+    };
+
     Some(FrontendVersion {
-        major: parts.first()?.parse().ok()?,
-        minor: Some(parts.get(1)?.parse().ok()?),
-        patch: parts.get(2).and_then(|patch| patch.parse().ok()),
+        major,
+        minor: Some(minor),
+        patch,
         labs,
     })
 }
