@@ -1,6 +1,6 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
-assertion_line: 1436
+assertion_line: 1452
 expression: metadata
 ---
 [
@@ -69,6 +69,17 @@ expression: metadata
     "profile": "default",
     "status": "implemented",
     "summary": "scope BuildKit SSH mounts to the command that needs the agent"
+  },
+  {
+    "category": "buildkit",
+    "code": "RDK1006",
+    "default_severity": "info",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDK1006.md",
+    "fix": "none",
+    "name": "cache-mount-stable-id",
+    "profile": "default",
+    "status": "implemented",
+    "summary": "require stable cache mount ids in multi-stage builds"
   },
   {
     "category": "compatibility",

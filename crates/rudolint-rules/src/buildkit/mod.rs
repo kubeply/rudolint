@@ -12,6 +12,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
         Box::new(CacheMountForPackageInstall),
         Box::new(SecretMountCopiedToLayer),
         Box::new(SshMountCommandScope),
+        Box::new(CacheMountStableId),
     ]
 }
 
@@ -895,4 +896,56 @@ fn ssh_mount_scope_is_broad(shell: &str) -> bool {
 fn shell_wrapper_command(command: &str) -> bool {
     let wrapper_name = command.rsplit('/').next().unwrap_or(command);
     matches!(wrapper_name, "sh" | "bash" | "dash" | "ash" | "zsh")
+}
+
+rule_metadata!(
+    CacheMountStableId,
+    "RDK1006",
+    "cache-mount-stable-id",
+    Severity::Info,
+    "require stable cache mount ids in multi-stage builds"
+);
+
+impl Rule for CacheMountStableId {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        if doc
+            .instructions
+            .iter()
+            .filter(|instruction| instruction.keyword == "FROM")
+            .count()
+            < 2
+        {
+            return Vec::new();
+        }
+
+        doc.instructions
+            .iter()
+            .filter(|instruction| instruction.keyword == "RUN")
+            .filter(|instruction| {
+                instruction
+                    .mounts
+                    .iter()
+                    .any(|mount| mount.mount_type == "cache" && mount_option(mount, "id").is_none())
+            })
+            .map(|instruction| {
+                diagnostic(
+                    "RDK1006",
+                    Severity::Info,
+                    "cache mount in multi-stage build should declare a stable id",
+                    instruction,
+                )
+            })
+            .collect()
+    }
+}
+
+fn mount_option<'a>(mount: &'a Mount, name: &str) -> Option<&'a str> {
+    mount
+        .options
+        .iter()
+        .find_map(|(key, value)| (key == name && !value.is_empty()).then_some(value.as_str()))
 }

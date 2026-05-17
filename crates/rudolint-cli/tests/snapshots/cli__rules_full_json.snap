@@ -41,6 +41,12 @@ expression: normalized_json(&output)
     "summary": "scope BuildKit SSH mounts to the command that needs the agent"
   },
   {
+    "code": "RDK1006",
+    "severity": "info",
+    "status": "implemented",
+    "summary": "require stable cache mount ids in multi-stage builds"
+  },
+  {
     "code": "RDL1001",
     "severity": "warning",
     "status": "implemented",
