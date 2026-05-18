@@ -84,7 +84,8 @@ brew install hyperfine
 ```
 
 On Linux, use your distribution package manager or `cargo install hyperfine`.
-On Windows, use `winget install sharkdp.hyperfine`, Scoop, or Cargo.
+On Windows, run the suite through WSL2; native Windows hosts are not supported
+yet because the runner only downloads Linux and macOS `hadolint` assets.
 
 Then run:
 

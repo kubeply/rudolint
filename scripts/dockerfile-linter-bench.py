@@ -543,11 +543,19 @@ def write_results(payload: dict) -> None:
     RESULTS_ROOT.mkdir(parents=True, exist_ok=True)
     if "manifest" in payload:
         payload["manifest"] = public_manifest(payload["manifest"])
+        tool_versions = payload["manifest"]
+    else:
+        tool_versions = {
+            "generated_at": payload.get("generated_at"),
+            "commands": {},
+            "versions": {},
+            "latest_sources": {},
+        }
     (RESULTS_ROOT / "latest.json").write_text(
         json.dumps(payload, indent=2) + "\n", encoding="utf-8"
     )
     (RESULTS_ROOT / "tool-versions.json").write_text(
-        json.dumps(payload["manifest"], indent=2) + "\n", encoding="utf-8"
+        json.dumps(tool_versions, indent=2) + "\n", encoding="utf-8"
     )
     render_headline_chart(payload, RESULTS_ROOT / "headline.svg")
     render_scenario_chart(payload, RESULTS_ROOT / "scenarios.svg")
