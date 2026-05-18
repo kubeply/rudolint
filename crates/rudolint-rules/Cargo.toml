@@ -9,6 +9,7 @@ repository.workspace = true
 [dependencies]
 clap.workspace = true
 email_address.workspace = true
+rudolint-buildkit.workspace = true
 rudolint-config.workspace = true
 rudolint-diagnostics.workspace = true
 rudolint-dockerfile.workspace = true

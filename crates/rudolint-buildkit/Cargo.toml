@@ -8,6 +8,7 @@ repository.workspace = true
 
 [dependencies]
 rudolint-dockerfile.workspace = true
+rudolint-shell.workspace = true
 
 [dev-dependencies]
 insta.workspace = true

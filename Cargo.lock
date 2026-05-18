@@ -683,6 +683,7 @@ version = "0.1.0"
 dependencies = [
  "insta",
  "rudolint-dockerfile",
+ "rudolint-shell",
  "rudolint-test",
  "serde_json",
 ]
@@ -768,6 +769,7 @@ dependencies = [
  "clap",
  "email_address",
  "insta",
+ "rudolint-buildkit",
  "rudolint-config",
  "rudolint-diagnostics",
  "rudolint-dockerfile",
