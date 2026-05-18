@@ -1074,8 +1074,8 @@ impl Rule for NoFromPlatformFlag {
     fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
         doc.instructions
             .iter()
-            .filter(|instruction| instruction.keyword == "FROM")
-            .filter(|instruction| instruction.flags.iter().any(|(name, _)| name == "platform"))
+            .filter(|instruction| instruction.keyword_is("FROM"))
+            .filter(|instruction| instruction.has_flag("platform"))
             .map(|instruction| {
                 diagnostic(
                     "RDL3029",
@@ -2889,11 +2889,10 @@ fn pip_no_cache_dir_truthy(value: &str) -> bool {
 
 fn has_pip_cache_mount(instruction: &Instruction) -> bool {
     instruction.mounts.iter().any(|mount| {
-        matches!(mount.mount_type.as_str(), "cache" | "tmpfs")
+        (mount.type_is("cache") || mount.type_is("tmpfs"))
             && mount
-                .options
-                .iter()
-                .any(|(name, value)| name == "target" && value.contains(".cache/pip"))
+                .target()
+                .is_some_and(|value| value.contains(".cache/pip"))
     })
 }
 
@@ -3287,11 +3286,8 @@ fn command_has_args(
 
 fn has_yarn_cache_mount(instruction: &Instruction) -> bool {
     instruction.mounts.iter().any(|mount| {
-        matches!(mount.mount_type.as_str(), "cache" | "tmpfs")
-            && mount
-                .options
-                .iter()
-                .any(|(name, value)| name == "target" && is_yarn_cache_target(value))
+        (mount.type_is("cache") || mount.type_is("tmpfs"))
+            && mount.target().is_some_and(is_yarn_cache_target)
     })
 }
 

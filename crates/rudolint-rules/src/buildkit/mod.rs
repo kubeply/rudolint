@@ -2,9 +2,9 @@ use crate::{Rule, RuleInfo, metadata::diagnostic, metadata::rule_metadata};
 use rudolint_buildkit::{
     final_stage_uses_build_platform, frontend_requirements, frontend_version_is_too_old,
     has_multi_platform_intent, has_secret_like_arg_or_env_name, is_official_dockerfile_frontend,
-    missing_buildkit_entitlements, mount_option, parse_pinned_frontend_version,
-    run_copies_secret_mount, run_uses_host_architecture_probe,
-    run_uses_lock_based_package_manager_with_shared_cache, ssh_mount_scope_is_broad,
+    missing_buildkit_entitlements, parse_pinned_frontend_version, run_copies_secret_mount,
+    run_uses_host_architecture_probe, run_uses_lock_based_package_manager_with_shared_cache,
+    ssh_mount_scope_is_broad,
 };
 use rudolint_config::Config;
 use rudolint_diagnostics::{Finding, Severity};
@@ -127,7 +127,7 @@ impl Rule for SecretInRun {
     fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
         doc.instructions
             .iter()
-            .filter(|instruction| instruction.keyword == "RUN")
+            .filter(|instruction| instruction.keyword_is("RUN"))
             .filter(|instruction| {
                 let upper = instruction.args.to_ascii_uppercase();
                 upper.contains("TOKEN=") || upper.contains("PASSWORD=") || upper.contains("SECRET=")
@@ -136,7 +136,7 @@ impl Rule for SecretInRun {
                 !instruction
                     .mounts
                     .iter()
-                    .any(|mount| mount.mount_type == "secret")
+                    .any(|mount| mount.type_is("secret"))
             })
             .map(|instruction| {
                 diagnostic(
@@ -166,7 +166,7 @@ impl Rule for CacheMountForPackageInstall {
     fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
         doc.instructions
             .iter()
-            .filter(|instruction| instruction.keyword == "RUN")
+            .filter(|instruction| instruction.keyword_is("RUN"))
             .filter(|instruction| {
                 instruction.args.contains("apt-get install")
                     || instruction.args.contains("apk add")
@@ -177,7 +177,7 @@ impl Rule for CacheMountForPackageInstall {
                 !instruction
                     .mounts
                     .iter()
-                    .any(|mount| mount.mount_type == "cache")
+                    .any(|mount| mount.type_is("cache"))
             })
             .map(|instruction| {
                 diagnostic(
@@ -207,7 +207,7 @@ impl Rule for SecretMountCopiedToLayer {
     fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
         doc.instructions
             .iter()
-            .filter(|instruction| instruction.keyword == "RUN")
+            .filter(|instruction| instruction.keyword_is("RUN"))
             .filter(|instruction| run_copies_secret_mount(instruction))
             .map(|instruction| {
                 diagnostic(
@@ -237,13 +237,8 @@ impl Rule for SshMountCommandScope {
     fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
         doc.instructions
             .iter()
-            .filter(|instruction| instruction.keyword == "RUN")
-            .filter(|instruction| {
-                instruction
-                    .mounts
-                    .iter()
-                    .any(|mount| mount.mount_type == "ssh")
-            })
+            .filter(|instruction| instruction.keyword_is("RUN"))
+            .filter(|instruction| instruction.mounts.iter().any(|mount| mount.type_is("ssh")))
             .filter(|instruction| {
                 instruction
                     .run
@@ -280,7 +275,7 @@ impl Rule for CacheMountStableId {
         if doc
             .instructions
             .iter()
-            .filter(|instruction| instruction.keyword == "FROM")
+            .filter(|instruction| instruction.keyword_is("FROM"))
             .count()
             < 2
         {
@@ -289,12 +284,12 @@ impl Rule for CacheMountStableId {
 
         doc.instructions
             .iter()
-            .filter(|instruction| instruction.keyword == "RUN")
+            .filter(|instruction| instruction.keyword_is("RUN"))
             .filter(|instruction| {
                 instruction
                     .mounts
                     .iter()
-                    .any(|mount| mount.mount_type == "cache" && mount_option(mount, "id").is_none())
+                    .any(|mount| mount.type_is("cache") && mount.option("id").is_none())
             })
             .map(|instruction| {
                 diagnostic(
@@ -324,7 +319,7 @@ impl Rule for CacheMountSafeSharing {
     fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
         doc.instructions
             .iter()
-            .filter(|instruction| instruction.keyword == "RUN")
+            .filter(|instruction| instruction.keyword_is("RUN"))
             .filter(|instruction| {
                 run_uses_lock_based_package_manager_with_shared_cache(instruction)
             })
@@ -360,7 +355,7 @@ impl Rule for BuildkitEntitlementRequiresOptIn {
     fn check_with_config(&self, doc: &Dockerfile, config: &Config) -> Vec<Finding> {
         doc.instructions
             .iter()
-            .filter(|instruction| instruction.keyword == "RUN")
+            .filter(|instruction| instruction.keyword_is("RUN"))
             .flat_map(|instruction| {
                 missing_buildkit_entitlements(instruction, &config.allow_entitlements)
                     .into_iter()
@@ -400,7 +395,7 @@ impl Rule for MultiPlatformHostArchitecture {
         let final_from_index = doc
             .instructions
             .iter()
-            .rposition(|instruction| instruction.keyword == "FROM");
+            .rposition(|instruction| instruction.keyword_is("FROM"));
 
         doc.instructions
             .iter()

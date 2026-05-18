@@ -32,17 +32,10 @@ pub fn has_secret_like_arg_or_env_name(keyword: &str, args: &str, secret_words: 
 }
 
 pub fn secret_mount_target(mount: &Mount) -> Option<String> {
-    let option = |name: &str| {
-        mount
-            .options
-            .iter()
-            .find_map(|(key, value)| (key == name && !value.is_empty()).then(|| value.clone()))
-    };
-
-    option("target")
-        .or_else(|| option("dst"))
-        .or_else(|| option("destination"))
-        .or_else(|| option("id").map(|id| format!("/run/secrets/{id}")))
+    mount
+        .target()
+        .map(ToString::to_string)
+        .or_else(|| mount.option("id").map(|id| format!("/run/secrets/{id}")))
         .filter(|target| target != "/")
 }
 
@@ -71,7 +64,7 @@ pub fn run_copies_secret_mount(instruction: &Instruction) -> bool {
     let secret_targets = instruction
         .mounts
         .iter()
-        .filter(|mount| mount.mount_type == "secret")
+        .filter(|mount| mount.type_is("secret"))
         .filter_map(secret_mount_target)
         .collect::<Vec<_>>();
 
@@ -409,13 +402,6 @@ pub fn shell_wrapper_command(command: &str) -> bool {
     matches!(wrapper_name, "sh" | "bash" | "dash" | "ash" | "zsh")
 }
 
-pub fn mount_option<'a>(mount: &'a Mount, name: &str) -> Option<&'a str> {
-    mount
-        .options
-        .iter()
-        .find_map(|(key, value)| (key == name && !value.is_empty()).then_some(value.as_str()))
-}
-
 pub fn run_uses_lock_based_package_manager_with_shared_cache(instruction: &Instruction) -> bool {
     let detected_lock_managers = instruction
         .run
@@ -431,18 +417,14 @@ pub fn run_uses_lock_based_package_manager_with_shared_cache(instruction: &Instr
 
     !detected_lock_managers.is_empty()
         && instruction.mounts.iter().any(|mount| {
-            mount.mount_type == "cache"
+            mount.type_is("cache")
                 && cache_mount_matches_lock_manager(mount, &detected_lock_managers)
-                && matches!(mount_option(mount, "sharing"), None | Some("shared"))
+                && matches!(mount.option("sharing"), None | Some("shared"))
         })
 }
 
 fn cache_mount_matches_lock_manager(mount: &Mount, managers: &[PackageManager]) -> bool {
-    let target = mount_option(mount, "target")
-        .or_else(|| mount_option(mount, "dst"))
-        .or_else(|| mount_option(mount, "destination"));
-
-    target.is_some_and(|target| {
+    mount.target().is_some_and(|target| {
         managers.iter().any(|manager| match manager {
             PackageManager::Apt | PackageManager::AptGet => {
                 target.starts_with("/var/cache/apt") || target.starts_with("/var/lib/apt")
@@ -715,66 +697,51 @@ pub fn frontend_requirements(instruction: &Instruction) -> Vec<FrontendRequireme
 
     match instruction.keyword.as_str() {
         "RUN" => {
-            for (name, _) in &instruction.flags {
-                match name.as_str() {
-                    "device" => {
-                        requirements.push(FrontendRequirement::labs("RUN --device", 1, 14));
-                    }
-                    "mount" => {
-                        requirements.push(FrontendRequirement::stable("RUN --mount", 1, 2));
-                    }
-                    "network" => {
-                        requirements.push(FrontendRequirement::stable("RUN --network", 1, 3));
-                    }
-                    "security" => {
-                        requirements.push(FrontendRequirement::stable("RUN --security", 1, 20));
-                    }
-                    _ => {}
-                }
+            if instruction.has_flag("device") {
+                requirements.push(FrontendRequirement::labs("RUN --device", 1, 14));
+            }
+            if instruction.has_flag("mount") {
+                requirements.push(FrontendRequirement::stable("RUN --mount", 1, 2));
+            }
+            if instruction.has_flag("network") {
+                requirements.push(FrontendRequirement::stable("RUN --network", 1, 3));
+            }
+            if instruction.has_flag("security") {
+                requirements.push(FrontendRequirement::stable("RUN --security", 1, 20));
             }
         }
         "ADD" => {
-            for (name, value) in &instruction.flags {
-                match name.as_str() {
-                    "keep-git-dir" => {
-                        requirements.push(FrontendRequirement::stable("ADD --keep-git-dir", 1, 1));
-                    }
-                    "checksum" => {
-                        requirements.push(FrontendRequirement::stable("ADD --checksum", 1, 6));
-                    }
-                    "chmod" => {
-                        requirements.push(chmod_frontend_requirement("ADD --chmod", value));
-                    }
-                    "link" => {
-                        requirements.push(FrontendRequirement::stable("ADD --link", 1, 4));
-                    }
-                    "unpack" => {
-                        requirements.push(FrontendRequirement::stable("ADD --unpack", 1, 17));
-                    }
-                    "exclude" => {
-                        requirements.push(FrontendRequirement::stable("ADD --exclude", 1, 19));
-                    }
-                    _ => {}
-                }
+            if instruction.has_flag("keep-git-dir") {
+                requirements.push(FrontendRequirement::stable("ADD --keep-git-dir", 1, 1));
+            }
+            if instruction.has_flag("checksum") {
+                requirements.push(FrontendRequirement::stable("ADD --checksum", 1, 6));
+            }
+            if let Some(value) = instruction.flag_value("chmod") {
+                requirements.push(chmod_frontend_requirement("ADD --chmod", value));
+            }
+            if instruction.has_flag("link") {
+                requirements.push(FrontendRequirement::stable("ADD --link", 1, 4));
+            }
+            if instruction.has_flag("unpack") {
+                requirements.push(FrontendRequirement::stable("ADD --unpack", 1, 17));
+            }
+            if instruction.has_flag("exclude") {
+                requirements.push(FrontendRequirement::stable("ADD --exclude", 1, 19));
             }
         }
         "COPY" => {
-            for (name, value) in &instruction.flags {
-                match name.as_str() {
-                    "chmod" => {
-                        requirements.push(chmod_frontend_requirement("COPY --chmod", value));
-                    }
-                    "link" => {
-                        requirements.push(FrontendRequirement::stable("COPY --link", 1, 4));
-                    }
-                    "parents" => {
-                        requirements.push(FrontendRequirement::stable("COPY --parents", 1, 20));
-                    }
-                    "exclude" => {
-                        requirements.push(FrontendRequirement::stable("COPY --exclude", 1, 19));
-                    }
-                    _ => {}
-                }
+            if let Some(value) = instruction.flag_value("chmod") {
+                requirements.push(chmod_frontend_requirement("COPY --chmod", value));
+            }
+            if instruction.has_flag("link") {
+                requirements.push(FrontendRequirement::stable("COPY --link", 1, 4));
+            }
+            if instruction.has_flag("parents") {
+                requirements.push(FrontendRequirement::stable("COPY --parents", 1, 20));
+            }
+            if instruction.has_flag("exclude") {
+                requirements.push(FrontendRequirement::stable("COPY --exclude", 1, 19));
             }
         }
         _ => {}

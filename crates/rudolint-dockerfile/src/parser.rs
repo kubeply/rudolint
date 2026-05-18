@@ -1040,17 +1040,30 @@ fn parse_heredocs(
 }
 
 impl Instruction {
+    pub fn keyword_is(&self, keyword: &str) -> bool {
+        self.keyword == keyword
+    }
+
+    pub fn flag_value(&self, name: &str) -> Option<&str> {
+        self.flags
+            .iter()
+            .find_map(|(key, value)| (key == name).then_some(value.as_str()))
+    }
+
+    pub fn has_flag(&self, name: &str) -> bool {
+        self.flag_value(name).is_some()
+    }
+
     pub fn has_buildkit_features(&self) -> bool {
         !self.mounts.is_empty()
             || !self.heredocs.is_empty()
-            || self
-                .flags
-                .iter()
-                .any(|(name, _)| matches!(name.as_str(), "network" | "security" | "ssh"))
+            || self.has_flag("network")
+            || self.has_flag("security")
+            || self.has_flag("ssh")
     }
 
     pub fn stage_alias(&self) -> Option<String> {
-        if self.keyword != "FROM" {
+        if !self.keyword_is("FROM") {
             return None;
         }
         let parts = self.args.split_whitespace().collect::<Vec<_>>();
@@ -1061,12 +1074,30 @@ impl Instruction {
     }
 
     pub fn base_image(&self) -> Option<&str> {
-        if self.keyword != "FROM" {
+        if !self.keyword_is("FROM") {
             return None;
         }
         self.args
             .split_whitespace()
             .find(|part| !part.starts_with("--") && !part.eq_ignore_ascii_case("AS"))
+    }
+}
+
+impl Mount {
+    pub fn type_is(&self, mount_type: &str) -> bool {
+        self.mount_type == mount_type
+    }
+
+    pub fn option(&self, name: &str) -> Option<&str> {
+        self.options
+            .iter()
+            .find_map(|(key, value)| (key == name && !value.is_empty()).then_some(value.as_str()))
+    }
+
+    pub fn target(&self) -> Option<&str> {
+        self.option("target")
+            .or_else(|| self.option("dst"))
+            .or_else(|| self.option("destination"))
     }
 }
 
@@ -1086,7 +1117,17 @@ RUN --mount=type=cache,target=/var/cache/apk apk add curl
 
         assert_eq!(doc.syntax.as_ref().unwrap().image, "docker/dockerfile:1.7");
         assert!(doc.has_buildkit_features);
-        assert_eq!(doc.instructions[1].mounts[0].mount_type, "cache");
+        assert!(doc.instructions[1].keyword_is("RUN"));
+        assert_eq!(
+            doc.instructions[1].flag_value("mount"),
+            Some("type=cache,target=/var/cache/apk")
+        );
+        assert!(doc.instructions[1].has_flag("mount"));
+        assert!(doc.instructions[1].mounts[0].type_is("cache"));
+        assert_eq!(
+            doc.instructions[1].mounts[0].target(),
+            Some("/var/cache/apk")
+        );
     }
 
     #[test]
