@@ -28,18 +28,22 @@ impl RuleEngine {
 
     /// Returns diagnostics emitted by all enabled rules for `document`.
     pub fn lint(&self, document: &Dockerfile) -> Vec<Finding> {
-        self.lint_path(Path::new(""), document)
+        self.lint_inner(None, document)
     }
 
     /// Returns diagnostics emitted by all enabled rules for `document` at `path`.
     pub fn lint_path(&self, path: &Path, document: &Dockerfile) -> Vec<Finding> {
+        self.lint_inner(Some(path), document)
+    }
+
+    fn lint_inner(&self, path: Option<&Path>, document: &Dockerfile) -> Vec<Finding> {
         let suppressions = targeted_suppressions(document);
         let mut findings = Vec::new();
         for rule in &self.rules {
             let info = rule.info();
             if !self.config.selects(info.code)
                 || self.config.ignores(info.code)
-                || self.config.ignores_for_path(info.code, path)
+                || path.is_some_and(|path| self.config.ignores_for_path(info.code, path))
             {
                 continue;
             }
@@ -72,17 +76,21 @@ impl RuleEngine {
 
     /// Returns fix previews emitted by all enabled rules for `document`.
     pub fn fixes(&self, document: &Dockerfile) -> Vec<FixPreview> {
-        self.fixes_path(Path::new(""), document)
+        self.fixes_inner(None, document)
     }
 
     /// Returns fix previews emitted by all enabled rules for `document` at `path`.
     pub fn fixes_path(&self, path: &Path, document: &Dockerfile) -> Vec<FixPreview> {
+        self.fixes_inner(Some(path), document)
+    }
+
+    fn fixes_inner(&self, path: Option<&Path>, document: &Dockerfile) -> Vec<FixPreview> {
         let mut fixes = Vec::new();
         for rule in &self.rules {
             let info = rule.info();
             if !self.config.selects(info.code)
                 || self.config.ignores(info.code)
-                || self.config.ignores_for_path(info.code, path)
+                || path.is_some_and(|path| self.config.ignores_for_path(info.code, path))
             {
                 continue;
             }

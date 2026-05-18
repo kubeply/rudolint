@@ -103,6 +103,7 @@ severity:
   RDK1000: warning
 
 per-file-ignores:
+  # Patterns are matched relative to this config file's directory.
   fixtures/**:
     - RDL3000
 

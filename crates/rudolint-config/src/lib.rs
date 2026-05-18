@@ -47,9 +47,11 @@ impl Config {
         };
         let raw = fs::read_to_string(path)
             .with_context(|| format!("failed to read {}", path.display()))?;
-        serde_yaml::from_str(&raw)
+        let config = serde_yaml::from_str(&raw)
             .map_err(|error| parse_error(path, error))
-            .with_context(|| format!("failed to parse {}", path.display()))
+            .with_context(|| format!("failed to parse {}", path.display()))?;
+        validate_per_file_ignore_patterns(&config, path)?;
+        Ok(config)
     }
 
     /// Loads an explicit config or discovers `.rudolint.yaml` from the provided start paths.
@@ -101,8 +103,21 @@ fn code_matches_target(code: &str, target: &str) -> bool {
 
 fn path_matches_pattern(path: &Path, pattern: &str) -> bool {
     Glob::new(pattern)
-        .map(|glob| glob.compile_matcher().is_match(path))
-        .unwrap_or(false)
+        .expect("per-file ignore glob should be validated at config load time")
+        .compile_matcher()
+        .is_match(path)
+}
+
+fn validate_per_file_ignore_patterns(config: &Config, path: &Path) -> Result<()> {
+    for pattern in config.per_file_ignores.keys() {
+        Glob::new(pattern).with_context(|| {
+            format!(
+                "invalid per-file-ignores pattern `{pattern}` in {}",
+                path.display()
+            )
+        })?;
+    }
+    Ok(())
 }
 
 fn parse_error(path: &Path, error: serde_yaml::Error) -> anyhow::Error {
@@ -211,5 +226,22 @@ per-file-ignores:
 
         assert!(message.contains("line 1"));
         assert!(message.contains("column"));
+    }
+
+    #[test]
+    fn load_rejects_invalid_per_file_ignore_globs() {
+        let temp = tempfile::TempDir::new().expect("temp dir should be created");
+        let path = temp.path().join(".rudolint.yaml");
+        std::fs::write(
+            &path,
+            "per-file-ignores:\n  '[unterminated':\n    - RDL3000\n",
+        )
+        .expect("config should be written");
+
+        let error = Config::load(Some(&path)).expect_err("config should fail to load");
+        let message = format!("{error:#}");
+
+        assert!(message.contains("invalid per-file-ignores pattern"));
+        assert!(message.contains("[unterminated"));
     }
 }
