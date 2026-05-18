@@ -1084,16 +1084,21 @@ impl Instruction {
 }
 
 impl Mount {
+    /// Returns `true` when this mount's type equals `mount_type`.
     pub fn type_is(&self, mount_type: &str) -> bool {
         self.mount_type == mount_type
     }
 
+    /// Returns the named option value when present and non-empty.
+    ///
+    /// Empty option values are treated as semantically absent.
     pub fn option(&self, name: &str) -> Option<&str> {
         self.options
             .iter()
             .find_map(|(key, value)| (key == name && !value.is_empty()).then_some(value.as_str()))
     }
 
+    /// Returns the mount target from `target`, `dst`, or `destination`.
     pub fn target(&self) -> Option<&str> {
         self.option("target")
             .or_else(|| self.option("dst"))
@@ -1128,6 +1133,13 @@ RUN --mount=type=cache,target=/var/cache/apk apk add curl
             doc.instructions[1].mounts[0].target(),
             Some("/var/cache/apk")
         );
+
+        let mount = Mount {
+            mount_type: "cache".to_string(),
+            options: vec![("empty".to_string(), String::new())],
+        };
+        assert_eq!(mount.option("empty"), None);
+        assert_eq!(mount.option("missing"), None);
     }
 
     #[test]
