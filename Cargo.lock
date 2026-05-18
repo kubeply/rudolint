@@ -1014,6 +1014,7 @@ dependencies = [
  "codspeed-criterion-compat",
  "rudolint-config",
  "rudolint-dockerfile",
+ "rudolint-output",
  "rudolint-rules",
 ]
 
