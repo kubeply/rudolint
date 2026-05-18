@@ -7,3 +7,13 @@ license.workspace = true
 repository.workspace = true
 
 [dependencies]
+
+[dev-dependencies]
+criterion = { version = "4.6.0", package = "codspeed-criterion-compat" }
+rudolint-config = { path = "../rudolint-config" }
+rudolint-dockerfile = { path = "../rudolint-dockerfile" }
+rudolint-rules = { path = "../rudolint-rules" }
+
+[[bench]]
+name = "rudolint_benchmarks"
+harness = false

@@ -1,5 +1,7 @@
 # rudolint
 
+[![CodSpeed](https://img.shields.io/endpoint?url=https://codspeed.io/badge.json)](https://codspeed.io/kubeply/rudolint?utm_source=badge)
+
 `rudolint` is a fast Dockerfile linter built for modern BuildKit and Buildx
 workflows.
 
