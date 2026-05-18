@@ -237,7 +237,7 @@ impl Rule for UseWorkdirForCd {
             .filter(|instruction| {
                 detect_command_invocations(&instruction.args)
                     .into_iter()
-                    .any(|invocation| invocation.command == "cd")
+                    .any(|invocation| invocation.command_is("cd"))
             })
             .map(|instruction| {
                 diagnostic(
@@ -271,7 +271,7 @@ impl Rule for NoSudo {
             .filter(|instruction| {
                 detect_command_invocations(&instruction.args)
                     .into_iter()
-                    .any(|invocation| invocation.command == "sudo")
+                    .any(|invocation| invocation.command_is("sudo"))
             })
             .map(|instruction| {
                 diagnostic(
@@ -2629,7 +2629,7 @@ fn normalized_add_source(source: &str) -> String {
 fn apt_get_install_has_unpinned_packages(shell: &str) -> bool {
     detect_command_invocations(shell)
         .into_iter()
-        .filter(|invocation| invocation.command == "apt-get")
+        .filter(|invocation| invocation.command_is("apt-get"))
         .any(|invocation| {
             let Some(install_index) = invocation
                 .arguments
@@ -2678,7 +2678,7 @@ fn apt_get_install_option_takes_value(argument: &str) -> bool {
 fn apt_get_uses_package_lists(shell: &str) -> bool {
     detect_command_invocations(shell)
         .into_iter()
-        .filter(|invocation| invocation.command == "apt-get")
+        .filter(|invocation| invocation.command_is("apt-get"))
         .any(|invocation| {
             invocation
                 .arguments
@@ -2691,7 +2691,7 @@ fn apt_get_uses_package_lists(shell: &str) -> bool {
 fn removes_apt_lists(shell: &str) -> bool {
     detect_command_invocations(shell)
         .into_iter()
-        .filter(|invocation| invocation.command == "rm")
+        .filter(|invocation| invocation.command_is("rm"))
         .flat_map(|invocation| invocation.arguments)
         .any(|argument| {
             let value = argument.trim_matches(|character| matches!(character, '"' | '\''));
@@ -2704,7 +2704,7 @@ fn removes_apt_lists(shell: &str) -> bool {
 fn pip_install_has_unpinned_packages(shell: &str) -> bool {
     detect_command_invocations(shell)
         .into_iter()
-        .filter(|invocation| matches!(invocation.command.as_str(), "pip" | "pip3"))
+        .filter(|invocation| invocation.command_is_any(&["pip", "pip3"]))
         .any(|invocation| {
             let Some(install_index) = invocation
                 .arguments
@@ -2825,7 +2825,7 @@ fn is_shell_assignment_name(name: &str) -> bool {
 }
 
 fn pip_install_arguments(invocation: &rudolint_shell::ShellCommandInvocation) -> Option<&[String]> {
-    if matches!(invocation.command.as_str(), "pip" | "pip3") {
+    if invocation.command_is_any(&["pip", "pip3"]) {
         return Some(&invocation.arguments);
     }
 
@@ -2963,7 +2963,7 @@ fn strip_instruction_prefix<'a>(args: &'a str, keyword: &str) -> Option<&'a str>
 fn useradd_missing_no_log_init(shell: &str) -> bool {
     detect_command_invocations(shell)
         .into_iter()
-        .filter(|invocation| invocation.command == "useradd")
+        .filter(|invocation| invocation.command_is("useradd"))
         .any(|invocation| {
             !has_useradd_no_log_init_flag(&invocation.arguments)
                 && useradd_uid_values(&invocation.arguments)
@@ -3007,7 +3007,7 @@ fn useradd_uid_values(arguments: &[String]) -> Vec<&str> {
 fn wget_missing_progress_control(shell: &str) -> bool {
     detect_command_invocations(shell)
         .into_iter()
-        .filter(|invocation| invocation.command == "wget")
+        .filter(|invocation| invocation.command_is("wget"))
         .any(|invocation| !wget_has_progress_control(&invocation.arguments))
 }
 
@@ -3254,33 +3254,15 @@ fn yarn_install_missing_cache_clean(instruction: &Instruction) -> bool {
     invocations
         .iter()
         .enumerate()
-        .filter(|(_, invocation)| command_has_args(invocation, "yarn", &["install"]))
+        .filter(|(_, invocation)| invocation.command_has_args("yarn", &["install"]))
         .any(|(install_index, _)| {
             !invocations
                 .iter()
                 .enumerate()
                 .any(|(clean_index, invocation)| {
                     clean_index > install_index
-                        && command_has_args(invocation, "yarn", &["cache", "clean"])
+                        && invocation.command_has_args("yarn", &["cache", "clean"])
                 })
-        })
-}
-
-fn command_has_args(
-    invocation: &rudolint_shell::ShellCommandInvocation,
-    command: &str,
-    expected: &[&str],
-) -> bool {
-    if expected.is_empty() {
-        return invocation.command == command;
-    }
-
-    invocation.command == command
-        && invocation.arguments.windows(expected.len()).any(|window| {
-            window
-                .iter()
-                .map(String::as_str)
-                .eq(expected.iter().copied())
         })
 }
 
@@ -3446,7 +3428,7 @@ fn run_links_default_shell(instruction: &Instruction) -> bool {
     detect_command_invocations(&shell.text)
         .iter()
         .any(|invocation| {
-            invocation.command == "ln"
+            invocation.command_is("ln")
                 && invocation
                     .arguments
                     .iter()
@@ -3753,7 +3735,7 @@ fn is_external_stage_reference(reference: &str) -> bool {
 fn apt_get_install_missing_yes(shell: &str) -> bool {
     detect_command_invocations(shell)
         .into_iter()
-        .filter(|invocation| invocation.command == "apt-get")
+        .filter(|invocation| invocation.command_is("apt-get"))
         .any(|invocation| {
             let has_install = apt_get_subcommand_index(&invocation.arguments)
                 .is_some_and(|index| invocation.arguments[index] == "install");
@@ -3769,7 +3751,7 @@ fn apt_get_install_missing_yes(shell: &str) -> bool {
 fn apt_get_install_missing_no_install_recommends(shell: &str) -> bool {
     detect_command_invocations(shell)
         .into_iter()
-        .filter(|invocation| invocation.command == "apt-get")
+        .filter(|invocation| invocation.command_is("apt-get"))
         .any(|invocation| {
             let has_install = apt_get_subcommand_index(&invocation.arguments)
                 .is_some_and(|index| invocation.arguments[index] == "install");
@@ -3812,7 +3794,7 @@ fn apt_get_subcommand_index(arguments: &[String]) -> Option<usize> {
 fn npm_install_has_unpinned_packages(shell: &str) -> bool {
     detect_command_invocations(shell)
         .into_iter()
-        .filter(|invocation| invocation.command == "npm")
+        .filter(|invocation| invocation.command_is("npm"))
         .any(|invocation| {
             let Some(install_index) = npm_subcommand_index(&invocation.arguments) else {
                 return false;
@@ -3915,7 +3897,7 @@ fn npm_install_option_takes_value(argument: &str) -> bool {
 fn apk_add_has_unpinned_packages(shell: &str) -> bool {
     detect_command_invocations(shell)
         .into_iter()
-        .filter(|invocation| invocation.command == "apk")
+        .filter(|invocation| invocation.command_is("apk"))
         .any(|invocation| {
             let Some(add_index) = apk_subcommand_index(&invocation.arguments) else {
                 return false;
@@ -4000,7 +3982,7 @@ fn apk_add_option_takes_value(argument: &str) -> bool {
 fn apk_add_missing_no_cache(shell: &str) -> bool {
     detect_command_invocations(shell)
         .into_iter()
-        .filter(|invocation| invocation.command == "apk")
+        .filter(|invocation| invocation.command_is("apk"))
         .any(|invocation| {
             apk_subcommand_index(&invocation.arguments)
                 .is_some_and(|index| invocation.arguments[index] == "add")
@@ -4113,13 +4095,13 @@ fn image_registry(image: &str) -> Option<&str> {
 fn shell_uses_apt(shell: &str) -> bool {
     detect_command_invocations(shell)
         .into_iter()
-        .any(|invocation| invocation.command == "apt")
+        .any(|invocation| invocation.command_is("apt"))
 }
 
 fn gem_install_has_unpinned_packages(shell: &str) -> bool {
     detect_command_invocations(shell)
         .into_iter()
-        .filter(|invocation| invocation.command == "gem")
+        .filter(|invocation| invocation.command_is("gem"))
         .any(|invocation| {
             let Some(install_index) = gem_subcommand_index(&invocation.arguments) else {
                 return false;
@@ -4219,7 +4201,7 @@ fn gem_option_takes_value(argument: &str) -> bool {
 fn yum_install_missing_yes(shell: &str) -> bool {
     detect_command_invocations(shell)
         .into_iter()
-        .filter(|invocation| invocation.command == "yum")
+        .filter(|invocation| invocation.command_is("yum"))
         .any(|invocation| {
             yum_subcommand_index(&invocation.arguments)
                 .is_some_and(|index| invocation.arguments[index] == "install")
@@ -4276,7 +4258,7 @@ fn yum_option_takes_value(argument: &str) -> bool {
 fn yum_install_missing_clean_all(shell: &str) -> bool {
     let invocations = detect_command_invocations(shell);
     let last_install_index = invocations.iter().rposition(|invocation| {
-        invocation.command == "yum"
+        invocation.command_is("yum")
             && yum_subcommand_index(&invocation.arguments)
                 .is_some_and(|index| invocation.arguments[index] == "install")
     });
@@ -4308,7 +4290,7 @@ fn yum_install_missing_clean_all(shell: &str) -> bool {
 fn yum_install_has_unpinned_packages(shell: &str) -> bool {
     detect_command_invocations(shell)
         .into_iter()
-        .filter(|invocation| invocation.command == "yum")
+        .filter(|invocation| invocation.command_is("yum"))
         .any(|invocation| {
             let Some(install_index) = yum_subcommand_index(&invocation.arguments) else {
                 return false;
@@ -4356,7 +4338,7 @@ fn rpm_package_has_version(package: &str) -> bool {
 fn zypper_install_missing_yes(shell: &str) -> bool {
     detect_command_invocations(shell)
         .into_iter()
-        .filter(|invocation| invocation.command == "zypper")
+        .filter(|invocation| invocation.command_is("zypper"))
         .any(|invocation| {
             zypper_subcommand_index(&invocation.arguments).is_some_and(|index| {
                 matches!(invocation.arguments[index].as_str(), "install" | "in")
@@ -4416,7 +4398,7 @@ fn zypper_option_takes_value(argument: &str) -> bool {
 fn shell_uses_zypper_dist_upgrade(shell: &str) -> bool {
     detect_command_invocations(shell)
         .into_iter()
-        .filter(|invocation| invocation.command == "zypper")
+        .filter(|invocation| invocation.command_is("zypper"))
         .any(|invocation| {
             zypper_subcommand_index(&invocation.arguments).is_some_and(|index| {
                 matches!(invocation.arguments[index].as_str(), "dist-upgrade" | "dup")
@@ -4452,7 +4434,7 @@ fn zypper_use_missing_clean(shell: &str) -> bool {
 fn zypper_install_has_unpinned_packages(shell: &str) -> bool {
     detect_command_invocations(shell)
         .into_iter()
-        .filter(|invocation| invocation.command == "zypper")
+        .filter(|invocation| invocation.command_is("zypper"))
         .any(|invocation| {
             let Some(install_index) = invocation
                 .arguments
@@ -4474,7 +4456,7 @@ fn zypper_install_has_unpinned_packages(shell: &str) -> bool {
 fn dnf_install_missing_yes(shell: &str) -> bool {
     detect_command_invocations(shell)
         .into_iter()
-        .filter(|invocation| invocation.command == "dnf")
+        .filter(|invocation| invocation.command_is("dnf"))
         .any(|invocation| {
             dnf_subcommand_index(&invocation.arguments)
                 .is_some_and(|index| invocation.arguments[index] == "install")
@@ -4494,7 +4476,7 @@ fn dnf_subcommand_index(arguments: &[String]) -> Option<usize> {
 fn dnf_install_missing_clean_all(shell: &str) -> bool {
     let invocations = detect_command_invocations(shell);
     let last_install_index = invocations.iter().rposition(|invocation| {
-        invocation.command == "dnf"
+        invocation.command_is("dnf")
             && dnf_subcommand_index(&invocation.arguments)
                 .is_some_and(|index| invocation.arguments[index] == "install")
     });
@@ -4527,7 +4509,7 @@ fn dnf_install_missing_clean_all(shell: &str) -> bool {
 fn dnf_install_has_unpinned_packages(shell: &str) -> bool {
     detect_command_invocations(shell)
         .into_iter()
-        .filter(|invocation| invocation.command == "dnf")
+        .filter(|invocation| invocation.command_is("dnf"))
         .any(|invocation| {
             let Some(install_index) = dnf_subcommand_index(&invocation.arguments) else {
                 return false;

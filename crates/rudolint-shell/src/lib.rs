@@ -16,6 +16,34 @@ pub struct ShellCommandInvocation {
     pub arguments: Vec<String>,
 }
 
+impl ShellCommandInvocation {
+    /// Returns `true` when this invocation's command basename equals `command`.
+    pub fn command_is(&self, command: &str) -> bool {
+        self.command == command
+    }
+
+    /// Returns `true` when this invocation's command basename matches any candidate.
+    pub fn command_is_any(&self, commands: &[&str]) -> bool {
+        commands.iter().any(|command| self.command_is(command))
+    }
+
+    /// Returns `true` when the invocation contains `expected` as a contiguous argument sequence.
+    pub fn has_arg_sequence(&self, expected: &[&str]) -> bool {
+        expected.is_empty()
+            || self.arguments.windows(expected.len()).any(|window| {
+                window
+                    .iter()
+                    .map(String::as_str)
+                    .eq(expected.iter().copied())
+            })
+    }
+
+    /// Returns `true` when both the command and argument sequence match.
+    pub fn command_has_args(&self, command: &str, expected: &[&str]) -> bool {
+        self.command_is(command) && self.has_arg_sequence(expected)
+    }
+}
+
 /// Package manager executable detected in shell command text.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PackageManager {
@@ -384,5 +412,20 @@ mod tests {
             .collect::<Vec<_>>();
 
         insta::assert_json_snapshot!(values);
+    }
+
+    #[test]
+    fn command_invocation_matching_handles_argument_sequences() {
+        let invocation = ShellCommandInvocation {
+            command: "yarn".to_string(),
+            arguments: vec!["cache".to_string(), "clean".to_string()],
+        };
+
+        assert!(invocation.command_is("yarn"));
+        assert!(invocation.command_is_any(&["npm", "yarn"]));
+        assert!(invocation.has_arg_sequence(&["cache", "clean"]));
+        assert!(invocation.command_has_args("yarn", &["cache", "clean"]));
+        assert!(!invocation.command_has_args("npm", &["cache", "clean"]));
+        assert!(!invocation.has_arg_sequence(&["clean", "cache"]));
     }
 }

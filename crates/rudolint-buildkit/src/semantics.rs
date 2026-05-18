@@ -43,7 +43,7 @@ pub fn invocation_copies_secret(
     invocation: &ShellCommandInvocation,
     secret_targets: &[String],
 ) -> bool {
-    if !matches!(invocation.command.as_str(), "cp" | "install" | "rsync") {
+    if !invocation.command_is_any(&["cp", "install", "rsync"]) {
         return false;
     }
 
@@ -561,23 +561,27 @@ fn shell_contains_host_architecture_probe(shell: &str) -> bool {
 }
 
 fn invocation_uses_host_architecture_probe(invocation: &ShellCommandInvocation) -> bool {
-    match invocation.command.as_str() {
-        "arch" => true,
-        "uname" => invocation.arguments.iter().any(|argument| {
+    if invocation.command_is("arch") {
+        true
+    } else if invocation.command_is("uname") {
+        invocation.arguments.iter().any(|argument| {
             matches!(
                 argument.as_str(),
                 "-m" | "-p" | "-i" | "--machine" | "--processor" | "--hardware-platform"
             )
-        }),
-        "dpkg" => invocation
+        })
+    } else if invocation.command_is("dpkg") {
+        invocation
             .arguments
             .iter()
-            .any(|argument| argument == "--print-architecture"),
-        "apk" => invocation
+            .any(|argument| argument == "--print-architecture")
+    } else if invocation.command_is("apk") {
+        invocation
             .arguments
             .iter()
-            .any(|argument| argument == "--print-arch"),
-        _ => false,
+            .any(|argument| argument == "--print-arch")
+    } else {
+        false
     }
 }
 
