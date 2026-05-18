@@ -88,6 +88,7 @@ fn run_check(args: cli::CheckArgs) -> Result<ExitCode, AppError> {
         inputs.clone()
     };
     let settings = resolve_from_parts(args.config.as_deref(), args.no_config, starts)?;
+    let config_path = settings.config_path.clone();
     let engine = RuleEngine::new(args.profile, settings.config);
     let input_count = if inputs.is_empty() { 1 } else { inputs.len() };
     let mut findings = Vec::new();
@@ -99,7 +100,13 @@ fn run_check(args: cli::CheckArgs) -> Result<ExitCode, AppError> {
         io::stdin().read_to_string(&mut source).map_err(|error| {
             AppError::usage(format!("failed to read Dockerfile from stdin: {error}"))
         })?;
-        let analysis = analyze_source(&args.stdin_filename, &source, &engine, args.fix)?;
+        let analysis = analyze_source(
+            &args.stdin_filename,
+            &args.stdin_filename,
+            &source,
+            &engine,
+            args.fix,
+        )?;
         findings.extend(analysis.findings);
         fixes.extend(analysis.fixes);
         sources.insert(args.stdin_filename.clone(), source);
@@ -108,7 +115,8 @@ fn run_check(args: cli::CheckArgs) -> Result<ExitCode, AppError> {
             let source = fs::read_to_string(&path).map_err(|error| {
                 AppError::usage(format!("failed to read {}: {error}", path.display()))
             })?;
-            let analysis = analyze_source(&path, &source, &engine, args.fix)?;
+            let lint_path = lint_path_for_config(&config_path, &path);
+            let analysis = analyze_source(&path, &lint_path, &source, &engine, args.fix)?;
             if args.fix && !args.dry_run {
                 apply_fixes(&path, &source, &analysis.fixes)?;
             }
@@ -242,6 +250,7 @@ struct Analysis {
 
 fn analyze_source(
     path: &Path,
+    lint_path: &Path,
     source: &str,
     engine: &RuleEngine,
     collect_fixes: bool,
@@ -255,16 +264,32 @@ fn analyze_source(
         })
         .map_err(|error| AppError::usage(error.to_string()))?;
     let findings = engine
-        .lint(&document)
+        .lint_path(lint_path, &document)
         .into_iter()
         .map(|finding| finding.with_path(path))
         .collect();
     let fixes = if collect_fixes {
-        engine.fixes(&document)
+        engine.fixes_path(lint_path, &document)
     } else {
         Vec::new()
     };
     Ok(Analysis { findings, fixes })
+}
+
+fn lint_path_for_config(config_path: &Option<PathBuf>, path: &Path) -> PathBuf {
+    let Some(config_parent) = config_path.as_ref().and_then(|path| path.parent()) else {
+        return path.to_path_buf();
+    };
+
+    let canonical_path = path.canonicalize().unwrap_or_else(|_| path.to_path_buf());
+    let canonical_parent = config_parent
+        .canonicalize()
+        .unwrap_or_else(|_| config_parent.to_path_buf());
+
+    canonical_path
+        .strip_prefix(canonical_parent)
+        .map(Path::to_path_buf)
+        .unwrap_or(canonical_path)
 }
 
 fn apply_fixes(path: &Path, source: &str, fixes: &[FixPreview]) -> Result<(), AppError> {

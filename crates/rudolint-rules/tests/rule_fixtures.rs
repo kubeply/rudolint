@@ -1508,6 +1508,19 @@ fn snapshots_rule_selection_matrix() {
         ..Config::default()
     };
 
+    let select_config = Config {
+        select: BTreeSet::from(["RDK".to_string()]),
+        ..Config::default()
+    };
+
+    let per_file_ignore_config = Config {
+        per_file_ignores: BTreeMap::from([(
+            "rules/**".to_string(),
+            BTreeSet::from(["RDL3000".to_string()]),
+        )]),
+        ..Config::default()
+    };
+
     let snapshot = serde_json::json!({
         "profile_findings": {
             "default": finding_codes(&default_engine.lint(&document)),
@@ -1523,6 +1536,13 @@ fn snapshots_rule_selection_matrix() {
             ),
             "severity_override_rdl3007": finding_codes(
                 &RuleEngine::new(Profile::Compat, severity_config).lint(&document)
+            ),
+            "select_rdk": finding_codes(
+                &RuleEngine::new(Profile::Default, select_config).lint(&document)
+            ),
+            "per_file_ignore_rdl3000": finding_codes(
+                &RuleEngine::new(Profile::Default, per_file_ignore_config)
+                    .lint_path(std::path::Path::new("rules/default-basic/Dockerfile"), &document)
             ),
         }
     });

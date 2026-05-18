@@ -1,6 +1,6 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
-assertion_line: 1530
+assertion_line: 1550
 expression: snapshot
 ---
 {
@@ -37,6 +37,50 @@ expression: snapshot
       {
         "code": "RDL4003",
         "severity": "warning"
+      }
+    ],
+    "per_file_ignore_rdl3000": [
+      {
+        "code": "RDL3007",
+        "severity": "warning"
+      },
+      {
+        "code": "RDK1001",
+        "severity": "warning"
+      },
+      {
+        "code": "RDK1003",
+        "severity": "info"
+      },
+      {
+        "code": "RDL3018",
+        "severity": "warning"
+      },
+      {
+        "code": "RDL3019",
+        "severity": "info"
+      },
+      {
+        "code": "RDL3020",
+        "severity": "error"
+      },
+      {
+        "code": "RDL3025",
+        "severity": "warning"
+      },
+      {
+        "code": "RDL4003",
+        "severity": "warning"
+      }
+    ],
+    "select_rdk": [
+      {
+        "code": "RDK1001",
+        "severity": "warning"
+      },
+      {
+        "code": "RDK1003",
+        "severity": "info"
       }
     ],
     "severity_override_rdl3007": [

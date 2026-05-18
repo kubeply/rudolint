@@ -126,6 +126,65 @@ fn explicit_config_can_ignore_rule() {
 }
 
 #[test]
+fn explicit_config_can_select_rule_prefix() {
+    let temp = TempDir::new().expect("temp dir should be created");
+    let dockerfile = temp.path().join("Dockerfile");
+    let config = temp.path().join(".rudolint.yaml");
+    std::fs::write(&dockerfile, "FROM alpine:latest\nWORKDIR app\n")
+        .expect("fixture should be written");
+    std::fs::write(&config, "select:\n  - RDL3000\n").expect("config should be written");
+
+    let output = rudolint_cmd()
+        .args([
+            "check",
+            "--format",
+            "json",
+            "--failure-threshold",
+            "error",
+            "--config",
+        ])
+        .arg(&config)
+        .arg(&dockerfile)
+        .assert()
+        .code(1)
+        .get_output()
+        .stdout
+        .clone();
+
+    let output = String::from_utf8(output).expect("stdout should be UTF-8");
+    let mut output = normalized_json(&output);
+    normalize_path_prefix(&mut output, temp.path(), "$TEMP");
+    insta::assert_json_snapshot!("config_select_json_findings", output);
+}
+
+#[test]
+fn config_per_file_ignores_match_paths_relative_to_config() {
+    let temp = TempDir::new().expect("temp dir should be created");
+    let service = temp.path().join("service");
+    std::fs::create_dir(&service).expect("service dir should be created");
+    let dockerfile = service.join("Dockerfile");
+    let config = temp.path().join(".rudolint.yaml");
+    std::fs::write(&dockerfile, "FROM alpine:latest\nWORKDIR app\n")
+        .expect("fixture should be written");
+    std::fs::write(&config, "per-file-ignores:\n  service/**:\n    - RDL3000\n")
+        .expect("config should be written");
+
+    let output = rudolint_cmd()
+        .args(["check", "--format", "json", "--failure-threshold", "error"])
+        .arg(&dockerfile)
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+
+    let output = String::from_utf8(output).expect("stdout should be UTF-8");
+    let mut output = normalized_json(&output);
+    normalize_path_prefix(&mut output, temp.path(), "$TEMP");
+    insta::assert_json_snapshot!("config_per_file_ignore_json_findings", output);
+}
+
+#[test]
 fn explicit_config_can_override_severity() {
     let temp = TempDir::new().expect("temp dir should be created");
     let dockerfile = temp.path().join("Dockerfile");

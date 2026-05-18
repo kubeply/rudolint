@@ -692,6 +692,7 @@ name = "rudolint-config"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "globset",
  "rudolint-diagnostics",
  "serde",
  "serde_yaml",
