@@ -333,12 +333,12 @@
       "python": "3.14.4"
     },
     "commands": {
-      "rudolint": "/Users/chainyo/code/kubeply/rudolint/target/release/rudolint",
-      "hadolint": "/Users/chainyo/code/kubeply/rudolint/target/dockerfile-linter-bench/tools/hadolint/v2.14.0/hadolint",
-      "tally": "/Users/chainyo/code/kubeply/rudolint/target/dockerfile-linter-bench/tools/node/node_modules/.bin/tally",
-      "dockerfilelint": "/Users/chainyo/code/kubeply/rudolint/target/dockerfile-linter-bench/tools/node/node_modules/.bin/dockerfilelint",
-      "dockerfile-lint": "/Users/chainyo/code/kubeply/rudolint/target/dockerfile-linter-bench/tools/node/node_modules/.bin/dockerfile_lint",
-      "docker-build-check": "/opt/homebrew/bin/docker"
+      "rudolint": "target/release/rudolint",
+      "hadolint": "target/dockerfile-linter-bench/tools/hadolint/<version>/hadolint",
+      "tally": "target/dockerfile-linter-bench/tools/node/node_modules/.bin/tally",
+      "dockerfilelint": "target/dockerfile-linter-bench/tools/node/node_modules/.bin/dockerfilelint",
+      "dockerfile-lint": "target/dockerfile-linter-bench/tools/node/node_modules/.bin/dockerfile_lint",
+      "docker-build-check": "docker"
     },
     "versions": {
       "rudolint": "rudolint 0.1.0",
@@ -352,8 +352,8 @@
       "hadolint": "GitHub release v2.14.0",
       "tally": "npm tally-cli@0.41.0",
       "dockerfilelint": "npm dockerfilelint@1.8.0",
-      "dockerfile_lint": "npm dockerfile_lint@0.3.4",
-      "docker-build-check": "local Docker CLI"
+      "docker-build-check": "local Docker CLI",
+      "dockerfile-lint": "npm dockerfile_lint@0.3.4"
     }
   }
 }

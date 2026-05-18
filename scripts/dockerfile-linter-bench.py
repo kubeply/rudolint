@@ -11,6 +11,7 @@ import argparse
 import json
 import os
 import platform
+import shlex
 import shutil
 import stat
 import subprocess
@@ -433,7 +434,7 @@ def setup() -> dict:
             "hadolint": f"GitHub release {hadolint_version}",
             "tally": f"npm {TALLY_NPM}@{tally_version}",
             "dockerfilelint": f"npm {DOCKERFILELINT_NPM}@{dockerfilelint_version}",
-            "dockerfile_lint": f"npm {DOCKERFILE_LINT_NPM}@{dockerfile_lint_version}",
+            "dockerfile-lint": f"npm {DOCKERFILE_LINT_NPM}@{dockerfile_lint_version}",
             "docker-build-check": "local Docker CLI",
         },
     }
@@ -446,7 +447,28 @@ def setup() -> dict:
 
 def hyperfine_command(tool: str, scenario: str) -> str:
     script = ROOT / "scripts" / "dockerfile-linter-bench.py"
-    return f"{sys.executable} {script} exec --tool {tool} --scenario {scenario}"
+    return (
+        f"{shlex.quote(sys.executable)} "
+        f"{shlex.quote(str(script))} "
+        f"exec --tool {shlex.quote(tool)} --scenario {shlex.quote(scenario)}"
+    )
+
+
+def public_manifest(manifest: dict) -> dict:
+    public = json.loads(json.dumps(manifest))
+    latest_sources = public.get("latest_sources", {})
+    if "dockerfile_lint" in latest_sources:
+        latest_sources["dockerfile-lint"] = latest_sources.pop("dockerfile_lint")
+    public["latest_sources"] = latest_sources
+    public["commands"] = {
+        "rudolint": "target/release/rudolint",
+        "hadolint": "target/dockerfile-linter-bench/tools/hadolint/<version>/hadolint",
+        "tally": "target/dockerfile-linter-bench/tools/node/node_modules/.bin/tally",
+        "dockerfilelint": "target/dockerfile-linter-bench/tools/node/node_modules/.bin/dockerfilelint",
+        "dockerfile-lint": "target/dockerfile-linter-bench/tools/node/node_modules/.bin/dockerfile_lint",
+        "docker-build-check": "docker",
+    }
+    return public
 
 
 def run_hyperfine(runs: int, warmup: int, scenarios: list[str]) -> dict:
@@ -490,7 +512,7 @@ def run_hyperfine(runs: int, warmup: int, scenarios: list[str]) -> dict:
         "warmup": warmup,
         "headline_scenario": HEADLINE_SCENARIO,
         "results": all_results,
-        "manifest": read_manifest(),
+        "manifest": public_manifest(read_manifest()),
     }
 
 
@@ -504,6 +526,8 @@ def scenario_supported(tool: str, scenario: str) -> bool:
 
 def write_results(payload: dict) -> None:
     RESULTS_ROOT.mkdir(parents=True, exist_ok=True)
+    if "manifest" in payload:
+        payload["manifest"] = public_manifest(payload["manifest"])
     (RESULTS_ROOT / "latest.json").write_text(
         json.dumps(payload, indent=2) + "\n", encoding="utf-8"
     )
@@ -541,6 +565,22 @@ def render_headline_chart(payload: dict, output: Path) -> None:
         for row in payload["results"]
         if row["scenario"] == payload["headline_scenario"]
     ]
+    if not rows:
+        svg = """<svg xmlns="http://www.w3.org/2000/svg" width="980" height="180" viewBox="0 0 980 180" role="img" aria-labelledby="title desc">
+  <title id="title">Dockerfile linter benchmark</title>
+  <desc id="desc">No data available for the configured headline scenario.</desc>
+  <style>
+    text { fill: #cbd5e1; font: 600 18px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .small { fill: #94a3b8; font-size: 16px; font-weight: 500; }
+    .title { fill: #e2e8f0; font-size: 28px; font-weight: 800; }
+  </style>
+  <rect width="100%" height="100%" fill="#111827"/>
+  <text class="title" x="32" y="54">Dockerfile linter performance</text>
+  <text class="small" x="32" y="92">No results for the configured headline scenario in this run.</text>
+</svg>
+"""
+        output.write_text(svg, encoding="utf-8")
+        return
     rows.sort(key=lambda row: row["mean_seconds"])
     max_time = max(row["mean_seconds"] for row in rows)
     width = 980
