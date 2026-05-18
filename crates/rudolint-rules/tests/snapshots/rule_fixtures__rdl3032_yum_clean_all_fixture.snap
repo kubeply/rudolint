@@ -1,5 +1,6 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 596
 expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
 ---
 [
@@ -10,10 +11,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "clean yum metadata with `yum clean all` in the same RUN layer",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 41,
+      "end_column": 24,
       "end_line": 2,
-      "start_byte": 0,
+      "start_byte": 18,
       "start_column": 1,
       "start_line": 2
     },
@@ -26,10 +27,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "clean yum metadata with `yum clean all` in the same RUN layer",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 184,
+      "end_column": 35,
       "end_line": 7,
-      "start_byte": 0,
+      "start_byte": 150,
       "start_column": 1,
       "start_line": 7
     },
@@ -42,10 +43,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "clean yum metadata with `yum clean all` in the same RUN layer",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 226,
+      "end_column": 42,
       "end_line": 8,
-      "start_byte": 0,
+      "start_byte": 185,
       "start_column": 1,
       "start_line": 8
     },
@@ -58,10 +59,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "clean yum metadata with `yum clean all` in the same RUN layer",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 384,
+      "end_column": 42,
       "end_line": 11,
-      "start_byte": 0,
+      "start_byte": 343,
       "start_column": 1,
       "start_line": 11
     },
@@ -74,10 +75,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "clean yum metadata with `yum clean all` in the same RUN layer",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 458,
+      "end_column": 74,
       "end_line": 12,
-      "start_byte": 0,
+      "start_byte": 385,
       "start_column": 1,
       "start_line": 12
     },

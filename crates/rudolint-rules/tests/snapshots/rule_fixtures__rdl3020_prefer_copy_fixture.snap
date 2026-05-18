@@ -1,5 +1,6 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 407
 expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
 ---
 [
@@ -10,10 +11,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "use COPY for local files unless archive extraction or remote fetch is intended",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 33,
+      "end_column": 17,
       "end_line": 2,
-      "start_byte": 0,
+      "start_byte": 17,
       "start_column": 1,
       "start_line": 2
     },
@@ -26,10 +27,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "use COPY for local files unless archive extraction or remote fetch is intended",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 48,
+      "end_column": 15,
       "end_line": 3,
-      "start_byte": 0,
+      "start_byte": 34,
       "start_column": 1,
       "start_line": 3
     },
@@ -42,10 +43,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "use COPY for local files unless archive extraction or remote fetch is intended",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 81,
+      "end_column": 33,
       "end_line": 4,
-      "start_byte": 0,
+      "start_byte": 49,
       "start_column": 1,
       "start_line": 4
     },
@@ -58,10 +59,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "use COPY for local files unless archive extraction or remote fetch is intended",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 105,
+      "end_column": 24,
       "end_line": 5,
-      "start_byte": 0,
+      "start_byte": 82,
       "start_column": 1,
       "start_line": 5
     },
@@ -74,10 +75,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "use COPY for local files unless archive extraction or remote fetch is intended",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 271,
+      "end_column": 29,
       "end_line": 11,
-      "start_byte": 0,
+      "start_byte": 243,
       "start_column": 1,
       "start_line": 11
     },
@@ -90,10 +91,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "use COPY for local files unless archive extraction or remote fetch is intended",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 323,
+      "end_column": 52,
       "end_line": 12,
-      "start_byte": 0,
+      "start_byte": 272,
       "start_column": 1,
       "start_line": 12
     },
@@ -106,10 +107,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "use COPY for local files unless archive extraction or remote fetch is intended",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 454,
+      "end_column": 16,
       "end_line": 16,
-      "start_byte": 0,
+      "start_byte": 439,
       "start_column": 1,
       "start_line": 16
     },
@@ -122,10 +123,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "use COPY for local files unless archive extraction or remote fetch is intended",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 471,
+      "end_column": 17,
       "end_line": 17,
-      "start_byte": 0,
+      "start_byte": 455,
       "start_column": 1,
       "start_line": 17
     },
@@ -138,10 +139,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "use COPY for local files unless archive extraction or remote fetch is intended",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 487,
+      "end_column": 16,
       "end_line": 18,
-      "start_byte": 0,
+      "start_byte": 472,
       "start_column": 1,
       "start_line": 18
     },

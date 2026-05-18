@@ -1,5 +1,6 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 134
 expression: "serde_json::to_value(&cases).expect(\"cases should serialize\")"
 ---
 [
@@ -24,10 +25,10 @@ expression: "serde_json::to_value(&cases).expect(\"cases should serialize\")"
         "message": "the final image user should not be root",
         "path": "",
         "primary_span": {
-          "end_byte": 0,
-          "end_column": 1,
+          "end_byte": 26,
+          "end_column": 10,
           "end_line": 2,
-          "start_byte": 0,
+          "start_byte": 17,
           "start_column": 1,
           "start_line": 2
         },
@@ -45,10 +46,10 @@ expression: "serde_json::to_value(&cases).expect(\"cases should serialize\")"
         "message": "the final image user should not be root",
         "path": "",
         "primary_span": {
-          "end_byte": 0,
-          "end_column": 1,
+          "end_byte": 23,
+          "end_column": 7,
           "end_line": 2,
-          "start_byte": 0,
+          "start_byte": 17,
           "start_column": 1,
           "start_line": 2
         },
@@ -66,10 +67,10 @@ expression: "serde_json::to_value(&cases).expect(\"cases should serialize\")"
         "message": "the final image user should not be root",
         "path": "",
         "primary_span": {
-          "end_byte": 0,
-          "end_column": 1,
+          "end_byte": 25,
+          "end_column": 9,
           "end_line": 2,
-          "start_byte": 0,
+          "start_byte": 17,
           "start_column": 1,
           "start_line": 2
         },

@@ -1,5 +1,6 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 295
 expression: "serde_json::to_value(&cases).expect(\"cases should serialize\")"
 ---
 [
@@ -24,10 +25,10 @@ expression: "serde_json::to_value(&cases).expect(\"cases should serialize\")"
         "message": "only one HEALTHCHECK is allowed",
         "path": "",
         "primary_span": {
-          "end_byte": 0,
-          "end_column": 1,
+          "end_byte": 93,
+          "end_column": 17,
           "end_line": 3,
-          "start_byte": 0,
+          "start_byte": 77,
           "start_column": 1,
           "start_line": 3
         },
@@ -40,10 +41,10 @@ expression: "serde_json::to_value(&cases).expect(\"cases should serialize\")"
         "message": "only one HEALTHCHECK is allowed",
         "path": "",
         "primary_span": {
-          "end_byte": 0,
-          "end_column": 1,
+          "end_byte": 141,
+          "end_column": 48,
           "end_line": 4,
-          "start_byte": 0,
+          "start_byte": 94,
           "start_column": 1,
           "start_line": 4
         },

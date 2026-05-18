@@ -11,10 +11,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "cache mount for lock-based package manager should use sharing=locked",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 134,
+      "end_column": 87,
       "end_line": 5,
-      "start_byte": 0,
+      "start_byte": 48,
       "start_column": 1,
       "start_line": 5
     },
@@ -27,10 +27,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "cache mount for lock-based package manager should use sharing=locked",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 213,
+      "end_column": 79,
       "end_line": 6,
-      "start_byte": 0,
+      "start_byte": 135,
       "start_column": 1,
       "start_line": 6
     },

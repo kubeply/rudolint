@@ -1,5 +1,6 @@
 ---
 source: crates/rudolint-cli/tests/cli.rs
+assertion_line: 68
 expression: output
 ---
 [
@@ -10,8 +11,8 @@ expression: output
     "message": "avoid mutable latest base image tags",
     "path": "$TEMP/Dockerfile",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 18,
+      "end_column": 19,
       "end_line": 1,
       "start_byte": 0,
       "start_column": 1,

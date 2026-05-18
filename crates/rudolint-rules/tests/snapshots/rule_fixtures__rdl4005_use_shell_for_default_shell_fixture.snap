@@ -1,5 +1,6 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 1319
 expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
 ---
 [
@@ -10,10 +11,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "use SHELL to change the default shell",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 45,
+      "end_column": 29,
       "end_line": 2,
-      "start_byte": 0,
+      "start_byte": 17,
       "start_column": 1,
       "start_line": 2
     },

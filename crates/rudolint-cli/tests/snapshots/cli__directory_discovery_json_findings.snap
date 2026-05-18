@@ -1,5 +1,6 @@
 ---
 source: crates/rudolint-cli/tests/cli.rs
+assertion_line: 93
 expression: output
 ---
 [
@@ -10,8 +11,8 @@ expression: output
     "message": "avoid mutable latest base image tags",
     "path": "$TEMP/Dockerfile",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 18,
+      "end_column": 19,
       "end_line": 1,
       "start_byte": 0,
       "start_column": 1,
@@ -26,8 +27,8 @@ expression: output
     "message": "base image should use an explicit tag or digest",
     "path": "$TEMP/service/Dockerfile.api",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 12,
+      "end_column": 13,
       "end_line": 1,
       "start_byte": 0,
       "start_column": 1,
@@ -42,10 +43,10 @@ expression: output
     "message": "WORKDIR should be absolute",
     "path": "$TEMP/service/Dockerfile.api",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 24,
+      "end_column": 12,
       "end_line": 2,
-      "start_byte": 0,
+      "start_byte": 13,
       "start_column": 1,
       "start_line": 2
     },

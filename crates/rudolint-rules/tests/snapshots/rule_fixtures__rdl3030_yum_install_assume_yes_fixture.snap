@@ -1,5 +1,6 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 580
 expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
 ---
 [
@@ -10,10 +11,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "use `yum install -y` to avoid interactive prompts",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 38,
+      "end_column": 21,
       "end_line": 2,
-      "start_byte": 0,
+      "start_byte": 18,
       "start_column": 1,
       "start_line": 2
     },
@@ -26,10 +27,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "use `yum install -y` to avoid interactive prompts",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 197,
+      "end_column": 32,
       "end_line": 8,
-      "start_byte": 0,
+      "start_byte": 166,
       "start_column": 1,
       "start_line": 8
     },
@@ -42,10 +43,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "use `yum install -y` to avoid interactive prompts",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 236,
+      "end_column": 39,
       "end_line": 9,
-      "start_byte": 0,
+      "start_byte": 198,
       "start_column": 1,
       "start_line": 9
     },

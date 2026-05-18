@@ -1,5 +1,6 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 1166
 expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
 ---
 [
@@ -10,10 +11,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "Dockerfile must begin with FROM, ARG, or comment",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 103,
+      "end_column": 18,
       "end_line": 4,
-      "start_byte": 0,
+      "start_byte": 86,
       "start_column": 1,
       "start_line": 4
     },
@@ -26,10 +27,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "Dockerfile must begin with FROM, ARG, or comment",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 124,
+      "end_column": 21,
       "end_line": 5,
-      "start_byte": 0,
+      "start_byte": 104,
       "start_column": 1,
       "start_line": 5
     },

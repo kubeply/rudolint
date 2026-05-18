@@ -1,5 +1,6 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 471
 expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
 ---
 [
@@ -10,10 +11,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "stage alias `build` is defined more than once",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 76,
+      "end_column": 27,
       "end_line": 3,
-      "start_byte": 0,
+      "start_byte": 50,
       "start_column": 1,
       "start_line": 3
     },
@@ -26,10 +27,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "stage alias `release` is defined more than once",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 141,
+      "end_column": 24,
       "end_line": 6,
-      "start_byte": 0,
+      "start_byte": 118,
       "start_column": 1,
       "start_line": 6
     },

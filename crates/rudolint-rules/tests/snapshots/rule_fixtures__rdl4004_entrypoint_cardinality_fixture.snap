@@ -1,5 +1,6 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 1303
 expression: "serde_json::to_value(&cases).expect(\"cases should serialize\")"
 ---
 [
@@ -20,10 +21,10 @@ expression: "serde_json::to_value(&cases).expect(\"cases should serialize\")"
         "message": "only the final ENTRYPOINT is used",
         "path": "",
         "primary_span": {
-          "end_byte": 0,
-          "end_column": 1,
+          "end_byte": 96,
+          "end_column": 31,
           "end_line": 4,
-          "start_byte": 0,
+          "start_byte": 66,
           "start_column": 1,
           "start_line": 4
         },
@@ -36,10 +37,10 @@ expression: "serde_json::to_value(&cases).expect(\"cases should serialize\")"
         "message": "only the final ENTRYPOINT is used",
         "path": "",
         "primary_span": {
-          "end_byte": 0,
-          "end_column": 1,
+          "end_byte": 132,
+          "end_column": 36,
           "end_line": 5,
-          "start_byte": 0,
+          "start_byte": 97,
           "start_column": 1,
           "start_line": 5
         },

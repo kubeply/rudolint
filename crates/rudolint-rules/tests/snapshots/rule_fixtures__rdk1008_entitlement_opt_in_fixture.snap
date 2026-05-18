@@ -11,10 +11,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "BuildKit entitlement network.host requires allow-entitlements opt-in",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 81,
+      "end_column": 32,
       "end_line": 5,
-      "start_byte": 0,
+      "start_byte": 50,
       "start_column": 1,
       "start_line": 5
     },
@@ -27,10 +27,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "BuildKit entitlement security.insecure requires allow-entitlements opt-in",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 130,
+      "end_column": 49,
       "end_line": 6,
-      "start_byte": 0,
+      "start_byte": 82,
       "start_column": 1,
       "start_line": 6
     },
@@ -43,10 +43,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "BuildKit entitlement network.host requires allow-entitlements opt-in",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 181,
+      "end_column": 51,
       "end_line": 7,
-      "start_byte": 0,
+      "start_byte": 131,
       "start_column": 1,
       "start_line": 7
     },
@@ -59,10 +59,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "BuildKit entitlement security.insecure requires allow-entitlements opt-in",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 181,
+      "end_column": 51,
       "end_line": 7,
-      "start_byte": 0,
+      "start_byte": 131,
       "start_column": 1,
       "start_line": 7
     },

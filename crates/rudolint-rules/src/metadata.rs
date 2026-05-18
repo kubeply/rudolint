@@ -155,7 +155,7 @@ pub(crate) fn diagnostic(
     message: impl Into<String>,
     instruction: &Instruction,
 ) -> Finding {
-    Finding::new(code, severity, message, instruction.line, 1)
+    Finding::with_span(code, severity, message, instruction.raw_span)
 }
 
 fn category_for_code(code: &str) -> RuleCategory {

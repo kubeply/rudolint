@@ -1,5 +1,6 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 708
 expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
 ---
 [
@@ -10,10 +11,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "clean dnf metadata with `dnf clean all` in the same RUN layer",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 38,
+      "end_column": 24,
       "end_line": 2,
-      "start_byte": 0,
+      "start_byte": 15,
       "start_column": 1,
       "start_line": 2
     },
@@ -26,10 +27,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "clean dnf metadata with `dnf clean all` in the same RUN layer",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 181,
+      "end_column": 35,
       "end_line": 7,
-      "start_byte": 0,
+      "start_byte": 147,
       "start_column": 1,
       "start_line": 7
     },
@@ -42,10 +43,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "clean dnf metadata with `dnf clean all` in the same RUN layer",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 221,
+      "end_column": 40,
       "end_line": 8,
-      "start_byte": 0,
+      "start_byte": 182,
       "start_column": 1,
       "start_line": 8
     },
@@ -58,10 +59,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "clean dnf metadata with `dnf clean all` in the same RUN layer",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 250,
+      "end_column": 29,
       "end_line": 9,
-      "start_byte": 0,
+      "start_byte": 222,
       "start_column": 1,
       "start_line": 9
     },
@@ -74,10 +75,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "clean dnf metadata with `dnf clean all` in the same RUN layer",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 311,
+      "end_column": 61,
       "end_line": 10,
-      "start_byte": 0,
+      "start_byte": 251,
       "start_column": 1,
       "start_line": 10
     },

@@ -1,5 +1,6 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 676
 expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
 ---
 [
@@ -10,10 +11,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "pin versions in zypper install",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 50,
+      "end_column": 27,
       "end_line": 2,
-      "start_byte": 0,
+      "start_byte": 24,
       "start_column": 1,
       "start_line": 2
     },
@@ -26,10 +27,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "pin versions in zypper install",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 121,
+      "end_column": 38,
       "end_line": 4,
-      "start_byte": 0,
+      "start_byte": 84,
       "start_column": 1,
       "start_line": 4
     },
@@ -42,10 +43,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "pin versions in zypper install",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 202,
+      "end_column": 37,
       "end_line": 6,
-      "start_byte": 0,
+      "start_byte": 166,
       "start_column": 1,
       "start_line": 6
     },
@@ -58,10 +59,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "pin versions in zypper install",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 295,
+      "end_column": 38,
       "end_line": 9,
-      "start_byte": 0,
+      "start_byte": 258,
       "start_column": 1,
       "start_line": 9
     },

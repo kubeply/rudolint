@@ -1,5 +1,6 @@
 ---
 source: crates/rudolint-cli/tests/cli.rs
+assertion_line: 32
 expression: normalized_json(&output)
 ---
 {
@@ -16,7 +17,7 @@ expression: normalized_json(&output)
                   "uri": "<stdin>"
                 },
                 "region": {
-                  "endColumn": 1,
+                  "endColumn": 19,
                   "endLine": 1,
                   "startColumn": 1,
                   "startLine": 1
@@ -38,7 +39,7 @@ expression: normalized_json(&output)
                   "uri": "<stdin>"
                 },
                 "region": {
-                  "endColumn": 1,
+                  "endColumn": 12,
                   "endLine": 2,
                   "startColumn": 1,
                   "startLine": 2

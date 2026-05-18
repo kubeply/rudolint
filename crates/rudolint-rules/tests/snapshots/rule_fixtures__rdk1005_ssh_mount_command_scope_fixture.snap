@@ -11,10 +11,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "SSH mount scope is broader than a single command invocation",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 135,
+      "end_column": 86,
       "end_line": 5,
-      "start_byte": 0,
+      "start_byte": 50,
       "start_column": 1,
       "start_line": 5
     },
@@ -27,10 +27,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "SSH mount scope is broader than a single command invocation",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 224,
+      "end_column": 89,
       "end_line": 6,
-      "start_byte": 0,
+      "start_byte": 136,
       "start_column": 1,
       "start_line": 6
     },
@@ -43,10 +43,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "SSH mount scope is broader than a single command invocation",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 303,
+      "end_column": 79,
       "end_line": 7,
-      "start_byte": 0,
+      "start_byte": 225,
       "start_column": 1,
       "start_line": 7
     },

@@ -1,5 +1,6 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 895
 expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
 ---
 [
@@ -10,10 +11,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "superfluous label(s) present",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 172,
+      "end_column": 32,
       "end_line": 4,
-      "start_byte": 0,
+      "start_byte": 141,
       "start_column": 1,
       "start_line": 4
     },
@@ -26,10 +27,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "superfluous label(s) present",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 248,
+      "end_column": 76,
       "end_line": 5,
-      "start_byte": 0,
+      "start_byte": 173,
       "start_column": 1,
       "start_line": 5
     },

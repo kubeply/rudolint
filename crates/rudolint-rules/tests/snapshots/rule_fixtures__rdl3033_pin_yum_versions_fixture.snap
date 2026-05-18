@@ -1,5 +1,6 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 612
 expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
 ---
 [
@@ -10,10 +11,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "pin versions in yum install",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 41,
+      "end_column": 24,
       "end_line": 2,
-      "start_byte": 0,
+      "start_byte": 18,
       "start_column": 1,
       "start_line": 2
     },
@@ -26,10 +27,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "pin versions in yum install",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 106,
+      "end_column": 35,
       "end_line": 4,
-      "start_byte": 0,
+      "start_byte": 72,
       "start_column": 1,
       "start_line": 4
     },
@@ -42,10 +43,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "pin versions in yum install",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 180,
+      "end_column": 34,
       "end_line": 6,
-      "start_byte": 0,
+      "start_byte": 147,
       "start_column": 1,
       "start_line": 6
     },
@@ -58,10 +59,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "pin versions in yum install",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 264,
+      "end_column": 35,
       "end_line": 9,
-      "start_byte": 0,
+      "start_byte": 230,
       "start_column": 1,
       "start_line": 9
     },
@@ -74,10 +75,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "pin versions in yum install",
     "path": "",
     "primary_span": {
-      "end_byte": 0,
-      "end_column": 1,
+      "end_byte": 356,
+      "end_column": 43,
       "end_line": 11,
-      "start_byte": 0,
+      "start_byte": 314,
       "start_column": 1,
       "start_line": 11
     },
