@@ -22,10 +22,10 @@
     "dockerfile-lint": "dockerfile_lint 0.3.4"
   },
   "latest_sources": {
-    "hadolint": "GitHub release v2.14.0",
-    "tally": "npm tally-cli@0.41.0",
-    "dockerfilelint": "npm dockerfilelint@1.8.0",
+    "hadolint": "pinned GitHub release v2.14.0",
+    "tally": "pinned npm tally-cli@0.41.0",
+    "dockerfilelint": "pinned npm dockerfilelint@1.8.0",
     "docker-build-check": "local Docker CLI",
-    "dockerfile-lint": "npm dockerfile_lint@0.3.4"
+    "dockerfile-lint": "pinned npm dockerfile_lint@0.3.4"
   }
 }

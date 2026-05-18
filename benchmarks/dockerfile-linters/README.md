@@ -8,17 +8,17 @@ user-facing question, "How fast is rudolint compared with other linters?"
 ## Compared Tools
 
 - `rudolint`: this repository, built in release mode.
-- `hadolint`: latest GitHub release for the host platform
+- `hadolint`: pinned current GitHub release for the host platform
   ([hadolint/hadolint](https://github.com/hadolint/hadolint)).
-- `tally`: latest `tally-cli` package from npm
+- `tally`: pinned current `tally-cli` package from npm
   ([npm](https://www.npmjs.com/package/tally-cli),
   [GitHub](https://github.com/wharflab/tally)).
 - `docker build --check`: Docker's native BuildKit build checks through the
   locally installed Docker CLI
   ([Docker build checks](https://docs.docker.com/reference/build-checks/)).
-- `dockerfilelint`: latest npm package
+- `dockerfilelint`: pinned current npm package
   ([npm](https://www.npmjs.com/package/dockerfilelint)).
-- `dockerfile_lint`: latest npm package
+- `dockerfile_lint`: pinned current npm package
   ([npm](https://www.npmjs.com/package/dockerfile_lint)).
 
 Docker image scanners such as Trivy, Dockle, and Grype are intentionally not
@@ -85,8 +85,8 @@ python3 scripts/dockerfile-linter-bench.py run --runs 5 --warmup 2
 The script will:
 
 1. build `rudolint` in release mode,
-2. download the latest `hadolint` release for the host platform,
-3. install the latest npm packages for `tally-cli`, `dockerfilelint`, and
+2. download the pinned `hadolint` release for the host platform,
+3. install the pinned npm packages for `tally-cli`, `dockerfilelint`, and
    `dockerfile_lint` into `target/dockerfile-linter-bench/tools/node`,
 4. use the local Docker CLI for `docker build --check`,
 5. generate `results/latest.json`, `results/tool-versions.json`,
@@ -96,6 +96,16 @@ Run a narrower pass while iterating:
 
 ```bash
 python3 scripts/dockerfile-linter-bench.py run --scenario repo-1000 --runs 3 --warmup 1
+```
+
+Use the explicit version flags when intentionally refreshing the comparison:
+
+```bash
+python3 scripts/dockerfile-linter-bench.py run \
+  --hadolint-version v2.14.0 \
+  --tally-version 0.41.0 \
+  --dockerfilelint-version 1.8.0 \
+  --dockerfile-lint-version 0.3.4
 ```
 
 ## Current Tool Versions

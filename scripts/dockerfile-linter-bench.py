@@ -34,6 +34,11 @@ TALLY_NPM = "tally-cli"
 DOCKERFILELINT_NPM = "dockerfilelint"
 DOCKERFILE_LINT_NPM = "dockerfile_lint"
 
+HADOLINT_VERSION = "v2.14.0"
+TALLY_VERSION = "0.41.0"
+DOCKERFILELINT_VERSION = "1.8.0"
+DOCKERFILE_LINT_VERSION = "0.3.4"
+
 SCENARIOS = {
     "small": "Single small Dockerfile",
     "buildkit": "Single BuildKit-heavy Dockerfile",
@@ -82,22 +87,6 @@ def run(
         stdout=subprocess.PIPE if capture else None,
         stderr=subprocess.PIPE if capture else None,
     )
-
-
-def capture(args: list[str], *, cwd: Path = ROOT) -> str:
-    result = run(args, cwd=cwd, capture=True)
-    return result.stdout.strip()
-
-
-def latest_github_release(repo: str) -> str:
-    api_url = f"https://api.github.com/repos/{repo}/releases/latest"
-    with urllib.request.urlopen(api_url, timeout=30) as response:
-        payload = json.loads(response.read().decode("utf-8"))
-    return payload["tag_name"]
-
-
-def latest_npm_version(package: str) -> str:
-    return capture(["npm", "view", package, "version"])
 
 
 def executable_suffix() -> str:
@@ -308,6 +297,11 @@ def run_allowing_findings(args: list[str], cwd: Path) -> None:
         raise SystemExit(result.returncode)
 
 
+def run_strict(args: list[str], cwd: Path) -> None:
+    with open(os.devnull, "wb") as devnull:
+        subprocess.run(args, cwd=cwd, stdout=devnull, stderr=devnull, check=True)
+
+
 def exec_tool(tool: str, scenario: str) -> None:
     files = dockerfiles_for_scenario(scenario)
     repo_root = repo_root_for_scenario(scenario)
@@ -374,7 +368,7 @@ def exec_tool(tool: str, scenario: str) -> None:
                 "--file",
                 "docker-bake.hcl",
             ]
-            run_allowing_findings(args, repo_root)
+            run_strict(args, repo_root)
             return
         for path in files:
             args = [
@@ -387,7 +381,7 @@ def exec_tool(tool: str, scenario: str) -> None:
                 str(path),
                 str(path.parent),
             ]
-            run_allowing_findings(args, ROOT)
+            run_strict(args, ROOT)
         return
 
     raise RuntimeError(f"unknown tool: {tool}")
@@ -399,13 +393,14 @@ def version_for_command(args: list[str]) -> str:
     return output.splitlines()[0] if output else "unknown"
 
 
-def setup() -> dict:
+def setup(
+    hadolint_version: str = HADOLINT_VERSION,
+    tally_version: str = TALLY_VERSION,
+    dockerfilelint_version: str = DOCKERFILELINT_VERSION,
+    dockerfile_lint_version: str = DOCKERFILE_LINT_VERSION,
+) -> dict:
     prepare_corpus()
     TOOLS_ROOT.mkdir(parents=True, exist_ok=True)
-    hadolint_version = latest_github_release(HADOLINT_REPO)
-    tally_version = latest_npm_version(TALLY_NPM)
-    dockerfilelint_version = latest_npm_version(DOCKERFILELINT_NPM)
-    dockerfile_lint_version = latest_npm_version(DOCKERFILE_LINT_NPM)
     node_bin = ensure_node_tools(
         tally_version, dockerfilelint_version, dockerfile_lint_version
     )
@@ -435,10 +430,10 @@ def setup() -> dict:
             "dockerfile-lint": f"dockerfile_lint {dockerfile_lint_version}",
         },
         "latest_sources": {
-            "hadolint": f"GitHub release {hadolint_version}",
-            "tally": f"npm {TALLY_NPM}@{tally_version}",
-            "dockerfilelint": f"npm {DOCKERFILELINT_NPM}@{dockerfilelint_version}",
-            "dockerfile-lint": f"npm {DOCKERFILE_LINT_NPM}@{dockerfile_lint_version}",
+            "hadolint": f"pinned GitHub release {hadolint_version}",
+            "tally": f"pinned npm {TALLY_NPM}@{tally_version}",
+            "dockerfilelint": f"pinned npm {DOCKERFILELINT_NPM}@{dockerfilelint_version}",
+            "dockerfile-lint": f"pinned npm {DOCKERFILE_LINT_NPM}@{dockerfile_lint_version}",
             "docker-build-check": "local Docker CLI",
         },
     }
@@ -687,6 +682,7 @@ def parse_args() -> argparse.Namespace:
     run_parser = subcommands.add_parser("run", help="prepare tools, run hyperfine, and render charts")
     run_parser.add_argument("--runs", type=int, default=5)
     run_parser.add_argument("--warmup", type=int, default=2)
+    add_version_args(run_parser)
     run_parser.add_argument(
         "--scenario",
         action="append",
@@ -694,7 +690,10 @@ def parse_args() -> argparse.Namespace:
         help="scenario to run; defaults to all scenarios",
     )
 
-    subcommands.add_parser("setup", help="prepare corpus and tools without running benchmarks")
+    setup_parser = subcommands.add_parser(
+        "setup", help="prepare corpus and tools without running benchmarks"
+    )
+    add_version_args(setup_parser)
 
     exec_parser = subcommands.add_parser("exec", help=argparse.SUPPRESS)
     exec_parser.add_argument("--tool", required=True, choices=[tool.key for tool in TOOLS])
@@ -706,10 +705,26 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def add_version_args(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--hadolint-version", default=HADOLINT_VERSION)
+    parser.add_argument("--tally-version", default=TALLY_VERSION)
+    parser.add_argument("--dockerfilelint-version", default=DOCKERFILELINT_VERSION)
+    parser.add_argument("--dockerfile-lint-version", default=DOCKERFILE_LINT_VERSION)
+
+
+def setup_from_args(args: argparse.Namespace) -> dict:
+    return setup(
+        hadolint_version=args.hadolint_version,
+        tally_version=args.tally_version,
+        dockerfilelint_version=args.dockerfilelint_version,
+        dockerfile_lint_version=args.dockerfile_lint_version,
+    )
+
+
 def main() -> None:
     args = parse_args()
     if args.command == "setup":
-        print(json.dumps(setup(), indent=2))
+        print(json.dumps(setup_from_args(args), indent=2))
         return
     if args.command == "exec":
         exec_tool(args.tool, args.scenario)
@@ -719,7 +734,7 @@ def main() -> None:
         write_results(payload)
         return
 
-    setup()
+    setup_from_args(args)
     scenarios = args.scenario or list(SCENARIOS)
     payload = run_hyperfine(args.runs, args.warmup, scenarios)
     write_results(payload)
