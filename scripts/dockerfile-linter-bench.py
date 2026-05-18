@@ -28,6 +28,7 @@ TARGET_ROOT = ROOT / "target" / "dockerfile-linter-bench"
 CORPUS_ROOT = TARGET_ROOT / "corpus"
 TOOLS_ROOT = TARGET_ROOT / "tools"
 RESULTS_ROOT = BENCH_ROOT / "results"
+NODE_TOOLS_ROOT = BENCH_ROOT / "node-tools"
 
 HADOLINT_REPO = "hadolint/hadolint"
 TALLY_NPM = "tally-cli"
@@ -63,7 +64,7 @@ TOOLS = [
     Tool("tally", "tally"),
     Tool("docker-build-check", "docker build --check"),
     Tool("dockerfilelint", "dockerfilelint"),
-    Tool("dockerfile-lint", "dockerfile_lint"),
+    Tool("dockerfile-lint", "dockerfile-lint"),
 ]
 
 SARIF_TOOLS = {"rudolint", "hadolint", "tally"}
@@ -134,21 +135,32 @@ def ensure_node_tools(
     package_root = TOOLS_ROOT / "node"
     package_root.mkdir(parents=True, exist_ok=True)
     package_json = package_root / "package.json"
-    if not package_json.exists():
-        package_json.write_text('{"private":true,"dependencies":{}}\n', encoding="utf-8")
-
-    run(
-        [
-            "npm",
-            "install",
-            "--silent",
-            "--prefix",
-            str(package_root),
-            f"{TALLY_NPM}@{tally_version}",
-            f"{DOCKERFILELINT_NPM}@{dockerfilelint_version}",
-            f"{DOCKERFILE_LINT_NPM}@{dockerfile_lint_version}",
-        ]
-    )
+    package_lock = package_root / "package-lock.json"
+    if (
+        tally_version == TALLY_VERSION
+        and dockerfilelint_version == DOCKERFILELINT_VERSION
+        and dockerfile_lint_version == DOCKERFILE_LINT_VERSION
+    ):
+        shutil.copyfile(NODE_TOOLS_ROOT / "package.json", package_json)
+        shutil.copyfile(NODE_TOOLS_ROOT / "package-lock.json", package_lock)
+        run(["npm", "ci", "--silent", "--prefix", str(package_root)])
+    else:
+        package_json.write_text(
+            json.dumps(
+                {
+                    "private": True,
+                    "dependencies": {
+                        TALLY_NPM: tally_version,
+                        DOCKERFILELINT_NPM: dockerfilelint_version,
+                        DOCKERFILE_LINT_NPM: dockerfile_lint_version,
+                    },
+                },
+                indent=2,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        run(["npm", "install", "--silent", "--prefix", str(package_root)])
     return package_root / "node_modules" / ".bin"
 
 
@@ -286,14 +298,18 @@ def read_manifest() -> dict:
     return json.loads((TARGET_ROOT / "manifest.json").read_text(encoding="utf-8"))
 
 
-def run_allowing_findings(args: list[str], cwd: Path) -> None:
-    with open(os.devnull, "wb") as devnull:
-        result = subprocess.run(args, cwd=cwd, stdout=devnull, stderr=devnull)
-    # Dockerfile linters disagree on exit-code contracts. Some return the
-    # number of findings, and dockerfile_lint can return values such as 200
-    # for a large batch. The benchmark times the completed CLI operation, so
-    # findings are normalized to success here.
-    if result.returncode < 0:
+def run_allowing_findings(args: list[str], cwd: Path, allowed_codes: set[int]) -> None:
+    result = subprocess.run(
+        args,
+        cwd=cwd,
+        text=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.PIPE,
+        check=False,
+    )
+    if result.returncode not in allowed_codes:
+        if result.stderr:
+            sys.stderr.write(result.stderr)
         raise SystemExit(result.returncode)
 
 
@@ -320,7 +336,7 @@ def exec_tool(tool: str, scenario: str) -> None:
             args.extend(["--format", "sarif"])
         else:
             args.append("--quiet")
-        run_allowing_findings(args, ROOT)
+        run_allowing_findings(args, ROOT, {0})
         return
 
     if tool == "tally":
@@ -329,7 +345,7 @@ def exec_tool(tool: str, scenario: str) -> None:
             args.extend(["--format", "json"])
         elif scenario.startswith("sarif"):
             args.extend(["--format", "sarif"])
-        run_allowing_findings(args, ROOT)
+        run_allowing_findings(args, ROOT, {0, 1})
         return
 
     if tool == "hadolint":
@@ -338,14 +354,14 @@ def exec_tool(tool: str, scenario: str) -> None:
             args.extend(["--format", "json"])
         elif scenario.startswith("sarif"):
             args.extend(["--format", "sarif"])
-        run_allowing_findings(args, ROOT)
+        run_allowing_findings(args, ROOT, {0, 1})
         return
 
     if tool == "dockerfilelint":
         args = [str(binary), *map(str, files)]
         if scenario.startswith("json"):
             args.extend(["--output", "json"])
-        run_allowing_findings(args, ROOT)
+        run_allowing_findings(args, ROOT, {0, 1})
         return
 
     if tool == "dockerfile-lint":
@@ -354,7 +370,7 @@ def exec_tool(tool: str, scenario: str) -> None:
             args.append("-j")
         for path in files:
             args.extend(["-f", str(path)])
-        run_allowing_findings(args, ROOT)
+        run_allowing_findings(args, ROOT, set(range(256)))
         return
 
     if tool == "docker-build-check":
@@ -544,7 +560,7 @@ def color_for_tool(tool: str) -> str:
         "tally": "#14b8a6",
         "docker build --check": "#0ea5e9",
         "dockerfilelint": "#f97316",
-        "dockerfile_lint": "#ef4444",
+        "dockerfile-lint": "#ef4444",
     }
     return colors.get(tool, "#94a3b8")
 
@@ -622,9 +638,14 @@ def render_headline_chart(payload: dict, output: Path) -> None:
 
 def render_scenario_chart(payload: dict, output: Path) -> None:
     scenarios = ["small", "buildkit", "repo-100", "repo-1000", "json-100", "sarif-100"]
+    visible_scenarios = [
+        scenario
+        for scenario in scenarios
+        if any(row["scenario"] == scenario for row in payload["results"])
+    ]
     width = 1120
     panel_height = 180
-    height = 80 + panel_height * len(scenarios)
+    height = 80 + panel_height * max(1, len(visible_scenarios))
     left = 220
     chart_width = 650
     parts = [
@@ -641,11 +662,9 @@ def render_scenario_chart(payload: dict, output: Path) -> None:
         '<text class="small" x="32" y="64">Mean seconds. Lower is better.</text>',
     ]
 
-    for scenario_index, scenario in enumerate(scenarios):
+    for scenario_index, scenario in enumerate(visible_scenarios):
         rows = [row for row in payload["results"] if row["scenario"] == scenario]
         rows.sort(key=lambda row: row["mean_seconds"])
-        if not rows:
-            continue
         max_time = max(row["mean_seconds"] for row in rows)
         panel_y = 84 + scenario_index * panel_height
         parts.append(

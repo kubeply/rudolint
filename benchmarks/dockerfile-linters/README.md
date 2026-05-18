@@ -70,11 +70,21 @@ of findings for a large batch.
 
 ## Reproduce
 
-Install `hyperfine` first:
+Prerequisites:
+
+- Python 3.10 or newer. The runner uses only the standard library.
+- Node.js and npm for the locked npm-based tools.
+- Docker CLI with Buildx for Docker's native build checks.
+- `hyperfine` for external command timing.
+
+Install `hyperfine` on macOS:
 
 ```bash
 brew install hyperfine
 ```
+
+On Linux, use your distribution package manager or `cargo install hyperfine`.
+On Windows, use `winget install sharkdp.hyperfine`, Scoop, or Cargo.
 
 Then run:
 
