@@ -139,7 +139,9 @@ def ensure_hadolint(version: str) -> Path:
     return binary
 
 
-def ensure_node_tools() -> Path:
+def ensure_node_tools(
+    tally_version: str, dockerfilelint_version: str, dockerfile_lint_version: str
+) -> Path:
     package_root = TOOLS_ROOT / "node"
     package_root.mkdir(parents=True, exist_ok=True)
     package_json = package_root / "package.json"
@@ -153,9 +155,9 @@ def ensure_node_tools() -> Path:
             "--silent",
             "--prefix",
             str(package_root),
-            f"{TALLY_NPM}@latest",
-            f"{DOCKERFILELINT_NPM}@latest",
-            f"{DOCKERFILE_LINT_NPM}@latest",
+            f"{TALLY_NPM}@{tally_version}",
+            f"{DOCKERFILELINT_NPM}@{dockerfilelint_version}",
+            f"{DOCKERFILE_LINT_NPM}@{dockerfile_lint_version}",
         ]
     )
     return package_root / "node_modules" / ".bin"
@@ -404,7 +406,9 @@ def setup() -> dict:
     tally_version = latest_npm_version(TALLY_NPM)
     dockerfilelint_version = latest_npm_version(DOCKERFILELINT_NPM)
     dockerfile_lint_version = latest_npm_version(DOCKERFILE_LINT_NPM)
-    node_bin = ensure_node_tools()
+    node_bin = ensure_node_tools(
+        tally_version, dockerfilelint_version, dockerfile_lint_version
+    )
     commands = {
         "rudolint": str(ensure_rudolint()),
         "hadolint": str(ensure_hadolint(hadolint_version)),
