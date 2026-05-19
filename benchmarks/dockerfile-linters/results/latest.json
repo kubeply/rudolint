@@ -155,6 +155,16 @@
       "max_seconds": 30.34487519896
     },
     {
+      "scenario": "repo-1000",
+      "scenario_name": "Repository with 1,000 generated Dockerfiles",
+      "tool": "docker build --check",
+      "mean_seconds": 127.34445771516,
+      "stddev_seconds": 0.9878374601681951,
+      "median_seconds": 127.29465478196,
+      "min_seconds": 126.22022694796,
+      "max_seconds": 128.84688494896002
+    },
+    {
       "scenario": "json-100",
       "scenario_name": "JSON output for 100 generated Dockerfiles",
       "tool": "kubeply/rudolint",

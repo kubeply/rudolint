@@ -53,9 +53,7 @@ Scenarios:
 - single small Dockerfile
 - single BuildKit-heavy Dockerfile
 - 100 generated Dockerfiles
-- 1,000 generated Dockerfiles, excluding Docker native checks because
-  `docker buildx bake --check` is not stable for a generated 1,000-target bake
-  file on the publishing runner
+- 1,000 generated Dockerfiles
 - JSON output for 100 generated Dockerfiles, where supported
 - SARIF output for 100 generated Dockerfiles, where supported
 
@@ -71,6 +69,12 @@ closest supported operation in each tool.
 Lint findings are treated as successful benchmark executions. Exit codes are
 normalized per tool because Dockerfile linters disagree on whether findings
 should return `0` or `1`.
+
+Each tool/scenario datapoint is timed independently. A benchmark command that
+fails on the publishing runner is retried and then omitted from the charts if it
+still cannot complete; the omission is recorded in `results/latest.json` so the
+workflow can keep publishing the successful datapoints without hiding the
+failure.
 
 ## Reproduce
 

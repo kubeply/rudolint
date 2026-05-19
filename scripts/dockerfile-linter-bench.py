@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import platform
 import shlex
 import shutil
@@ -300,8 +299,18 @@ def run_allowing_findings(args: list[str], cwd: Path, allowed_codes: set[int]) -
 
 
 def run_strict(args: list[str], cwd: Path) -> None:
-    with open(os.devnull, "wb") as devnull:
-        subprocess.run(args, cwd=cwd, stdout=devnull, stderr=devnull, check=True)
+    result = subprocess.run(
+        args,
+        cwd=cwd,
+        text=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.PIPE,
+        check=False,
+    )
+    if result.returncode != 0:
+        if result.stderr:
+            sys.stderr.write(result.stderr)
+        raise SystemExit(result.returncode)
 
 
 def exec_tool(tool: str, scenario: str) -> None:
@@ -447,28 +456,77 @@ def public_manifest(manifest: dict) -> dict:
     return public
 
 
-def run_hyperfine(runs: int, warmup: int, scenarios: list[str]) -> dict:
+def run_hyperfine_tool(
+    *,
+    tool: Tool,
+    scenario: str,
+    runs: int,
+    warmup: int,
+    raw_dir: Path,
+    retries: int,
+) -> tuple[dict | None, dict | None]:
+    raw_file = raw_dir / f"{scenario}-{tool.key}.json"
+    args = [
+        "hyperfine",
+        "--show-output",
+        "--warmup",
+        str(warmup),
+        "--runs",
+        str(runs),
+        "--export-json",
+        str(raw_file),
+        "--command-name",
+        tool.name,
+        hyperfine_command(tool.key, scenario),
+    ]
+    attempts = retries + 1
+    for attempt in range(1, attempts + 1):
+        result = subprocess.run(args, cwd=ROOT, text=True, check=False)
+        if result.returncode == 0:
+            payload = json.loads(raw_file.read_text(encoding="utf-8"))
+            return payload["results"][0], None
+        if attempt < attempts:
+            print(
+                f"Benchmark failed for {tool.name} on {scenario}; "
+                f"retrying ({attempt}/{retries})...",
+                file=sys.stderr,
+            )
+            time.sleep(attempt)
+
+    return None, {
+        "scenario": scenario,
+        "scenario_name": SCENARIOS[scenario],
+        "tool": tool.name,
+        "reason": f"benchmark command failed after {attempts} attempts",
+    }
+
+
+def run_hyperfine(runs: int, warmup: int, scenarios: list[str], retries: int) -> dict:
     ensure_hyperfine()
     raw_dir = TARGET_ROOT / "raw"
     raw_dir.mkdir(parents=True, exist_ok=True)
 
     all_results = []
+    omitted_results = []
     for scenario in scenarios:
         tools = [tool for tool in TOOLS if scenario_supported(tool.key, scenario)]
-        args = [
-            "hyperfine",
-            "--warmup",
-            str(warmup),
-            "--runs",
-            str(runs),
-            "--export-json",
-            str(raw_dir / f"{scenario}.json"),
-        ]
         for tool in tools:
-            args.extend(["--command-name", tool.name, hyperfine_command(tool.key, scenario)])
-        run(args)
-        payload = json.loads((raw_dir / f"{scenario}.json").read_text(encoding="utf-8"))
-        for result in payload["results"]:
+            result, omitted = run_hyperfine_tool(
+                tool=tool,
+                scenario=scenario,
+                runs=runs,
+                warmup=warmup,
+                raw_dir=raw_dir,
+                retries=retries,
+            )
+            if omitted is not None:
+                omitted_results.append(omitted)
+                print(
+                    f"Omitting {tool.name} from {scenario}: {omitted['reason']}",
+                    file=sys.stderr,
+                )
+                continue
+            assert result is not None
             all_results.append(
                 {
                     "scenario": scenario,
@@ -486,15 +544,15 @@ def run_hyperfine(runs: int, warmup: int, scenarios: list[str]) -> dict:
         "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "runs": runs,
         "warmup": warmup,
+        "tool_retries": retries,
         "headline_scenario": HEADLINE_SCENARIO,
         "results": all_results,
+        "omitted_results": omitted_results,
         "manifest": public_manifest(read_manifest()),
     }
 
 
 def scenario_supported(tool: str, scenario: str) -> bool:
-    if tool == "docker-build-check" and scenario == "repo-1000":
-        return False
     if scenario.startswith("json"):
         return tool in JSON_TOOLS
     if scenario.startswith("sarif"):
@@ -670,6 +728,12 @@ def parse_args() -> argparse.Namespace:
     run_parser = subcommands.add_parser("run", help="prepare tools, run hyperfine, and render charts")
     run_parser.add_argument("--runs", type=int, default=5)
     run_parser.add_argument("--warmup", type=int, default=2)
+    run_parser.add_argument(
+        "--tool-retries",
+        type=int,
+        default=2,
+        help="times to retry a failing tool benchmark before omitting that datapoint",
+    )
     add_version_args(run_parser)
     run_parser.add_argument(
         "--scenario",
@@ -720,7 +784,7 @@ def main() -> None:
 
     setup_from_args(args)
     scenarios = args.scenario or list(SCENARIOS)
-    payload = run_hyperfine(args.runs, args.warmup, scenarios)
+    payload = run_hyperfine(args.runs, args.warmup, scenarios, args.tool_retries)
     write_results(payload)
     print_summary(payload)
 
