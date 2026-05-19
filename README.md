@@ -170,7 +170,8 @@ The intended loop is:
   benchmarks against regressions on pull requests.
 - The external [Dockerfile linter benchmark suite](benchmarks/dockerfile-linters/README.md)
   compares `rudolint` with `hadolint`, `tally`, Docker build checks,
-  `dockerfilelint`, and `dockerfile_lint` on reproducible CLI workloads.
+  `replicatedhq/dockerfilelint`, and `projectatomic/dockerfile_lint` on
+  reproducible CLI workloads.
 
 Refresh the external charts with:
 

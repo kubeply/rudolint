@@ -59,12 +59,12 @@ class Tool:
 
 
 TOOLS = [
-    Tool("rudolint", "rudolint"),
-    Tool("hadolint", "hadolint"),
-    Tool("tally", "tally"),
+    Tool("rudolint", "kubeply/rudolint"),
+    Tool("hadolint", "hadolint/hadolint"),
+    Tool("tally", "wharflab/tally"),
     Tool("docker-build-check", "docker build --check"),
-    Tool("dockerfilelint", "dockerfilelint"),
-    Tool("dockerfile-lint", "dockerfile-lint"),
+    Tool("dockerfilelint", "replicatedhq/dockerfilelint"),
+    Tool("dockerfile-lint", "projectatomic/dockerfile_lint"),
 ]
 
 SARIF_TOOLS = {"rudolint", "hadolint", "tally"}
@@ -563,12 +563,12 @@ def write_results(payload: dict) -> None:
 
 def color_for_tool(tool: str) -> str:
     colors = {
-        "rudolint": "#8b5cf6",
-        "hadolint": "#64748b",
-        "tally": "#14b8a6",
+        "kubeply/rudolint": "#8b5cf6",
+        "hadolint/hadolint": "#64748b",
+        "wharflab/tally": "#14b8a6",
         "docker build --check": "#0ea5e9",
-        "dockerfilelint": "#f97316",
-        "dockerfile-lint": "#ef4444",
+        "replicatedhq/dockerfilelint": "#f97316",
+        "projectatomic/dockerfile_lint": "#ef4444",
     }
     return colors.get(tool, "#94a3b8")
 
@@ -609,8 +609,8 @@ def render_headline_chart(payload: dict, output: Path) -> None:
     width = 980
     row_height = 42
     top = 70
-    left = 210
-    chart_width = 610
+    left = 330
+    chart_width = 490
     height = top + row_height * len(rows) + 80
 
     bars = []
@@ -654,8 +654,8 @@ def render_scenario_chart(payload: dict, output: Path) -> None:
     width = 1120
     panel_height = 180
     height = 80 + panel_height * max(1, len(visible_scenarios))
-    left = 220
-    chart_width = 650
+    left = 320
+    chart_width = 550
     parts = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-labelledby="title desc">',
         '<title id="title">Dockerfile linter benchmark scenarios</title>',

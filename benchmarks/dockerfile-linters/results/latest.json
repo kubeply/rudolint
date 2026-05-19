@@ -7,7 +7,7 @@
     {
       "scenario": "small",
       "scenario_name": "Single small Dockerfile",
-      "tool": "rudolint",
+      "tool": "kubeply/rudolint",
       "mean_seconds": 0.08436330692,
       "stddev_seconds": 0.0030839486206816575,
       "median_seconds": 0.08395965732,
@@ -17,7 +17,7 @@
     {
       "scenario": "small",
       "scenario_name": "Single small Dockerfile",
-      "tool": "hadolint",
+      "tool": "hadolint/hadolint",
       "mean_seconds": 0.10631340672000003,
       "stddev_seconds": 0.00265101982310191,
       "median_seconds": 0.10590469832000002,
@@ -27,7 +27,7 @@
     {
       "scenario": "small",
       "scenario_name": "Single small Dockerfile",
-      "tool": "tally",
+      "tool": "wharflab/tally",
       "mean_seconds": 1.74024260672,
       "stddev_seconds": 0.03997997471889705,
       "median_seconds": 1.73724174032,
@@ -47,7 +47,7 @@
     {
       "scenario": "small",
       "scenario_name": "Single small Dockerfile",
-      "tool": "dockerfilelint",
+      "tool": "replicatedhq/dockerfilelint",
       "mean_seconds": 0.15903266512,
       "stddev_seconds": 0.004550807242507164,
       "median_seconds": 0.16081994832000002,
@@ -57,7 +57,7 @@
     {
       "scenario": "small",
       "scenario_name": "Single small Dockerfile",
-      "tool": "dockerfile-lint",
+      "tool": "projectatomic/dockerfile_lint",
       "mean_seconds": 0.19869324012000003,
       "stddev_seconds": 0.0036001772068432513,
       "median_seconds": 0.19893078132000003,
@@ -67,7 +67,7 @@
     {
       "scenario": "buildkit",
       "scenario_name": "Single BuildKit-heavy Dockerfile",
-      "tool": "rudolint",
+      "tool": "kubeply/rudolint",
       "mean_seconds": 0.0988431282,
       "stddev_seconds": 0.015389258448180393,
       "median_seconds": 0.090824495,
@@ -77,7 +77,7 @@
     {
       "scenario": "buildkit",
       "scenario_name": "Single BuildKit-heavy Dockerfile",
-      "tool": "hadolint",
+      "tool": "hadolint/hadolint",
       "mean_seconds": 0.1300434116,
       "stddev_seconds": 0.005146065663632436,
       "median_seconds": 0.130024745,
@@ -87,7 +87,7 @@
     {
       "scenario": "buildkit",
       "scenario_name": "Single BuildKit-heavy Dockerfile",
-      "tool": "tally",
+      "tool": "wharflab/tally",
       "mean_seconds": 1.8390260786,
       "stddev_seconds": 0.17775760508684949,
       "median_seconds": 1.7269058290000001,
@@ -107,7 +107,7 @@
     {
       "scenario": "buildkit",
       "scenario_name": "Single BuildKit-heavy Dockerfile",
-      "tool": "dockerfilelint",
+      "tool": "replicatedhq/dockerfilelint",
       "mean_seconds": 0.1551841698,
       "stddev_seconds": 0.0032403514847475505,
       "median_seconds": 0.154414661,
@@ -117,7 +117,7 @@
     {
       "scenario": "buildkit",
       "scenario_name": "Single BuildKit-heavy Dockerfile",
-      "tool": "dockerfile-lint",
+      "tool": "projectatomic/dockerfile_lint",
       "mean_seconds": 0.19989052000000002,
       "stddev_seconds": 0.00300056881768899,
       "median_seconds": 0.20109837,
@@ -127,7 +127,7 @@
     {
       "scenario": "repo-100",
       "scenario_name": "Repository with 100 generated Dockerfiles",
-      "tool": "rudolint",
+      "tool": "kubeply/rudolint",
       "mean_seconds": 0.17174502262,
       "stddev_seconds": 0.01868735997873043,
       "median_seconds": 0.16156128082000001,
@@ -137,7 +137,7 @@
     {
       "scenario": "repo-100",
       "scenario_name": "Repository with 100 generated Dockerfiles",
-      "tool": "hadolint",
+      "tool": "hadolint/hadolint",
       "mean_seconds": 0.28267988062000005,
       "stddev_seconds": 0.006631565640648046,
       "median_seconds": 0.28214953082000005,
@@ -147,7 +147,7 @@
     {
       "scenario": "repo-100",
       "scenario_name": "Repository with 100 generated Dockerfiles",
-      "tool": "tally",
+      "tool": "wharflab/tally",
       "mean_seconds": 10.285248488819999,
       "stddev_seconds": 10.084705480074572,
       "median_seconds": 3.16598373882,
@@ -167,7 +167,7 @@
     {
       "scenario": "repo-100",
       "scenario_name": "Repository with 100 generated Dockerfiles",
-      "tool": "dockerfilelint",
+      "tool": "replicatedhq/dockerfilelint",
       "mean_seconds": 0.20469646422000004,
       "stddev_seconds": 0.016426474025083636,
       "median_seconds": 0.20102532282000002,
@@ -177,7 +177,7 @@
     {
       "scenario": "repo-100",
       "scenario_name": "Repository with 100 generated Dockerfiles",
-      "tool": "dockerfile-lint",
+      "tool": "projectatomic/dockerfile_lint",
       "mean_seconds": 0.30862501402000003,
       "stddev_seconds": 0.043641576593450755,
       "median_seconds": 0.29029490582000006,
@@ -187,7 +187,7 @@
     {
       "scenario": "repo-1000",
       "scenario_name": "Repository with 1,000 generated Dockerfiles",
-      "tool": "rudolint",
+      "tool": "kubeply/rudolint",
       "mean_seconds": 0.7932671153599999,
       "stddev_seconds": 0.01634546515873302,
       "median_seconds": 0.78835307396,
@@ -197,7 +197,7 @@
     {
       "scenario": "repo-1000",
       "scenario_name": "Repository with 1,000 generated Dockerfiles",
-      "tool": "hadolint",
+      "tool": "hadolint/hadolint",
       "mean_seconds": 1.8485824565600002,
       "stddev_seconds": 0.05833418182167664,
       "median_seconds": 1.85983553096,
@@ -207,7 +207,7 @@
     {
       "scenario": "repo-1000",
       "scenario_name": "Repository with 1,000 generated Dockerfiles",
-      "tool": "tally",
+      "tool": "wharflab/tally",
       "mean_seconds": 30.051741314960005,
       "stddev_seconds": 0.3327742601411994,
       "median_seconds": 30.21746873996,
@@ -227,7 +227,7 @@
     {
       "scenario": "repo-1000",
       "scenario_name": "Repository with 1,000 generated Dockerfiles",
-      "tool": "dockerfilelint",
+      "tool": "replicatedhq/dockerfilelint",
       "mean_seconds": 0.48723293136,
       "stddev_seconds": 0.013601442472880323,
       "median_seconds": 0.48317215596,
@@ -237,7 +237,7 @@
     {
       "scenario": "repo-1000",
       "scenario_name": "Repository with 1,000 generated Dockerfiles",
-      "tool": "dockerfile-lint",
+      "tool": "projectatomic/dockerfile_lint",
       "mean_seconds": 0.89018921516,
       "stddev_seconds": 0.029199362951023967,
       "median_seconds": 0.88521969796,
@@ -247,7 +247,7 @@
     {
       "scenario": "json-100",
       "scenario_name": "JSON output for 100 generated Dockerfiles",
-      "tool": "rudolint",
+      "tool": "kubeply/rudolint",
       "mean_seconds": 0.17233484182,
       "stddev_seconds": 0.01961821708022975,
       "median_seconds": 0.16455509962,
@@ -257,7 +257,7 @@
     {
       "scenario": "json-100",
       "scenario_name": "JSON output for 100 generated Dockerfiles",
-      "tool": "hadolint",
+      "tool": "hadolint/hadolint",
       "mean_seconds": 0.29168640002,
       "stddev_seconds": 0.016173225011602854,
       "median_seconds": 0.28497347462,
@@ -267,7 +267,7 @@
     {
       "scenario": "json-100",
       "scenario_name": "JSON output for 100 generated Dockerfiles",
-      "tool": "tally",
+      "tool": "wharflab/tally",
       "mean_seconds": 21.275726441419998,
       "stddev_seconds": 0.026366064506659074,
       "median_seconds": 21.288746599619998,
@@ -277,7 +277,7 @@
     {
       "scenario": "json-100",
       "scenario_name": "JSON output for 100 generated Dockerfiles",
-      "tool": "dockerfilelint",
+      "tool": "replicatedhq/dockerfilelint",
       "mean_seconds": 0.16788016641999998,
       "stddev_seconds": 0.00339556805448377,
       "median_seconds": 0.16875343362,
@@ -287,7 +287,7 @@
     {
       "scenario": "json-100",
       "scenario_name": "JSON output for 100 generated Dockerfiles",
-      "tool": "dockerfile-lint",
+      "tool": "projectatomic/dockerfile_lint",
       "mean_seconds": 0.29338772502,
       "stddev_seconds": 0.018602938369959007,
       "median_seconds": 0.28652760062,
@@ -297,7 +297,7 @@
     {
       "scenario": "sarif-100",
       "scenario_name": "SARIF output for 100 generated Dockerfiles",
-      "tool": "rudolint",
+      "tool": "kubeply/rudolint",
       "mean_seconds": 0.16245180943999998,
       "stddev_seconds": 0.003014441382658866,
       "median_seconds": 0.16079955984,
@@ -307,7 +307,7 @@
     {
       "scenario": "sarif-100",
       "scenario_name": "SARIF output for 100 generated Dockerfiles",
-      "tool": "hadolint",
+      "tool": "hadolint/hadolint",
       "mean_seconds": 0.30013746744,
       "stddev_seconds": 0.021472548915673528,
       "median_seconds": 0.29311885084000006,
@@ -317,7 +317,7 @@
     {
       "scenario": "sarif-100",
       "scenario_name": "SARIF output for 100 generated Dockerfiles",
-      "tool": "tally",
+      "tool": "wharflab/tally",
       "mean_seconds": 21.263538976040003,
       "stddev_seconds": 0.058561962194132844,
       "median_seconds": 21.28389139284,

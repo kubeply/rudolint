@@ -7,19 +7,21 @@ user-facing question, "How fast is rudolint compared with other linters?"
 
 ## Compared Tools
 
-- `rudolint`: this repository, built in release mode.
-- `hadolint`: pinned current GitHub release for the host platform
+- `kubeply/rudolint`: this repository, built in release mode.
+- `hadolint/hadolint`: pinned current GitHub release for the host platform
   ([hadolint/hadolint](https://github.com/hadolint/hadolint)).
-- `tally`: pinned current `tally-cli` package from npm
+- `wharflab/tally`: pinned current `tally-cli` package from npm
   ([npm](https://www.npmjs.com/package/tally-cli),
   [GitHub](https://github.com/wharflab/tally)).
 - `docker build --check`: Docker's native BuildKit build checks through the
   locally installed Docker CLI
   ([Docker build checks](https://docs.docker.com/reference/build-checks/)).
-- `dockerfilelint`: pinned current npm package
-  ([npm](https://www.npmjs.com/package/dockerfilelint)).
-- `dockerfile_lint`: pinned current npm package
-  ([npm](https://www.npmjs.com/package/dockerfile_lint)).
+- `replicatedhq/dockerfilelint`: pinned current npm package
+  ([npm](https://www.npmjs.com/package/dockerfilelint),
+  [GitHub](https://github.com/replicatedhq/dockerfilelint)).
+- `projectatomic/dockerfile_lint`: pinned current npm package
+  ([npm](https://www.npmjs.com/package/dockerfile_lint),
+  [GitHub](https://github.com/projectatomic/dockerfile_lint)).
 
 Docker image scanners such as Trivy, Dockle, and Grype are intentionally not
 included because they analyze built images or SBOMs rather than Dockerfile
