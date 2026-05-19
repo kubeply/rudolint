@@ -11,8 +11,6 @@ on:
         description: Number of hyperfine warmup runs
         required: false
         default: "5"
-  schedule:
-    - cron: "0 4 * * 1"
 
 permissions:
   contents: write
@@ -31,7 +29,6 @@ jobs:
     name: update external benchmark charts
     runs-on: depot-ubuntu-24.04
     timeout-minutes: 90
-    if: ${{ github.event_name != 'schedule' || github.repository == 'kubeply/rudolint' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
