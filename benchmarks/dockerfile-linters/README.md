@@ -53,7 +53,9 @@ Scenarios:
 - single small Dockerfile
 - single BuildKit-heavy Dockerfile
 - 100 generated Dockerfiles
-- 1,000 generated Dockerfiles
+- 1,000 generated Dockerfiles, excluding Docker native checks because
+  `docker buildx bake --check` is not stable for a generated 1,000-target bake
+  file on the publishing runner
 - JSON output for 100 generated Dockerfiles, where supported
 - SARIF output for 100 generated Dockerfiles, where supported
 

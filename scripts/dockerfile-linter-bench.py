@@ -493,6 +493,8 @@ def run_hyperfine(runs: int, warmup: int, scenarios: list[str]) -> dict:
 
 
 def scenario_supported(tool: str, scenario: str) -> bool:
+    if tool == "docker-build-check" and scenario == "repo-1000":
+        return False
     if scenario.startswith("json"):
         return tool in JSON_TOOLS
     if scenario.startswith("sarif"):
