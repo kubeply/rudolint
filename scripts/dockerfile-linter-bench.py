@@ -314,14 +314,12 @@ def run_strict(args: list[str], cwd: Path) -> None:
 
 
 def exec_tool(tool: str, scenario: str) -> None:
+    if not scenario_supported(tool, scenario):
+        raise SystemExit(2)
+
     files = dockerfiles_for_scenario(scenario)
     repo_root = repo_root_for_scenario(scenario)
     binary = command_path(tool)
-
-    if scenario.startswith("json") and tool not in JSON_TOOLS:
-        raise SystemExit(2)
-    if scenario.startswith("sarif") and tool not in SARIF_TOOLS:
-        raise SystemExit(2)
 
     if tool == "rudolint":
         args = [str(binary), "check", str(repo_root), "--exit-zero", "--no-config"]
