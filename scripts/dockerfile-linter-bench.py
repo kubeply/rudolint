@@ -32,13 +32,9 @@ NODE_TOOLS_ROOT = BENCH_ROOT / "node-tools"
 
 HADOLINT_REPO = "hadolint/hadolint"
 TALLY_NPM = "tally-cli"
-DOCKERFILELINT_NPM = "dockerfilelint"
-DOCKERFILE_LINT_NPM = "dockerfile_lint"
 
 HADOLINT_VERSION = "v2.14.0"
 TALLY_VERSION = "0.41.0"
-DOCKERFILELINT_VERSION = "1.8.0"
-DOCKERFILE_LINT_VERSION = "0.3.4"
 
 SCENARIOS = {
     "small": "Single small Dockerfile",
@@ -63,12 +59,10 @@ TOOLS = [
     Tool("hadolint", "hadolint/hadolint"),
     Tool("tally", "wharflab/tally"),
     Tool("docker-build-check", "docker build --check"),
-    Tool("dockerfilelint", "replicatedhq/dockerfilelint"),
-    Tool("dockerfile-lint", "projectatomic/dockerfile_lint"),
 ]
 
 SARIF_TOOLS = {"rudolint", "hadolint", "tally"}
-JSON_TOOLS = {"rudolint", "hadolint", "tally", "dockerfilelint", "dockerfile-lint"}
+JSON_TOOLS = {"rudolint", "hadolint", "tally"}
 
 
 def run(
@@ -129,18 +123,12 @@ def ensure_hadolint(version: str) -> Path:
     return binary
 
 
-def ensure_node_tools(
-    tally_version: str, dockerfilelint_version: str, dockerfile_lint_version: str
-) -> Path:
+def ensure_node_tools(tally_version: str) -> Path:
     package_root = TOOLS_ROOT / "node"
     package_root.mkdir(parents=True, exist_ok=True)
     package_json = package_root / "package.json"
     package_lock = package_root / "package-lock.json"
-    if (
-        tally_version == TALLY_VERSION
-        and dockerfilelint_version == DOCKERFILELINT_VERSION
-        and dockerfile_lint_version == DOCKERFILE_LINT_VERSION
-    ):
+    if tally_version == TALLY_VERSION:
         shutil.copyfile(NODE_TOOLS_ROOT / "package.json", package_json)
         shutil.copyfile(NODE_TOOLS_ROOT / "package-lock.json", package_lock)
         run(["npm", "ci", "--silent", "--prefix", str(package_root)])
@@ -151,8 +139,6 @@ def ensure_node_tools(
                     "private": True,
                     "dependencies": {
                         TALLY_NPM: tally_version,
-                        DOCKERFILELINT_NPM: dockerfilelint_version,
-                        DOCKERFILE_LINT_NPM: dockerfile_lint_version,
                     },
                 },
                 indent=2,
@@ -357,22 +343,6 @@ def exec_tool(tool: str, scenario: str) -> None:
         run_allowing_findings(args, ROOT, {0, 1})
         return
 
-    if tool == "dockerfilelint":
-        args = [str(binary), *map(str, files)]
-        if scenario.startswith("json"):
-            args.extend(["--output", "json"])
-        run_allowing_findings(args, ROOT, {0, 1})
-        return
-
-    if tool == "dockerfile-lint":
-        args = [str(binary)]
-        if scenario.startswith("json"):
-            args.append("-j")
-        for path in files:
-            args.extend(["-f", str(path)])
-        run_allowing_findings(args, ROOT, set(range(256)))
-        return
-
     if tool == "docker-build-check":
         if scenario in {"repo-100", "repo-1000"}:
             args = [
@@ -412,20 +382,14 @@ def version_for_command(args: list[str]) -> str:
 def setup(
     hadolint_version: str = HADOLINT_VERSION,
     tally_version: str = TALLY_VERSION,
-    dockerfilelint_version: str = DOCKERFILELINT_VERSION,
-    dockerfile_lint_version: str = DOCKERFILE_LINT_VERSION,
 ) -> dict:
     prepare_corpus()
     TOOLS_ROOT.mkdir(parents=True, exist_ok=True)
-    node_bin = ensure_node_tools(
-        tally_version, dockerfilelint_version, dockerfile_lint_version
-    )
+    node_bin = ensure_node_tools(tally_version)
     commands = {
         "rudolint": str(ensure_rudolint()),
         "hadolint": str(ensure_hadolint(hadolint_version)),
         "tally": str(node_bin / "tally"),
-        "dockerfilelint": str(node_bin / "dockerfilelint"),
-        "dockerfile-lint": str(node_bin / "dockerfile_lint"),
         "docker-build-check": shutil.which("docker") or "docker",
     }
 
@@ -442,14 +406,10 @@ def setup(
             "hadolint": version_for_command([commands["hadolint"], "--version"]),
             "tally": version_for_command([commands["tally"], "--version"]),
             "docker-build-check": version_for_command([commands["docker-build-check"], "version", "--format", "{{.Client.Version}}"]),
-            "dockerfilelint": version_for_command([commands["dockerfilelint"], "--version"]),
-            "dockerfile-lint": f"dockerfile_lint {dockerfile_lint_version}",
         },
         "latest_sources": {
             "hadolint": f"pinned GitHub release {hadolint_version}",
             "tally": f"pinned npm {TALLY_NPM}@{tally_version}",
-            "dockerfilelint": f"pinned npm {DOCKERFILELINT_NPM}@{dockerfilelint_version}",
-            "dockerfile-lint": f"pinned npm {DOCKERFILE_LINT_NPM}@{dockerfile_lint_version}",
             "docker-build-check": "local Docker CLI",
         },
     }
@@ -471,16 +431,10 @@ def hyperfine_command(tool: str, scenario: str) -> str:
 
 def public_manifest(manifest: dict) -> dict:
     public = json.loads(json.dumps(manifest))
-    latest_sources = public.get("latest_sources", {})
-    if "dockerfile_lint" in latest_sources:
-        latest_sources["dockerfile-lint"] = latest_sources.pop("dockerfile_lint")
-    public["latest_sources"] = latest_sources
     public["commands"] = {
         "rudolint": "target/release/rudolint",
         "hadolint": "target/dockerfile-linter-bench/tools/hadolint/<version>/hadolint",
         "tally": "target/dockerfile-linter-bench/tools/node/node_modules/.bin/tally",
-        "dockerfilelint": "target/dockerfile-linter-bench/tools/node/node_modules/.bin/dockerfilelint",
-        "dockerfile-lint": "target/dockerfile-linter-bench/tools/node/node_modules/.bin/dockerfile_lint",
         "docker-build-check": "docker",
     }
     return public
@@ -567,8 +521,6 @@ def color_for_tool(tool: str) -> str:
         "hadolint/hadolint": "#64748b",
         "wharflab/tally": "#14b8a6",
         "docker build --check": "#0ea5e9",
-        "replicatedhq/dockerfilelint": "#f97316",
-        "projectatomic/dockerfile_lint": "#ef4444",
     }
     return colors.get(tool, "#94a3b8")
 
@@ -735,16 +687,12 @@ def parse_args() -> argparse.Namespace:
 def add_version_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--hadolint-version", default=HADOLINT_VERSION)
     parser.add_argument("--tally-version", default=TALLY_VERSION)
-    parser.add_argument("--dockerfilelint-version", default=DOCKERFILELINT_VERSION)
-    parser.add_argument("--dockerfile-lint-version", default=DOCKERFILE_LINT_VERSION)
 
 
 def setup_from_args(args: argparse.Namespace) -> dict:
     return setup(
         hadolint_version=args.hadolint_version,
         tally_version=args.tally_version,
-        dockerfilelint_version=args.dockerfilelint_version,
-        dockerfile_lint_version=args.dockerfile_lint_version,
     )
 
 

@@ -9,23 +9,17 @@
     "rudolint": "target/release/rudolint",
     "hadolint": "target/dockerfile-linter-bench/tools/hadolint/<version>/hadolint",
     "tally": "target/dockerfile-linter-bench/tools/node/node_modules/.bin/tally",
-    "dockerfilelint": "target/dockerfile-linter-bench/tools/node/node_modules/.bin/dockerfilelint",
-    "dockerfile-lint": "target/dockerfile-linter-bench/tools/node/node_modules/.bin/dockerfile_lint",
     "docker-build-check": "docker"
   },
   "versions": {
     "rudolint": "rudolint 0.1.0",
     "hadolint": "Haskell Dockerfile Linter 2.14.0",
     "tally": "tally version 0.41.0 (buildkit v0.29.0)",
-    "docker-build-check": "29.4.0",
-    "dockerfilelint": "1.8.0",
-    "dockerfile-lint": "dockerfile_lint 0.3.4"
+    "docker-build-check": "29.4.0"
   },
   "latest_sources": {
     "hadolint": "pinned GitHub release v2.14.0",
     "tally": "pinned npm tally-cli@0.41.0",
-    "dockerfilelint": "pinned npm dockerfilelint@1.8.0",
-    "docker-build-check": "local Docker CLI",
-    "dockerfile-lint": "pinned npm dockerfile_lint@0.3.4"
+    "docker-build-check": "local Docker CLI"
   }
 }

@@ -169,8 +169,7 @@ The intended loop is:
 - CodSpeed guards internal parser, rule-engine, end-to-end, and output-rendering
   benchmarks against regressions on pull requests.
 - The external [Dockerfile linter benchmark suite](benchmarks/dockerfile-linters/README.md)
-  compares `rudolint` with `hadolint`, `tally`, Docker build checks,
-  `replicatedhq/dockerfilelint`, and `projectatomic/dockerfile_lint` on
+  compares `rudolint` with `hadolint`, `tally`, and Docker build checks on
   reproducible CLI workloads.
 
 Refresh the external charts with:

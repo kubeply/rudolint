@@ -1,8 +1,6 @@
 {
   "private": true,
   "dependencies": {
-    "dockerfile_lint": "0.3.4",
-    "dockerfilelint": "1.8.0",
     "tally-cli": "0.41.0"
   }
 }

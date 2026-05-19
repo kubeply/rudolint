@@ -16,16 +16,12 @@ user-facing question, "How fast is rudolint compared with other linters?"
 - `docker build --check`: Docker's native BuildKit build checks through the
   locally installed Docker CLI
   ([Docker build checks](https://docs.docker.com/reference/build-checks/)).
-- `replicatedhq/dockerfilelint`: pinned current npm package
-  ([npm](https://www.npmjs.com/package/dockerfilelint),
-  [GitHub](https://github.com/replicatedhq/dockerfilelint)).
-- `projectatomic/dockerfile_lint`: pinned current npm package
-  ([npm](https://www.npmjs.com/package/dockerfile_lint),
-  [GitHub](https://github.com/projectatomic/dockerfile_lint)).
 
-Docker image scanners such as Trivy, Dockle, and Grype are intentionally not
-included because they analyze built images or SBOMs rather than Dockerfile
-source.
+Legacy Dockerfile linters such as `replicatedhq/dockerfilelint` and
+`projectatomic/dockerfile_lint` are intentionally not included because they have
+not shipped modern rule coverage in years. Docker image scanners such as Trivy,
+Dockle, and Grype are also excluded because they analyze built images or SBOMs
+rather than Dockerfile source.
 
 ## Headline Result
 
@@ -66,9 +62,8 @@ tool has a different rule catalog. The suite measures CLI elapsed time for the
 closest supported operation in each tool.
 
 Lint findings are treated as successful benchmark executions. Exit codes are
-normalized because Dockerfile linters disagree on contracts: some return `1`,
-some return parser-specific values, and `dockerfile_lint` can return the number
-of findings for a large batch.
+normalized per tool because Dockerfile linters disagree on whether findings
+should return `0` or `1`.
 
 ## Reproduce
 
@@ -99,8 +94,8 @@ The script will:
 
 1. build `rudolint` in release mode,
 2. download the pinned `hadolint` release for the host platform,
-3. install the pinned npm packages for `tally-cli`, `dockerfilelint`, and
-   `dockerfile_lint` into `target/dockerfile-linter-bench/tools/node`,
+3. install the pinned npm package for `tally-cli` into
+   `target/dockerfile-linter-bench/tools/node`,
 4. use the local Docker CLI for `docker build --check`,
 5. generate `results/latest.json`, `results/tool-versions.json`,
    `results/headline.svg`, and `results/scenarios.svg`.
@@ -116,9 +111,7 @@ Use the explicit version flags when intentionally refreshing the comparison:
 ```bash
 python3 scripts/dockerfile-linter-bench.py run \
   --hadolint-version v2.14.0 \
-  --tally-version 0.41.0 \
-  --dockerfilelint-version 1.8.0 \
-  --dockerfile-lint-version 0.3.4
+  --tally-version 0.41.0
 ```
 
 ## Current Tool Versions
