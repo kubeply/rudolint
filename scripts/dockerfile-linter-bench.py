@@ -437,6 +437,7 @@ def hyperfine_command(tool: str, scenario: str) -> str:
 
 def public_manifest(manifest: dict) -> dict:
     public = json.loads(json.dumps(manifest))
+    public.pop("host", None)
     public["commands"] = {
         "rudolint": "target/release/rudolint",
         "hadolint": "target/dockerfile-linter-bench/tools/hadolint/<version>/hadolint",
