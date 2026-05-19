@@ -178,8 +178,8 @@ Refresh the external charts with:
 python3 scripts/dockerfile-linter-bench.py run --runs 5 --warmup 5
 ```
 
-The checked-in comparison chart is refreshed by the
-`Dockerfile linter benchmarks` workflow on a Depot Ubuntu runner.
+After this workflow exists on `main`, refresh the checked-in comparison chart
+with the `Dockerfile linter benchmarks` workflow on a Depot Ubuntu runner.
 
 ## Development
 

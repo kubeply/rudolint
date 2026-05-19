@@ -43,8 +43,8 @@ generates deterministic corpora under `target/dockerfile-linter-bench/corpus`
 so benchmark inputs are reproducible but do not add 1,000 fixture files to the
 repository.
 
-The checked-in results are intended to be produced by the
-`Dockerfile linter benchmarks` GitHub Actions workflow on a Depot
+After this workflow exists on `main`, the checked-in results should be refreshed
+through the `Dockerfile linter benchmarks` GitHub Actions workflow on a Depot
 `depot-ubuntu-24.04` runner. Local runs are useful for investigation, but should
 not be treated as the canonical public chart.
 

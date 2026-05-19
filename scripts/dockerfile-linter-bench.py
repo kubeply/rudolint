@@ -386,11 +386,17 @@ def setup(
     prepare_corpus()
     TOOLS_ROOT.mkdir(parents=True, exist_ok=True)
     node_bin = ensure_node_tools(tally_version)
+    docker = shutil.which("docker")
+    if docker is None:
+        raise RuntimeError(
+            "Docker CLI is required for docker build --check benchmarks. "
+            "Install Docker and ensure `docker` is on PATH."
+        )
     commands = {
         "rudolint": str(ensure_rudolint()),
         "hadolint": str(ensure_hadolint(hadolint_version)),
         "tally": str(node_bin / "tally"),
-        "docker-build-check": shutil.which("docker") or "docker",
+        "docker-build-check": docker,
     }
 
     manifest = {
