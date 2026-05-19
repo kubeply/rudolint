@@ -175,8 +175,11 @@ The intended loop is:
 Refresh the external charts with:
 
 ```bash
-python3 scripts/dockerfile-linter-bench.py run --runs 5 --warmup 2
+python3 scripts/dockerfile-linter-bench.py run --runs 5 --warmup 5
 ```
+
+The checked-in comparison chart is refreshed by the
+`Dockerfile linter benchmarks` workflow on a Depot Ubuntu runner.
 
 ## Development
 

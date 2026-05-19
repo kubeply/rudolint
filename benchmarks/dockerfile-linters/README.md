@@ -43,6 +43,11 @@ generates deterministic corpora under `target/dockerfile-linter-bench/corpus`
 so benchmark inputs are reproducible but do not add 1,000 fixture files to the
 repository.
 
+The checked-in results are intended to be produced by the
+`Dockerfile linter benchmarks` GitHub Actions workflow on a Depot
+`depot-ubuntu-24.04` runner. Local runs are useful for investigation, but should
+not be treated as the canonical public chart.
+
 Scenarios:
 
 - single small Dockerfile
@@ -87,7 +92,7 @@ yet because the runner only downloads Linux and macOS `hadolint` assets.
 Then run:
 
 ```bash
-python3 scripts/dockerfile-linter-bench.py run --runs 5 --warmup 2
+python3 scripts/dockerfile-linter-bench.py run --runs 5 --warmup 5
 ```
 
 The script will:
@@ -104,6 +109,12 @@ Run a narrower pass while iterating:
 
 ```bash
 python3 scripts/dockerfile-linter-bench.py run --scenario repo-1000 --runs 3 --warmup 1
+```
+
+Refresh the checked-in artifacts through GitHub Actions:
+
+```bash
+gh workflow run dockerfile-linter-benchmarks.yml
 ```
 
 Use the explicit version flags when intentionally refreshing the comparison:
