@@ -1,5 +1,9 @@
 FROM alpine:3.20
 
+# RSC2002: cat is only feeding a pipeline.
+RUN cat app.log | grep error
+# Good RSC2002: cat options make the pipeline meaningful.
+RUN cat -n app.log | sed -n '1,10p'
 # RSC2086: unquoted variable expansion.
 RUN echo $HOME
 # Good RSC2086: quoted variable expansion.
@@ -24,3 +28,7 @@ RUN cd /app; make
 RUN cd /app && make
 # Good RSC2164: cd is guarded with ||.
 RUN cd /app || exit 1
+# RSC2181: checks the previous exit code indirectly.
+RUN make; test $? -eq 0
+# Good RSC2181: checks the command directly.
+RUN make && echo ok

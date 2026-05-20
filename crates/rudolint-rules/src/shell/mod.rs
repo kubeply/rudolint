@@ -10,11 +10,13 @@ use rudolint_shell::{
 
 pub(crate) fn implemented_catalog() -> Vec<RuleInfo> {
     vec![
+        UselessCat.metadata_info(),
         CommandChainAsCondition.metadata_info(),
         UnquotedCommandSubstitution.metadata_info(),
         UnquotedVariableExpansion.metadata_info(),
         DeclareAndAssignSeparately.metadata_info(),
         CheckCdExitStatus.metadata_info(),
+        CheckExitCodeDirectly.metadata_info(),
     ]
 }
 
@@ -22,8 +24,39 @@ pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
         "RSC1000", "RSC1001", "RSC1007", "RSC1010", "RSC1018", "RSC1035", "RSC1045", "RSC1065",
         "RSC1066", "RSC1077", "RSC1078", "RSC1079", "RSC1081", "RSC1083", "RSC1086", "RSC1095",
-        "RSC2002", "RSC2026", "RSC2035", "RSC2140", "RSC2154", "RSC2181", "RSC2196",
+        "RSC2026", "RSC2035", "RSC2140", "RSC2154", "RSC2196",
     ]
+}
+
+rule_metadata!(
+    UselessCat,
+    "RSC2002",
+    "avoid-useless-cat",
+    Severity::Warning,
+    "avoid piping cat output when the next command can read files directly"
+);
+
+impl Rule for UselessCat {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        shell_findings(doc, |instruction, program| {
+            program
+                .commands
+                .iter()
+                .any(|invocation| invocation_is_useless_cat(program, invocation))
+                .then(|| {
+                    diagnostic(
+                        "RSC2002",
+                        Severity::Warning,
+                        "avoid piping cat output when the next command can read files directly",
+                        instruction,
+                    )
+                })
+        })
+    }
 }
 
 rule_metadata!(
@@ -191,6 +224,37 @@ impl Rule for CheckCdExitStatus {
     }
 }
 
+rule_metadata!(
+    CheckExitCodeDirectly,
+    "RSC2181",
+    "check-exit-code-directly",
+    Severity::Warning,
+    "check command exit status directly instead of testing $?"
+);
+
+impl Rule for CheckExitCodeDirectly {
+    fn info(&self) -> RuleInfo {
+        self.metadata_info()
+    }
+
+    fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        shell_findings(doc, |instruction, program| {
+            program
+                .commands
+                .iter()
+                .any(invocation_tests_previous_exit_status)
+                .then(|| {
+                    diagnostic(
+                        "RSC2181",
+                        Severity::Warning,
+                        "check command exit status directly instead of testing $?",
+                        instruction,
+                    )
+                })
+        })
+    }
+}
+
 fn shell_findings(
     doc: &Dockerfile,
     check: impl Fn(&Instruction, &ShellProgram) -> Option<Finding>,
@@ -229,6 +293,24 @@ fn lint_program(
     path: Option<&Path>,
     findings: &mut Vec<Finding>,
 ) {
+    push_if_enabled(
+        "RSC2002",
+        config,
+        path,
+        findings,
+        program
+            .commands
+            .iter()
+            .any(|invocation| invocation_is_useless_cat(program, invocation))
+            .then(|| {
+                diagnostic(
+                    "RSC2002",
+                    Severity::Warning,
+                    "avoid piping cat output when the next command can read files directly",
+                    instruction,
+                )
+            }),
+    );
     push_if_enabled(
         "RSC2015",
         config,
@@ -307,6 +389,24 @@ fn lint_program(
                 )
             }),
     );
+    push_if_enabled(
+        "RSC2181",
+        config,
+        path,
+        findings,
+        program
+            .commands
+            .iter()
+            .any(invocation_tests_previous_exit_status)
+            .then(|| {
+                diagnostic(
+                    "RSC2181",
+                    Severity::Warning,
+                    "check command exit status directly instead of testing $?",
+                    instruction,
+                )
+            }),
+    );
 }
 
 fn push_if_enabled(
@@ -367,6 +467,33 @@ fn following_separator_is(program: &ShellProgram, start: usize, expected: &str) 
     }
 
     false
+}
+
+fn invocation_is_useless_cat(program: &ShellProgram, invocation: &ShellCommandInvocation) -> bool {
+    invocation.command_is("cat")
+        && !invocation.argument_facts.is_empty()
+        && invocation
+            .argument_facts
+            .iter()
+            .all(|argument| !argument.text.starts_with('-'))
+        && next_command_separator_after(program, invocation).is_some_and(|token| token.raw == "|")
+}
+
+fn invocation_tests_previous_exit_status(invocation: &ShellCommandInvocation) -> bool {
+    invocation.command_is_any(&["test", "["])
+        && invocation
+            .argument_facts
+            .iter()
+            .any(|argument| argument.raw == "$?" || argument.text == "$?")
+}
+
+fn next_command_separator_after<'a>(
+    program: &'a ShellProgram,
+    invocation: &ShellCommandInvocation,
+) -> Option<&'a rudolint_shell::ShellToken> {
+    program.tokens.iter().find(|token| {
+        token.span.start >= invocation.command_span.end && token.is_command_separator()
+    })
 }
 
 fn invocation_declares_assignment_with_command_substitution(

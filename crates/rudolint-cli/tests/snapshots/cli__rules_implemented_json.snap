@@ -1,6 +1,5 @@
 ---
 source: crates/rudolint-cli/tests/cli.rs
-assertion_line: 622
 expression: normalized_json(&output)
 ---
 [
@@ -473,6 +472,12 @@ expression: normalized_json(&output)
     "summary": "set pipefail before RUN instructions with pipes"
   },
   {
+    "code": "RSC2002",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "avoid piping cat output when the next command can read files directly"
+  },
+  {
     "code": "RSC2015",
     "severity": "warning",
     "status": "implemented",
@@ -501,5 +506,11 @@ expression: normalized_json(&output)
     "severity": "warning",
     "status": "implemented",
     "summary": "check cd exit status before running more commands"
+  },
+  {
+    "code": "RSC2181",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "check command exit status directly instead of testing $?"
   }
 ]

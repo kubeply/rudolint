@@ -629,7 +629,7 @@ false positives.
 16. [x] Implement `RSC2015` after command-chain facts are reliable.
 17. [x] Implement `RSC2164` after `cd` command facts are reliable.
 18. [x] Implement `RSC2155` after assignment facts are reliable.
-19. Add remaining tracked `RSC` rules only when fixture coverage shows low
+19. [x] Add remaining tracked `RSC` rules only when fixture coverage shows low
     false-positive risk.
 
 Acceptance criteria:

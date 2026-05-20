@@ -4,18 +4,34 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
 ---
 [
   {
+    "code": "RSC2002",
+    "help": null,
+    "labels": [],
+    "message": "avoid piping cat output when the next command can read files directly",
+    "path": "",
+    "primary_span": {
+      "end_byte": 89,
+      "end_column": 29,
+      "end_line": 4,
+      "start_byte": 61,
+      "start_column": 1,
+      "start_line": 4
+    },
+    "severity": "warning"
+  },
+  {
     "code": "RSC2086",
     "help": null,
     "labels": [],
     "message": "quote variable expansions to prevent word splitting and globbing",
     "path": "",
     "primary_span": {
-      "end_byte": 72,
+      "end_byte": 238,
       "end_column": 15,
-      "end_line": 4,
-      "start_byte": 58,
+      "end_line": 8,
+      "start_byte": 224,
       "start_column": 1,
-      "start_line": 4
+      "start_line": 8
     },
     "severity": "warning"
   },
@@ -26,12 +42,12 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "quote command substitutions to prevent word splitting",
     "path": "",
     "primary_span": {
-      "end_byte": 192,
+      "end_byte": 358,
       "end_column": 18,
-      "end_line": 8,
-      "start_byte": 175,
+      "end_line": 12,
+      "start_byte": 341,
       "start_column": 1,
-      "start_line": 8
+      "start_line": 12
     },
     "severity": "warning"
   },
@@ -42,12 +58,12 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "A && B || C is not a safe conditional expression",
     "path": "",
     "primary_span": {
-      "end_byte": 323,
+      "end_byte": 489,
       "end_column": 42,
-      "end_line": 12,
-      "start_byte": 282,
+      "end_line": 16,
+      "start_byte": 448,
       "start_column": 1,
-      "start_line": 12
+      "start_line": 16
     },
     "severity": "warning"
   },
@@ -58,12 +74,12 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "declare and assign separately to avoid masking command failures",
     "path": "",
     "primary_span": {
-      "end_byte": 577,
+      "end_byte": 743,
       "end_column": 31,
-      "end_line": 18,
-      "start_byte": 547,
+      "end_line": 22,
+      "start_byte": 713,
       "start_column": 1,
-      "start_line": 18
+      "start_line": 22
     },
     "severity": "warning"
   },
@@ -74,12 +90,28 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "check cd exit status before running more commands",
     "path": "",
     "primary_span": {
-      "end_byte": 712,
+      "end_byte": 878,
       "end_column": 18,
-      "end_line": 22,
-      "start_byte": 695,
+      "end_line": 26,
+      "start_byte": 861,
       "start_column": 1,
-      "start_line": 22
+      "start_line": 26
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "RSC2181",
+    "help": null,
+    "labels": [],
+    "message": "check command exit status directly instead of testing $?",
+    "path": "",
+    "primary_span": {
+      "end_byte": 1075,
+      "end_column": 24,
+      "end_line": 32,
+      "start_byte": 1052,
+      "start_column": 1,
+      "start_line": 32
     },
     "severity": "warning"
   }

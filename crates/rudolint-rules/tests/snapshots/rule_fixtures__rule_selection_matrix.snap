@@ -1,6 +1,5 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
-assertion_line: 1567
 expression: snapshot
 ---
 {
@@ -183,11 +182,13 @@ expression: snapshot
       "RDL4004",
       "RDL4005",
       "RDL4006",
+      "RSC2002",
       "RSC2015",
       "RSC2046",
       "RSC2086",
       "RSC2155",
-      "RSC2164"
+      "RSC2164",
+      "RSC2181"
     ],
     "default": [
       "RDK1000",
@@ -268,11 +269,13 @@ expression: snapshot
       "RDL4004",
       "RDL4005",
       "RDL4006",
+      "RSC2002",
       "RSC2015",
       "RSC2046",
       "RSC2086",
       "RSC2155",
-      "RSC2164"
+      "RSC2164",
+      "RSC2181"
     ]
   },
   "profile_findings": {

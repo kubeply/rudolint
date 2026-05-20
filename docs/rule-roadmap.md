@@ -86,11 +86,13 @@ IDs should be added here when they are intentionally tracked.
 `RSC` rules should come from a dedicated shell-analysis layer for `RUN`
 commands. They should not be implemented by ad hoc substring checks.
 
+- `RSC2002`
 - `RSC2015`
 - `RSC2046`
 - `RSC2086`
 - `RSC2155`
 - `RSC2164`
+- `RSC2181`
 
 ## Planned Shell Rules
 
@@ -112,12 +114,10 @@ Initial tracked IDs:
 - `RSC1083`
 - `RSC1086`
 - `RSC1095`
-- `RSC2002`
 - `RSC2026`
 - `RSC2035`
 - `RSC2140`
 - `RSC2154`
-- `RSC2181`
 - `RSC2196`
 
 ## BuildKit-Native Rules

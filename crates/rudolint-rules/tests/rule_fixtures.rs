@@ -58,7 +58,9 @@ fn snapshots_legacy_external_suppression_warnings() {
 fn snapshots_initial_shell_rule_findings() {
     let source = read_fixture("rules/RSC.initial-shell-rules/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
-    let shell_codes = BTreeSet::from(["RSC2015", "RSC2046", "RSC2086", "RSC2155", "RSC2164"]);
+    let shell_codes = BTreeSet::from([
+        "RSC2002", "RSC2015", "RSC2046", "RSC2086", "RSC2155", "RSC2164", "RSC2181",
+    ]);
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()

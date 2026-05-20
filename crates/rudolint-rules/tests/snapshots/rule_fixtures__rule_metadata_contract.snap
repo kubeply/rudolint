@@ -1,6 +1,5 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
-assertion_line: 1593
 expression: metadata
 ---
 [
@@ -864,6 +863,17 @@ expression: metadata
   },
   {
     "category": "shell",
+    "code": "RSC2002",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RSC2002.md",
+    "fix": "none",
+    "name": "avoid-useless-cat",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "avoid piping cat output when the next command can read files directly"
+  },
+  {
+    "category": "shell",
     "code": "RSC2015",
     "default_severity": "warning",
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RSC2015.md",
@@ -916,5 +926,16 @@ expression: metadata
     "profile": "compat",
     "status": "implemented",
     "summary": "check cd exit status before running more commands"
+  },
+  {
+    "category": "shell",
+    "code": "RSC2181",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RSC2181.md",
+    "fix": "none",
+    "name": "check-exit-code-directly",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "check command exit status directly instead of testing $?"
   }
 ]
