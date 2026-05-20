@@ -22,8 +22,9 @@ pub fn human(findings: &[Finding]) -> String {
             .push(finding);
     }
 
-    for (path, group) in grouped {
+    for (path, mut group) in grouped {
         rendered.push_str(&format!("{}:\n", path.display()));
+        group.sort_by_key(|finding| (finding.line(), finding.column()));
         for finding in group {
             rendered.push_str(&format!(
                 "  {}:{} {} {} {}\n",
@@ -65,7 +66,7 @@ pub fn sarif(findings: &[Finding]) -> Result<String> {
             }
             Some(json!({
                 "id": finding.code,
-                "shortDescription": { "text": finding.message },
+                "shortDescription": { "text": finding.code },
                 "defaultConfiguration": {
                     "level": finding.severity.sarif_level()
                 }

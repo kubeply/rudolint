@@ -85,7 +85,7 @@ expression: output
               },
               "id": "RDL3007",
               "shortDescription": {
-                "text": "avoid mutable latest base image tags"
+                "text": "RDL3007"
               }
             },
             {
@@ -94,7 +94,7 @@ expression: output
               },
               "id": "RDL3006",
               "shortDescription": {
-                "text": "base image should use an explicit tag or digest"
+                "text": "RDL3006"
               }
             },
             {
@@ -103,7 +103,7 @@ expression: output
               },
               "id": "RDL3000",
               "shortDescription": {
-                "text": "WORKDIR should be absolute"
+                "text": "RDL3000"
               }
             }
           ]
