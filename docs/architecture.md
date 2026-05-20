@@ -67,7 +67,8 @@ Compatibility rules live under `RDL` and `RSC`. BuildKit-native rules live under
 ## Output
 
 `rudolint-output` converts diagnostics into human text, JSON, SARIF, and future
-editor/LSP responses. Renderers must not change rule behavior.
+editor/LSP responses. Renderers must not change rule behavior. Format stability
+and schema notes live in [`docs/output.md`](output.md).
 
 ## Tests
 

@@ -2,5 +2,6 @@
 source: crates/rudolint-cli/tests/cli.rs
 expression: output
 ---
-<stdin>:1:1: warning RDL3007 avoid mutable latest base image tags
-<stdin>:2:1: error RDL3000 WORKDIR should be absolute
+<stdin>:
+  1:1 warning RDL3007 avoid mutable latest base image tags
+  2:1 error RDL3000 WORKDIR should be absolute

@@ -1,8 +1,9 @@
 ---
 source: crates/rudolint-cli/tests/cli.rs
-expression: output
+expression: "output.replace(temp_path, \"$TEMP\")"
 ---
 $TEMP/Dockerfile:
   1:1 warning RDL3007 avoid mutable latest base image tags
+$TEMP/Dockerfile.api:
+  1:1 warning RDL3006 base image should use an explicit tag or digest
   2:1 error RDL3000 WORKDIR should be absolute
-fixes: write mode is enabled; no fixes are currently available

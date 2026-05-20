@@ -12,10 +12,14 @@ pub fn human(findings: &[Finding]) -> String {
     }
 
     let mut rendered = String::new();
+    let mut current_path = None;
     for finding in findings {
+        if current_path.as_ref() != Some(&finding.path) {
+            current_path = Some(finding.path.clone());
+            rendered.push_str(&format!("{}:\n", finding.path.display()));
+        }
         rendered.push_str(&format!(
-            "{}:{}:{}: {} {} {}\n",
-            finding.path.display(),
+            "  {}:{} {} {} {}\n",
             finding.line(),
             finding.column(),
             finding.severity,
@@ -44,6 +48,24 @@ pub fn json_with_fixes(findings: &[Finding], fixes: &[FixPreview]) -> Result<Str
 
 /// Renders findings as a SARIF 2.1.0 report.
 pub fn sarif(findings: &[Finding]) -> Result<String> {
+    let mut rule_codes = Vec::new();
+    let rules = findings
+        .iter()
+        .filter_map(|finding| {
+            if rule_codes.iter().any(|code| code == &finding.code) {
+                return None;
+            }
+            rule_codes.push(finding.code.clone());
+            Some(json!({
+                "id": finding.code,
+                "shortDescription": { "text": finding.message },
+                "defaultConfiguration": {
+                    "level": finding.severity.sarif_level()
+                }
+            }))
+        })
+        .collect::<Vec<_>>();
+
     let results = findings
         .iter()
         .map(|finding| {
@@ -76,7 +98,7 @@ pub fn sarif(findings: &[Finding]) -> Result<String> {
                     "driver": {
                         "name": "rudolint",
                         "informationUri": "https://github.com/kubeply/rudolint",
-                        "rules": []
+                        "rules": rules
                     }
                 },
                 "results": results

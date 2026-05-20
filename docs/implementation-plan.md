@@ -646,19 +646,19 @@ Acceptance criteria:
 Goal: support terminal users, CI systems, SARIF upload, and future editor
 integrations with stable output.
 
-1. Document that JSON schema may break before `1.0.0`.
-2. Document JSON schema in `docs/output.md`.
-3. Snapshot JSON output for multiple files.
-4. Snapshot JSON output for stdin.
-5. Snapshot JSON output with config overrides.
-6. Stabilize SARIF output.
-7. Validate SARIF output against GitHub code scanning expectations.
-8. Add SARIF snapshot for multiple files.
-9. Add SARIF snapshot for source spans.
-10. Add human renderer grouping by file.
-11. Add human renderer source excerpts behind `--show-source`.
-12. Add future GitHub annotation format only if SARIF is insufficient for a
-    specific CI workflow.
+1. [x] Document that JSON schema may break before `1.0.0`.
+2. [x] Document JSON schema in `docs/output.md`.
+3. [x] Snapshot JSON output for multiple files.
+4. [x] Snapshot JSON output for stdin.
+5. [x] Snapshot JSON output with config overrides.
+6. [x] Stabilize SARIF output.
+7. [x] Validate SARIF output against GitHub code scanning expectations.
+8. [x] Add SARIF snapshot for multiple files.
+9. [x] Add SARIF snapshot for source spans.
+10. [x] Add human renderer grouping by file.
+11. [x] Add human renderer source excerpts behind `--show-source`.
+12. [x] Defer a future GitHub annotation format unless SARIF proves
+    insufficient for a specific CI workflow.
 
 Acceptance criteria:
 

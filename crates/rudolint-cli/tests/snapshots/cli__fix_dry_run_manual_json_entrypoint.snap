@@ -2,7 +2,8 @@
 source: crates/rudolint-cli/tests/cli.rs
 expression: output
 ---
-<stdin>:2:1: warning RDL3025 use exec/JSON form for CMD and ENTRYPOINT
+<stdin>:
+  2:1 warning RDL3025 use exec/JSON form for CMD and ENTRYPOINT
 fixes: dry-run mode is enabled; 1 fix(es) available
 title: convert CMD to exec/JSON form
 applicability: manual

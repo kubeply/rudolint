@@ -1,5 +1,6 @@
 use predicates::prelude::PredicateBooleanExt;
 use rudolint_test::{normalize_path_prefix, normalized_json, rudolint_cmd};
+use serde_json::Value;
 use tempfile::TempDir;
 
 #[test]
@@ -91,6 +92,122 @@ fn discovers_dockerfiles_in_directory() {
     let mut output = normalized_json(&output);
     normalize_path_prefix(&mut output, temp.path(), "$TEMP");
     insta::assert_json_snapshot!("directory_discovery_json_findings", output);
+}
+
+#[test]
+fn emits_json_findings_for_multiple_files() {
+    let temp = TempDir::new().expect("temp dir should be created");
+    std::fs::write(temp.path().join("Dockerfile"), "FROM alpine:latest\n")
+        .expect("root Dockerfile should be written");
+    std::fs::write(
+        temp.path().join("Dockerfile.api"),
+        "FROM busybox\nWORKDIR app\n",
+    )
+    .expect("second Dockerfile should be written");
+
+    let output = rudolint_cmd()
+        .args(["check", "--format", "json", "--failure-threshold", "error"])
+        .arg(temp.path())
+        .assert()
+        .failure()
+        .get_output()
+        .stdout
+        .clone();
+
+    let output = String::from_utf8(output).expect("stdout should be UTF-8");
+    let mut output = normalized_json(&output);
+    normalize_path_prefix(&mut output, temp.path(), "$TEMP");
+    insta::assert_json_snapshot!("multi_file_json_findings", output);
+}
+
+#[test]
+fn emits_sarif_findings_for_multiple_files() {
+    let temp = TempDir::new().expect("temp dir should be created");
+    std::fs::write(temp.path().join("Dockerfile"), "FROM alpine:latest\n")
+        .expect("root Dockerfile should be written");
+    std::fs::write(
+        temp.path().join("Dockerfile.api"),
+        "FROM busybox\nWORKDIR app\n",
+    )
+    .expect("second Dockerfile should be written");
+
+    let output = rudolint_cmd()
+        .args(["check", "--format", "sarif", "--failure-threshold", "error"])
+        .arg(temp.path())
+        .assert()
+        .failure()
+        .get_output()
+        .stdout
+        .clone();
+
+    let output = String::from_utf8(output).expect("stdout should be UTF-8");
+    let mut output = normalized_json(&output);
+    normalize_path_prefix(&mut output, temp.path(), "$TEMP");
+    insta::assert_json_snapshot!("multi_file_sarif_findings", output);
+}
+
+#[test]
+fn emits_sarif_source_spans_and_github_required_fields() {
+    let output = rudolint_cmd()
+        .args(["check", "--format", "sarif", "--failure-threshold", "error"])
+        .write_stdin("FROM alpine:latest\nWORKDIR app\n")
+        .assert()
+        .failure()
+        .get_output()
+        .stdout
+        .clone();
+
+    let output = String::from_utf8(output).expect("stdout should be UTF-8");
+    let value: Value = serde_json::from_str(&output).expect("SARIF should be JSON");
+    assert_eq!(value["version"], "2.1.0");
+    assert_eq!(value["runs"][0]["tool"]["driver"]["name"], "rudolint");
+    assert!(
+        value["runs"][0]["tool"]["driver"]["rules"]
+            .as_array()
+            .is_some_and(|rules| !rules.is_empty())
+    );
+    assert!(
+        value["runs"][0]["results"]
+            .as_array()
+            .expect("SARIF results should be an array")
+            .iter()
+            .all(|result| {
+                let location = &result["locations"][0]["physicalLocation"];
+                location["artifactLocation"]["uri"].is_string()
+                    && location["region"]["startLine"].is_number()
+                    && location["region"]["startColumn"].is_number()
+            })
+    );
+
+    insta::assert_json_snapshot!("stdin_sarif_source_spans", normalized_json(&output));
+}
+
+#[test]
+fn emits_human_findings_grouped_by_file() {
+    let temp = TempDir::new().expect("temp dir should be created");
+    std::fs::write(temp.path().join("Dockerfile"), "FROM alpine:latest\n")
+        .expect("root Dockerfile should be written");
+    std::fs::write(
+        temp.path().join("Dockerfile.api"),
+        "FROM busybox\nWORKDIR app\n",
+    )
+    .expect("second Dockerfile should be written");
+
+    let output = rudolint_cmd()
+        .args(["check", "--failure-threshold", "error"])
+        .arg(temp.path())
+        .assert()
+        .failure()
+        .get_output()
+        .stdout
+        .clone();
+
+    let output = String::from_utf8(output).expect("stdout should be UTF-8");
+    let temp_path = temp.path().to_str().expect("temp path should be UTF-8");
+    insta::assert_snapshot!(
+        "multi_file_human_grouped",
+        output.replace(temp_path, "$TEMP")
+    );
 }
 
 #[test]
