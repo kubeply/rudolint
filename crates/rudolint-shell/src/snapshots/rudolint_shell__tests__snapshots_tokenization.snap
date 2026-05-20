@@ -1,6 +1,6 @@
 ---
 source: crates/rudolint-shell/src/lib.rs
-assertion_line: 828
+assertion_line: 825
 expression: values
 ---
 [
@@ -333,6 +333,53 @@ expression: values
           "start": 7
         },
         "text": "escaped value"
+      }
+    ]
+  },
+  {
+    "shell": "printf \\$PATH \"$PATH\"",
+    "tokens": [
+      {
+        "expansions": [],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "printf",
+        "span": {
+          "end": 6,
+          "start": 0
+        },
+        "text": "printf"
+      },
+      {
+        "expansions": [],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "\\$PATH",
+        "span": {
+          "end": 13,
+          "start": 7
+        },
+        "text": "$PATH"
+      },
+      {
+        "expansions": [
+          {
+            "kind": "Variable",
+            "span": {
+              "end": 20,
+              "start": 15
+            },
+            "text": "PATH"
+          }
+        ],
+        "kind": "Word",
+        "quote": "Double",
+        "raw": "\"$PATH\"",
+        "span": {
+          "end": 21,
+          "start": 14
+        },
+        "text": "$PATH"
       }
     ]
   },

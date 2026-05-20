@@ -345,10 +345,9 @@ pub fn tokenize(shell: &str) -> Vec<ShellToken> {
         let mut expansions = Vec::new();
 
         while index < bytes.len() {
-            let character = shell[index..]
-                .chars()
-                .next()
-                .expect("index should be on a UTF-8 boundary");
+            let Some(character) = char_at(shell, index) else {
+                break;
+            };
 
             if active_quote.is_none() && character.is_whitespace() {
                 break;
@@ -381,30 +380,19 @@ pub fn tokenize(shell: &str) -> Vec<ShellToken> {
             }
 
             if character == '\\' && active_quote != Some('\'') {
-                let escape_start = index;
                 index += character.len_utf8();
                 if index >= bytes.len() {
                     text.push('\\');
                     break;
                 }
-                let escaped = shell[index..]
-                    .chars()
-                    .next()
-                    .expect("index should be on a UTF-8 boundary");
+                let Some(escaped) = char_at(shell, index) else {
+                    text.push('\\');
+                    break;
+                };
                 text.push(escaped);
                 index += escaped.len_utf8();
                 if escaped == '\n' {
                     text.pop();
-                }
-                if escaped == '$' {
-                    expansions.push(ShellExpansion {
-                        kind: ShellExpansionKind::Variable,
-                        text: String::new(),
-                        span: ShellSpan {
-                            start: escape_start,
-                            end: index,
-                        },
-                    });
                 }
                 continue;
             }
@@ -629,6 +617,10 @@ fn read_expansion(shell: &str, start: usize) -> Option<(ShellExpansion, usize)> 
     }
 }
 
+fn char_at(shell: &str, index: usize) -> Option<char> {
+    shell.get(index..)?.chars().next()
+}
+
 fn read_braced_variable(
     shell: &str,
     start: usize,
@@ -685,17 +677,15 @@ fn read_command_substitution(
     let mut quote = None;
 
     while index < shell.len() {
-        let character = shell[index..]
-            .chars()
-            .next()
-            .expect("index should be on a UTF-8 boundary");
+        let Some(character) = char_at(shell, index) else {
+            break;
+        };
         if character == '\\' {
             index += character.len_utf8();
             if index < shell.len() {
-                let escaped = shell[index..]
-                    .chars()
-                    .next()
-                    .expect("index should be on a UTF-8 boundary");
+                let Some(escaped) = char_at(shell, index) else {
+                    break;
+                };
                 index += escaped.len_utf8();
             }
             continue;
@@ -801,6 +791,7 @@ mod tests {
             "echo $(uname -m) > /tmp/arch",
             "cat <<EOF\nhello\nEOF",
             "printf escaped\\ value",
+            "printf \\$PATH \"$PATH\"",
             "cmd 2>/tmp/error || true",
         ];
         let values = cases
