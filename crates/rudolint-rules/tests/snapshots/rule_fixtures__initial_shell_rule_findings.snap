@@ -1,6 +1,5 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
-assertion_line: 68
 expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
 ---
 [
@@ -11,12 +10,12 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "quote variable expansions to prevent word splitting and globbing",
     "path": "",
     "primary_span": {
-      "end_byte": 31,
+      "end_byte": 72,
       "end_column": 15,
-      "end_line": 2,
-      "start_byte": 17,
+      "end_line": 4,
+      "start_byte": 58,
       "start_column": 1,
-      "start_line": 2
+      "start_line": 4
     },
     "severity": "warning"
   },
@@ -27,12 +26,12 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "quote command substitutions to prevent word splitting",
     "path": "",
     "primary_span": {
-      "end_byte": 66,
+      "end_byte": 192,
       "end_column": 18,
-      "end_line": 4,
-      "start_byte": 49,
+      "end_line": 8,
+      "start_byte": 175,
       "start_column": 1,
-      "start_line": 4
+      "start_line": 8
     },
     "severity": "warning"
   },
@@ -43,12 +42,12 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "A && B || C is not a safe conditional expression",
     "path": "",
     "primary_span": {
-      "end_byte": 128,
+      "end_byte": 323,
       "end_column": 42,
-      "end_line": 6,
-      "start_byte": 87,
+      "end_line": 12,
+      "start_byte": 282,
       "start_column": 1,
-      "start_line": 6
+      "start_line": 12
     },
     "severity": "warning"
   },
@@ -59,12 +58,12 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "declare and assign separately to avoid masking command failures",
     "path": "",
     "primary_span": {
-      "end_byte": 240,
+      "end_byte": 577,
       "end_column": 31,
-      "end_line": 9,
-      "start_byte": 210,
+      "end_line": 18,
+      "start_byte": 547,
       "start_column": 1,
-      "start_line": 9
+      "start_line": 18
     },
     "severity": "warning"
   },
@@ -75,12 +74,12 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "check cd exit status before running more commands",
     "path": "",
     "primary_span": {
-      "end_byte": 291,
+      "end_byte": 712,
       "end_column": 18,
-      "end_line": 11,
-      "start_byte": 274,
+      "end_line": 22,
+      "start_byte": 695,
       "start_column": 1,
-      "start_line": 11
+      "start_line": 22
     },
     "severity": "warning"
   }

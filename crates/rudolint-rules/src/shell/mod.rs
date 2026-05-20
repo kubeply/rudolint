@@ -360,12 +360,13 @@ fn has_and_or_chain(program: &ShellProgram) -> bool {
 }
 
 fn following_separator_is(program: &ShellProgram, start: usize, expected: &str) -> bool {
-    program
-        .tokens
-        .iter()
-        .skip(start + 1)
-        .take_while(|token| !(token.kind == ShellTokenKind::Separator && token.raw == ";"))
-        .any(|token| token.kind == ShellTokenKind::Separator && token.raw == expected)
+    for token in program.tokens.iter().skip(start + 1) {
+        if token.kind == ShellTokenKind::Separator {
+            return token.raw == expected;
+        }
+    }
+
+    false
 }
 
 fn invocation_declares_assignment_with_command_substitution(
