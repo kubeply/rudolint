@@ -4,8 +4,25 @@ on:
   push:
     branches:
       - main
+    paths:
+      - ".github/workflows/codspeed.yml"
+      - "Cargo.lock"
+      - "Cargo.toml"
+      - "crates/rudolint-bench/**"
+      - "crates/rudolint-dockerfile/**"
+      - "crates/rudolint-source/**"
+      - "fixtures/corpus/**"
+      - "fixtures/parser/**"
   pull_request:
-  merge_group:
+    paths:
+      - ".github/workflows/codspeed.yml"
+      - "Cargo.lock"
+      - "Cargo.toml"
+      - "crates/rudolint-bench/**"
+      - "crates/rudolint-dockerfile/**"
+      - "crates/rudolint-source/**"
+      - "fixtures/corpus/**"
+      - "fixtures/parser/**"
   workflow_dispatch:
 
 permissions:
