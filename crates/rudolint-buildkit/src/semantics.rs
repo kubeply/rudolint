@@ -838,87 +838,87 @@ mod tests {
         let secret_targets = vec!["/run/secrets/api_token".to_string()];
 
         assert!(invocation_copies_secret(
-            &ShellCommandInvocation {
-                command: "install".to_string(),
-                arguments: vec![
+            &test_invocation(
+                "install",
+                [
                     "-m".to_string(),
                     "0600".to_string(),
                     "/run/secrets/api_token".to_string(),
                     "/app/token".to_string(),
                 ],
-            },
+            ),
             &secret_targets,
         ));
         assert!(invocation_copies_secret(
-            &ShellCommandInvocation {
-                command: "cp".to_string(),
-                arguments: vec![
+            &test_invocation(
+                "cp",
+                [
                     "-t".to_string(),
                     "/app".to_string(),
                     "/run/secrets/api_token".to_string(),
                 ],
-            },
+            ),
             &secret_targets,
         ));
         assert!(!invocation_copies_secret(
-            &ShellCommandInvocation {
-                command: "cp".to_string(),
-                arguments: vec!["/run/secrets".to_string(), "/app/secrets".to_string()],
-            },
+            &test_invocation(
+                "cp",
+                ["/run/secrets".to_string(), "/app/secrets".to_string()],
+            ),
             &secret_targets,
         ));
         assert!(!invocation_copies_secret(
-            &ShellCommandInvocation {
-                command: "cp".to_string(),
-                arguments: vec![
+            &test_invocation(
+                "cp",
+                [
                     "-t/var".to_string(),
                     "/run/secrets".to_string(),
                     "/app/secrets".to_string(),
                 ],
-            },
+            ),
             &secret_targets,
         ));
         assert!(!invocation_copies_secret(
-            &ShellCommandInvocation {
-                command: "rsync".to_string(),
-                arguments: vec![
+            &test_invocation(
+                "rsync",
+                [
                     "-R".to_string(),
                     "/run/secrets".to_string(),
                     "/app/secrets".to_string(),
                 ],
-            },
+            ),
             &secret_targets,
         ));
         assert!(!invocation_copies_secret(
-            &ShellCommandInvocation {
-                command: "install".to_string(),
-                arguments: vec![
+            &test_invocation(
+                "install",
+                [
                     "-d".to_string(),
                     "/run/secrets".to_string(),
                     "/app/secrets".to_string(),
                 ],
-            },
+            ),
             &secret_targets,
         ));
         assert!(!invocation_copies_secret(
-            &ShellCommandInvocation {
-                command: "cp".to_string(),
-                arguments: vec![
+            &test_invocation(
+                "cp",
+                [
                     "/tmp/source".to_string(),
                     "/run/secrets/api_token".to_string(),
                 ],
-            },
+            ),
             &secret_targets,
         ));
         assert!(invocation_copies_secret(
-            &ShellCommandInvocation {
-                command: "cp".to_string(),
-                arguments: vec![
+            &test_invocation(
+                "cp",
+                [
                     "-r".to_string(),
                     "/run/secrets".to_string(),
                     "/app/secrets".to_string(),
                 ],
-            },
+            ),
             &secret_targets,
         ));
         assert!(path_is_at_or_under(
@@ -1051,5 +1051,22 @@ mod tests {
         assert!(!chmod_value_is_symbolic("0755"));
         assert!(chmod_value_is_symbolic("+x"));
         assert!(chmod_value_is_symbolic("u=rwX,go=rX"));
+    }
+
+    fn test_invocation<const N: usize>(
+        command: &str,
+        arguments: [String; N],
+    ) -> ShellCommandInvocation {
+        ShellCommandInvocation {
+            command: command.to_string(),
+            command_word: command.to_string(),
+            command_span: rudolint_shell::ShellSpan {
+                start: 0,
+                end: command.len(),
+            },
+            arguments: arguments.into(),
+            argument_facts: Vec::new(),
+            env: Vec::new(),
+        }
     }
 }

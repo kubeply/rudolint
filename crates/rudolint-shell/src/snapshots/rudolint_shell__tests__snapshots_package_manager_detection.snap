@@ -1,27 +1,308 @@
 ---
 source: crates/rudolint-shell/src/lib.rs
+assertion_line: 895
 expression: values
 ---
 [
   {
+    "invocations": [
+      {
+        "command": {
+          "argument_facts": [
+            {
+              "quote": "None",
+              "raw": "update",
+              "span": {
+                "end": 14,
+                "start": 8
+              },
+              "text": "update"
+            }
+          ],
+          "arguments": [
+            "update"
+          ],
+          "command": "apt-get",
+          "command_span": {
+            "end": 7,
+            "start": 0
+          },
+          "command_word": "apt-get",
+          "env": []
+        },
+        "manager": "apt-get"
+      },
+      {
+        "command": {
+          "argument_facts": [
+            {
+              "quote": "None",
+              "raw": "install",
+              "span": {
+                "end": 33,
+                "start": 26
+              },
+              "text": "install"
+            },
+            {
+              "quote": "None",
+              "raw": "-y",
+              "span": {
+                "end": 36,
+                "start": 34
+              },
+              "text": "-y"
+            },
+            {
+              "quote": "None",
+              "raw": "curl",
+              "span": {
+                "end": 41,
+                "start": 37
+              },
+              "text": "curl"
+            }
+          ],
+          "arguments": [
+            "install",
+            "-y",
+            "curl"
+          ],
+          "command": "apt-get",
+          "command_span": {
+            "end": 25,
+            "start": 18
+          },
+          "command_word": "apt-get",
+          "env": []
+        },
+        "manager": "apt-get"
+      }
+    ],
     "package_managers": [
       "apt-get"
     ],
     "shell": "apt-get update && apt-get install -y curl"
   },
   {
+    "invocations": [
+      {
+        "command": {
+          "argument_facts": [
+            {
+              "quote": "None",
+              "raw": "update",
+              "span": {
+                "end": 10,
+                "start": 4
+              },
+              "text": "update"
+            }
+          ],
+          "arguments": [
+            "update"
+          ],
+          "command": "apt",
+          "command_span": {
+            "end": 3,
+            "start": 0
+          },
+          "command_word": "apt",
+          "env": []
+        },
+        "manager": "apt"
+      },
+      {
+        "command": {
+          "argument_facts": [
+            {
+              "quote": "None",
+              "raw": "install",
+              "span": {
+                "end": 25,
+                "start": 18
+              },
+              "text": "install"
+            },
+            {
+              "quote": "None",
+              "raw": "-y",
+              "span": {
+                "end": 28,
+                "start": 26
+              },
+              "text": "-y"
+            },
+            {
+              "quote": "None",
+              "raw": "curl",
+              "span": {
+                "end": 33,
+                "start": 29
+              },
+              "text": "curl"
+            }
+          ],
+          "arguments": [
+            "install",
+            "-y",
+            "curl"
+          ],
+          "command": "apt",
+          "command_span": {
+            "end": 17,
+            "start": 14
+          },
+          "command_word": "apt",
+          "env": []
+        },
+        "manager": "apt"
+      }
+    ],
     "package_managers": [
       "apt"
     ],
     "shell": "apt update && apt install -y curl"
   },
   {
+    "invocations": [
+      {
+        "command": {
+          "argument_facts": [
+            {
+              "quote": "None",
+              "raw": "add",
+              "span": {
+                "end": 7,
+                "start": 4
+              },
+              "text": "add"
+            },
+            {
+              "quote": "None",
+              "raw": "--no-cache",
+              "span": {
+                "end": 18,
+                "start": 8
+              },
+              "text": "--no-cache"
+            },
+            {
+              "quote": "None",
+              "raw": "git",
+              "span": {
+                "end": 22,
+                "start": 19
+              },
+              "text": "git"
+            }
+          ],
+          "arguments": [
+            "add",
+            "--no-cache",
+            "git"
+          ],
+          "command": "apk",
+          "command_span": {
+            "end": 3,
+            "start": 0
+          },
+          "command_word": "apk",
+          "env": []
+        },
+        "manager": "apk"
+      }
+    ],
     "package_managers": [
       "apk"
     ],
     "shell": "apk add --no-cache git"
   },
   {
+    "invocations": [
+      {
+        "command": {
+          "argument_facts": [
+            {
+              "quote": "None",
+              "raw": "install",
+              "span": {
+                "end": 11,
+                "start": 4
+              },
+              "text": "install"
+            },
+            {
+              "quote": "None",
+              "raw": "-y",
+              "span": {
+                "end": 14,
+                "start": 12
+              },
+              "text": "-y"
+            },
+            {
+              "quote": "None",
+              "raw": "gcc",
+              "span": {
+                "end": 18,
+                "start": 15
+              },
+              "text": "gcc"
+            }
+          ],
+          "arguments": [
+            "install",
+            "-y",
+            "gcc"
+          ],
+          "command": "dnf",
+          "command_span": {
+            "end": 3,
+            "start": 0
+          },
+          "command_word": "dnf",
+          "env": []
+        },
+        "manager": "dnf"
+      },
+      {
+        "command": {
+          "argument_facts": [
+            {
+              "quote": "None",
+              "raw": "install",
+              "span": {
+                "end": 33,
+                "start": 26
+              },
+              "text": "install"
+            },
+            {
+              "quote": "None",
+              "raw": "maturin",
+              "span": {
+                "end": 41,
+                "start": 34
+              },
+              "text": "maturin"
+            }
+          ],
+          "arguments": [
+            "install",
+            "maturin"
+          ],
+          "command": "pip",
+          "command_span": {
+            "end": 25,
+            "start": 22
+          },
+          "command_word": "pip",
+          "env": []
+        },
+        "manager": "pip"
+      }
+    ],
     "package_managers": [
       "dnf",
       "pip"
@@ -29,12 +310,140 @@ expression: values
     "shell": "dnf install -y gcc && pip install maturin"
   },
   {
+    "invocations": [
+      {
+        "command": {
+          "argument_facts": [
+            {
+              "quote": "None",
+              "raw": "install",
+              "span": {
+                "end": 12,
+                "start": 5
+              },
+              "text": "install"
+            },
+            {
+              "quote": "None",
+              "raw": "-r",
+              "span": {
+                "end": 15,
+                "start": 13
+              },
+              "text": "-r"
+            },
+            {
+              "quote": "None",
+              "raw": "requirements.txt",
+              "span": {
+                "end": 32,
+                "start": 16
+              },
+              "text": "requirements.txt"
+            }
+          ],
+          "arguments": [
+            "install",
+            "-r",
+            "requirements.txt"
+          ],
+          "command": "pip3",
+          "command_span": {
+            "end": 4,
+            "start": 0
+          },
+          "command_word": "pip3",
+          "env": []
+        },
+        "manager": "pip"
+      }
+    ],
     "package_managers": [
       "pip"
     ],
     "shell": "pip3 install -r requirements.txt"
   },
   {
+    "invocations": [
+      {
+        "command": {
+          "argument_facts": [
+            {
+              "quote": "None",
+              "raw": "ci",
+              "span": {
+                "end": 6,
+                "start": 4
+              },
+              "text": "ci"
+            }
+          ],
+          "arguments": [
+            "ci"
+          ],
+          "command": "npm",
+          "command_span": {
+            "end": 3,
+            "start": 0
+          },
+          "command_word": "npm",
+          "env": []
+        },
+        "manager": "npm"
+      },
+      {
+        "command": {
+          "argument_facts": [
+            {
+              "quote": "None",
+              "raw": "install",
+              "span": {
+                "end": 22,
+                "start": 15
+              },
+              "text": "install"
+            }
+          ],
+          "arguments": [
+            "install"
+          ],
+          "command": "pnpm",
+          "command_span": {
+            "end": 14,
+            "start": 10
+          },
+          "command_word": "pnpm",
+          "env": []
+        },
+        "manager": "pnpm"
+      },
+      {
+        "command": {
+          "argument_facts": [
+            {
+              "quote": "None",
+              "raw": "install",
+              "span": {
+                "end": 38,
+                "start": 31
+              },
+              "text": "install"
+            }
+          ],
+          "arguments": [
+            "install"
+          ],
+          "command": "yarn",
+          "command_span": {
+            "end": 30,
+            "start": 26
+          },
+          "command_word": "yarn",
+          "env": []
+        },
+        "manager": "yarn"
+      }
+    ],
     "package_managers": [
       "npm",
       "pnpm",
@@ -43,6 +452,80 @@ expression: values
     "shell": "npm ci && pnpm install && yarn install"
   },
   {
+    "invocations": [
+      {
+        "command": {
+          "argument_facts": [
+            {
+              "quote": "None",
+              "raw": "install",
+              "span": {
+                "end": 13,
+                "start": 6
+              },
+              "text": "install"
+            },
+            {
+              "quote": "None",
+              "raw": "cargo-deny",
+              "span": {
+                "end": 24,
+                "start": 14
+              },
+              "text": "cargo-deny"
+            }
+          ],
+          "arguments": [
+            "install",
+            "cargo-deny"
+          ],
+          "command": "cargo",
+          "command_span": {
+            "end": 5,
+            "start": 0
+          },
+          "command_word": "cargo",
+          "env": []
+        },
+        "manager": "cargo"
+      },
+      {
+        "command": {
+          "argument_facts": [
+            {
+              "quote": "None",
+              "raw": "install",
+              "span": {
+                "end": 38,
+                "start": 31
+              },
+              "text": "install"
+            },
+            {
+              "quote": "None",
+              "raw": "example.com/tool@latest",
+              "span": {
+                "end": 62,
+                "start": 39
+              },
+              "text": "example.com/tool@latest"
+            }
+          ],
+          "arguments": [
+            "install",
+            "example.com/tool@latest"
+          ],
+          "command": "go",
+          "command_span": {
+            "end": 30,
+            "start": 28
+          },
+          "command_word": "go",
+          "env": []
+        },
+        "manager": "go"
+      }
+    ],
     "package_managers": [
       "cargo",
       "go"
@@ -50,6 +533,80 @@ expression: values
     "shell": "cargo install cargo-deny && go install example.com/tool@latest"
   },
   {
+    "invocations": [
+      {
+        "command": {
+          "argument_facts": [
+            {
+              "quote": "None",
+              "raw": "install",
+              "span": {
+                "end": 16,
+                "start": 9
+              },
+              "text": "install"
+            },
+            {
+              "quote": "None",
+              "raw": "shadow-utils",
+              "span": {
+                "end": 29,
+                "start": 17
+              },
+              "text": "shadow-utils"
+            }
+          ],
+          "arguments": [
+            "install",
+            "shadow-utils"
+          ],
+          "command": "microdnf",
+          "command_span": {
+            "end": 8,
+            "start": 0
+          },
+          "command_word": "microdnf",
+          "env": []
+        },
+        "manager": "microdnf"
+      },
+      {
+        "command": {
+          "argument_facts": [
+            {
+              "quote": "None",
+              "raw": "install",
+              "span": {
+                "end": 44,
+                "start": 37
+              },
+              "text": "install"
+            },
+            {
+              "quote": "None",
+              "raw": "shadow-utils",
+              "span": {
+                "end": 57,
+                "start": 45
+              },
+              "text": "shadow-utils"
+            }
+          ],
+          "arguments": [
+            "install",
+            "shadow-utils"
+          ],
+          "command": "yum",
+          "command_span": {
+            "end": 36,
+            "start": 33
+          },
+          "command_word": "yum",
+          "env": []
+        },
+        "manager": "yum"
+      }
+    ],
     "package_managers": [
       "microdnf",
       "yum"
@@ -57,9 +614,42 @@ expression: values
     "shell": "microdnf install shadow-utils || yum install shadow-utils"
   },
   {
+    "invocations": [
+      {
+        "command": {
+          "argument_facts": [
+            {
+              "quote": "None",
+              "raw": "update",
+              "span": {
+                "end": 15,
+                "start": 9
+              },
+              "text": "update"
+            }
+          ],
+          "arguments": [
+            "update"
+          ],
+          "command": "apt-get",
+          "command_span": {
+            "end": 8,
+            "start": 1
+          },
+          "command_word": "apt-get",
+          "env": []
+        },
+        "manager": "apt-get"
+      }
+    ],
     "package_managers": [
       "apt-get"
     ],
     "shell": "(apt-get update)"
+  },
+  {
+    "invocations": [],
+    "package_managers": [],
+    "shell": "printf '%s' apt-get"
   }
 ]

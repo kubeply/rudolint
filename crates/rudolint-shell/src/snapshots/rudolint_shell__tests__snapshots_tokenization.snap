@@ -1,0 +1,399 @@
+---
+source: crates/rudolint-shell/src/lib.rs
+assertion_line: 828
+expression: values
+---
+[
+  {
+    "shell": "apt-get update && apt-get install -y curl",
+    "tokens": [
+      {
+        "expansions": [],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "apt-get",
+        "span": {
+          "end": 7,
+          "start": 0
+        },
+        "text": "apt-get"
+      },
+      {
+        "expansions": [],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "update",
+        "span": {
+          "end": 14,
+          "start": 8
+        },
+        "text": "update"
+      },
+      {
+        "expansions": [],
+        "kind": "Separator",
+        "quote": "None",
+        "raw": "&&",
+        "span": {
+          "end": 17,
+          "start": 15
+        },
+        "text": "&&"
+      },
+      {
+        "expansions": [],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "apt-get",
+        "span": {
+          "end": 25,
+          "start": 18
+        },
+        "text": "apt-get"
+      },
+      {
+        "expansions": [],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "install",
+        "span": {
+          "end": 33,
+          "start": 26
+        },
+        "text": "install"
+      },
+      {
+        "expansions": [],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "-y",
+        "span": {
+          "end": 36,
+          "start": 34
+        },
+        "text": "-y"
+      },
+      {
+        "expansions": [],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "curl",
+        "span": {
+          "end": 41,
+          "start": 37
+        },
+        "text": "curl"
+      }
+    ]
+  },
+  {
+    "shell": "printf '%s' \"$TARGETARCH\"",
+    "tokens": [
+      {
+        "expansions": [],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "printf",
+        "span": {
+          "end": 6,
+          "start": 0
+        },
+        "text": "printf"
+      },
+      {
+        "expansions": [],
+        "kind": "Word",
+        "quote": "Single",
+        "raw": "'%s'",
+        "span": {
+          "end": 11,
+          "start": 7
+        },
+        "text": "%s"
+      },
+      {
+        "expansions": [
+          {
+            "kind": "Variable",
+            "span": {
+              "end": 24,
+              "start": 13
+            },
+            "text": "TARGETARCH"
+          }
+        ],
+        "kind": "Word",
+        "quote": "Double",
+        "raw": "\"$TARGETARCH\"",
+        "span": {
+          "end": 25,
+          "start": 12
+        },
+        "text": "$TARGETARCH"
+      }
+    ]
+  },
+  {
+    "shell": "FOO=bar PATH=/usr/bin:$PATH make build",
+    "tokens": [
+      {
+        "expansions": [],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "FOO=bar",
+        "span": {
+          "end": 7,
+          "start": 0
+        },
+        "text": "FOO=bar"
+      },
+      {
+        "expansions": [
+          {
+            "kind": "Variable",
+            "span": {
+              "end": 27,
+              "start": 22
+            },
+            "text": "PATH"
+          }
+        ],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "PATH=/usr/bin:$PATH",
+        "span": {
+          "end": 27,
+          "start": 8
+        },
+        "text": "PATH=/usr/bin:$PATH"
+      },
+      {
+        "expansions": [],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "make",
+        "span": {
+          "end": 32,
+          "start": 28
+        },
+        "text": "make"
+      },
+      {
+        "expansions": [],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "build",
+        "span": {
+          "end": 38,
+          "start": 33
+        },
+        "text": "build"
+      }
+    ]
+  },
+  {
+    "shell": "echo $(uname -m) > /tmp/arch",
+    "tokens": [
+      {
+        "expansions": [],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "echo",
+        "span": {
+          "end": 4,
+          "start": 0
+        },
+        "text": "echo"
+      },
+      {
+        "expansions": [
+          {
+            "kind": "Command",
+            "span": {
+              "end": 16,
+              "start": 5
+            },
+            "text": "uname -m"
+          }
+        ],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "$(uname -m)",
+        "span": {
+          "end": 16,
+          "start": 5
+        },
+        "text": "$(uname -m)"
+      },
+      {
+        "expansions": [],
+        "kind": "Redirection",
+        "quote": "None",
+        "raw": ">",
+        "span": {
+          "end": 18,
+          "start": 17
+        },
+        "text": ">"
+      },
+      {
+        "expansions": [],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "/tmp/arch",
+        "span": {
+          "end": 28,
+          "start": 19
+        },
+        "text": "/tmp/arch"
+      }
+    ]
+  },
+  {
+    "shell": "cat <<EOF\nhello\nEOF",
+    "tokens": [
+      {
+        "expansions": [],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "cat",
+        "span": {
+          "end": 3,
+          "start": 0
+        },
+        "text": "cat"
+      },
+      {
+        "expansions": [],
+        "kind": "Redirection",
+        "quote": "None",
+        "raw": "<<",
+        "span": {
+          "end": 6,
+          "start": 4
+        },
+        "text": "<<"
+      },
+      {
+        "expansions": [],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "EOF",
+        "span": {
+          "end": 9,
+          "start": 6
+        },
+        "text": "EOF"
+      },
+      {
+        "expansions": [],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "hello",
+        "span": {
+          "end": 15,
+          "start": 10
+        },
+        "text": "hello"
+      },
+      {
+        "expansions": [],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "EOF",
+        "span": {
+          "end": 19,
+          "start": 16
+        },
+        "text": "EOF"
+      }
+    ]
+  },
+  {
+    "shell": "printf escaped\\ value",
+    "tokens": [
+      {
+        "expansions": [],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "printf",
+        "span": {
+          "end": 6,
+          "start": 0
+        },
+        "text": "printf"
+      },
+      {
+        "expansions": [],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "escaped\\ value",
+        "span": {
+          "end": 21,
+          "start": 7
+        },
+        "text": "escaped value"
+      }
+    ]
+  },
+  {
+    "shell": "cmd 2>/tmp/error || true",
+    "tokens": [
+      {
+        "expansions": [],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "cmd",
+        "span": {
+          "end": 3,
+          "start": 0
+        },
+        "text": "cmd"
+      },
+      {
+        "expansions": [],
+        "kind": "Redirection",
+        "quote": "None",
+        "raw": "2>",
+        "span": {
+          "end": 6,
+          "start": 4
+        },
+        "text": "2>"
+      },
+      {
+        "expansions": [],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "/tmp/error",
+        "span": {
+          "end": 16,
+          "start": 6
+        },
+        "text": "/tmp/error"
+      },
+      {
+        "expansions": [],
+        "kind": "Separator",
+        "quote": "None",
+        "raw": "||",
+        "span": {
+          "end": 19,
+          "start": 17
+        },
+        "text": "||"
+      },
+      {
+        "expansions": [],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "true",
+        "span": {
+          "end": 24,
+          "start": 20
+        },
+        "text": "true"
+      }
+    ]
+  }
+]

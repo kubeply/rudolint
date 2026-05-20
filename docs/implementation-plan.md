@@ -611,19 +611,19 @@ Acceptance criteria:
 Goal: add useful `RUN` diagnostics without creating noisy substring-based
 false positives.
 
-1. Add native shell tokenization in `rudolint-shell`.
-2. Track token spans back to Dockerfile source spans.
-3. Recognize single-quoted and double-quoted strings.
-4. Recognize escapes.
-5. Recognize variable expansions.
-6. Recognize environment assignments.
-7. Recognize simple commands.
-8. Recognize pipelines.
-9. Recognize command chains with `&&` and `||`.
-10. Recognize redirections.
-11. Recognize command substitutions.
-12. Build package-manager command facts on top of shell tokens.
-13. Add shell fixture snapshots.
+1. [x] Add native shell tokenization in `rudolint-shell`.
+2. [x] Track token spans back to Dockerfile source spans.
+3. [x] Recognize single-quoted and double-quoted strings.
+4. [x] Recognize escapes.
+5. [x] Recognize variable expansions.
+6. [x] Recognize environment assignments.
+7. [x] Recognize simple commands.
+8. [x] Recognize pipelines.
+9. [x] Recognize command chains with `&&` and `||`.
+10. [x] Recognize redirections.
+11. [x] Recognize command substitutions.
+12. [x] Build package-manager command facts on top of shell tokens.
+13. [x] Add shell fixture snapshots.
 14. Implement `RSC2086` after quoting facts are reliable.
 15. Implement `RSC2046` after command substitution facts are reliable.
 16. Implement `RSC2015` after command-chain facts are reliable.

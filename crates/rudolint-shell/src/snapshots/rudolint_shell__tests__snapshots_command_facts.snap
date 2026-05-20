@@ -1,0 +1,397 @@
+---
+source: crates/rudolint-shell/src/lib.rs
+assertion_line: 856
+expression: values
+---
+[
+  {
+    "commands": [
+      {
+        "argument_facts": [
+          {
+            "quote": "None",
+            "raw": "/tmp",
+            "span": {
+              "end": 7,
+              "start": 3
+            },
+            "text": "/tmp"
+          }
+        ],
+        "arguments": [
+          "/tmp"
+        ],
+        "command": "cd",
+        "command_span": {
+          "end": 2,
+          "start": 0
+        },
+        "command_word": "cd",
+        "env": []
+      },
+      {
+        "argument_facts": [],
+        "arguments": [],
+        "command": "make",
+        "command_span": {
+          "end": 15,
+          "start": 11
+        },
+        "command_word": "make",
+        "env": []
+      }
+    ],
+    "shell": "cd /tmp && make"
+  },
+  {
+    "commands": [
+      {
+        "argument_facts": [
+          {
+            "quote": "None",
+            "raw": "add",
+            "span": {
+              "end": 7,
+              "start": 4
+            },
+            "text": "add"
+          },
+          {
+            "quote": "None",
+            "raw": "vim",
+            "span": {
+              "end": 11,
+              "start": 8
+            },
+            "text": "vim"
+          }
+        ],
+        "arguments": [
+          "add",
+          "vim"
+        ],
+        "command": "apk",
+        "command_span": {
+          "end": 3,
+          "start": 0
+        },
+        "command_word": "apk",
+        "env": []
+      }
+    ],
+    "shell": "apk add vim"
+  },
+  {
+    "commands": [
+      {
+        "argument_facts": [
+          {
+            "quote": "None",
+            "raw": "nginx",
+            "span": {
+              "end": 30,
+              "start": 25
+            },
+            "text": "nginx"
+          },
+          {
+            "quote": "None",
+            "raw": "start",
+            "span": {
+              "end": 36,
+              "start": 31
+            },
+            "text": "start"
+          }
+        ],
+        "arguments": [
+          "nginx",
+          "start"
+        ],
+        "command": "service",
+        "command_span": {
+          "end": 24,
+          "start": 8
+        },
+        "command_word": "/usr/bin/service",
+        "env": [
+          {
+            "name": "FOO",
+            "span": {
+              "end": 7,
+              "start": 0
+            },
+            "value": "bar"
+          }
+        ]
+      }
+    ],
+    "shell": "FOO=bar /usr/bin/service nginx start"
+  },
+  {
+    "commands": [
+      {
+        "argument_facts": [
+          {
+            "quote": "Single",
+            "raw": "'%s'",
+            "span": {
+              "end": 11,
+              "start": 7
+            },
+            "text": "%s"
+          },
+          {
+            "quote": "None",
+            "raw": "cd",
+            "span": {
+              "end": 14,
+              "start": 12
+            },
+            "text": "cd"
+          }
+        ],
+        "arguments": [
+          "%s",
+          "cd"
+        ],
+        "command": "printf",
+        "command_span": {
+          "end": 6,
+          "start": 0
+        },
+        "command_word": "printf",
+        "env": []
+      }
+    ],
+    "shell": "printf '%s' cd"
+  },
+  {
+    "commands": [
+      {
+        "argument_facts": [
+          {
+            "quote": "None",
+            "raw": "-t",
+            "span": {
+              "end": 8,
+              "start": 6
+            },
+            "text": "-t"
+          },
+          {
+            "quote": "None",
+            "raw": "proc",
+            "span": {
+              "end": 13,
+              "start": 9
+            },
+            "text": "proc"
+          },
+          {
+            "quote": "None",
+            "raw": "proc",
+            "span": {
+              "end": 18,
+              "start": 14
+            },
+            "text": "proc"
+          },
+          {
+            "quote": "None",
+            "raw": "/proc",
+            "span": {
+              "end": 24,
+              "start": 19
+            },
+            "text": "/proc"
+          }
+        ],
+        "arguments": [
+          "-t",
+          "proc",
+          "proc",
+          "/proc"
+        ],
+        "command": "mount",
+        "command_span": {
+          "end": 5,
+          "start": 0
+        },
+        "command_word": "mount",
+        "env": []
+      },
+      {
+        "argument_facts": [],
+        "arguments": [],
+        "command": "ifconfig",
+        "command_span": {
+          "end": 34,
+          "start": 26
+        },
+        "command_word": "ifconfig",
+        "env": []
+      }
+    ],
+    "shell": "mount -t proc proc /proc; ifconfig"
+  },
+  {
+    "commands": [
+      {
+        "argument_facts": [
+          {
+            "quote": "None",
+            "raw": "-t",
+            "span": {
+              "end": 8,
+              "start": 6
+            },
+            "text": "-t"
+          },
+          {
+            "quote": "None",
+            "raw": "proc",
+            "span": {
+              "end": 13,
+              "start": 9
+            },
+            "text": "proc"
+          },
+          {
+            "quote": "None",
+            "raw": "proc",
+            "span": {
+              "end": 18,
+              "start": 14
+            },
+            "text": "proc"
+          },
+          {
+            "quote": "None",
+            "raw": "/proc",
+            "span": {
+              "end": 24,
+              "start": 19
+            },
+            "text": "/proc"
+          }
+        ],
+        "arguments": [
+          "-t",
+          "proc",
+          "proc",
+          "/proc"
+        ],
+        "command": "mount",
+        "command_span": {
+          "end": 5,
+          "start": 0
+        },
+        "command_word": "mount",
+        "env": []
+      },
+      {
+        "argument_facts": [],
+        "arguments": [],
+        "command": "ifconfig",
+        "command_span": {
+          "end": 33,
+          "start": 25
+        },
+        "command_word": "ifconfig",
+        "env": []
+      }
+    ],
+    "shell": "mount -t proc proc /proc;ifconfig"
+  },
+  {
+    "commands": [
+      {
+        "argument_facts": [
+          {
+            "quote": "None",
+            "raw": "$(uname -m)",
+            "span": {
+              "end": 16,
+              "start": 5
+            },
+            "text": "$(uname -m)"
+          }
+        ],
+        "arguments": [
+          "$(uname -m)"
+        ],
+        "command": "echo",
+        "command_span": {
+          "end": 4,
+          "start": 0
+        },
+        "command_word": "echo",
+        "env": []
+      },
+      {
+        "argument_facts": [
+          {
+            "quote": "None",
+            "raw": "/tmp/arch",
+            "span": {
+              "end": 32,
+              "start": 23
+            },
+            "text": "/tmp/arch"
+          }
+        ],
+        "arguments": [
+          "/tmp/arch"
+        ],
+        "command": "tee",
+        "command_span": {
+          "end": 22,
+          "start": 19
+        },
+        "command_word": "tee",
+        "env": []
+      }
+    ],
+    "shell": "echo $(uname -m) | tee /tmp/arch"
+  },
+  {
+    "commands": [
+      {
+        "argument_facts": [],
+        "arguments": [],
+        "command": "cat",
+        "command_span": {
+          "end": 3,
+          "start": 0
+        },
+        "command_word": "cat",
+        "env": []
+      },
+      {
+        "argument_facts": [
+          {
+            "quote": "None",
+            "raw": "input.txt",
+            "span": {
+              "end": 44,
+              "start": 35
+            },
+            "text": "input.txt"
+          }
+        ],
+        "arguments": [
+          "input.txt"
+        ],
+        "command": "rm",
+        "command_span": {
+          "end": 34,
+          "start": 32
+        },
+        "command_word": "rm",
+        "env": []
+      }
+    ],
+    "shell": "cat < input.txt > output.txt && rm input.txt"
+  }
+]
