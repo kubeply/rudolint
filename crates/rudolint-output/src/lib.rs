@@ -1,5 +1,7 @@
 //! Render lint findings and fix previews in user-facing output formats.
 
+use std::collections::{BTreeMap, HashSet};
+
 use anyhow::Result;
 use rudolint_diagnostics::Finding;
 use rudolint_fix::FixPreview;
@@ -12,20 +14,26 @@ pub fn human(findings: &[Finding]) -> String {
     }
 
     let mut rendered = String::new();
-    let mut current_path = None;
+    let mut grouped = BTreeMap::new();
     for finding in findings {
-        if current_path.as_ref() != Some(&finding.path) {
-            current_path = Some(finding.path.clone());
-            rendered.push_str(&format!("{}:\n", finding.path.display()));
+        grouped
+            .entry(&finding.path)
+            .or_insert_with(Vec::new)
+            .push(finding);
+    }
+
+    for (path, group) in grouped {
+        rendered.push_str(&format!("{}:\n", path.display()));
+        for finding in group {
+            rendered.push_str(&format!(
+                "  {}:{} {} {} {}\n",
+                finding.line(),
+                finding.column(),
+                finding.severity,
+                finding.code,
+                finding.message
+            ));
         }
-        rendered.push_str(&format!(
-            "  {}:{} {} {} {}\n",
-            finding.line(),
-            finding.column(),
-            finding.severity,
-            finding.code,
-            finding.message
-        ));
     }
     rendered
 }
@@ -48,14 +56,13 @@ pub fn json_with_fixes(findings: &[Finding], fixes: &[FixPreview]) -> Result<Str
 
 /// Renders findings as a SARIF 2.1.0 report.
 pub fn sarif(findings: &[Finding]) -> Result<String> {
-    let mut rule_codes = Vec::new();
+    let mut rule_codes = HashSet::with_capacity(findings.len());
     let rules = findings
         .iter()
         .filter_map(|finding| {
-            if rule_codes.iter().any(|code| code == &finding.code) {
+            if !rule_codes.insert(finding.code.as_str()) {
                 return None;
             }
-            rule_codes.push(finding.code.clone());
             Some(json!({
                 "id": finding.code,
                 "shortDescription": { "text": finding.message },
