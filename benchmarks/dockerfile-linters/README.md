@@ -62,6 +62,11 @@ images, package-manager commands, labels, ports, cache mounts, build arguments,
 and copied paths. The benchmark does not duplicate the same Dockerfile hundreds
 of times.
 
+Docker's native build checks use `docker buildx bake --check` for repository
+scenarios. The 1,000-file scenario is split into deterministic 50-target bake
+batches so the publishing runner does not ask BuildKit to solve 1,000 lint
+frontends at once.
+
 Rule coverage and diagnostic counts are not scored in these charts because each
 tool has a different rule catalog. The suite measures CLI elapsed time for the
 closest supported operation in each tool.

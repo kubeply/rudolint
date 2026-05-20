@@ -28,6 +28,7 @@ CORPUS_ROOT = TARGET_ROOT / "corpus"
 TOOLS_ROOT = TARGET_ROOT / "tools"
 RESULTS_ROOT = BENCH_ROOT / "results"
 NODE_TOOLS_ROOT = BENCH_ROOT / "node-tools"
+DOCKER_BAKE_BATCH_SIZE = 50
 
 HADOLINT_REPO = "hadolint/hadolint"
 TALLY_NPM = "tally-cli"
@@ -189,7 +190,7 @@ def generated_dockerfile(index: int) -> str:
         extra += f"\nLABEL org.opencontainers.image.title=\"{service}\""
 
     return f"""
-    # syntax=docker/dockerfile:1.7
+    # syntax=docker/dockerfile:1
     FROM {distro} AS base
     ARG SERVICE_NAME={service}
     WORKDIR /srv/${{SERVICE_NAME}}
@@ -273,6 +274,10 @@ def repo_root_for_scenario(scenario: str) -> Path:
     raise RuntimeError(f"unknown scenario: {scenario}")
 
 
+def chunks(values: list[str], size: int) -> list[list[str]]:
+    return [values[index : index + size] for index in range(0, len(values), size)]
+
+
 def command_path(tool: str) -> Path:
     manifest = read_manifest()
     path = manifest["commands"][tool]
@@ -352,16 +357,22 @@ def exec_tool(tool: str, scenario: str) -> None:
 
     if tool == "docker-build-check":
         if scenario in {"repo-100", "repo-1000"}:
-            args = [
-                str(binary),
-                "buildx",
-                "bake",
-                "--check",
-                "--progress=quiet",
-                "--file",
-                "docker-bake.hcl",
-            ]
-            run_strict(args, repo_root)
+            target_names = [path.parent.name for path in files]
+            batch_size = (
+                DOCKER_BAKE_BATCH_SIZE if scenario == "repo-1000" else len(target_names)
+            )
+            for batch in chunks(target_names, batch_size):
+                args = [
+                    str(binary),
+                    "buildx",
+                    "bake",
+                    "--check",
+                    "--progress=quiet",
+                    "--file",
+                    "docker-bake.hcl",
+                    *batch,
+                ]
+                run_strict(args, repo_root)
             return
         for path in files:
             args = [
