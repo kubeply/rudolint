@@ -364,6 +364,7 @@ fn following_separator_is(program: &ShellProgram, start: usize, expected: &str) 
         .tokens
         .iter()
         .skip(start + 1)
+        .take_while(|token| !(token.kind == ShellTokenKind::Separator && token.raw == ";"))
         .any(|token| token.kind == ShellTokenKind::Separator && token.raw == expected)
 }
 
