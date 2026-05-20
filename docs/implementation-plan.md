@@ -629,10 +629,12 @@ false positives.
 16. [x] Implement `RSC2015` after command-chain facts are reliable.
 17. [x] Implement `RSC2164` after `cd` command facts are reliable.
 18. [x] Implement `RSC2155` after assignment facts are reliable.
-19. [x] Add a low-risk tracked `RSC` follow-up batch (`RSC2002`, `RSC2181`)
+19. [x] Add the low-risk tracked `RSC` follow-up batch (`RSC2002`, `RSC2181`)
     after fixture coverage shows low false-positive risk.
-20. Add additional tracked `RSC` rules iteratively only when fixture coverage
-    shows low false-positive risk.
+
+Additional tracked `RSC` IDs remain in `docs/rule-roadmap.md` and should move
+into future implementation milestones only when fixture coverage demonstrates
+low false-positive risk.
 
 Acceptance criteria:
 
