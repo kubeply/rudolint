@@ -27,10 +27,11 @@ pub(crate) fn catalog(profile: PolicyProfile) -> Vec<RuleInfo> {
     }
 
     if profile.includes_shell_catalog() {
+        rules.extend(shell::implemented_catalog());
         rules.extend(
-            shell::catalog()
+            shell::planned_catalog()
                 .into_iter()
-                .map(RuleMetadata::external_shell)
+                .map(RuleMetadata::planned_shell)
                 .map(RuleInfo::from_metadata),
         );
     }

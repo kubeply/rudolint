@@ -624,11 +624,11 @@ false positives.
 11. [x] Recognize command substitutions.
 12. [x] Build package-manager command facts on top of shell tokens.
 13. [x] Add shell fixture snapshots.
-14. Implement `RSC2086` after quoting facts are reliable.
-15. Implement `RSC2046` after command substitution facts are reliable.
-16. Implement `RSC2015` after command-chain facts are reliable.
-17. Implement `RSC2164` after `cd` command facts are reliable.
-18. Implement `RSC2155` after assignment facts are reliable.
+14. [x] Implement `RSC2086` after quoting facts are reliable.
+15. [x] Implement `RSC2046` after command substitution facts are reliable.
+16. [x] Implement `RSC2015` after command-chain facts are reliable.
+17. [x] Implement `RSC2164` after `cd` command facts are reliable.
+18. [x] Implement `RSC2155` after assignment facts are reliable.
 19. Add remaining tracked `RSC` rules only when fixture coverage shows low
     false-positive risk.
 

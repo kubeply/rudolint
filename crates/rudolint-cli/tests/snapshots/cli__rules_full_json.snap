@@ -1,6 +1,6 @@
 ---
 source: crates/rudolint-cli/tests/cli.rs
-assertion_line: 634
+assertion_line: 693
 expression: normalized_json(&output)
 ---
 [
@@ -475,169 +475,169 @@ expression: normalized_json(&output)
   {
     "code": "RSC1000",
     "severity": "warning",
-    "status": "external",
-    "summary": "shell diagnostics delegated to the shell-analysis layer"
+    "status": "planned",
+    "summary": "tracked for shell-analysis coverage"
   },
   {
     "code": "RSC1001",
     "severity": "warning",
-    "status": "external",
-    "summary": "shell diagnostics delegated to the shell-analysis layer"
+    "status": "planned",
+    "summary": "tracked for shell-analysis coverage"
   },
   {
     "code": "RSC1007",
     "severity": "warning",
-    "status": "external",
-    "summary": "shell diagnostics delegated to the shell-analysis layer"
+    "status": "planned",
+    "summary": "tracked for shell-analysis coverage"
   },
   {
     "code": "RSC1010",
     "severity": "warning",
-    "status": "external",
-    "summary": "shell diagnostics delegated to the shell-analysis layer"
+    "status": "planned",
+    "summary": "tracked for shell-analysis coverage"
   },
   {
     "code": "RSC1018",
     "severity": "warning",
-    "status": "external",
-    "summary": "shell diagnostics delegated to the shell-analysis layer"
+    "status": "planned",
+    "summary": "tracked for shell-analysis coverage"
   },
   {
     "code": "RSC1035",
     "severity": "warning",
-    "status": "external",
-    "summary": "shell diagnostics delegated to the shell-analysis layer"
+    "status": "planned",
+    "summary": "tracked for shell-analysis coverage"
   },
   {
     "code": "RSC1045",
     "severity": "warning",
-    "status": "external",
-    "summary": "shell diagnostics delegated to the shell-analysis layer"
+    "status": "planned",
+    "summary": "tracked for shell-analysis coverage"
   },
   {
     "code": "RSC1065",
     "severity": "warning",
-    "status": "external",
-    "summary": "shell diagnostics delegated to the shell-analysis layer"
+    "status": "planned",
+    "summary": "tracked for shell-analysis coverage"
   },
   {
     "code": "RSC1066",
     "severity": "warning",
-    "status": "external",
-    "summary": "shell diagnostics delegated to the shell-analysis layer"
+    "status": "planned",
+    "summary": "tracked for shell-analysis coverage"
   },
   {
     "code": "RSC1077",
     "severity": "warning",
-    "status": "external",
-    "summary": "shell diagnostics delegated to the shell-analysis layer"
+    "status": "planned",
+    "summary": "tracked for shell-analysis coverage"
   },
   {
     "code": "RSC1078",
     "severity": "warning",
-    "status": "external",
-    "summary": "shell diagnostics delegated to the shell-analysis layer"
+    "status": "planned",
+    "summary": "tracked for shell-analysis coverage"
   },
   {
     "code": "RSC1079",
     "severity": "warning",
-    "status": "external",
-    "summary": "shell diagnostics delegated to the shell-analysis layer"
+    "status": "planned",
+    "summary": "tracked for shell-analysis coverage"
   },
   {
     "code": "RSC1081",
     "severity": "warning",
-    "status": "external",
-    "summary": "shell diagnostics delegated to the shell-analysis layer"
+    "status": "planned",
+    "summary": "tracked for shell-analysis coverage"
   },
   {
     "code": "RSC1083",
     "severity": "warning",
-    "status": "external",
-    "summary": "shell diagnostics delegated to the shell-analysis layer"
+    "status": "planned",
+    "summary": "tracked for shell-analysis coverage"
   },
   {
     "code": "RSC1086",
     "severity": "warning",
-    "status": "external",
-    "summary": "shell diagnostics delegated to the shell-analysis layer"
+    "status": "planned",
+    "summary": "tracked for shell-analysis coverage"
   },
   {
     "code": "RSC1095",
     "severity": "warning",
-    "status": "external",
-    "summary": "shell diagnostics delegated to the shell-analysis layer"
+    "status": "planned",
+    "summary": "tracked for shell-analysis coverage"
   },
   {
     "code": "RSC2002",
     "severity": "warning",
-    "status": "external",
-    "summary": "shell diagnostics delegated to the shell-analysis layer"
+    "status": "planned",
+    "summary": "tracked for shell-analysis coverage"
   },
   {
     "code": "RSC2015",
     "severity": "warning",
-    "status": "external",
-    "summary": "shell diagnostics delegated to the shell-analysis layer"
+    "status": "implemented",
+    "summary": "avoid using A && B || C as a conditional expression"
   },
   {
     "code": "RSC2026",
     "severity": "warning",
-    "status": "external",
-    "summary": "shell diagnostics delegated to the shell-analysis layer"
+    "status": "planned",
+    "summary": "tracked for shell-analysis coverage"
   },
   {
     "code": "RSC2035",
     "severity": "warning",
-    "status": "external",
-    "summary": "shell diagnostics delegated to the shell-analysis layer"
+    "status": "planned",
+    "summary": "tracked for shell-analysis coverage"
   },
   {
     "code": "RSC2046",
     "severity": "warning",
-    "status": "external",
-    "summary": "shell diagnostics delegated to the shell-analysis layer"
+    "status": "implemented",
+    "summary": "quote command substitutions to prevent word splitting"
   },
   {
     "code": "RSC2086",
     "severity": "warning",
-    "status": "external",
-    "summary": "shell diagnostics delegated to the shell-analysis layer"
+    "status": "implemented",
+    "summary": "quote variable expansions to prevent word splitting and globbing"
   },
   {
     "code": "RSC2140",
     "severity": "warning",
-    "status": "external",
-    "summary": "shell diagnostics delegated to the shell-analysis layer"
+    "status": "planned",
+    "summary": "tracked for shell-analysis coverage"
   },
   {
     "code": "RSC2154",
     "severity": "warning",
-    "status": "external",
-    "summary": "shell diagnostics delegated to the shell-analysis layer"
+    "status": "planned",
+    "summary": "tracked for shell-analysis coverage"
   },
   {
     "code": "RSC2155",
     "severity": "warning",
-    "status": "external",
-    "summary": "shell diagnostics delegated to the shell-analysis layer"
+    "status": "implemented",
+    "summary": "declare and assign separately to avoid masking command failures"
   },
   {
     "code": "RSC2164",
     "severity": "warning",
-    "status": "external",
-    "summary": "shell diagnostics delegated to the shell-analysis layer"
+    "status": "implemented",
+    "summary": "check cd exit status before running more commands"
   },
   {
     "code": "RSC2181",
     "severity": "warning",
-    "status": "external",
-    "summary": "shell diagnostics delegated to the shell-analysis layer"
+    "status": "planned",
+    "summary": "tracked for shell-analysis coverage"
   },
   {
     "code": "RSC2196",
     "severity": "warning",
-    "status": "external",
-    "summary": "shell diagnostics delegated to the shell-analysis layer"
+    "status": "planned",
+    "summary": "tracked for shell-analysis coverage"
   }
 ]

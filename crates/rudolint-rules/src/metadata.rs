@@ -64,16 +64,16 @@ impl RuleMetadata {
         }
     }
 
-    /// Builds metadata for a shell-rule catalog entry handled outside this crate.
-    pub fn external_shell(code: &'static str) -> Self {
+    /// Builds metadata for a planned shell-rule catalog entry.
+    pub fn planned_shell(code: &'static str) -> Self {
         Self {
             code,
             name: code,
-            summary: "shell diagnostics delegated to the shell-analysis layer",
+            summary: "tracked for shell-analysis coverage",
             default_severity: Severity::Warning,
-            profile: PolicyProfile::Default,
+            profile: PolicyProfile::Compat,
             category: RuleCategory::Shell,
-            status: RuleStatus::External,
+            status: RuleStatus::Planned,
             docs_url: docs_url(code),
             fix: FixAvailability::None,
         }
@@ -161,6 +161,8 @@ pub(crate) fn diagnostic(
 fn category_for_code(code: &str) -> RuleCategory {
     if code.starts_with("RDK") {
         RuleCategory::BuildKit
+    } else if code.starts_with("RSC") {
+        RuleCategory::Shell
     } else {
         RuleCategory::Compatibility
     }

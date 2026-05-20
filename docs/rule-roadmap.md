@@ -81,10 +81,18 @@ project-local.
 No compatibility rules are currently planned in this roadmap. New compatibility
 IDs should be added here when they are intentionally tracked.
 
-## Planned Shell Rules
+## Implemented Shell Rules
 
 `RSC` rules should come from a dedicated shell-analysis layer for `RUN`
 commands. They should not be implemented by ad hoc substring checks.
+
+- `RSC2015`
+- `RSC2046`
+- `RSC2086`
+- `RSC2155`
+- `RSC2164`
+
+## Planned Shell Rules
 
 Initial tracked IDs:
 
@@ -105,15 +113,10 @@ Initial tracked IDs:
 - `RSC1086`
 - `RSC1095`
 - `RSC2002`
-- `RSC2015`
 - `RSC2026`
 - `RSC2035`
-- `RSC2046`
-- `RSC2086`
 - `RSC2140`
 - `RSC2154`
-- `RSC2155`
-- `RSC2164`
 - `RSC2181`
 - `RSC2196`
 

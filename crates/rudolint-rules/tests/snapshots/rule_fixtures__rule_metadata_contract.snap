@@ -1,6 +1,6 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
-assertion_line: 1556
+assertion_line: 1593
 expression: metadata
 ---
 [
@@ -861,5 +861,60 @@ expression: metadata
     "profile": "compat",
     "status": "implemented",
     "summary": "set pipefail before RUN instructions with pipes"
+  },
+  {
+    "category": "shell",
+    "code": "RSC2015",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RSC2015.md",
+    "fix": "none",
+    "name": "command-chain-as-condition",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "avoid using A && B || C as a conditional expression"
+  },
+  {
+    "category": "shell",
+    "code": "RSC2046",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RSC2046.md",
+    "fix": "none",
+    "name": "quote-command-substitutions",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "quote command substitutions to prevent word splitting"
+  },
+  {
+    "category": "shell",
+    "code": "RSC2086",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RSC2086.md",
+    "fix": "none",
+    "name": "quote-variable-expansions",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "quote variable expansions to prevent word splitting and globbing"
+  },
+  {
+    "category": "shell",
+    "code": "RSC2155",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RSC2155.md",
+    "fix": "none",
+    "name": "declare-and-assign-separately",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "declare and assign separately to avoid masking command failures"
+  },
+  {
+    "category": "shell",
+    "code": "RSC2164",
+    "default_severity": "warning",
+    "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RSC2164.md",
+    "fix": "none",
+    "name": "check-cd-exit-status",
+    "profile": "compat",
+    "status": "implemented",
+    "summary": "check cd exit status before running more commands"
   }
 ]

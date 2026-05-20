@@ -1,6 +1,6 @@
 ---
 source: crates/rudolint-cli/tests/cli.rs
-assertion_line: 563
+assertion_line: 622
 expression: normalized_json(&output)
 ---
 [
@@ -471,5 +471,35 @@ expression: normalized_json(&output)
     "severity": "warning",
     "status": "implemented",
     "summary": "set pipefail before RUN instructions with pipes"
+  },
+  {
+    "code": "RSC2015",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "avoid using A && B || C as a conditional expression"
+  },
+  {
+    "code": "RSC2046",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "quote command substitutions to prevent word splitting"
+  },
+  {
+    "code": "RSC2086",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "quote variable expansions to prevent word splitting and globbing"
+  },
+  {
+    "code": "RSC2155",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "declare and assign separately to avoid masking command failures"
+  },
+  {
+    "code": "RSC2164",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "check cd exit status before running more commands"
   }
 ]
