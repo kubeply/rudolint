@@ -74,16 +74,25 @@ jobs:
 
 ## Inputs
 
-- `version`: release tag to install, or `latest`.
-- `repository`: repository that publishes rudolint release artifacts.
-- `paths`: newline-separated Dockerfile paths or directories.
-- `config`: optional `.rudolint.yaml` path.
-- `profile`: `default` or `compat`.
-- `format`: `human`, `json`, or `sarif` when `upload-sarif` is false.
-- `failure-threshold`: `ignore`, `style`, `info`, `warning`, or `error`.
-- `sarif-output`: SARIF path to write when `upload-sarif` is true.
-- `upload-sarif`: upload SARIF through GitHub code scanning.
-- `github-token`: optional token for release downloads.
+- `version` (optional): release tag to install, or `latest`. Default:
+  `latest`.
+- `repository` (optional): repository in `owner/repo` format that publishes
+  rudolint release artifacts. Default: `kubeply/rudolint`.
+- `paths` (optional): newline-separated Dockerfile paths or directories.
+  Default: `.`.
+- `config` (optional): `.rudolint.yaml` path. Default: empty, which lets
+  rudolint use its normal config discovery.
+- `profile` (optional): `default` or `compat`. Default: `default`.
+- `format` (optional): `human`, `json`, or `sarif` when `upload-sarif` is
+  false. Default: `human`.
+- `failure-threshold` (optional): `ignore`, `style`, `info`, `warning`, or
+  `error`. Default: `warning`.
+- `sarif-output` (optional): SARIF path to write when `upload-sarif` is true.
+  Default: `rudolint.sarif`.
+- `upload-sarif` (optional): upload SARIF through GitHub code scanning.
+  Default: `false`.
+- `github-token` (optional): token for release downloads. Useful to avoid rate
+  limits or to access a private `repository`. Default: empty.
 
 ## Outputs
 
