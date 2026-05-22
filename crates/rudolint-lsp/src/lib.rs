@@ -33,7 +33,7 @@ impl DocumentLinter {
         Self { profile, settings }
     }
 
-    /// Creates a document linter by discovering configuration from a document URI.
+    /// Creates a document linter by discovering configuration from a document [`lsp_types::Uri`].
     pub fn discover_for_document(profile: Profile, uri: &lsp_types::Uri) -> Result<Self> {
         let search_starts = search_start_for_uri(uri).into_iter().collect::<Vec<_>>();
         let settings = rudolint_settings::resolve(
@@ -42,7 +42,7 @@ impl DocumentLinter {
         Ok(Self::new(profile, settings))
     }
 
-    /// Creates a document linter by discovering configuration from LSP workspace folders.
+    /// Creates a document linter by discovering configuration from LSP [`lsp_types::WorkspaceFolder`] values.
     pub fn discover_for_workspace(
         profile: Profile,
         workspace_folders: &[lsp_types::WorkspaceFolder],
@@ -472,6 +472,7 @@ mod tests {
         std::fs::write(temp.path().join(".rudolint.yaml"), "ignore:\n  - RDL3007\n")
             .expect("config should be written");
         let dockerfile = temp.path().join("Dockerfile");
+        std::fs::write(&dockerfile, "FROM alpine:latest\n").expect("Dockerfile should be written");
         let uri = file_uri(&dockerfile);
         let linter = DocumentLinter::discover_for_document(rudolint_rules::Profile::Default, &uri)
             .expect("document settings should resolve");
