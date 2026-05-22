@@ -1,8 +1,57 @@
 //! Language server integration points.
 
+use std::path::{Path, PathBuf};
+
+use anyhow::{Context, Result};
 use lsp_types::{Diagnostic, DiagnosticSeverity, DiagnosticTag, NumberOrString, Position, Range};
 use rudolint_diagnostics::{Finding, Severity};
+use rudolint_dockerfile::parse_dockerfile;
+use rudolint_rules::{Profile, RuleEngine};
+use rudolint_settings::Settings;
 use rudolint_source::Span;
+use url::Url;
+
+/// Lints open editor documents using the same parser and rule engine as the CLI.
+#[derive(Debug, Clone)]
+pub struct DocumentLinter {
+    profile: Profile,
+    settings: Settings,
+}
+
+impl Default for DocumentLinter {
+    fn default() -> Self {
+        Self {
+            profile: Profile::Default,
+            settings: Settings::default(),
+        }
+    }
+}
+
+impl DocumentLinter {
+    /// Creates a document linter from a rule profile and resolved settings.
+    pub fn new(profile: Profile, settings: Settings) -> Self {
+        Self { profile, settings }
+    }
+
+    /// Lints a document received through `textDocument/didOpen`.
+    pub fn lint_open_document(
+        &self,
+        document: &lsp_types::TextDocumentItem,
+    ) -> Result<Vec<Diagnostic>> {
+        let display_path = document_path(&document.uri);
+        let lint_path = lint_path_for_config(&self.settings.config_path, &display_path);
+        let parsed = parse_dockerfile(&document.text)
+            .with_context(|| format!("failed to parse {}", document.uri.as_str()))?;
+        let engine = RuleEngine::new(self.profile, self.settings.config.clone());
+        let findings = engine
+            .lint_path(&lint_path, &parsed)
+            .into_iter()
+            .map(|finding| finding.with_path(&display_path))
+            .collect::<Vec<_>>();
+
+        Ok(diagnostics(&findings))
+    }
+}
 
 /// Converts a [`Finding`] into an LSP [`Diagnostic`].
 ///
@@ -70,13 +119,42 @@ fn zero_based(value: usize) -> u32 {
     value.saturating_sub(1).try_into().unwrap_or(u32::MAX)
 }
 
+fn document_path(uri: &lsp_types::Uri) -> PathBuf {
+    Url::parse(uri.as_str())
+        .ok()
+        .filter(|url| url.scheme() == "file")
+        .and_then(|url| url.to_file_path().ok())
+        .unwrap_or_else(|| PathBuf::from(uri.as_str()))
+}
+
+fn lint_path_for_config(config_path: &Option<PathBuf>, path: &Path) -> PathBuf {
+    let Some(config_parent) = config_path.as_ref().and_then(|path| path.parent()) else {
+        return path.to_path_buf();
+    };
+
+    let canonical_path = path.canonicalize().unwrap_or_else(|_| path.to_path_buf());
+    let canonical_parent = config_parent
+        .canonicalize()
+        .unwrap_or_else(|_| config_parent.to_path_buf());
+
+    canonical_path
+        .strip_prefix(canonical_parent)
+        .map(Path::to_path_buf)
+        .unwrap_or(canonical_path)
+}
+
 #[cfg(test)]
 mod tests {
+    use std::collections::BTreeSet;
+    use std::str::FromStr;
+
     use lsp_types::{DiagnosticSeverity, NumberOrString};
+    use rudolint_config::Config;
     use rudolint_diagnostics::{Finding, Severity};
+    use rudolint_settings::Settings;
     use rudolint_source::Span;
 
-    use super::{diagnostic, diagnostics, position, range};
+    use super::{DocumentLinter, diagnostic, diagnostics, position, range};
 
     #[test]
     fn converts_finding_to_lsp_diagnostic() {
@@ -164,5 +242,52 @@ mod tests {
             diagnostic.tags,
             Some(vec![lsp_types::DiagnosticTag::UNNECESSARY])
         );
+    }
+
+    #[test]
+    fn lints_open_document_with_default_settings() {
+        let linter = DocumentLinter::default();
+        let document = lsp_types::TextDocumentItem::new(
+            lsp_types::Uri::from_str("file:///workspace/Dockerfile").expect("uri should parse"),
+            "dockerfile".to_string(),
+            1,
+            "FROM alpine:latest\n".to_string(),
+        );
+
+        let diagnostics = linter
+            .lint_open_document(&document)
+            .expect("open document should lint");
+
+        assert!(diagnostics.iter().any(
+            |diagnostic| diagnostic.code == Some(NumberOrString::String("RDL3007".to_string()))
+        ));
+    }
+
+    #[test]
+    fn open_document_linting_uses_resolved_settings() {
+        let linter = DocumentLinter::new(
+            rudolint_rules::Profile::Default,
+            Settings {
+                config: Config {
+                    ignore: BTreeSet::from(["RDL3007".to_string()]),
+                    ..Config::default()
+                },
+                config_path: None,
+            },
+        );
+        let document = lsp_types::TextDocumentItem::new(
+            lsp_types::Uri::from_str("untitled:Untitled-1").expect("uri should parse"),
+            "dockerfile".to_string(),
+            1,
+            "FROM alpine:latest\n".to_string(),
+        );
+
+        let diagnostics = linter
+            .lint_open_document(&document)
+            .expect("open document should lint");
+
+        assert!(diagnostics.iter().all(
+            |diagnostic| diagnostic.code != Some(NumberOrString::String("RDL3007".to_string()))
+        ));
     }
 }

@@ -1111,9 +1111,15 @@ dependencies = [
 name = "rudolint-lsp"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "lsp-types",
+ "rudolint-config",
  "rudolint-diagnostics",
+ "rudolint-dockerfile",
+ "rudolint-rules",
+ "rudolint-settings",
  "rudolint-source",
+ "url",
 ]
 
 [[package]]

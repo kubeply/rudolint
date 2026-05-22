@@ -7,6 +7,12 @@ license.workspace = true
 repository.workspace = true
 
 [dependencies]
+anyhow.workspace = true
 lsp-types.workspace = true
+rudolint-config.workspace = true
 rudolint-diagnostics.workspace = true
+rudolint-dockerfile.workspace = true
+rudolint-rules.workspace = true
+rudolint-settings.workspace = true
 rudolint-source.workspace = true
+url.workspace = true
