@@ -1116,9 +1116,11 @@ dependencies = [
  "rudolint-config",
  "rudolint-diagnostics",
  "rudolint-dockerfile",
+ "rudolint-fix",
  "rudolint-rules",
  "rudolint-settings",
  "rudolint-source",
+ "serde_json",
  "tempfile",
  "url",
 ]

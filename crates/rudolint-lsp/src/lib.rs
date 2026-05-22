@@ -1,14 +1,17 @@
 //! Language server integration points.
 
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result, bail};
 use lsp_types::{
-    Diagnostic, DiagnosticSeverity, DiagnosticTag, Hover, HoverContents, MarkupContent, MarkupKind,
-    NumberOrString, Position, Range,
+    CodeAction, CodeActionKind, Diagnostic, DiagnosticSeverity, DiagnosticTag, Hover,
+    HoverContents, MarkupContent, MarkupKind, NumberOrString, Position, Range,
+    TextEdit as LspTextEdit, WorkspaceEdit,
 };
 use rudolint_diagnostics::{Finding, Severity};
 use rudolint_dockerfile::parse_dockerfile;
+use rudolint_fix::{FixPreview, TextEdit as FixTextEdit, detect_conflicts};
 use rudolint_rules::{Profile, RuleEngine};
 use rudolint_settings::{Settings, SettingsOptions};
 use rudolint_source::Span;
@@ -99,6 +102,24 @@ impl DocumentLinter {
             }),
             range: None,
         })
+    }
+
+    /// Builds quick-fix code actions from safe `rudolint` fix previews.
+    pub fn code_actions_for_document(
+        &self,
+        document: &lsp_types::TextDocumentItem,
+    ) -> Result<Vec<CodeAction>> {
+        let display_path = document_path(&document.uri);
+        let lint_path = lint_path_for_config(&self.settings.config_path, &display_path);
+        let parsed = parse_dockerfile(&document.text)
+            .with_context(|| format!("failed to parse {}", document.uri.as_str()))?;
+        let engine = RuleEngine::new(self.profile, self.settings.config.clone());
+
+        Ok(engine
+            .fixes_path(&lint_path, &parsed)
+            .iter()
+            .filter_map(|fix| code_action(&document.uri, fix))
+            .collect())
     }
 
     fn lint_uri(&self, uri: &lsp_types::Uri, text: &str) -> Result<Vec<Diagnostic>> {
@@ -249,6 +270,43 @@ fn rule_hover_markdown(rule: &rudolint_rules::RuleInfo) -> String {
         rule.metadata.category.as_str(),
         rule.metadata.fix.as_str(),
         rule.metadata.docs_url
+    )
+}
+
+/// Converts a safe, non-conflicting fix preview into an LSP quick-fix action.
+fn code_action(uri: &lsp_types::Uri, fix: &FixPreview) -> Option<CodeAction> {
+    if !fix.applicability.is_automatically_applicable()
+        || fix.edits.is_empty()
+        || !detect_conflicts(&fix.edits).is_empty()
+    {
+        return None;
+    }
+
+    let edits = fix.edits.iter().map(lsp_text_edit).collect::<Vec<_>>();
+    Some(CodeAction {
+        title: fix.title.clone(),
+        kind: Some(CodeActionKind::QUICKFIX),
+        diagnostics: None,
+        edit: Some(WorkspaceEdit {
+            changes: Some(HashMap::from([(uri.clone(), edits)])),
+            document_changes: None,
+            change_annotations: None,
+        }),
+        command: None,
+        is_preferred: Some(true),
+        disabled: None,
+        data: None,
+    })
+}
+
+/// Converts a `rudolint-fix` source edit into an LSP text edit.
+fn lsp_text_edit(edit: &FixTextEdit) -> LspTextEdit {
+    LspTextEdit::new(
+        Range::new(
+            position(edit.span.line, edit.span.column),
+            position(edit.span.line, edit.end_column()),
+        ),
+        edit.replacement_text().to_string(),
     )
 }
 
@@ -577,6 +635,73 @@ mod tests {
         let linter = DocumentLinter::default();
 
         assert!(linter.hover_for_rule("RDL9999").is_none());
+    }
+
+    /// Safe rule fixes are surfaced as LSP quick-fix workspace edits.
+    #[test]
+    fn builds_code_actions_for_safe_fixes() {
+        let linter = DocumentLinter::default();
+        let document = lsp_types::TextDocumentItem::new(
+            lsp_types::Uri::from_str("file:///workspace/Dockerfile").expect("uri should parse"),
+            "dockerfile".to_string(),
+            1,
+            "RUN --mount=type=cache,target=/var/cache/apt apt-get update\n".to_string(),
+        );
+
+        let actions = linter
+            .code_actions_for_document(&document)
+            .expect("code actions should be built");
+
+        let action = actions
+            .iter()
+            .find(|action| action.title == "insert BuildKit syntax directive")
+            .expect("safe BuildKit syntax fix should be exposed");
+        assert_eq!(action.kind, Some(lsp_types::CodeActionKind::QUICKFIX));
+        assert_eq!(action.is_preferred, Some(true));
+
+        let edit = action.edit.as_ref().expect("action should include edit");
+        let edit_json = serde_json::to_value(edit).expect("workspace edit should serialize");
+        let text_edits = &edit_json["changes"][document.uri.as_str()];
+        assert_eq!(
+            text_edits
+                .as_array()
+                .expect("edit should be an array")
+                .len(),
+            1
+        );
+        assert_eq!(
+            text_edits[0]["range"],
+            serde_json::json!({
+                "start": { "line": 0, "character": 0 },
+                "end": { "line": 0, "character": 0 }
+            })
+        );
+        assert_eq!(
+            text_edits[0]["newText"],
+            serde_json::json!("# syntax=docker/dockerfile:1\n")
+        );
+    }
+
+    /// Manual fix previews are intentionally not exposed as code actions.
+    #[test]
+    fn skips_manual_code_actions() {
+        let linter = DocumentLinter::default();
+        let document = lsp_types::TextDocumentItem::new(
+            lsp_types::Uri::from_str("file:///workspace/Dockerfile").expect("uri should parse"),
+            "dockerfile".to_string(),
+            1,
+            "FROM alpine:3.20\nCMD echo ok\n".to_string(),
+        );
+
+        let actions = linter
+            .code_actions_for_document(&document)
+            .expect("code actions should be built");
+
+        assert!(
+            actions
+                .iter()
+                .all(|action| !action.title.contains("convert CMD"))
+        );
     }
 
     fn file_uri(path: &Path) -> lsp_types::Uri {
