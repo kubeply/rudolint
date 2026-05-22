@@ -1,0 +1,198 @@
+name: rudolint
+description: Run the BuildKit-native rudolint Dockerfile linter.
+
+inputs:
+  version:
+    description: Release tag to install, or latest.
+    required: false
+    default: latest
+  repository:
+    description: Repository that publishes rudolint release artifacts.
+    required: false
+    default: kubeply/rudolint
+  paths:
+    description: Newline-separated Dockerfile paths or directories to check.
+    required: false
+    default: "."
+  config:
+    description: Optional .rudolint.yaml config path.
+    required: false
+    default: ""
+  profile:
+    description: Rule profile to use.
+    required: false
+    default: default
+  format:
+    description: Output format when upload-sarif is false.
+    required: false
+    default: human
+  failure-threshold:
+    description: Minimum severity that exits non-zero.
+    required: false
+    default: warning
+  sarif-output:
+    description: SARIF path to write when upload-sarif is true.
+    required: false
+    default: rudolint.sarif
+  upload-sarif:
+    description: Upload SARIF to GitHub code scanning.
+    required: false
+    default: "false"
+  github-token:
+    description: Optional GitHub token for release downloads.
+    required: false
+    default: ""
+
+outputs:
+  exit-code:
+    description: rudolint process exit code.
+    value: ${{ steps.run.outputs.exit-code }}
+  findings-count:
+    description: Number of findings reported by rudolint, when countable.
+    value: ${{ steps.run.outputs.findings-count }}
+  sarif-path:
+    description: SARIF file path when SARIF output is written.
+    value: ${{ steps.run.outputs.sarif-path }}
+
+runs:
+  using: composite
+  steps:
+    - name: Install rudolint
+      id: install
+      shell: bash
+      env:
+        INPUT_VERSION: ${{ inputs.version }}
+        INPUT_REPOSITORY: ${{ inputs.repository }}
+        INPUT_GITHUB_TOKEN: ${{ inputs.github-token }}
+      run: |
+        set -euo pipefail
+
+        case "$(uname -s)" in
+          Linux) os=unknown-linux-gnu ;;
+          Darwin) os=apple-darwin ;;
+          *) echo "unsupported operating system: $(uname -s)" >&2; exit 2 ;;
+        esac
+
+        case "$(uname -m)" in
+          x86_64 | amd64) arch=x86_64 ;;
+          arm64 | aarch64) arch=aarch64 ;;
+          *) echo "unsupported architecture: $(uname -m)" >&2; exit 2 ;;
+        esac
+
+        target="${arch}-${os}"
+        asset="rudolint-${target}.tar.xz"
+        if [[ "$INPUT_VERSION" == "latest" ]]; then
+          base_url="https://github.com/${INPUT_REPOSITORY}/releases/latest/download"
+        else
+          base_url="https://github.com/${INPUT_REPOSITORY}/releases/download/${INPUT_VERSION}"
+        fi
+
+        work_dir="$(mktemp -d)"
+        install_dir="${RUNNER_TEMP:-$work_dir}/rudolint-action-bin"
+        mkdir -p "$install_dir"
+
+        curl_args=(--fail --location --show-error --silent)
+        if [[ -n "$INPUT_GITHUB_TOKEN" ]]; then
+          curl_args+=(--header "Authorization: Bearer ${INPUT_GITHUB_TOKEN}")
+        fi
+
+        (
+          cd "$work_dir"
+          curl "${curl_args[@]}" --remote-name "${base_url}/${asset}"
+          curl "${curl_args[@]}" --remote-name "${base_url}/sha256.sum"
+          if command -v sha256sum >/dev/null 2>&1; then
+            sha256sum --check --ignore-missing sha256.sum
+          else
+            grep "  ${asset}$" sha256.sum > "${asset}.sha256"
+            shasum -a 256 --check "${asset}.sha256"
+          fi
+          tar -xf "$asset"
+          binary="$(find . -type f -name rudolint -perm -111 | head -n 1)"
+          if [[ -z "$binary" ]]; then
+            echo "archive did not contain an executable rudolint binary" >&2
+            exit 2
+          fi
+          cp "$binary" "$install_dir/rudolint"
+        )
+
+        chmod +x "$install_dir/rudolint"
+        echo "$install_dir" >> "$GITHUB_PATH"
+        echo "binary=$install_dir/rudolint" >> "$GITHUB_OUTPUT"
+
+    - name: Run rudolint
+      id: run
+      shell: bash
+      env:
+        RUDOLINT_BIN: ${{ steps.install.outputs.binary }}
+        INPUT_PATHS: ${{ inputs.paths }}
+        INPUT_CONFIG: ${{ inputs.config }}
+        INPUT_PROFILE: ${{ inputs.profile }}
+        INPUT_FORMAT: ${{ inputs.format }}
+        INPUT_FAILURE_THRESHOLD: ${{ inputs.failure-threshold }}
+        INPUT_SARIF_OUTPUT: ${{ inputs.sarif-output }}
+        INPUT_UPLOAD_SARIF: ${{ inputs.upload-sarif }}
+      run: |
+        set -euo pipefail
+
+        filtered_paths=()
+        while IFS= read -r path; do
+          [[ -n "$path" ]] && filtered_paths+=("$path")
+        done <<< "$INPUT_PATHS"
+        if [[ "${#filtered_paths[@]}" -eq 0 ]]; then
+          filtered_paths=(".")
+        fi
+
+        output_format="$INPUT_FORMAT"
+        if [[ "$INPUT_UPLOAD_SARIF" == "true" ]]; then
+          output_format="sarif"
+        fi
+
+        args=(
+          check
+          --format "$output_format"
+          --profile "$INPUT_PROFILE"
+          --failure-threshold "$INPUT_FAILURE_THRESHOLD"
+        )
+        if [[ -n "$INPUT_CONFIG" ]]; then
+          args+=(--config "$INPUT_CONFIG")
+        fi
+
+        output_file="$(mktemp)"
+        set +e
+        "$RUDOLINT_BIN" "${args[@]}" "${filtered_paths[@]}" > "$output_file"
+        exit_code="$?"
+        set -e
+
+        sarif_path=""
+        if [[ "$output_format" == "sarif" ]]; then
+          sarif_path="$INPUT_SARIF_OUTPUT"
+          mkdir -p "$(dirname "$sarif_path")"
+          cp "$output_file" "$sarif_path"
+        else
+          cat "$output_file"
+        fi
+
+        findings_count=""
+        if [[ "$output_format" == "json" ]] && command -v jq >/dev/null 2>&1; then
+          findings_count="$(jq 'if type == "array" then length else .findings | length end' "$output_file")"
+        elif [[ "$output_format" == "sarif" ]] && command -v jq >/dev/null 2>&1; then
+          findings_count="$(jq '.runs[0].results | length' "$output_file")"
+        elif [[ "$output_format" == "human" ]]; then
+          findings_count="$(grep -Ec '^[[:space:]]+[0-9]+:[0-9]+[[:space:]]' "$output_file" || true)"
+        fi
+
+        {
+          echo "exit-code=$exit_code"
+          echo "findings-count=$findings_count"
+          echo "sarif-path=$sarif_path"
+        } >> "$GITHUB_OUTPUT"
+
+    - name: Upload SARIF
+      if: ${{ inputs.upload-sarif == 'true' }}
+      uses: github/codeql-action/upload-sarif@9e0d7b8d25671d64c341c19c0152d693099fb5ba
+      with:
+        sarif_file: ${{ steps.run.outputs.sarif-path }}
+
+    - name: Exit with rudolint status
+      shell: bash
+      run: exit "${{ steps.run.outputs.exit-code }}"

@@ -59,6 +59,8 @@ performance budgets.
 
 See [docs/release.md](docs/release.md) for release automation details.
 
+See [docs/action.md](docs/action.md) for GitHub Action usage.
+
 ## Install
 
 Released versions publish checksummed binaries for Linux and macOS on
