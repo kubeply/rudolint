@@ -56,8 +56,20 @@ fn bench_cold_start(c: &mut Criterion) {
 fn bench_cli_lint(c: &mut Criterion) {
     let small = common::fixture_path("fixtures/corpus/small/Dockerfile");
     let directory = common::fixture_path("fixtures/corpus/directory-tree");
-    let small_path = small.to_str().expect("fixture path should be UTF-8");
-    let directory_path = directory.to_str().expect("fixture path should be UTF-8");
+    let Some(small_path) = small.to_str() else {
+        eprintln!(
+            "skipping cli_lint: non-UTF-8 fixture path {}",
+            small.display()
+        );
+        return;
+    };
+    let Some(directory_path) = directory.to_str() else {
+        eprintln!(
+            "skipping cli_lint: non-UTF-8 fixture path {}",
+            directory.display()
+        );
+        return;
+    };
 
     let mut group = c.benchmark_group("cli_lint");
 

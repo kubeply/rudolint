@@ -11,7 +11,10 @@ fn bench_parse_and_lint(c: &mut Criterion) {
     for (name, source) in &sources {
         group.bench_function(*name, |b| {
             b.iter(|| {
-                let document = parse_dockerfile(black_box(source)).unwrap();
+                let document = parse_dockerfile(black_box(source)).expect(
+                    "parse_dockerfile only errors on regex compilation \
+                    (heredoc_delimiters/parse_heredocs), not on fixture content",
+                );
                 engine.lint(&document)
             });
         });

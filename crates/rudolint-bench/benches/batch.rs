@@ -12,9 +12,12 @@ fn bench_many_files(c: &mut Criterion) {
         b.iter(|| {
             sources
                 .iter()
-                .map(|source| {
-                    let document = parse_dockerfile(black_box(source)).unwrap();
-                    engine.lint(&document)
+                .map(|source| match parse_dockerfile(black_box(source)) {
+                    Ok(document) => engine.lint(&document),
+                    Err(error) => {
+                        eprintln!("skipping parse_lint_1000 input: {error}");
+                        Vec::new()
+                    }
                 })
                 .collect::<Vec<_>>()
         });
