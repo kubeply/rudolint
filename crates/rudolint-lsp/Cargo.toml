@@ -7,4 +7,6 @@ license.workspace = true
 repository.workspace = true
 
 [dependencies]
+lsp-types.workspace = true
 rudolint-diagnostics.workspace = true
+rudolint-source.workspace = true
