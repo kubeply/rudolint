@@ -1013,6 +1013,7 @@ version = "0.1.0"
 dependencies = [
  "codspeed-criterion-compat",
  "rudolint-config",
+ "rudolint-diagnostics",
  "rudolint-dockerfile",
  "rudolint-output",
  "rudolint-rules",

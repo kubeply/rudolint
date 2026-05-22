@@ -39,13 +39,100 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
-  codspeed:
-    name: Run benchmarks
+  changes:
+    name: Select benchmark groups
     runs-on: depot-ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 5
+    outputs:
+      parser: ${{ steps.filter.outputs.parser }}
+      lint: ${{ steps.filter.outputs.lint }}
+      output: ${{ steps.filter.outputs.output }}
+      cli: ${{ steps.filter.outputs.cli }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Select benchmark groups
+        id: filter
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before || '' }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          if [[ "$EVENT_NAME" == "push" || "$EVENT_NAME" == "workflow_dispatch" || -z "$BASE_SHA" ]]; then
+            {
+              echo "parser=true"
+              echo "lint=true"
+              echo "output=true"
+              echo "cli=true"
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          changed_files="$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")"
+          parser=false
+          lint=false
+          output=false
+          cli=false
+
+          while IFS= read -r path; do
+            case "$path" in
+              Cargo.lock|Cargo.toml|crates/rudolint-bench/*|fixtures/corpus/*)
+                parser=true
+                lint=true
+                output=true
+                cli=true
+                ;;
+              crates/rudolint-dockerfile/*|crates/rudolint-source/*|fixtures/parser/*)
+                parser=true
+                lint=true
+                cli=true
+                ;;
+              crates/rudolint-rules/*|crates/rudolint-buildkit/*|crates/rudolint-shell/*|crates/rudolint-config/*|crates/rudolint-policy/*|crates/rudolint-image/*|fixtures/rules/*)
+                lint=true
+                output=true
+                cli=true
+                ;;
+              crates/rudolint-output/*|crates/rudolint-diagnostics/*)
+                output=true
+                cli=true
+                ;;
+              crates/rudolint-cli/*|crates/rudolint-settings/*)
+                cli=true
+                ;;
+              .github/workflows/codspeed.yml)
+                parser=true
+                lint=true
+                output=true
+                cli=true
+                ;;
+            esac
+          done <<< "$changed_files"
+
+          {
+            echo "parser=$parser"
+            echo "lint=$lint"
+            echo "output=$output"
+            echo "cli=$cli"
+          } >> "$GITHUB_OUTPUT"
+
+  parser:
+    name: parser benchmarks
+    needs: changes
+    if: ${{ needs.changes.outputs.parser == 'true' }}
+    runs-on: depot-ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@master
@@ -59,10 +146,111 @@ jobs:
         run: cargo install cargo-codspeed --locked
 
       - name: Build the benchmark target(s)
-        run: cargo codspeed build -p rudolint-bench
+        run: cargo codspeed build -p rudolint-bench --bench parser --locked
 
       - name: Run the benchmarks
         uses: CodSpeedHQ/action@v4
         with:
           mode: simulation
-          run: cargo codspeed run
+          run: cargo codspeed run -p rudolint-bench --bench parser
+
+  lint:
+    name: lint benchmarks
+    needs: changes
+    if: ${{ needs.changes.outputs.lint == 'true' }}
+    runs-on: depot-ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.95.0
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install cargo-codspeed
+        run: cargo install cargo-codspeed --locked
+
+      - name: Build the benchmark target(s)
+        run: cargo codspeed build -p rudolint-bench --bench lint --locked
+
+      - name: Run the benchmarks
+        uses: CodSpeedHQ/action@v4
+        with:
+          mode: simulation
+          run: cargo codspeed run -p rudolint-bench --bench lint
+
+  output:
+    name: output benchmarks
+    needs: changes
+    if: ${{ needs.changes.outputs.output == 'true' }}
+    runs-on: depot-ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.95.0
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install cargo-codspeed
+        run: cargo install cargo-codspeed --locked
+
+      - name: Build the benchmark target(s)
+        run: cargo codspeed build -p rudolint-bench --bench output --locked
+
+      - name: Run the benchmarks
+        uses: CodSpeedHQ/action@v4
+        with:
+          mode: simulation
+          run: cargo codspeed run -p rudolint-bench --bench output
+
+  cli:
+    name: cli benchmarks
+    needs: changes
+    if: ${{ needs.changes.outputs.cli == 'true' }}
+    runs-on: depot-ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.95.0
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install cargo-codspeed
+        run: cargo install cargo-codspeed --locked
+
+      - name: Build release binary
+        run: cargo build -p rudolint --release --locked
+
+      - name: Build the benchmark target(s)
+        run: cargo codspeed build -p rudolint-bench --bench cli --locked
+
+      - name: Run the benchmarks
+        uses: CodSpeedHQ/action@v4
+        env:
+          RUDOLINT_BENCH_BIN: ${{ github.workspace }}/target/release/rudolint
+        with:
+          mode: simulation
+          run: cargo codspeed run -p rudolint-bench --bench cli

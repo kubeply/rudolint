@@ -1,0 +1,94 @@
+name: Performance advisory
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/performance-advisory.yml"
+      - "Cargo.lock"
+      - "Cargo.toml"
+      - "crates/rudolint-bench/**"
+      - "crates/rudolint-cli/**"
+      - "crates/rudolint-config/**"
+      - "crates/rudolint-diagnostics/**"
+      - "crates/rudolint-dockerfile/**"
+      - "crates/rudolint-output/**"
+      - "crates/rudolint-rules/**"
+      - "crates/rudolint-settings/**"
+      - "fixtures/corpus/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_INCREMENTAL: "0"
+  CARGO_TERM_COLOR: always
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  advisory:
+    name: advisory performance and memory
+    runs-on: depot-ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.95.0
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install measurement tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends hyperfine time
+
+      - name: Build release binary
+        run: cargo build -p rudolint --release --locked
+
+      - name: Record environment
+        run: |
+          rustc --version
+          cargo --version
+          uname -a
+          target/release/rudolint --version
+
+      - name: Run advisory timing benchmarks
+        run: |
+          hyperfine --warmup 5 --runs 20 \
+            --export-json target/perf-cold-start.json \
+            'target/release/rudolint --version'
+
+          hyperfine --warmup 3 --runs 10 \
+            --export-json target/perf-one-file.json \
+            'target/release/rudolint check fixtures/corpus/small/Dockerfile --format json --failure-threshold ignore'
+
+          hyperfine --warmup 3 --runs 10 \
+            --export-json target/perf-directory.json \
+            'target/release/rudolint check fixtures/corpus/directory-tree --format json --failure-threshold ignore'
+
+      - name: Run advisory memory measurements
+        run: |
+          /usr/bin/time -v target/release/rudolint check fixtures/corpus/large-generated/Dockerfile --format json --failure-threshold ignore >/tmp/rudolint-large-json.out
+          /usr/bin/time -v target/release/rudolint check fixtures/corpus/large-generated/Dockerfile --format sarif --failure-threshold ignore >/tmp/rudolint-large-sarif.out
+
+      - name: Upload advisory artifacts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: performance-advisory
+          path: |
+            target/perf-cold-start.json
+            target/perf-one-file.json
+            target/perf-directory.json

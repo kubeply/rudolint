@@ -672,22 +672,22 @@ Acceptance criteria:
 
 Goal: keep the binary fast enough for pre-commit hooks and large CI jobs.
 
-1. Add cold-start benchmark.
-2. Add one-file lint benchmark.
-3. Add recursive directory benchmark.
-4. Add JSON rendering benchmark.
-5. Add SARIF rendering benchmark.
-6. Add large generated Dockerfile benchmark.
-7. Add memory measurement notes for local benchmark runs.
-8. Maintain performance budget documentation in `docs/performance.md`.
-9. Start with advisory targets:
+1. [x] Add cold-start benchmark.
+2. [x] Add one-file lint benchmark.
+3. [x] Add recursive directory benchmark.
+4. [x] Add JSON rendering benchmark.
+5. [x] Add SARIF rendering benchmark.
+6. [x] Add large generated Dockerfile benchmark.
+7. [x] Add memory measurement notes for local benchmark runs.
+8. [x] Maintain performance budget documentation in `docs/performance.md`.
+9. [x] Start with advisory targets:
    - cold start under 50 ms on a typical CI Linux runner.
    - one Dockerfile under 20 ms after process start.
    - 1,000 small Dockerfiles under 2 seconds.
    - JSON overhead under 15 percent on large fixture sets.
    - SARIF overhead under 30 percent on large fixture sets.
-10. Avoid blocking CI on performance numbers until benchmarks are stable.
-11. Add an advisory benchmark job on main branch only.
+10. [x] Avoid blocking CI on performance numbers until benchmarks are stable.
+11. [x] Add an advisory benchmark job on main branch only.
 
 Acceptance criteria:
 
