@@ -35,9 +35,10 @@ jobs:
       run_rust: ${{ steps.scope.outputs.run_rust }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Select CI scope
         id: scope
@@ -54,7 +55,12 @@ jobs:
             exit 0
           fi
 
-          changed_files="$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")"
+          merge_base="$(git merge-base "$BASE_SHA" "$HEAD_SHA" || true)"
+          if [[ -z "$merge_base" ]]; then
+            merge_base="$BASE_SHA"
+          fi
+
+          changed_files="$(git diff --name-only "$merge_base" "$HEAD_SHA")"
           run_rust=false
 
           while IFS= read -r path; do
@@ -79,7 +85,9 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
 
       - name: Lint workflows
         uses: raven-actions/actionlint@v2
@@ -116,7 +124,9 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@master
@@ -138,7 +148,9 @@ jobs:
       RUDOLINT_ORACLE_BIN: hadolint
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@3c5f7ea28cd621ae0bf5283f0e981fb97b8a7af9 # master as of 2026-05-16
