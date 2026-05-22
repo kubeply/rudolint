@@ -7,7 +7,7 @@ use lsp_types::{Diagnostic, DiagnosticSeverity, DiagnosticTag, NumberOrString, P
 use rudolint_diagnostics::{Finding, Severity};
 use rudolint_dockerfile::parse_dockerfile;
 use rudolint_rules::{Profile, RuleEngine};
-use rudolint_settings::Settings;
+use rudolint_settings::{Settings, SettingsOptions};
 use rudolint_source::Span;
 use url::Url;
 
@@ -31,6 +31,30 @@ impl DocumentLinter {
     /// Creates a document linter from a rule profile and resolved settings.
     pub fn new(profile: Profile, settings: Settings) -> Self {
         Self { profile, settings }
+    }
+
+    /// Creates a document linter by discovering configuration from a document URI.
+    pub fn discover_for_document(profile: Profile, uri: &lsp_types::Uri) -> Result<Self> {
+        let search_starts = search_start_for_uri(uri).into_iter().collect::<Vec<_>>();
+        let settings = rudolint_settings::resolve(
+            &SettingsOptions::default().with_search_starts(search_starts),
+        )?;
+        Ok(Self::new(profile, settings))
+    }
+
+    /// Creates a document linter by discovering configuration from LSP workspace folders.
+    pub fn discover_for_workspace(
+        profile: Profile,
+        workspace_folders: &[lsp_types::WorkspaceFolder],
+    ) -> Result<Self> {
+        let search_starts = workspace_folders
+            .iter()
+            .filter_map(|folder| search_start_for_uri(&folder.uri))
+            .collect::<Vec<_>>();
+        let settings = rudolint_settings::resolve(
+            &SettingsOptions::default().with_search_starts(search_starts),
+        )?;
+        Ok(Self::new(profile, settings))
     }
 
     /// Lints a document received through `textDocument/didOpen`.
@@ -140,11 +164,23 @@ fn zero_based(value: usize) -> u32 {
 }
 
 fn document_path(uri: &lsp_types::Uri) -> PathBuf {
+    file_path_for_uri(uri).unwrap_or_else(|| PathBuf::from(uri.as_str()))
+}
+
+fn search_start_for_uri(uri: &lsp_types::Uri) -> Option<PathBuf> {
+    let path = file_path_for_uri(uri)?;
+    if path.exists() {
+        return Some(path);
+    }
+
+    path.parent().map(Path::to_path_buf)
+}
+
+fn file_path_for_uri(uri: &lsp_types::Uri) -> Option<PathBuf> {
     Url::parse(uri.as_str())
         .ok()
         .filter(|url| url.scheme() == "file")
         .and_then(|url| url.to_file_path().ok())
-        .unwrap_or_else(|| PathBuf::from(uri.as_str()))
 }
 
 fn lint_path_for_config(config_path: &Option<PathBuf>, path: &Path) -> PathBuf {
@@ -185,6 +221,7 @@ fn full_document_text(params: &lsp_types::DidChangeTextDocumentParams) -> Result
 #[cfg(test)]
 mod tests {
     use std::collections::BTreeSet;
+    use std::path::Path;
     use std::str::FromStr;
 
     use lsp_types::{DiagnosticSeverity, NumberOrString};
@@ -427,5 +464,70 @@ mod tests {
             .expect_err("mixed change batch should not be linted as a full document");
 
         assert!(error.to_string().contains("incremental"));
+    }
+
+    #[test]
+    fn discovers_config_from_document_uri() {
+        let temp = tempfile::TempDir::new().expect("temp dir should be created");
+        std::fs::write(temp.path().join(".rudolint.yaml"), "ignore:\n  - RDL3007\n")
+            .expect("config should be written");
+        let dockerfile = temp.path().join("Dockerfile");
+        let uri = file_uri(&dockerfile);
+        let linter = DocumentLinter::discover_for_document(rudolint_rules::Profile::Default, &uri)
+            .expect("document settings should resolve");
+        let document = lsp_types::TextDocumentItem::new(
+            uri,
+            "dockerfile".to_string(),
+            1,
+            "FROM alpine:latest\n".to_string(),
+        );
+
+        let diagnostics = linter
+            .lint_open_document(&document)
+            .expect("open document should lint");
+
+        assert!(diagnostics.iter().all(
+            |diagnostic| diagnostic.code != Some(NumberOrString::String("RDL3007".to_string()))
+        ));
+    }
+
+    #[test]
+    fn discovers_config_from_workspace_folders() {
+        let temp = tempfile::TempDir::new().expect("temp dir should be created");
+        std::fs::write(temp.path().join(".rudolint.yaml"), "ignore:\n  - RDL3007\n")
+            .expect("config should be written");
+        let workspace = lsp_types::WorkspaceFolder {
+            uri: file_uri(temp.path()),
+            name: "workspace".to_string(),
+        };
+        let dockerfile = temp.path().join("service").join("Dockerfile");
+        let linter =
+            DocumentLinter::discover_for_workspace(rudolint_rules::Profile::Default, &[workspace])
+                .expect("workspace settings should resolve");
+        let document = lsp_types::TextDocumentItem::new(
+            file_uri(&dockerfile),
+            "dockerfile".to_string(),
+            1,
+            "FROM alpine:latest\n".to_string(),
+        );
+
+        let diagnostics = linter
+            .lint_open_document(&document)
+            .expect("open document should lint");
+
+        assert!(diagnostics.iter().all(
+            |diagnostic| diagnostic.code != Some(NumberOrString::String("RDL3007".to_string()))
+        ));
+    }
+
+    fn file_uri(path: &Path) -> lsp_types::Uri {
+        let url = if path.is_dir() {
+            url::Url::from_directory_path(path)
+        } else {
+            url::Url::from_file_path(path)
+        }
+        .expect("file URL should be built");
+
+        lsp_types::Uri::from_str(url.as_str()).expect("uri should parse")
     }
 }

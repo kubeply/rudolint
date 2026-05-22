@@ -16,3 +16,6 @@ rudolint-rules.workspace = true
 rudolint-settings.workspace = true
 rudolint-source.workspace = true
 url.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true

@@ -1119,6 +1119,7 @@ dependencies = [
  "rudolint-rules",
  "rudolint-settings",
  "rudolint-source",
+ "tempfile",
  "url",
 ]
 
