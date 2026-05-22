@@ -2,7 +2,7 @@
 
 use std::path::{Path, PathBuf};
 
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, bail};
 use lsp_types::{Diagnostic, DiagnosticSeverity, DiagnosticTag, NumberOrString, Position, Range};
 use rudolint_diagnostics::{Finding, Severity};
 use rudolint_dockerfile::parse_dockerfile;
@@ -38,10 +38,30 @@ impl DocumentLinter {
         &self,
         document: &lsp_types::TextDocumentItem,
     ) -> Result<Vec<Diagnostic>> {
-        let display_path = document_path(&document.uri);
+        self.lint_uri(&document.uri, &document.text)
+    }
+
+    /// Lints a full-document `textDocument/didChange` notification.
+    ///
+    /// This helper expects the client to use full document synchronization. It
+    /// returns an error for incremental changes so callers do not accidentally
+    /// lint a partial replacement as the whole Dockerfile.
+    pub fn lint_changed_document(
+        &self,
+        params: &lsp_types::DidChangeTextDocumentParams,
+    ) -> Result<Vec<Diagnostic>> {
+        let Some(text) = full_document_text(params)? else {
+            return Ok(Vec::new());
+        };
+
+        self.lint_uri(&params.text_document.uri, text)
+    }
+
+    fn lint_uri(&self, uri: &lsp_types::Uri, text: &str) -> Result<Vec<Diagnostic>> {
+        let display_path = document_path(uri);
         let lint_path = lint_path_for_config(&self.settings.config_path, &display_path);
-        let parsed = parse_dockerfile(&document.text)
-            .with_context(|| format!("failed to parse {}", document.uri.as_str()))?;
+        let parsed =
+            parse_dockerfile(text).with_context(|| format!("failed to parse {}", uri.as_str()))?;
         let engine = RuleEngine::new(self.profile, self.settings.config.clone());
         let findings = engine
             .lint_path(&lint_path, &parsed)
@@ -141,6 +161,21 @@ fn lint_path_for_config(config_path: &Option<PathBuf>, path: &Path) -> PathBuf {
         .strip_prefix(canonical_parent)
         .map(Path::to_path_buf)
         .unwrap_or(canonical_path)
+}
+
+fn full_document_text(params: &lsp_types::DidChangeTextDocumentParams) -> Result<Option<&str>> {
+    let Some(change) = params.content_changes.last() else {
+        return Ok(None);
+    };
+
+    if change.range.is_some() || change.range_length.is_some() {
+        bail!(
+            "incremental textDocument/didChange is not supported yet for {}",
+            params.text_document.uri.as_str()
+        );
+    }
+
+    Ok(Some(change.text.as_str()))
 }
 
 #[cfg(test)]
@@ -289,5 +324,72 @@ mod tests {
         assert!(diagnostics.iter().all(
             |diagnostic| diagnostic.code != Some(NumberOrString::String("RDL3007".to_string()))
         ));
+    }
+
+    #[test]
+    fn lints_full_document_changes() {
+        let linter = DocumentLinter::default();
+        let params = lsp_types::DidChangeTextDocumentParams {
+            text_document: lsp_types::VersionedTextDocumentIdentifier::new(
+                lsp_types::Uri::from_str("file:///workspace/Dockerfile").expect("uri should parse"),
+                2,
+            ),
+            content_changes: vec![lsp_types::TextDocumentContentChangeEvent {
+                range: None,
+                range_length: None,
+                text: "FROM alpine:latest\n".to_string(),
+            }],
+        };
+
+        let diagnostics = linter
+            .lint_changed_document(&params)
+            .expect("full document change should lint");
+
+        assert!(diagnostics.iter().any(
+            |diagnostic| diagnostic.code == Some(NumberOrString::String("RDL3007".to_string()))
+        ));
+    }
+
+    #[test]
+    fn skips_empty_document_change_batches() {
+        let linter = DocumentLinter::default();
+        let params = lsp_types::DidChangeTextDocumentParams {
+            text_document: lsp_types::VersionedTextDocumentIdentifier::new(
+                lsp_types::Uri::from_str("file:///workspace/Dockerfile").expect("uri should parse"),
+                2,
+            ),
+            content_changes: Vec::new(),
+        };
+
+        let diagnostics = linter
+            .lint_changed_document(&params)
+            .expect("empty change batch should be accepted");
+
+        assert!(diagnostics.is_empty());
+    }
+
+    #[test]
+    fn rejects_incremental_document_changes() {
+        let linter = DocumentLinter::default();
+        let params = lsp_types::DidChangeTextDocumentParams {
+            text_document: lsp_types::VersionedTextDocumentIdentifier::new(
+                lsp_types::Uri::from_str("file:///workspace/Dockerfile").expect("uri should parse"),
+                2,
+            ),
+            content_changes: vec![lsp_types::TextDocumentContentChangeEvent {
+                range: Some(lsp_types::Range::new(
+                    lsp_types::Position::new(0, 0),
+                    lsp_types::Position::new(0, 4),
+                )),
+                range_length: None,
+                text: "FROM".to_string(),
+            }],
+        };
+
+        let error = linter
+            .lint_changed_document(&params)
+            .expect_err("incremental change should not be linted as a full document");
+
+        assert!(error.to_string().contains("incremental"));
     }
 }
