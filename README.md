@@ -61,6 +61,9 @@ See [docs/release.md](docs/release.md) for release automation details.
 
 See [docs/action.md](docs/action.md) for GitHub Action usage.
 
+See [docs/first-release.md](docs/first-release.md) for first release readiness
+criteria and known limitations.
+
 ## Install
 
 Released versions publish checksummed binaries for Linux and macOS on
