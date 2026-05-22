@@ -44,3 +44,49 @@ Tag pushes that look like semantic versions publish a GitHub Release with:
 
 Pull requests run `dist plan` only. They verify release metadata without
 building or publishing release artifacts.
+
+## Install Paths
+
+The shell installer downloads the archive that matches the host platform and
+installs `rudolint` into `CARGO_HOME` by default.
+
+Latest release:
+
+```bash
+curl --proto '=https' --tlsv1.2 -LsSf \
+  https://github.com/kubeply/rudolint/releases/latest/download/rudolint-installer.sh \
+  | sh
+```
+
+Pinned release:
+
+```bash
+curl --proto '=https' --tlsv1.2 -LsSf \
+  https://github.com/kubeply/rudolint/releases/download/v0.1.0/rudolint-installer.sh \
+  | sh
+```
+
+Direct downloads use this shape:
+
+```text
+https://github.com/kubeply/rudolint/releases/download/<tag>/rudolint-<target>.tar.xz
+https://github.com/kubeply/rudolint/releases/download/<tag>/rudolint-<target>.tar.xz.sha256
+```
+
+Example:
+
+```bash
+curl -LO https://github.com/kubeply/rudolint/releases/download/v0.1.0/rudolint-x86_64-unknown-linux-gnu.tar.xz
+curl -LO https://github.com/kubeply/rudolint/releases/download/v0.1.0/rudolint-x86_64-unknown-linux-gnu.tar.xz.sha256
+sha256sum --check rudolint-x86_64-unknown-linux-gnu.tar.xz.sha256
+tar -xf rudolint-x86_64-unknown-linux-gnu.tar.xz
+```
+
+Developers can still install from the checked-out repository:
+
+```bash
+cargo install --path crates/rudolint-cli
+```
+
+No Docker image is published yet. Add one only when there is a concrete CI use
+case that benefits from image distribution over the released binary archives.
