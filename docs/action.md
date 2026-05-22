@@ -72,6 +72,14 @@ jobs:
           sarif-output: rudolint.sarif
 ```
 
+## Self-Test Workflow
+
+The repository includes a manual `GitHub Action self-test` workflow that runs
+the local `./` action against checked-in fixtures. Run it after publishing a
+release by passing the release tag as `version`. The workflow keeps the same
+contract as user workflows: it downloads a released binary and does not compile
+Rust inside the action path.
+
 ## Inputs
 
 - `version` (optional): release tag to install, or `latest`. Default:

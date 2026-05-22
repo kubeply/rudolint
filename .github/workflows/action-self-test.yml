@@ -1,0 +1,85 @@
+name: GitHub Action self-test
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release tag to install, or latest.
+        required: false
+        default: latest
+      repository:
+        description: Repository in owner/repo format that publishes release artifacts.
+        required: false
+        default: kubeply/rudolint
+      upload-sarif:
+        description: Also test SARIF upload through GitHub code scanning.
+        required: false
+        default: "false"
+
+permissions:
+  contents: read
+  security-events: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  self-test:
+    name: run local action against fixtures
+    runs-on: depot-ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run JSON fixture check
+        id: json
+        uses: ./
+        with:
+          version: ${{ inputs.version || 'latest' }}
+          repository: ${{ inputs.repository || 'kubeply/rudolint' }}
+          paths: fixtures/rules/default-basic/Dockerfile
+          format: json
+          failure-threshold: ignore
+
+      - name: Validate JSON action outputs
+        shell: bash
+        env:
+          EXIT_CODE: ${{ steps.json.outputs['exit-code'] }}
+          FINDINGS_COUNT: ${{ steps.json.outputs['findings-count'] }}
+          SARIF_PATH: ${{ steps.json.outputs['sarif-path'] }}
+        run: |
+          set -euo pipefail
+          test "$EXIT_CODE" = "0"
+          test "$SARIF_PATH" = ""
+          test "$FINDINGS_COUNT" -gt 0
+
+      - name: Run SARIF fixture check
+        id: sarif
+        if: ${{ inputs['upload-sarif'] == 'true' }}
+        uses: ./
+        with:
+          version: ${{ inputs.version || 'latest' }}
+          repository: ${{ inputs.repository || 'kubeply/rudolint' }}
+          paths: fixtures/rules/default-basic/Dockerfile
+          failure-threshold: ignore
+          upload-sarif: "true"
+          sarif-output: rudolint-action-self-test.sarif
+
+      - name: Validate SARIF action outputs
+        if: ${{ inputs['upload-sarif'] == 'true' }}
+        shell: bash
+        env:
+          EXIT_CODE: ${{ steps.sarif.outputs['exit-code'] }}
+          FINDINGS_COUNT: ${{ steps.sarif.outputs['findings-count'] }}
+          SARIF_PATH: ${{ steps.sarif.outputs['sarif-path'] }}
+        run: |
+          set -euo pipefail
+          test "$EXIT_CODE" = "0"
+          test "$SARIF_PATH" = "rudolint-action-self-test.sarif"
+          test "$FINDINGS_COUNT" -gt 0
+          test -s rudolint-action-self-test.sarif
