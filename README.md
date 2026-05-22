@@ -57,6 +57,8 @@ See [docs/rules/README.md](docs/rules/README.md) for the rule documentation
 template and [docs/performance.md](docs/performance.md) for initial advisory
 performance budgets.
 
+See [docs/release.md](docs/release.md) for release automation details.
+
 ## Install
 
 ```bash

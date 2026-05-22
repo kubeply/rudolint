@@ -58,3 +58,8 @@ semver = "1.0.28"
 spdx = "0.13.4"
 tempfile = "3.23.0"
 url = "2.5"
+
+# The profile that 'dist' will build with
+[profile.dist]
+inherits = "release"
+lto = "thin"
