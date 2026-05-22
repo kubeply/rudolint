@@ -25,6 +25,14 @@ name = "lint"
 harness = false
 
 [[bench]]
+name = "end_to_end"
+harness = false
+
+[[bench]]
+name = "batch"
+harness = false
+
+[[bench]]
 name = "output"
 harness = false
 

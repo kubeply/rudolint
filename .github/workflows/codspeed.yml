@@ -46,6 +46,8 @@ jobs:
     outputs:
       parser: ${{ steps.filter.outputs.parser }}
       lint: ${{ steps.filter.outputs.lint }}
+      end_to_end: ${{ steps.filter.outputs.end_to_end }}
+      batch: ${{ steps.filter.outputs.batch }}
       output: ${{ steps.filter.outputs.output }}
       cli: ${{ steps.filter.outputs.cli }}
     steps:
@@ -69,6 +71,8 @@ jobs:
             {
               echo "parser=true"
               echo "lint=true"
+              echo "end_to_end=true"
+              echo "batch=true"
               echo "output=true"
               echo "cli=true"
             } >> "$GITHUB_OUTPUT"
@@ -78,6 +82,8 @@ jobs:
           changed_files="$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")"
           parser=false
           lint=false
+          end_to_end=false
+          batch=false
           output=false
           cli=false
 
@@ -86,16 +92,20 @@ jobs:
               Cargo.lock|Cargo.toml|crates/rudolint-bench/*|fixtures/corpus/*)
                 parser=true
                 lint=true
+                end_to_end=true
+                batch=true
                 output=true
                 cli=true
                 ;;
               crates/rudolint-dockerfile/*|crates/rudolint-source/*|fixtures/parser/*)
                 parser=true
                 lint=true
+                end_to_end=true
                 cli=true
                 ;;
               crates/rudolint-rules/*|crates/rudolint-buildkit/*|crates/rudolint-shell/*|crates/rudolint-config/*|crates/rudolint-policy/*|crates/rudolint-image/*|fixtures/rules/*)
                 lint=true
+                end_to_end=true
                 output=true
                 cli=true
                 ;;
@@ -109,6 +119,8 @@ jobs:
               .github/workflows/codspeed.yml)
                 parser=true
                 lint=true
+                end_to_end=true
+                batch=true
                 output=true
                 cli=true
                 ;;
@@ -118,6 +130,8 @@ jobs:
           {
             echo "parser=$parser"
             echo "lint=$lint"
+            echo "end_to_end=$end_to_end"
+            echo "batch=$batch"
             echo "output=$output"
             echo "cli=$cli"
           } >> "$GITHUB_OUTPUT"
@@ -135,12 +149,12 @@ jobs:
           persist-credentials: false
 
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@master
+        uses: dtolnay/rust-toolchain@3c5f7ea28cd621ae0bf5283f0e981fb97b8a7af9
         with:
           toolchain: 1.95.0
 
       - name: Cache Rust build
-        uses: Swatinem/rust-cache@v2
+        uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
 
       - name: Install cargo-codspeed
         run: cargo install cargo-codspeed --locked
@@ -149,7 +163,7 @@ jobs:
         run: cargo codspeed build -p rudolint-bench --bench parser --locked
 
       - name: Run the benchmarks
-        uses: CodSpeedHQ/action@v4
+        uses: CodSpeedHQ/action@3194d9a39c4d46684cb44bf7207fc56626aad8fd
         with:
           mode: simulation
           run: cargo codspeed run -p rudolint-bench --bench parser
@@ -167,12 +181,12 @@ jobs:
           persist-credentials: false
 
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@master
+        uses: dtolnay/rust-toolchain@3c5f7ea28cd621ae0bf5283f0e981fb97b8a7af9
         with:
           toolchain: 1.95.0
 
       - name: Cache Rust build
-        uses: Swatinem/rust-cache@v2
+        uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
 
       - name: Install cargo-codspeed
         run: cargo install cargo-codspeed --locked
@@ -181,10 +195,74 @@ jobs:
         run: cargo codspeed build -p rudolint-bench --bench lint --locked
 
       - name: Run the benchmarks
-        uses: CodSpeedHQ/action@v4
+        uses: CodSpeedHQ/action@3194d9a39c4d46684cb44bf7207fc56626aad8fd
         with:
           mode: simulation
           run: cargo codspeed run -p rudolint-bench --bench lint
+
+  end-to-end:
+    name: end-to-end benchmarks
+    needs: changes
+    if: ${{ needs.changes.outputs.end_to_end == 'true' }}
+    runs-on: depot-ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@3c5f7ea28cd621ae0bf5283f0e981fb97b8a7af9
+        with:
+          toolchain: 1.95.0
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
+
+      - name: Install cargo-codspeed
+        run: cargo install cargo-codspeed --locked
+
+      - name: Build the benchmark target(s)
+        run: cargo codspeed build -p rudolint-bench --bench end_to_end --locked
+
+      - name: Run the benchmarks
+        uses: CodSpeedHQ/action@3194d9a39c4d46684cb44bf7207fc56626aad8fd
+        with:
+          mode: simulation
+          run: cargo codspeed run -p rudolint-bench --bench end_to_end
+
+  batch:
+    name: batch benchmarks
+    needs: changes
+    if: ${{ needs.changes.outputs.batch == 'true' }}
+    runs-on: depot-ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@3c5f7ea28cd621ae0bf5283f0e981fb97b8a7af9
+        with:
+          toolchain: 1.95.0
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
+
+      - name: Install cargo-codspeed
+        run: cargo install cargo-codspeed --locked
+
+      - name: Build the benchmark target(s)
+        run: cargo codspeed build -p rudolint-bench --bench batch --locked
+
+      - name: Run the benchmarks
+        uses: CodSpeedHQ/action@3194d9a39c4d46684cb44bf7207fc56626aad8fd
+        with:
+          mode: simulation
+          run: cargo codspeed run -p rudolint-bench --bench batch
 
   output:
     name: output benchmarks
@@ -199,12 +277,12 @@ jobs:
           persist-credentials: false
 
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@master
+        uses: dtolnay/rust-toolchain@3c5f7ea28cd621ae0bf5283f0e981fb97b8a7af9
         with:
           toolchain: 1.95.0
 
       - name: Cache Rust build
-        uses: Swatinem/rust-cache@v2
+        uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
 
       - name: Install cargo-codspeed
         run: cargo install cargo-codspeed --locked
@@ -213,7 +291,7 @@ jobs:
         run: cargo codspeed build -p rudolint-bench --bench output --locked
 
       - name: Run the benchmarks
-        uses: CodSpeedHQ/action@v4
+        uses: CodSpeedHQ/action@3194d9a39c4d46684cb44bf7207fc56626aad8fd
         with:
           mode: simulation
           run: cargo codspeed run -p rudolint-bench --bench output
@@ -231,12 +309,12 @@ jobs:
           persist-credentials: false
 
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@master
+        uses: dtolnay/rust-toolchain@3c5f7ea28cd621ae0bf5283f0e981fb97b8a7af9
         with:
           toolchain: 1.95.0
 
       - name: Cache Rust build
-        uses: Swatinem/rust-cache@v2
+        uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32
 
       - name: Install cargo-codspeed
         run: cargo install cargo-codspeed --locked
@@ -248,7 +326,7 @@ jobs:
         run: cargo codspeed build -p rudolint-bench --bench cli --locked
 
       - name: Run the benchmarks
-        uses: CodSpeedHQ/action@v4
+        uses: CodSpeedHQ/action@3194d9a39c4d46684cb44bf7207fc56626aad8fd
         env:
           RUDOLINT_BENCH_BIN: ${{ github.workspace }}/target/release/rudolint
         with:

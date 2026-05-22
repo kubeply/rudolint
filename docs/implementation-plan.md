@@ -688,6 +688,8 @@ Goal: keep the binary fast enough for pre-commit hooks and large CI jobs.
    - SARIF overhead under 30 percent on large fixture sets.
 10. [x] Avoid blocking CI on performance numbers until benchmarks are stable.
 11. [x] Add an advisory benchmark job on main branch only.
+12. [x] Split CodSpeed benchmarks into path-scoped jobs for parser, lint,
+    end-to-end, batch, output, and CLI workloads.
 
 Acceptance criteria:
 

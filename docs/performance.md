@@ -7,9 +7,9 @@ keep design decisions honest before the first usable release.
 
 `rudolint` uses two performance tracks:
 
-- CodSpeed PR benchmarks for parser, lint, output rendering, and CLI-style
-  workloads. The workflow splits these into independent jobs so path-scoped
-  changes run only the relevant benchmark group.
+- CodSpeed PR benchmarks for parser, lint, end-to-end, batch, output
+  rendering, and CLI-style workloads. The workflow splits these into
+  independent jobs so path-scoped changes run only the relevant benchmark group.
 - A main-branch-only advisory workflow for process cold-start timing, recursive
   directory timing, and memory measurements from the release binary.
 
@@ -27,7 +27,9 @@ tracks:
 The CodSpeed workflow is intentionally split by benchmark target:
 
 - `parser`: Dockerfile parsing over the corpus files.
-- `lint`: one-file linting, parse-and-lint, and the 1,000-file batch workload.
+- `lint`: one-file linting against pre-parsed Dockerfiles.
+- `end_to_end`: parse-and-lint over the corpus files.
+- `batch`: the 1,000-file parse-and-lint workload.
 - `output`: JSON and SARIF rendering over a large diagnostic set.
 - `cli`: release-binary cold start plus one-file and recursive-directory CLI
   checks.

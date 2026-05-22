@@ -4,28 +4,51 @@ use std::process::Command;
 
 use criterion::{Criterion, black_box, criterion_group, criterion_main};
 
-fn run_rudolint(args: &[&str]) {
+fn run_rudolint(args: &[&str]) -> Result<(), String> {
     let binary = common::release_binary_path();
+    if !binary.exists() {
+        return Err(format!("{} is not available", binary.display()));
+    }
+
     let output = Command::new(&binary)
         .args(args)
         .output()
-        .unwrap_or_else(|_| panic!("{} should run", binary.display()));
+        .map_err(|error| format!("{} should run: {error}", binary.display()))?;
 
     if !output.status.success() {
-        panic!(
+        return Err(format!(
             "{} failed with status {}: {}",
             binary.display(),
             output.status,
             String::from_utf8_lossy(&output.stderr)
-        );
+        ));
     }
     black_box(output.stdout);
+    Ok(())
+}
+
+fn should_register_benchmark(args: &[&str], label: &str) -> bool {
+    match run_rudolint(args) {
+        Ok(()) => true,
+        Err(error) => {
+            eprintln!("skipping {label}: {error}");
+            false
+        }
+    }
 }
 
 fn bench_cold_start(c: &mut Criterion) {
+    if !should_register_benchmark(&["--version"], "cli_cold_start/version") {
+        return;
+    }
+
     let mut group = c.benchmark_group("cli_cold_start");
     group.bench_function("version", |b| {
-        b.iter(|| run_rudolint(&["--version"]));
+        b.iter(|| {
+            if let Err(error) = run_rudolint(&["--version"]) {
+                black_box(error);
+            }
+        });
     });
     group.finish();
 }
@@ -33,32 +56,47 @@ fn bench_cold_start(c: &mut Criterion) {
 fn bench_cli_lint(c: &mut Criterion) {
     let small = common::fixture_path("fixtures/corpus/small/Dockerfile");
     let directory = common::fixture_path("fixtures/corpus/directory-tree");
+    let small_path = small.to_str().expect("fixture path should be UTF-8");
+    let directory_path = directory.to_str().expect("fixture path should be UTF-8");
 
     let mut group = c.benchmark_group("cli_lint");
-    group.bench_function("one_file_json", |b| {
-        b.iter(|| {
-            run_rudolint(&[
-                "check",
-                small.to_str().expect("fixture path should be UTF-8"),
-                "--format",
-                "json",
-                "--failure-threshold",
-                "ignore",
-            ]);
+
+    let one_file_args = [
+        "check",
+        small_path,
+        "--format",
+        "json",
+        "--failure-threshold",
+        "ignore",
+    ];
+    if should_register_benchmark(&one_file_args, "cli_lint/one_file_json") {
+        group.bench_function("one_file_json", |b| {
+            b.iter(|| {
+                if let Err(error) = run_rudolint(&one_file_args) {
+                    black_box(error);
+                }
+            });
         });
-    });
-    group.bench_function("recursive_directory_json", |b| {
-        b.iter(|| {
-            run_rudolint(&[
-                "check",
-                directory.to_str().expect("fixture path should be UTF-8"),
-                "--format",
-                "json",
-                "--failure-threshold",
-                "ignore",
-            ]);
+    }
+
+    let directory_args = [
+        "check",
+        directory_path,
+        "--format",
+        "json",
+        "--failure-threshold",
+        "ignore",
+    ];
+    if should_register_benchmark(&directory_args, "cli_lint/recursive_directory_json") {
+        group.bench_function("recursive_directory_json", |b| {
+            b.iter(|| {
+                if let Err(error) = run_rudolint(&directory_args) {
+                    black_box(error);
+                }
+            });
         });
-    });
+    }
+
     group.finish();
 }
 

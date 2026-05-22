@@ -1,0 +1,26 @@
+mod common;
+
+use criterion::{Criterion, black_box, criterion_group, criterion_main};
+use rudolint_dockerfile::parse_dockerfile;
+
+fn bench_many_files(c: &mut Criterion) {
+    let sources = common::repeated_sources(1_000);
+    let engine = common::default_engine();
+
+    let mut group = c.benchmark_group("many_files");
+    group.bench_function("parse_lint_1000", |b| {
+        b.iter(|| {
+            sources
+                .iter()
+                .map(|source| {
+                    let document = parse_dockerfile(black_box(source)).unwrap();
+                    engine.lint(&document)
+                })
+                .collect::<Vec<_>>()
+        });
+    });
+    group.finish();
+}
+
+criterion_group!(benches, bench_many_files);
+criterion_main!(benches);
