@@ -164,16 +164,20 @@ fn lint_path_for_config(config_path: &Option<PathBuf>, path: &Path) -> PathBuf {
 }
 
 fn full_document_text(params: &lsp_types::DidChangeTextDocumentParams) -> Result<Option<&str>> {
-    let Some(change) = params.content_changes.last() else {
-        return Ok(None);
-    };
-
-    if change.range.is_some() || change.range_length.is_some() {
+    if params
+        .content_changes
+        .iter()
+        .any(|change| change.range.is_some() || change.range_length.is_some())
+    {
         bail!(
             "incremental textDocument/didChange is not supported yet for {}",
             params.text_document.uri.as_str()
         );
     }
+
+    let Some(change) = params.content_changes.last() else {
+        return Ok(None);
+    };
 
     Ok(Some(change.text.as_str()))
 }
@@ -389,6 +393,38 @@ mod tests {
         let error = linter
             .lint_changed_document(&params)
             .expect_err("incremental change should not be linted as a full document");
+
+        assert!(error.to_string().contains("incremental"));
+    }
+
+    #[test]
+    fn rejects_mixed_full_and_incremental_document_change_batches() {
+        let linter = DocumentLinter::default();
+        let params = lsp_types::DidChangeTextDocumentParams {
+            text_document: lsp_types::VersionedTextDocumentIdentifier::new(
+                lsp_types::Uri::from_str("file:///workspace/Dockerfile").expect("uri should parse"),
+                2,
+            ),
+            content_changes: vec![
+                lsp_types::TextDocumentContentChangeEvent {
+                    range: Some(lsp_types::Range::new(
+                        lsp_types::Position::new(0, 0),
+                        lsp_types::Position::new(0, 4),
+                    )),
+                    range_length: None,
+                    text: "FROM".to_string(),
+                },
+                lsp_types::TextDocumentContentChangeEvent {
+                    range: None,
+                    range_length: None,
+                    text: "FROM alpine:latest\n".to_string(),
+                },
+            ],
+        };
+
+        let error = linter
+            .lint_changed_document(&params)
+            .expect_err("mixed change batch should not be linted as a full document");
 
         assert!(error.to_string().contains("incremental"));
     }
