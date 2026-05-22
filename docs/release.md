@@ -86,7 +86,7 @@ Example:
 ```bash
 curl -LO https://github.com/kubeply/rudolint/releases/download/<tag>/rudolint-x86_64-unknown-linux-gnu.tar.xz
 curl -LO https://github.com/kubeply/rudolint/releases/download/<tag>/sha256.sum
-sha256sum --check sha256.sum
+sha256sum --check --ignore-missing sha256.sum
 tar -xf rudolint-x86_64-unknown-linux-gnu.tar.xz
 ```
 
