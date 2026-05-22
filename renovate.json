@@ -3,5 +3,74 @@
   "extends": [
     "config:recommended"
   ],
-  "dependencyDashboard": true
+  "dependencyDashboard": true,
+  "timezone": "Europe/Paris",
+  "semanticCommits": "enabled",
+  "semanticCommitType": "chore",
+  "labels": [
+    "dependencies"
+  ],
+  "prHourlyLimit": 2,
+  "prConcurrentLimit": 3,
+  "schedule": [
+    "before 7am every weekday"
+  ],
+  "ignorePaths": [
+    "fixtures/**",
+    "crates/**/snapshots/**",
+    "**/*.snap",
+    "scripts/dockerfile-linter-bench.py"
+  ],
+  "dockerfile": {
+    "enabled": false
+  },
+  "vulnerabilityAlerts": {
+    "enabled": true
+  },
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": [
+      "before 7am on monday"
+    ]
+  },
+  "packageRules": [
+    {
+      "matchManagers": [
+        "cargo"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "groupName": "Rust crates"
+    },
+    {
+      "matchManagers": [
+        "cargo"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "labels": [
+        "dependencies",
+        "rust",
+        "major"
+      ]
+    },
+    {
+      "matchManagers": [
+        "github-actions"
+      ],
+      "groupName": "GitHub Actions"
+    },
+    {
+      "matchManagers": [
+        "npm"
+      ],
+      "matchFileNames": [
+        "benchmarks/dockerfile-linters/node-tools/package.json"
+      ],
+      "groupName": "benchmark node tools"
+    }
+  ]
 }
