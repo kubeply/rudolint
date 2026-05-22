@@ -3,7 +3,10 @@
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result, bail};
-use lsp_types::{Diagnostic, DiagnosticSeverity, DiagnosticTag, NumberOrString, Position, Range};
+use lsp_types::{
+    Diagnostic, DiagnosticSeverity, DiagnosticTag, Hover, HoverContents, MarkupContent, MarkupKind,
+    NumberOrString, Position, Range,
+};
 use rudolint_diagnostics::{Finding, Severity};
 use rudolint_dockerfile::parse_dockerfile;
 use rudolint_rules::{Profile, RuleEngine};
@@ -79,6 +82,23 @@ impl DocumentLinter {
         };
 
         self.lint_uri(&params.text_document.uri, text)
+    }
+
+    /// Builds hover content explaining a `rudolint` rule code.
+    pub fn hover_for_rule(&self, code: &str) -> Option<Hover> {
+        let engine = RuleEngine::new(self.profile, self.settings.config.clone());
+        let rule = engine
+            .catalog()
+            .into_iter()
+            .find(|rule| rule.code.eq_ignore_ascii_case(code))?;
+
+        Some(Hover {
+            contents: HoverContents::Markup(MarkupContent {
+                kind: MarkupKind::Markdown,
+                value: rule_hover_markdown(&rule),
+            }),
+            range: None,
+        })
     }
 
     fn lint_uri(&self, uri: &lsp_types::Uri, text: &str) -> Result<Vec<Diagnostic>> {
@@ -216,6 +236,20 @@ fn full_document_text(params: &lsp_types::DidChangeTextDocumentParams) -> Result
     };
 
     Ok(Some(change.text.as_str()))
+}
+
+fn rule_hover_markdown(rule: &rudolint_rules::RuleInfo) -> String {
+    format!(
+        "**{}** `{}`\n\n{}\n\nSeverity: `{}`\n\nStatus: `{}`\n\nCategory: `{}`\n\nAutofix: `{}`\n\n[Rule documentation]({})",
+        rule.code,
+        rule.metadata.name,
+        rule.summary,
+        rule.severity,
+        rule.status,
+        rule.metadata.category.as_str(),
+        rule.metadata.fix.as_str(),
+        rule.metadata.docs_url
+    )
 }
 
 #[cfg(test)]
@@ -519,6 +553,30 @@ mod tests {
         assert!(diagnostics.iter().all(
             |diagnostic| diagnostic.code != Some(NumberOrString::String("RDL3007".to_string()))
         ));
+    }
+
+    #[test]
+    fn builds_rule_explanation_hover() {
+        let linter = DocumentLinter::default();
+
+        let hover = linter
+            .hover_for_rule("rdl3007")
+            .expect("rule hover should be built");
+
+        let lsp_types::HoverContents::Markup(content) = hover.contents else {
+            panic!("hover should use markup content");
+        };
+        assert_eq!(content.kind, lsp_types::MarkupKind::Markdown);
+        assert!(content.value.contains("**RDL3007**"));
+        assert!(content.value.contains("Severity: `warning`"));
+        assert!(content.value.contains("Rule documentation"));
+    }
+
+    #[test]
+    fn skips_unknown_rule_hover() {
+        let linter = DocumentLinter::default();
+
+        assert!(linter.hover_for_rule("RDL9999").is_none());
     }
 
     fn file_uri(path: &Path) -> lsp_types::Uri {
