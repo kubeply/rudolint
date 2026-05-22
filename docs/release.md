@@ -50,7 +50,7 @@ building or publishing release artifacts.
 The shell installer downloads the archive that matches the host platform and
 installs `rudolint` into `CARGO_HOME` by default.
 
-Latest release:
+After the first release is published, install the latest release:
 
 ```bash
 curl --proto '=https' --tlsv1.2 -LsSf \
@@ -62,25 +62,42 @@ Pinned release:
 
 ```bash
 curl --proto '=https' --tlsv1.2 -LsSf \
-  https://github.com/kubeply/rudolint/releases/download/v0.1.0/rudolint-installer.sh \
+  https://github.com/kubeply/rudolint/releases/download/<tag>/rudolint-installer.sh \
   | sh
 ```
+
+Verify the installed binary:
+
+```bash
+rudolint --version
+```
+
+The command should print `rudolint <version>` and exit with status `0`.
 
 Direct downloads use this shape:
 
 ```text
 https://github.com/kubeply/rudolint/releases/download/<tag>/rudolint-<target>.tar.xz
-https://github.com/kubeply/rudolint/releases/download/<tag>/rudolint-<target>.tar.xz.sha256
+https://github.com/kubeply/rudolint/releases/download/<tag>/sha256.sum
 ```
 
 Example:
 
 ```bash
-curl -LO https://github.com/kubeply/rudolint/releases/download/v0.1.0/rudolint-x86_64-unknown-linux-gnu.tar.xz
-curl -LO https://github.com/kubeply/rudolint/releases/download/v0.1.0/rudolint-x86_64-unknown-linux-gnu.tar.xz.sha256
-sha256sum --check rudolint-x86_64-unknown-linux-gnu.tar.xz.sha256
+curl -LO https://github.com/kubeply/rudolint/releases/download/<tag>/rudolint-x86_64-unknown-linux-gnu.tar.xz
+curl -LO https://github.com/kubeply/rudolint/releases/download/<tag>/sha256.sum
+sha256sum --check sha256.sum
 tar -xf rudolint-x86_64-unknown-linux-gnu.tar.xz
 ```
+
+Successful checksum verification prints a line ending in:
+
+```text
+rudolint-x86_64-unknown-linux-gnu.tar.xz: OK
+```
+
+If verification prints `FAILED`, do not extract or run the archive. A successful
+`tar -xf` extracts the `rudolint` binary in the current directory.
 
 Developers can still install from the checked-out repository:
 
