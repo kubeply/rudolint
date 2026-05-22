@@ -17,8 +17,8 @@ on:
         default: "false"
 
 permissions:
-  contents: read
-  security-events: write
+  contents: read # checkout only
+  security-events: write # SARIF upload when upload-sarif is true
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -34,14 +34,16 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
 
       - name: Run JSON fixture check
         id: json
         uses: ./
         with:
-          version: ${{ inputs.version || 'latest' }}
-          repository: ${{ inputs.repository || 'kubeply/rudolint' }}
+          version: ${{ inputs.version }}
+          repository: ${{ inputs.repository }}
           paths: fixtures/rules/default-basic/Dockerfile
           format: json
           failure-threshold: ignore
@@ -63,8 +65,8 @@ jobs:
         if: ${{ inputs['upload-sarif'] == 'true' }}
         uses: ./
         with:
-          version: ${{ inputs.version || 'latest' }}
-          repository: ${{ inputs.repository || 'kubeply/rudolint' }}
+          version: ${{ inputs.version }}
+          repository: ${{ inputs.repository }}
           paths: fixtures/rules/default-basic/Dockerfile
           failure-threshold: ignore
           upload-sarif: "true"
