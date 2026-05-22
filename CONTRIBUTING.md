@@ -83,6 +83,6 @@ cargo update --package <name> --precise <version>
 
 ## Releases
 
-Do not cut releases from local machines yet. Release automation should produce
-checksummed artifacts and should run from GitHub Actions once the release
-workflow exists.
+Do not cut releases from local machines. Release automation produces
+checksummed artifacts from GitHub Actions through the generated `cargo-dist`
+workflow.

@@ -51,7 +51,7 @@ building or publishing release artifacts.
 The shell installer downloads the archive that matches the host platform and
 installs `rudolint` into `CARGO_HOME` by default.
 
-After the first release is published, install the latest release:
+Install the latest release:
 
 ```bash
 curl --proto '=https' --tlsv1.2 -LsSf \
@@ -108,6 +108,12 @@ cargo install --path crates/rudolint-cli
 
 No Docker image is published yet. Add one only when there is a concrete CI use
 case that benefits from image distribution over the released binary archives.
+
+## Marketplace
+
+The GitHub Action is released from this repository, but the Marketplace listing
+is a separate publication step. Track that work in milestone 20 of
+[`docs/implementation-plan.md`](implementation-plan.md).
 
 ## GitHub Action Versioning
 

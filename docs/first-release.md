@@ -1,9 +1,12 @@
 # First Release Readiness
 
-This page tracks the minimum criteria for the first usable `rudolint` release.
-It is a release checklist, not a complete project roadmap. The first release can
-ship before every planned rule exists, as long as the shipped behavior is clear,
-tested, and easy to install in CI.
+This page records the minimum criteria used for the first usable `rudolint`
+release. It is a release checklist, not a complete project roadmap. The first
+release can ship before every planned rule exists, as long as the shipped
+behavior is clear, tested, and easy to install in CI.
+
+`v0.1.0` satisfied this checklist. Future releases should continue to preserve
+these guarantees unless a replacement contract is documented first.
 
 ## Readiness Checklist
 
@@ -40,9 +43,9 @@ tested, and easy to install in CI.
     `cargo test` with `INSTA_UPDATE=no`, `cargo deny`, and `actionlint`.
 - [x] Known limitations are documented below.
 
-## Release Preconditions
+## Release Procedure
 
-Before tagging the first release:
+For each release:
 
 1. Confirm `main` is green for CI and the release plan job.
 2. Run `dist plan --output-format=json` locally or inspect the latest release
@@ -75,3 +78,5 @@ rudolint check --format json --failure-threshold error < Dockerfile
   remains the supported entrypoint.
 - The GitHub Action should be pinned to a release tag for blocking CI. Floating
   major tags such as `v0` or `v1` are not published yet.
+- The GitHub Action is not listed on GitHub Marketplace yet. That visibility
+  work is tracked separately in milestone 20.

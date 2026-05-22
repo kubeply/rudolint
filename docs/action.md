@@ -24,9 +24,9 @@ jobs:
           version: <release-tag>
 ```
 
-Use the same released tag for `<action-tag>` and `<release-tag>` after the
-first release is published. Use `version: latest` only when workflows should
-track the newest rudolint release automatically.
+Use the same released tag for `<action-tag>` and `<release-tag>`. Use
+`version: latest` only when workflows should track the newest rudolint release
+automatically.
 
 ## Monorepo Paths
 
@@ -101,6 +101,13 @@ Before `1.0.0`, every released tag is treated as the complete action contract
 for that release. The project does not publish floating major tags such as `v0`
 or `v1` yet; add those only after the action and CLI contracts are stable enough
 to support compatibility expectations.
+
+## Marketplace
+
+The action can be used by referencing this repository and a release tag. GitHub
+Marketplace publication is tracked separately in milestone 20, because it
+requires the publishing account or organization to accept GitHub's Marketplace
+Developer Agreement.
 
 ## Inputs
 

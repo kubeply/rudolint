@@ -1,7 +1,8 @@
 # Implementation Plan
 
 This plan orders the work needed to make `rudolint` usable as a fast
-Dockerfile linter for local development, CI, and future GitHub Action usage.
+Dockerfile linter for local development, CI, GitHub Actions, and editor
+integration.
 
 The order is intentional:
 
@@ -38,8 +39,8 @@ need to change.
 6. Be explicit about rule provenance. `RDL` compatibility rules come from
    Hadolint behavior and should be documented that way. Project-native rules
    remain under `RDK` for BuildKit behavior and `RSC` for shell behavior.
-7. The future GitHub Action downloads released binaries only. It must not
-   compile Rust in user workflows.
+7. The GitHub Action downloads released binaries only. It must not compile Rust
+   in user workflows.
 8. Release targets should be broad from day one, with Linux and macOS for
    `x86_64` and `aarch64`, plus portable Linux targets where release tooling
    supports them cleanly.
@@ -180,7 +181,7 @@ Goal: keep every pull request trustworthy while the implementation grows.
    can install the latest supported compared tool reproducibly.
 8. Add CI caching checks for Rust builds through the existing cache action.
 9. Keep Depot runners as the default runner target.
-10. Add a CI comment in workflow files explaining that future GitHub Action
+10. Add a CI comment in workflow files explaining that GitHub Action
    tests must use released binaries instead of compiling Rust in user jobs.
 
 Acceptance criteria:
@@ -719,30 +720,30 @@ Acceptance criteria:
 Goal: make installation fast and lightweight for CI without requiring Rust on
 user machines.
 
-1. Choose release tooling, likely `cargo-dist` unless it conflicts with the
+1. [x] Choose release tooling, likely `cargo-dist` unless it conflicts with the
    repository constraints.
-2. Keep `rust-toolchain.toml` as the exact release toolchain until `1.0.0`.
-3. Produce release binaries for:
-   - `x86_64-unknown-linux-gnu`.
-   - `aarch64-unknown-linux-gnu`.
-   - `x86_64-unknown-linux-musl`, if release tooling supports it cleanly.
-   - `aarch64-unknown-linux-musl`, if release tooling supports it cleanly.
-   - `x86_64-apple-darwin`.
-   - `aarch64-apple-darwin`.
-4. Add Windows targets only after path handling and shell behavior are tested on
-   Windows CI.
-5. Generate checksums for all artifacts.
-6. Generate release notes from conventional commits or curated release notes.
-7. Add provenance or attestations if release tooling supports them cleanly.
-8. Add a release dry-run workflow.
-9. Add a tagged release workflow.
-10. Add install script that downloads pinned release artifacts.
-11. Add documentation for:
-    - direct binary download.
-    - install script.
-    - `cargo install`.
-    - Docker image, if added.
-12. Keep local-machine releases forbidden in `CONTRIBUTING.md`.
+2. [x] Keep `rust-toolchain.toml` as the exact release toolchain until `1.0.0`.
+3. [x] Produce release binaries for:
+   - [x] `x86_64-unknown-linux-gnu`.
+   - [x] `aarch64-unknown-linux-gnu`.
+   - [x] `x86_64-unknown-linux-musl`, if release tooling supports it cleanly.
+   - [x] `aarch64-unknown-linux-musl`, if release tooling supports it cleanly.
+   - [x] `x86_64-apple-darwin`.
+   - [x] `aarch64-apple-darwin`.
+4. [x] Defer Windows targets until path handling and shell behavior are tested
+   on Windows CI.
+5. [x] Generate checksums for all artifacts.
+6. [x] Generate release notes from conventional commits or curated release notes.
+7. [x] Add provenance or attestations if release tooling supports them cleanly.
+8. [x] Add a release dry-run workflow.
+9. [x] Add a tagged release workflow.
+10. [x] Add install script that downloads pinned release artifacts.
+11. [x] Add documentation for:
+    - [x] direct binary download.
+    - [x] install script.
+    - [x] `cargo install`.
+    - [x] Docker image non-goal until there is a concrete CI use case.
+12. [x] Keep local-machine releases forbidden in `CONTRIBUTING.md`.
 
 Acceptance criteria:
 
@@ -755,30 +756,30 @@ Acceptance criteria:
 Goal: provide a first-class CI entrypoint while keeping the action thin and
 fast.
 
-1. Add `action.yml` in this repository as part of the first binary release.
-2. Publish the action and release binary together so versions stay aligned.
-3. Make the action download a released binary by version.
-4. Do not compile Rust inside the user action path.
-5. Add action inputs:
-   - `version`.
-   - `paths`.
-   - `config`.
-   - `profile`.
-   - `format`.
-   - `failure-threshold`.
-   - `sarif-output`.
-   - `upload-sarif`.
-6. Add action outputs:
-   - `exit-code`.
-   - `findings-count`.
-   - `sarif-path`.
-7. Add examples for:
-   - simple check.
-   - monorepo path check.
-   - SARIF upload.
-   - compatibility profile.
-8. Add self-test workflow that uses the local action against fixtures.
-9. Add an action versioning policy.
+1. [x] Add `action.yml` in this repository as part of the first binary release.
+2. [x] Publish the action and release binary together so versions stay aligned.
+3. [x] Make the action download a released binary by version.
+4. [x] Do not compile Rust inside the user action path.
+5. [x] Add action inputs:
+   - [x] `version`.
+   - [x] `paths`.
+   - [x] `config`.
+   - [x] `profile`.
+   - [x] `format`.
+   - [x] `failure-threshold`.
+   - [x] `sarif-output`.
+   - [x] `upload-sarif`.
+6. [x] Add action outputs:
+   - [x] `exit-code`.
+   - [x] `findings-count`.
+   - [x] `sarif-path`.
+7. [x] Add examples for:
+   - [x] simple check.
+   - [x] monorepo path check.
+   - [x] SARIF upload.
+   - [x] compatibility profile.
+8. [x] Add self-test workflow that uses the local action against fixtures.
+9. [x] Add an action versioning policy.
 
 Acceptance criteria:
 
@@ -792,19 +793,49 @@ Acceptance criteria:
 The first usable release should not require every planned rule. It should meet
 these criteria instead:
 
-1. Parser handles common Dockerfiles, BuildKit mounts, heredocs, stage aliases,
+1. [x] Parser handles common Dockerfiles, BuildKit mounts, heredocs, stage aliases,
    and platform flags.
-2. JSON and SARIF schemas are stable enough for CI use.
-3. CLI exit codes are documented and tested.
-4. Config supports ignore, severity overrides, trusted registries, and
+2. [x] JSON and SARIF schemas are stable enough for CI use.
+3. [x] CLI exit codes are documented and tested.
+4. [x] Config supports ignore, severity overrides, trusted registries, and
    BuildKit entitlement opt-ins.
-5. At least the existing compatibility rules are fixture-backed and reliable.
-6. At least `RDK1000` through `RDK1003` are typed-fact based and reliable.
-7. Release binaries are available for common Linux and macOS targets.
-8. GitHub Action can run without Rust installed.
-9. CI gates formatting, clippy, tests, dependency policy, snapshots, and
+5. [x] At least the existing compatibility rules are fixture-backed and reliable.
+6. [x] At least `RDK1000` through `RDK1003` are typed-fact based and reliable.
+7. [x] Release binaries are available for common Linux and macOS targets.
+8. [x] GitHub Action can run without Rust installed.
+9. [x] CI gates formatting, clippy, tests, dependency policy, snapshots, and
    workflow syntax.
-10. Known limitations are documented clearly.
+10. [x] Known limitations are documented clearly.
+
+## Milestone 20: GitHub Marketplace Publication
+
+Goal: make the GitHub Action discoverable without changing the release or
+runtime contract.
+
+1. Accept the GitHub Marketplace Developer Agreement for the publishing account
+   or organization.
+2. Confirm `action.yml` has Marketplace-ready metadata:
+   - name.
+   - description.
+   - branding.
+   - complete inputs and outputs.
+3. Confirm README and `docs/action.md` include copy-paste examples for:
+   - basic check.
+   - monorepo path check.
+   - SARIF upload.
+   - compatibility profile.
+4. Publish the released action to GitHub Marketplace from the existing release
+   tag.
+5. Verify the Marketplace listing points users to the pinned release workflow
+   pattern.
+6. Add the Marketplace link to README after publication.
+
+Acceptance criteria:
+
+- The action is discoverable on GitHub Marketplace.
+- Marketplace users can install it with a pinned release tag.
+- The Marketplace listing does not imply floating major tags are available
+  before the project commits to that compatibility policy.
 
 ## Execution Notes
 
@@ -813,7 +844,7 @@ these criteria instead:
   snapshot, and fix behavior declaration.
 - Do not add shell diagnostics by substring matching.
 - Do not let output renderers influence rule behavior.
-- Do not make the future GitHub Action compile Rust in user workflows.
+- Do not make the GitHub Action compile Rust in user workflows.
 - Keep Hadolint-derived compatibility behavior in `RDL`.
 - Keep shell behavior in `RSC`.
 - Keep BuildKit-native behavior in `RDK`.

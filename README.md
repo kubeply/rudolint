@@ -50,8 +50,8 @@ See [docs/rule-roadmap.md](docs/rule-roadmap.md) for the compatibility and
 BuildKit rule roadmap.
 
 See [docs/implementation-plan.md](docs/implementation-plan.md) for the ordered
-implementation plan from test harness work through release packaging and a
-future GitHub Action.
+implementation plan from test harness work through release packaging, GitHub
+Actions, and future editor integration.
 
 See [docs/rules/README.md](docs/rules/README.md) for the rule documentation
 template and [docs/performance.md](docs/performance.md) for initial advisory
@@ -69,8 +69,7 @@ criteria and known limitations.
 Released versions publish checksummed binaries for Linux and macOS on
 [GitHub Releases](https://github.com/kubeply/rudolint/releases).
 
-After the first release is published, install the latest release with the
-generated shell installer:
+Install the latest release with the generated shell installer:
 
 ```bash
 curl --proto '=https' --tlsv1.2 -LsSf \
