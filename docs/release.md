@@ -40,6 +40,7 @@ Tag pushes that look like semantic versions publish a GitHub Release with:
 - aggregate `sha256.sum`
 - source tarball
 - shell installer
+- the `action.yml` contract from the same git tag
 - GitHub artifact attestations
 
 Pull requests run `dist plan` only. They verify release metadata without
@@ -107,3 +108,21 @@ cargo install --path crates/rudolint-cli
 
 No Docker image is published yet. Add one only when there is a concrete CI use
 case that benefits from image distribution over the released binary archives.
+
+## GitHub Action Versioning
+
+The GitHub Action and binary artifacts are versioned together. Release tags
+should point at a commit where `action.yml`, release docs, and generated
+artifacts agree on the same user-facing contract.
+
+Recommended workflow usage pins both sides to the same tag:
+
+```yaml
+- uses: kubeply/rudolint@<release-tag>
+  with:
+    version: <release-tag>
+```
+
+`version: latest` is supported for workflows that intentionally track the newest
+binary, but blocking CI should prefer an explicit tag so action behavior and the
+downloaded binary move together only during planned upgrades.

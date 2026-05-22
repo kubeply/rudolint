@@ -80,6 +80,28 @@ release by passing the release tag as `version`. The workflow keeps the same
 contract as user workflows: it downloads a released binary and does not compile
 Rust inside the action path.
 
+## Versioning Policy
+
+`action.yml` is released from the same repository and tag as the `rudolint`
+binary artifacts. For reproducible CI, pin both the action reference and the
+downloaded binary to the same release tag:
+
+```yaml
+- uses: kubeply/rudolint@<release-tag>
+  with:
+    version: <release-tag>
+```
+
+Use `version: latest` only when a workflow should automatically pick up newer
+`rudolint` releases while keeping the checked-out action implementation pinned.
+This can be useful for non-blocking advisory jobs, but blocking CI should prefer
+an explicit tag.
+
+Before `1.0.0`, every released tag is treated as the complete action contract
+for that release. The project does not publish floating major tags such as `v0`
+or `v1` yet; add those only after the action and CLI contracts are stable enough
+to support compatibility expectations.
+
 ## Inputs
 
 - `version` (optional): release tag to install, or `latest`. Default:
