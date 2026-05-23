@@ -18,6 +18,39 @@ rule metadata, result locations, and physical source regions.
 `rudolint check --format json` emits a versioned JSON envelope. This output is
 the v1 findings schema surface and is described by
 [`schemas/rudolint-findings-v1.schema.json`](../schemas/rudolint-findings-v1.schema.json).
+The schema uses JSON Schema draft 2020-12 and disallows properties that are not
+listed below.
+
+Envelope fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `schemaVersion` | string | Stable output contract version. The v1 schema requires `v1`. |
+| `findings` | array | Lint findings emitted by the selected rules and configuration. |
+
+Finding fields:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `code` | string | Stable rule identifier such as `RDL3007`, `RDK1000`, or `RSC2086`. |
+| `severity` | string | One of `ignore`, `style`, `info`, `warning`, or `error`. |
+| `message` | string | Human-readable diagnostic message. |
+| `path` | string | Display path for the Dockerfile that produced the finding. |
+| `primary_span` | object | Primary source range for the finding. |
+| `labels` | array | Optional secondary source ranges with messages. |
+| `help` | string or null | Optional remediation hint. |
+
+Span fields are one-based for line and column positions and zero-based for byte
+offsets:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `start_byte` | integer | Start byte offset in the source text. |
+| `end_byte` | integer | End byte offset in the source text. |
+| `start_line` | integer | Start line, beginning at `1`. |
+| `start_column` | integer | Start column, beginning at `1`. |
+| `end_line` | integer | End line, beginning at `1`. |
+| `end_column` | integer | End column, beginning at `1`. |
 
 ```json
 {
@@ -43,7 +76,11 @@ the v1 findings schema surface and is described by
 }
 ```
 
-When `--fix --dry-run --format json` is used, the command emits an envelope:
+When `--fix --dry-run --format json` is used, the command emits an envelope
+with the same `schemaVersion` and `findings` fields plus a `fixes` array for fix
+previews. The committed v1 findings schema describes the `schemaVersion` and
+`findings` portion of this envelope; fix preview entries are documented by the
+fix preview output itself and may grow independently before v1.
 
 ```json
 {
