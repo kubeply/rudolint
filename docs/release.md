@@ -1,7 +1,8 @@
 # Release Automation
 
 `rudolint` release artifacts are built by `cargo-dist` from GitHub Actions. Do
-not cut releases from a local machine.
+not cut releases from a local machine. Releases currently ship both the
+`rudolint` CLI and the `rudolint-lsp` stdio language server.
 
 ## Tooling
 
@@ -33,25 +34,28 @@ behavior have dedicated CI coverage.
 
 ## Artifacts
 
-Tag pushes that look like semantic versions publish a GitHub Release with:
+Tag pushes that look like semantic versions publish a GitHub Release with one
+artifact set for `rudolint` and one artifact set for `rudolint-lsp`. Each set
+contains:
 
 - one archive per target
 - `.sha256` sidecar files
 - aggregate `sha256.sum`
 - source tarball
 - shell installer
-- the `action.yml` contract from the same git tag
 - GitHub artifact attestations
+
+The release also carries the `action.yml` contract from the same git tag.
 
 Pull requests run `dist plan` only. They verify release metadata without
 building or publishing release artifacts.
 
 ## Install Paths
 
-The shell installer downloads the archive that matches the host platform and
-installs `rudolint` into `CARGO_HOME` by default.
+The shell installers download the archive that matches the host platform and
+install into `CARGO_HOME` by default.
 
-Install the latest release:
+Install the latest CLI release:
 
 ```bash
 curl --proto '=https' --tlsv1.2 -LsSf \
@@ -59,7 +63,15 @@ curl --proto '=https' --tlsv1.2 -LsSf \
   | sh
 ```
 
-Pinned release:
+Install the latest LSP server release:
+
+```bash
+curl --proto '=https' --tlsv1.2 -LsSf \
+  https://github.com/kubeply/rudolint/releases/latest/download/rudolint-lsp-installer.sh \
+  | sh
+```
+
+Pinned CLI release:
 
 ```bash
 curl --proto '=https' --tlsv1.2 -LsSf \
@@ -67,18 +79,29 @@ curl --proto '=https' --tlsv1.2 -LsSf \
   | sh
 ```
 
-Verify the installed binary:
+Pinned LSP server release:
+
+```bash
+curl --proto '=https' --tlsv1.2 -LsSf \
+  https://github.com/kubeply/rudolint/releases/download/<tag>/rudolint-lsp-installer.sh \
+  | sh
+```
+
+Verify the installed CLI:
 
 ```bash
 rudolint --version
 ```
 
 The command should print `rudolint <version>` and exit with status `0`.
+`rudolint-lsp` is a stdio protocol server, so it should be launched by an
+editor or LSP test client rather than run for human-readable output.
 
 Direct downloads use this shape:
 
 ```text
 https://github.com/kubeply/rudolint/releases/download/<tag>/rudolint-<target>.tar.xz
+https://github.com/kubeply/rudolint/releases/download/<tag>/rudolint-lsp-<target>.tar.xz
 https://github.com/kubeply/rudolint/releases/download/<tag>/sha256.sum
 ```
 
@@ -104,6 +127,7 @@ Developers can still install from the checked-out repository:
 
 ```bash
 cargo install --path crates/rudolint-cli
+cargo install --path crates/rudolint-lsp
 ```
 
 No Docker image is published yet. Add one only when there is a concrete CI use

@@ -66,8 +66,8 @@ criteria and known limitations.
 
 ## Install
 
-Released versions publish checksummed binaries for Linux and macOS on
-[GitHub Releases](https://github.com/kubeply/rudolint/releases).
+Released versions publish checksummed CLI and LSP server binaries for Linux and
+macOS on [GitHub Releases](https://github.com/kubeply/rudolint/releases).
 
 Install the latest release with the generated shell installer:
 
@@ -99,6 +99,7 @@ Or install from source while developing:
 
 ```bash
 cargo install --path crates/rudolint-cli
+cargo install --path crates/rudolint-lsp
 ```
 
 ## Usage
