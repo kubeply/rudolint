@@ -21,6 +21,27 @@ the v1 findings schema surface and is described by
 The schema uses JSON Schema draft 2020-12 and disallows properties that are not
 listed below.
 
+### JSON Compatibility Policy
+
+`schemaVersion` names the JSON contract that automation can validate and parse.
+After `rudolint` reaches `v1.0.0`, patch and minor releases must keep
+`schemaVersion: "v1"` backward compatible.
+
+The following changes are breaking and require a new schema version:
+
+- removing an existing envelope, finding, label, or span field
+- renaming a field or changing its JSON type
+- changing severity values or rule code format
+- changing span coordinate semantics
+- making an optional field required
+- adding a required field to any existing object
+
+Non-breaking documentation clarifications and bug fixes that keep existing v1
+JSON consumers valid may stay on `schemaVersion: "v1"`. Because the v1 schema is
+strict, adding new emitted fields is treated as a compatibility decision and
+should use a new schema version unless the project explicitly relaxes the schema
+first.
+
 Envelope fields:
 
 | Field | Type | Description |
