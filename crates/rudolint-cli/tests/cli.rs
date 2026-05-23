@@ -34,6 +34,39 @@ fn normalized_findings_json(raw: &str) -> Value {
     output
 }
 
+fn assert_no_internal_finding_fields(output: &Value) {
+    let findings = output
+        .get("findings")
+        .and_then(Value::as_array)
+        .expect("findings output should contain a findings array");
+    assert!(
+        !findings.is_empty(),
+        "internal field regression needs at least one finding"
+    );
+
+    let internal_fields = [
+        "line",
+        "column",
+        "end_line",
+        "end_column",
+        "source",
+        "source_excerpt",
+        "sourceExcerpt",
+        "raw",
+    ];
+    for finding in findings {
+        let finding = finding
+            .as_object()
+            .expect("each finding should serialize as an object");
+        for field in internal_fields {
+            assert!(
+                !finding.contains_key(field),
+                "finding JSON should not expose internal-only field `{field}`"
+            );
+        }
+    }
+}
+
 #[test]
 fn emits_json_findings_for_stdin() {
     let output = rudolint_cmd()
@@ -47,6 +80,29 @@ fn emits_json_findings_for_stdin() {
 
     let output = String::from_utf8(output).expect("stdout should be UTF-8");
     insta::assert_json_snapshot!("stdin_json_findings", normalized_findings_json(&output));
+}
+
+#[test]
+fn json_findings_do_not_emit_internal_only_fields() {
+    let output = rudolint_cmd()
+        .args([
+            "check",
+            "--format",
+            "json",
+            "--show-source",
+            "--failure-threshold",
+            "error",
+        ])
+        .write_stdin("FROM alpine:latest\nWORKDIR app\n")
+        .assert()
+        .failure()
+        .get_output()
+        .stdout
+        .clone();
+
+    let output = String::from_utf8(output).expect("stdout should be UTF-8");
+    let output = normalized_findings_json(&output);
+    assert_no_internal_finding_fields(&output);
 }
 
 #[test]
