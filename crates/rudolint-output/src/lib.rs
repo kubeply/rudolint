@@ -7,6 +7,8 @@ use rudolint_diagnostics::Finding;
 use rudolint_fix::FixPreview;
 use serde_json::json;
 
+const FINDINGS_SCHEMA_VERSION: &str = "v1";
+
 /// Renders findings as line-oriented human-readable diagnostics.
 pub fn human(findings: &[Finding]) -> String {
     if findings.is_empty() {
@@ -39,9 +41,15 @@ pub fn human(findings: &[Finding]) -> String {
     rendered
 }
 
-/// Renders findings as a JSON array.
+/// Renders findings as the versioned JSON findings envelope.
 pub fn json(findings: &[Finding]) -> Result<String> {
-    Ok(format!("{}\n", serde_json::to_string_pretty(findings)?))
+    Ok(format!(
+        "{}\n",
+        serde_json::to_string_pretty(&json!({
+            "schemaVersion": FINDINGS_SCHEMA_VERSION,
+            "findings": findings,
+        }))?
+    ))
 }
 
 /// Renders findings and fix previews as the check command's JSON envelope.
@@ -49,6 +57,7 @@ pub fn json_with_fixes(findings: &[Finding], fixes: &[FixPreview]) -> Result<Str
     Ok(format!(
         "{}\n",
         serde_json::to_string_pretty(&json!({
+            "schemaVersion": FINDINGS_SCHEMA_VERSION,
             "findings": findings,
             "fixes": fixes,
         }))?

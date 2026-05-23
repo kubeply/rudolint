@@ -1,23 +1,25 @@
 ---
 source: crates/rudolint-cli/tests/cli.rs
-assertion_line: 157
 expression: output
 ---
-[
-  {
-    "code": "RDL3000",
-    "help": null,
-    "labels": [],
-    "message": "WORKDIR should be absolute",
-    "path": "$TEMP/Dockerfile",
-    "primary_span": {
-      "end_byte": 30,
-      "end_column": 12,
-      "end_line": 2,
-      "start_byte": 19,
-      "start_column": 1,
-      "start_line": 2
-    },
-    "severity": "error"
-  }
-]
+{
+  "findings": [
+    {
+      "code": "RDL3000",
+      "help": null,
+      "labels": [],
+      "message": "WORKDIR should be absolute",
+      "path": "$TEMP/Dockerfile",
+      "primary_span": {
+        "end_byte": 30,
+        "end_column": 12,
+        "end_line": 2,
+        "start_byte": 19,
+        "start_column": 1,
+        "start_line": 2
+      },
+      "severity": "error"
+    }
+  ],
+  "schemaVersion": "v1"
+}

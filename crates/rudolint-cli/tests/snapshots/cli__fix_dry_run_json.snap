@@ -1,6 +1,5 @@
 ---
 source: crates/rudolint-cli/tests/cli.rs
-assertion_line: 608
 expression: normalized_json(&output)
 ---
 {
@@ -42,5 +41,6 @@ expression: normalized_json(&output)
       ],
       "title": "insert BuildKit syntax directive"
     }
-  ]
+  ],
+  "schemaVersion": "v1"
 }

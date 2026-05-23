@@ -15,35 +15,39 @@ rule metadata, result locations, and physical source regions.
 
 ## JSON
 
-`rudolint check --format json` emits a JSON array of findings. This output is
+`rudolint check --format json` emits a versioned JSON envelope. This output is
 the v1 findings schema surface and is described by
 [`schemas/rudolint-findings-v1.schema.json`](../schemas/rudolint-findings-v1.schema.json).
 
 ```json
-[
-  {
-    "code": "RDL3007",
-    "message": "avoid using latest tag",
-    "severity": "warning",
-    "path": "Dockerfile",
-    "primary_span": {
-      "start_line": 1,
-      "start_column": 1,
-      "end_line": 1,
-      "end_column": 19,
-      "start_byte": 0,
-      "end_byte": 18
-    },
-    "labels": [],
-    "help": null
-  }
-]
+{
+  "schemaVersion": "v1",
+  "findings": [
+    {
+      "code": "RDL3007",
+      "message": "avoid using latest tag",
+      "severity": "warning",
+      "path": "Dockerfile",
+      "primary_span": {
+        "start_line": 1,
+        "start_column": 1,
+        "end_line": 1,
+        "end_column": 19,
+        "start_byte": 0,
+        "end_byte": 18
+      },
+      "labels": [],
+      "help": null
+    }
+  ]
+}
 ```
 
 When `--fix --dry-run --format json` is used, the command emits an envelope:
 
 ```json
 {
+  "schemaVersion": "v1",
   "findings": [],
   "fixes": []
 }

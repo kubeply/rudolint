@@ -2,10 +2,24 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/kubeply/rudolint/schemas/rudolint-findings-v1.schema.json",
   "title": "rudolint findings v1",
-  "description": "JSON findings emitted by `rudolint check --format json`.",
-  "type": "array",
-  "items": {
-    "$ref": "#/$defs/finding"
+  "description": "JSON findings envelope emitted by `rudolint check --format json`.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "findings"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "v1"
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/finding"
+      }
+    }
   },
   "$defs": {
     "finding": {
