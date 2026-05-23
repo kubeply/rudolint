@@ -43,11 +43,17 @@ automatically.
 
 ## Compatibility Profile
 
+The default profile runs broadly compatible Dockerfile checks plus
+BuildKit-native `RDK` diagnostics. Use `hadolint-compat` when a workflow should
+stay on Hadolint-style Dockerfile and shell-style checks while excluding
+BuildKit-native recommendations. This is useful during migration from Hadolint
+or for repositories that are not ready to enforce BuildKit behavior yet.
+
 ```yaml
 - uses: kubeply/rudolint@<action-tag>
   with:
     version: <release-tag>
-    profile: compat
+    profile: hadolint-compat
     failure-threshold: error
 ```
 
@@ -136,7 +142,7 @@ Before publishing:
   Default: `.`.
 - `config` (optional): `.rudolint.yaml` path. Default: empty, which lets
   rudolint use its normal config discovery.
-- `profile` (optional): `default` or `compat`. Default: `default`.
+- `profile` (optional): `default` or `hadolint-compat`. Default: `default`.
 - `format` (optional): `human`, `json`, or `sarif` when `upload-sarif` is
   false. Default: `human`.
 - `failure-threshold` (optional): `ignore`, `style`, `info`, `warning`, or

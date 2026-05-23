@@ -23,12 +23,33 @@ The Rust workspace lives under `crates/`. Each crate should have one clear job.
 Read [crates/README.md](crates/README.md) and
 [docs/architecture.md](docs/architecture.md) before adding new modules.
 
+Workspace crates:
+
+- `rudolint-cli`: binary crate and CLI orchestration.
+- `rudolint-bench`: benchmark harness support and corpus metadata.
+- `rudolint-buildkit`: BuildKit and Buildx semantic analysis.
+- `rudolint-config`: config loading and config-domain types.
+- `rudolint-diagnostics`: severities and diagnostic records.
+- `rudolint-dockerfile`: Dockerfile parser and syntax model.
+- `rudolint-fix`: autofix edit planning.
+- `rudolint-image`: container image reference parsing.
+- `rudolint-lsp`: stdio language server and editor integration primitives.
+- `rudolint-output`: human, JSON, and SARIF renderers.
+- `rudolint-policy`: rule selection and compatibility profiles.
+- `rudolint-rules`: rule catalog and rule engine.
+- `rudolint-settings`: resolved settings.
+- `rudolint-shell`: shell and `RUN` command analysis.
+- `rudolint-source`: source text and spans.
+- `rudolint-test`: shared test-only fixture, snapshot, and CLI helpers.
+- `xtask`: repository maintenance commands that should not ship in runtime
+  binaries.
+
 ## Validation
 
 Run the same checks as CI before sending a pull request:
 
 ```bash
-cargo fmt --all -- --check
+cargo fmt --all --check
 cargo check --all-targets --all-features --locked
 cargo clippy --all-targets --all-features --locked -- -D warnings
 cargo test --all-targets --all-features --locked
@@ -47,6 +68,12 @@ During iteration, prefer targeted tests:
 ```bash
 cargo test -p rudolint-dockerfile parser
 cargo test -p rudolint --test cli
+```
+
+Run ignored oracle tests only when the pinned oracle binary is installed:
+
+```bash
+cargo test --all-targets --all-features --locked -- --ignored
 ```
 
 ## Tests

@@ -22,7 +22,7 @@ fn snapshots_default_rule_findings() {
 fn snapshots_compat_rule_findings() {
     let source = read_fixture("rules/default-basic/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
-    let findings = RuleEngine::new(Profile::Compat, Config::default()).lint(&document);
+    let findings = RuleEngine::new(Profile::HadolintCompat, Config::default()).lint(&document);
 
     insta::assert_json_snapshot!(
         "compat_rule_findings",
@@ -1515,7 +1515,7 @@ fn snapshots_rule_selection_matrix() {
     let document = parse_dockerfile(&source).expect("fixture should parse");
 
     let default_engine = RuleEngine::new(Profile::Default, Config::default());
-    let compat_engine = RuleEngine::new(Profile::Compat, Config::default());
+    let compat_engine = RuleEngine::new(Profile::HadolintCompat, Config::default());
 
     let ignore_config = Config {
         ignore: BTreeSet::from(["RDL3000".to_string()]),
@@ -1554,7 +1554,7 @@ fn snapshots_rule_selection_matrix() {
                 &RuleEngine::new(Profile::Default, ignore_config).lint(&document)
             ),
             "severity_override_rdl3007": finding_codes(
-                &RuleEngine::new(Profile::Compat, severity_config).lint(&document)
+                &RuleEngine::new(Profile::HadolintCompat, severity_config).lint(&document)
             ),
             "select_rdk": finding_codes(
                 &RuleEngine::new(Profile::Default, select_config).lint(&document)

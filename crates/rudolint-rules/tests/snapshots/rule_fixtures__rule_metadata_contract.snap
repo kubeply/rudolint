@@ -1,5 +1,6 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 1595
 expression: metadata
 ---
 [
@@ -131,7 +132,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL1001.md",
     "fix": "none",
     "name": "legacy-external-suppression",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "warn on legacy external linter suppression comments"
   },
@@ -142,7 +143,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3000.md",
     "fix": "none",
     "name": "absolute-workdir",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "require absolute WORKDIR paths"
   },
@@ -153,7 +154,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3001.md",
     "fix": "none",
     "name": "disallowed-container-commands",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "avoid commands that rarely make sense during Docker builds"
   },
@@ -164,7 +165,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3002.md",
     "fix": "none",
     "name": "final-user-not-root",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "require the final USER to be non-root"
   },
@@ -175,7 +176,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3003.md",
     "fix": "none",
     "name": "use-workdir-for-cd",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "prefer WORKDIR over RUN cd"
   },
@@ -186,7 +187,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3004.md",
     "fix": "none",
     "name": "no-sudo",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "avoid sudo in Docker builds"
   },
@@ -197,7 +198,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3006.md",
     "fix": "none",
     "name": "explicit-from-tag",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "require explicit image tags in FROM"
   },
@@ -208,7 +209,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3007.md",
     "fix": "none",
     "name": "no-latest-tag",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "reject latest base image tags"
   },
@@ -219,7 +220,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3008.md",
     "fix": "none",
     "name": "pin-apt-get-install-versions",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "pin versions in apt-get install"
   },
@@ -230,7 +231,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3009.md",
     "fix": "none",
     "name": "clean-apt-lists",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "delete apt-get package lists after use"
   },
@@ -241,7 +242,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3010.md",
     "fix": "none",
     "name": "use-add-for-archives",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "use ADD for extracting local archives"
   },
@@ -252,7 +253,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3011.md",
     "fix": "none",
     "name": "valid-expose-port",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "validate EXPOSE port numbers"
   },
@@ -263,7 +264,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3012.md",
     "fix": "none",
     "name": "single-healthcheck",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "allow only one HEALTHCHECK instruction"
   },
@@ -274,7 +275,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3013.md",
     "fix": "none",
     "name": "pin-pip-versions",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "pin versions in pip install"
   },
@@ -285,7 +286,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3014.md",
     "fix": "none",
     "name": "apt-get-install-assume-yes",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "use -y with apt-get install"
   },
@@ -296,7 +297,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3015.md",
     "fix": "none",
     "name": "apt-get-no-install-recommends",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "avoid recommended packages in apt-get install"
   },
@@ -307,7 +308,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3016.md",
     "fix": "none",
     "name": "pin-npm-versions",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "pin versions in npm install"
   },
@@ -318,7 +319,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3018.md",
     "fix": "none",
     "name": "pin-apk-versions",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "pin versions in apk add"
   },
@@ -329,7 +330,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3019.md",
     "fix": "none",
     "name": "apk-add-no-cache",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "use --no-cache with apk add"
   },
@@ -340,7 +341,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3020.md",
     "fix": "none",
     "name": "prefer-copy",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "prefer COPY for plain local files"
   },
@@ -351,7 +352,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3021.md",
     "fix": "none",
     "name": "copy-multiple-destination-slash",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "require trailing slash for COPY destinations with multiple sources"
   },
@@ -362,7 +363,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3022.md",
     "fix": "none",
     "name": "copy-from-previous-stage",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "require COPY --from references to resolve to previous build stages"
   },
@@ -373,7 +374,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3023.md",
     "fix": "none",
     "name": "copy-from-own-stage",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "forbid COPY --from references to the current stage"
   },
@@ -384,7 +385,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3024.md",
     "fix": "none",
     "name": "unique-stage-names",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "require unique multi-stage aliases"
   },
@@ -395,7 +396,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3025.md",
     "fix": "manual",
     "name": "json-entrypoints",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "prefer JSON form for CMD and ENTRYPOINT"
   },
@@ -406,7 +407,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3026.md",
     "fix": "none",
     "name": "trusted-registries",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "restrict FROM images to trusted registries"
   },
@@ -417,7 +418,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3027.md",
     "fix": "none",
     "name": "use-apt-get",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "prefer apt-get or apt-cache over apt"
   },
@@ -428,7 +429,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3028.md",
     "fix": "none",
     "name": "pin-gem-versions",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "pin versions in gem install"
   },
@@ -439,7 +440,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3029.md",
     "fix": "none",
     "name": "no-from-platform-flag",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "avoid --platform in FROM"
   },
@@ -450,7 +451,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3030.md",
     "fix": "none",
     "name": "yum-install-assume-yes",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "use -y with yum install"
   },
@@ -461,7 +462,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3032.md",
     "fix": "none",
     "name": "yum-clean-all",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "clean yum metadata after installs"
   },
@@ -472,7 +473,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3033.md",
     "fix": "none",
     "name": "pin-yum-versions",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "pin versions in yum install"
   },
@@ -483,7 +484,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3034.md",
     "fix": "none",
     "name": "zypper-install-assume-yes",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "use a non-interactive flag with zypper install"
   },
@@ -494,7 +495,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3035.md",
     "fix": "none",
     "name": "no-zypper-dist-upgrade",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "avoid zypper dist-upgrade"
   },
@@ -505,7 +506,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3036.md",
     "fix": "none",
     "name": "zypper-clean",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "clean zypper metadata after use"
   },
@@ -516,7 +517,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3037.md",
     "fix": "none",
     "name": "pin-zypper-versions",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "pin versions in zypper install"
   },
@@ -527,7 +528,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3038.md",
     "fix": "none",
     "name": "dnf-install-assume-yes",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "use -y with dnf install"
   },
@@ -538,7 +539,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3040.md",
     "fix": "none",
     "name": "dnf-clean-all",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "clean dnf metadata after installs"
   },
@@ -549,7 +550,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3041.md",
     "fix": "none",
     "name": "pin-dnf-versions",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "pin versions in dnf install"
   },
@@ -560,7 +561,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3042.md",
     "fix": "none",
     "name": "pip-no-cache-dir",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "avoid pip cache directories"
   },
@@ -571,7 +572,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3043.md",
     "fix": "none",
     "name": "no-onbuild-trigger",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "reject ONBUILD triggers for ONBUILD, FROM, or MAINTAINER"
   },
@@ -582,7 +583,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3044.md",
     "fix": "none",
     "name": "no-env-self-reference",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "reject same-statement ENV references"
   },
@@ -593,7 +594,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3045.md",
     "fix": "none",
     "name": "copy-relative-without-workdir",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "avoid COPY to relative destinations without WORKDIR"
   },
@@ -604,7 +605,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3046.md",
     "fix": "none",
     "name": "useradd-no-log-init",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "use no-log-init with high useradd UIDs"
   },
@@ -615,7 +616,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3047.md",
     "fix": "none",
     "name": "wget-progress",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "avoid noisy wget progress output"
   },
@@ -626,7 +627,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3048.md",
     "fix": "none",
     "name": "valid-label-key",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "reject invalid label keys"
   },
@@ -637,7 +638,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3049.md",
     "fix": "none",
     "name": "missing-required-labels",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "require configured labels"
   },
@@ -648,7 +649,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3050.md",
     "fix": "none",
     "name": "no-superfluous-labels",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "reject labels outside the configured label schema"
   },
@@ -659,7 +660,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3051.md",
     "fix": "none",
     "name": "no-empty-labels",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "reject empty configured label values"
   },
@@ -670,7 +671,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3052.md",
     "fix": "none",
     "name": "valid-url-labels",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "validate URL label values"
   },
@@ -681,7 +682,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3053.md",
     "fix": "none",
     "name": "valid-rfc3339-labels",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "validate RFC3339 label values"
   },
@@ -692,7 +693,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3054.md",
     "fix": "none",
     "name": "valid-spdx-labels",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "validate SPDX license label values"
   },
@@ -703,7 +704,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3055.md",
     "fix": "none",
     "name": "valid-git-hash-labels",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "validate git hash label values"
   },
@@ -714,7 +715,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3056.md",
     "fix": "none",
     "name": "valid-semver-labels",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "validate semantic version label values"
   },
@@ -725,7 +726,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3057.md",
     "fix": "none",
     "name": "missing-healthcheck",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "require HEALTHCHECK instructions"
   },
@@ -736,7 +737,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3058.md",
     "fix": "none",
     "name": "valid-email-labels",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "validate email label values"
   },
@@ -747,7 +748,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3059.md",
     "fix": "none",
     "name": "consecutive-run",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "combine consecutive RUN instructions"
   },
@@ -758,7 +759,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3060.md",
     "fix": "none",
     "name": "yarn-cache-clean",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "clean yarn cache after yarn install"
   },
@@ -769,7 +770,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3061.md",
     "fix": "none",
     "name": "instruction-order",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "require Dockerfiles to begin with FROM, ARG, or comments"
   },
@@ -780,7 +781,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3062.md",
     "fix": "none",
     "name": "pin-go-versions",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "pin Go package versions"
   },
@@ -791,7 +792,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL3063.md",
     "fix": "none",
     "name": "reserved-stage-name",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "avoid reserved stage names"
   },
@@ -802,7 +803,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4000.md",
     "fix": "safe",
     "name": "deprecated-maintainer",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "reject deprecated MAINTAINER instructions"
   },
@@ -813,7 +814,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4001.md",
     "fix": "none",
     "name": "either-wget-or-curl",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "use either wget or curl in a stage"
   },
@@ -824,7 +825,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4003.md",
     "fix": "none",
     "name": "single-cmd",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "allow only one CMD instruction"
   },
@@ -835,7 +836,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4004.md",
     "fix": "none",
     "name": "single-entrypoint",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "allow only one ENTRYPOINT instruction"
   },
@@ -846,7 +847,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4005.md",
     "fix": "none",
     "name": "use-shell-for-default-shell",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "use SHELL to change the default shell"
   },
@@ -857,7 +858,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RDL4006.md",
     "fix": "none",
     "name": "pipefail-before-pipe",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "set pipefail before RUN instructions with pipes"
   },
@@ -868,7 +869,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RSC2002.md",
     "fix": "none",
     "name": "avoid-useless-cat",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "avoid piping cat output when the next command can read files directly"
   },
@@ -879,7 +880,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RSC2015.md",
     "fix": "none",
     "name": "command-chain-as-condition",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "avoid using A && B || C as a conditional expression"
   },
@@ -890,7 +891,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RSC2046.md",
     "fix": "none",
     "name": "quote-command-substitutions",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "quote command substitutions to prevent word splitting"
   },
@@ -901,7 +902,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RSC2086.md",
     "fix": "none",
     "name": "quote-variable-expansions",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "quote variable expansions to prevent word splitting and globbing"
   },
@@ -912,7 +913,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RSC2155.md",
     "fix": "none",
     "name": "declare-and-assign-separately",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "declare and assign separately to avoid masking command failures"
   },
@@ -923,7 +924,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RSC2164.md",
     "fix": "none",
     "name": "check-cd-exit-status",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "check cd exit status before running more commands"
   },
@@ -934,7 +935,7 @@ expression: metadata
     "docs_url": "https://github.com/kubeply/rudolint/blob/main/docs/rules/RSC2181.md",
     "fix": "none",
     "name": "check-exit-code-directly",
-    "profile": "compat",
+    "profile": "hadolint-compat",
     "status": "implemented",
     "summary": "check command exit status directly instead of testing $?"
   }

@@ -8,8 +8,8 @@ pub enum PolicyProfile {
     /// Default rudolint behavior with compatibility and BuildKit-native rules.
     #[default]
     Default,
-    /// Compatibility-focused behavior that excludes native-only rules.
-    Compat,
+    /// Hadolint-style compatibility behavior that excludes native-only rules.
+    HadolintCompat,
     /// Reserved stricter behavior for future opt-in checks.
     Strict,
 }
@@ -19,7 +19,7 @@ impl PolicyProfile {
     pub const fn as_str(self) -> &'static str {
         match self {
             Self::Default => "default",
-            Self::Compat => "compat",
+            Self::HadolintCompat => "hadolint-compat",
             Self::Strict => "strict",
         }
     }
@@ -28,7 +28,7 @@ impl PolicyProfile {
     pub const fn includes_buildkit_native_rules(self) -> bool {
         match self {
             Self::Default | Self::Strict => true,
-            Self::Compat => false,
+            Self::HadolintCompat => false,
         }
     }
 
@@ -174,10 +174,10 @@ mod tests {
     }
 
     #[test]
-    fn compat_profile_excludes_buildkit_native_rules() {
-        let profile = PolicyProfile::Compat;
+    fn hadolint_compat_profile_excludes_buildkit_native_rules() {
+        let profile = PolicyProfile::HadolintCompat;
 
-        assert_eq!(profile.as_str(), "compat");
+        assert_eq!(profile.as_str(), "hadolint-compat");
         assert!(profile.includes_compatibility_rules());
         assert!(!profile.includes_buildkit_native_rules());
         assert!(profile.includes_shell_catalog());

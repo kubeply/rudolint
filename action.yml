@@ -23,7 +23,7 @@ inputs:
     required: false
     default: ""
   profile:
-    description: Rule profile to use.
+    description: Hadolint-style checks without BuildKit-native RDK diagnostics.
     required: false
     default: default
   format:

@@ -1,68 +1,62 @@
 # rudolint
 
+[![CI](https://github.com/kubeply/rudolint/actions/workflows/ci.yml/badge.svg)](https://github.com/kubeply/rudolint/actions/workflows/ci.yml)
+[![Release](https://github.com/kubeply/rudolint/actions/workflows/release.yml/badge.svg)](https://github.com/kubeply/rudolint/actions/workflows/release.yml)
+[![GitHub release](https://img.shields.io/github/v/release/kubeply/rudolint?sort=semver)](https://github.com/kubeply/rudolint/releases)
+[![Rust 1.95.0](https://img.shields.io/badge/rust-1.95.0-orange)](rust-toolchain.toml)
+[![License](https://img.shields.io/github/license/kubeply/rudolint)](LICENSE)
 [![CodSpeed](https://img.shields.io/endpoint?url=https://codspeed.io/badge.json)](https://codspeed.io/kubeply/rudolint?utm_source=badge)
 
 `rudolint` is a fast Dockerfile linter built for modern BuildKit and Buildx
 workflows.
 
-![Dockerfile linter benchmark](benchmarks/dockerfile-linters/results/headline.svg)
+## Features
 
-_Linting 1,000 deterministic Dockerfiles. Lower is better. See the full
-[Dockerfile linter benchmark methodology](benchmarks/dockerfile-linters/README.md)._
+| Feature | What is implemented |
+| --- | --- |
+| Dockerfile parsing | Source-aware parsing for instructions, flags, heredocs, comments, and stage aliases. |
+| BuildKit support | Frontend syntax directives, cache mounts, secret mounts, SSH mounts, insecure entitlements, and Buildx platform checks. |
+| Rule profiles | `default` runs Hadolint-style compatibility rules plus BuildKit-native rules. `hadolint-compat` runs Hadolint-style and shell-style rules without BuildKit-native `RDK` diagnostics. |
+| CI output | Human output for terminals, JSON for automation, and SARIF for GitHub code scanning. |
+| Configuration | `.rudolint.yaml` supports ignored rules, severity overrides, per-file ignores, selected rule prefixes, and trusted registries. |
+| GitHub Action | A composite action downloads checksummed release binaries and runs `rudolint` without compiling Rust in user workflows. |
+| Language server | `rudolint-lsp` speaks LSP over stdio for editor diagnostics. |
+| Rule documentation | Implemented rules are documented under [docs/rules](docs/rules/README.md), with compatibility and BuildKit roadmap notes in [docs/rule-roadmap.md](docs/rule-roadmap.md). |
 
-The goal is a single static binary that understands current Dockerfile syntax,
-emits CI-native diagnostics, and stays pleasant to run in pre-commit hooks,
-editors, and large monorepos.
+## Install
 
-## Why
+```bash
+curl --proto '=https' --tlsv1.2 -LsSf https://github.com/kubeply/rudolint/releases/latest/download/rudolint-installer.sh | sh
+```
 
-Dockerfile linting still matters, but Docker builds have moved on:
+## Usage
 
-- BuildKit is the normal builder path for Docker Desktop and Docker Engine.
-- `# syntax=docker/dockerfile:1.x` controls frontend behavior.
-- `RUN --mount=type=cache` changes old package-cache advice.
-- `RUN --mount=type=secret` and `--mount=type=ssh` need security-aware linting.
-- heredocs and multi-stage builds deserve parser-level support.
-- CI systems expect JSON, SARIF, and stable rule IDs.
+Check one Dockerfile:
 
-`rudolint` starts from those assumptions instead of treating them as edge cases.
+```bash
+rudolint check Dockerfile
+```
 
-## Current Status
+Check a repository:
 
-This repository is a baseline implementation. It already has:
+```bash
+rudolint check .
+```
 
-- a Rust CLI with `check` and `rules` commands
-- recursive Dockerfile discovery
-- BuildKit syntax directive detection
-- parsing for instruction flags, mounts, heredocs, and stage aliases
-- human, JSON, and SARIF output
-- a rule engine with default and compatibility profiles
-- initial Dockerfile rules and BuildKit-specific rules
-- ignored rules and severity overrides through `.rudolint.yaml`
-- ignored parity-test scaffolding for comparing behavior against an external
-  pinned oracle
+Write SARIF for CI:
 
-It is not ready to replace established Dockerfile linters yet. The first
-milestone is broad parity on common Dockerfile rules, followed by
-BuildKit-native rules that older linters cannot model cleanly.
+```bash
+rudolint check . --format sarif > rudolint.sarif
+```
 
-See [docs/rule-roadmap.md](docs/rule-roadmap.md) for the compatibility and
-BuildKit rule roadmap.
+Exit codes:
 
-See [docs/implementation-plan.md](docs/implementation-plan.md) for the ordered
-implementation plan from test harness work through release packaging, GitHub
-Actions, and future editor integration.
-
-See [docs/rules/README.md](docs/rules/README.md) for the rule documentation
-template and [docs/performance.md](docs/performance.md) for initial advisory
-performance budgets.
-
-See [docs/release.md](docs/release.md) for release automation details.
-
-See [docs/action.md](docs/action.md) for GitHub Action usage.
-
-See [docs/first-release.md](docs/first-release.md) for first release readiness
-criteria and known limitations.
+| Code | Meaning |
+| --- | --- |
+| `0` | No findings at or above the failure threshold. |
+| `1` | Findings met or exceeded the failure threshold. |
+| `2` | Usage, config, or input error. |
+| `3` | Unexpected internal error. |
 
 ## GitHub Action
 
@@ -113,95 +107,19 @@ steps:
       sarif-output: rudolint.sarif
 ```
 
-Use the compatibility profile when matching established Dockerfile-linter
-expectations matters more than BuildKit-specific coverage:
+Use `profile: hadolint-compat` when you want Hadolint-style Dockerfile and
+shell-style checks without BuildKit-native `RDK` diagnostics. This is useful
+while migrating from Hadolint or when a project is not ready for BuildKit
+recommendations yet. See [docs/action.md](docs/action.md) for the full action
+contract.
 
 ```yaml
 - uses: kubeply/rudolint@<release-tag>
   with:
     version: <release-tag>
-    profile: compat
+    profile: hadolint-compat
     failure-threshold: error
 ```
-
-## Install
-
-Released versions publish checksummed CLI and LSP server binaries for Linux and
-macOS on [GitHub Releases](https://github.com/kubeply/rudolint/releases).
-
-Install the latest release with the generated shell installer:
-
-```bash
-curl --proto '=https' --tlsv1.2 -LsSf \
-  https://github.com/kubeply/rudolint/releases/latest/download/rudolint-installer.sh \
-  | sh
-```
-
-Install a pinned version:
-
-```bash
-curl --proto '=https' --tlsv1.2 -LsSf \
-  https://github.com/kubeply/rudolint/releases/download/<tag>/rudolint-installer.sh \
-  | sh
-```
-
-Verify the installed binary:
-
-```bash
-rudolint --version
-```
-
-The command should print `rudolint <version>` and exit with status `0`.
-Failures usually mean the install directory is not on `PATH`, the shell cannot
-execute the installed binary, or the installer failed before completion.
-
-Or install from source while developing:
-
-```bash
-cargo install --path crates/rudolint-cli
-cargo install --path crates/rudolint-lsp
-```
-
-## Usage
-
-```bash
-rudolint check Dockerfile
-rudolint check . --format json
-rudolint check . --format sarif > rudolint.sarif
-rudolint rules --implemented
-rudolint check . --exit-zero
-rudolint check . --no-config
-rudolint check --stdin-filename Dockerfile --format json < Dockerfile
-rudolint check . --quiet
-rudolint check . --verbose
-rudolint check . --show-source
-rudolint rules --format json
-rudolint explain RDL3007
-```
-
-Use stdin:
-
-```bash
-rudolint check --format json < Dockerfile
-```
-
-Run the language server while developing:
-
-```bash
-cargo run -p rudolint-lsp --bin rudolint-lsp
-```
-
-The `rudolint-lsp` binary speaks LSP over stdio. Editors should launch it as
-the language server command for Dockerfile buffers; see
-[`crates/rudolint-lsp`](crates/rudolint-lsp/README.md) for the current server
-capabilities and wrapper notes.
-
-Exit codes:
-
-- `0`: no findings at or above the failure threshold.
-- `1`: findings met or exceeded the failure threshold.
-- `2`: usage, config, or input error.
-- `3`: unexpected internal error.
 
 ## Configuration
 
@@ -237,92 +155,21 @@ rudolint check . --config .rudolint.yaml
 
 ## Rule Families
 
-`RDL` rules cover broadly compatible Dockerfile correctness, reproducibility,
-and maintainability checks.
+| Prefix | Scope |
+| --- | --- |
+| `RDL` | Broad Dockerfile correctness, reproducibility, and maintainability checks. |
+| `RDK` | BuildKit-specific behavior such as frontend directives, mounts, entitlements, and Buildx platform behavior. |
+| `RSC` | Shell diagnostics extracted from `RUN` bodies. |
 
-`RDK` rules cover BuildKit-specific behavior such as frontend directives,
-cache mounts, secret mounts, SSH mounts, and build-time network/security flags.
+## More Docs
 
-`RSC` rules are reserved for shell diagnostics extracted from `RUN` bodies.
-Those rules are tracked separately because shell analysis needs its own parser
-and data-flow model.
-
-## Compatibility Strategy
-
-Compatibility is tested with an external, pinned oracle in ignored tests and
-fixtures. The runtime linter does not shell out to another linter.
-
-The intended loop is:
-
-1. Add a Dockerfile fixture.
-2. Capture oracle diagnostics in normalized JSON.
-3. Implement the matching `RDL` or `RSC` behavior.
-4. Keep `rudolint --profile compat --format json` stable for CI users.
-5. Add BuildKit-aware `RDK` diagnostics in the default profile.
-
-## BuildKit Rule Coverage
-
-- flag secret-like `ARG` and `ENV` names
-- prefer `RUN --mount=type=secret` over build arguments for secrets
-- detect secret files copied into image layers
-- recommend cache mounts for package managers where safe
-- check cache mount IDs and sharing modes in multi-stage builds
-- understand frontend versions from `# syntax=...`
-- detect Buildx platform footguns in multi-arch Dockerfiles
-- warn on insecure entitlements such as broad network or security modes
-- preserve source spans for heredocs and mounted `RUN` commands
-
-## Benchmarks
-
-`rudolint` has two benchmark tracks:
-
-- CodSpeed guards internal parser, rule-engine, end-to-end, and output-rendering
-  benchmarks against regressions on pull requests.
-- The external [Dockerfile linter benchmark suite](benchmarks/dockerfile-linters/README.md)
-  compares `rudolint` with `hadolint`, `tally`, and Docker build checks on
-  reproducible CLI workloads.
-
-Refresh the external charts with:
-
-```bash
-python3 scripts/dockerfile-linter-bench.py run --runs 5 --warmup 5
-```
-
-After this workflow exists on `main`, refresh the checked-in comparison chart
-with the `Dockerfile linter benchmarks` workflow on a Depot Ubuntu runner.
+- [GitHub Action usage](docs/action.md)
+- [Rule roadmap](docs/rule-roadmap.md)
+- [Architecture](docs/architecture.md)
+- [Implementation plan](docs/implementation-plan.md)
+- [Release automation](docs/release.md)
 
 ## Development
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, validation, and contribution
-guidelines.
-
-The Rust code is organized as a Cargo workspace under `crates/`:
-
-- `rudolint`: binary crate and CLI orchestration
-- `rudolint-bench`: benchmark harness support and corpus metadata
-- `rudolint-buildkit`: BuildKit and Buildx semantic analysis
-- `rudolint-config`: config loading and config-domain types
-- `rudolint-diagnostics`: severities and diagnostic records
-- `rudolint-dockerfile`: Dockerfile parser and syntax model
-- `rudolint-fix`: autofix edit planning
-- `rudolint-image`: container image reference parsing
-- `rudolint-lsp`: stdio language server and editor integration primitives
-- `rudolint-output`: human, JSON, and SARIF renderers
-- `rudolint-policy`: rule selection and compatibility profiles
-- `rudolint-rules`: rule catalog and rule engine
-- `rudolint-settings`: resolved settings
-- `rudolint-shell`: shell and `RUN` command analysis
-- `rudolint-source`: source text and spans
-
-```bash
-cargo fmt --all -- --check
-cargo check --all-targets --all-features --locked
-cargo clippy --all-targets --all-features --locked -- -D warnings
-cargo test --all-targets --all-features --locked
-```
-
-Run ignored oracle tests only when the pinned oracle binary is installed:
-
-```bash
-cargo test --test parity -- --ignored
-```
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, repository layout,
+validation, testing, and contribution guidelines.

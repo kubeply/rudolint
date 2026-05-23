@@ -18,20 +18,21 @@ use serde::Serialize;
 pub use engine::RuleEngine;
 pub use metadata::{FixAvailability, RuleCategory, RuleMetadata};
 
-#[derive(Debug, Clone, Copy, Default, ValueEnum)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, ValueEnum)]
 pub enum Profile {
     /// BuildKit-native rules plus broadly compatible Dockerfile checks.
     #[default]
     Default,
-    /// Emit only diagnostics intended to match established Dockerfile rule IDs.
-    Compat,
+    /// Emit Hadolint-style diagnostics without BuildKit-native rules.
+    #[value(name = "hadolint-compat")]
+    HadolintCompat,
 }
 
 impl From<Profile> for PolicyProfile {
     fn from(profile: Profile) -> Self {
         match profile {
             Profile::Default => Self::Default,
-            Profile::Compat => Self::Compat,
+            Profile::HadolintCompat => Self::HadolintCompat,
         }
     }
 }

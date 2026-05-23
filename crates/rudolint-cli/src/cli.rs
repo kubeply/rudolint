@@ -146,3 +146,30 @@ pub enum OutputFormat {
     Json,
     Sarif,
 }
+
+#[cfg(test)]
+mod tests {
+    use clap::Parser;
+    use rudolint_rules::Profile;
+
+    use super::{Cli, Command};
+
+    #[test]
+    fn accepts_hadolint_compat_profile_name() {
+        let cli = Cli::try_parse_from(["rudolint", "check", "--profile", "hadolint-compat"])
+            .expect("hadolint-compat should parse");
+
+        let Some(Command::Check(args)) = cli.command else {
+            panic!("expected check command");
+        };
+        assert_eq!(args.profile, Profile::HadolintCompat);
+    }
+
+    #[test]
+    fn rejects_removed_compat_profile_alias() {
+        let error = Cli::try_parse_from(["rudolint", "check", "--profile", "compat"])
+            .expect_err("compat should no longer parse");
+
+        assert_eq!(error.kind(), clap::error::ErrorKind::InvalidValue);
+    }
+}

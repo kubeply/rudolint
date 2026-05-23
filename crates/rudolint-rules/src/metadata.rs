@@ -56,7 +56,7 @@ impl RuleMetadata {
             name: code,
             summary: "tracked for compatibility parity",
             default_severity: Severity::Warning,
-            profile: PolicyProfile::Compat,
+            profile: PolicyProfile::HadolintCompat,
             category: RuleCategory::Compatibility,
             status: RuleStatus::Planned,
             docs_url: docs_url(code),
@@ -71,7 +71,7 @@ impl RuleMetadata {
             name: code,
             summary: "tracked for shell-analysis coverage",
             default_severity: Severity::Warning,
-            profile: PolicyProfile::Compat,
+            profile: PolicyProfile::HadolintCompat,
             category: RuleCategory::Shell,
             status: RuleStatus::Planned,
             docs_url: docs_url(code),
@@ -170,7 +170,7 @@ fn category_for_code(code: &str) -> RuleCategory {
 
 fn profile_for_code(code: &str) -> PolicyProfile {
     if code.starts_with("RDL") || code.starts_with("RSC") {
-        PolicyProfile::Compat
+        PolicyProfile::HadolintCompat
     } else {
         PolicyProfile::Default
     }

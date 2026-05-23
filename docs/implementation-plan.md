@@ -389,7 +389,7 @@ Goal: make rule selection predictable for real repositories.
 6. Move effective settings out of `rudolint-cli`.
 7. Add profile behavior in `rudolint-policy`:
    - `default`.
-   - `compat`.
+   - `hadolint-compat`.
    - future `strict`.
 8. Add inline suppression parsing for project-native comments.
 9. Keep compatibility warnings for legacy external suppression comments.
@@ -399,7 +399,7 @@ Acceptance criteria:
 
 - A CI run can be reproduced locally with the same config file.
 - Users can incrementally adopt the tool by ignoring specific rules.
-- Compatibility mode emits only intended compatibility diagnostics.
+- Hadolint compatibility mode emits only intended compatibility diagnostics.
 
 ## Milestone 8: Rule Engine Refactor
 
