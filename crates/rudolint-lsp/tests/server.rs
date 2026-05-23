@@ -2,7 +2,7 @@ use std::collections::VecDeque;
 use std::io::{BufRead, BufReader, Read, Write};
 use std::process::{Child, ChildStdin, Command, Stdio};
 use std::sync::mpsc::{self, Receiver};
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 use serde_json::{Value, json};
 use tempfile::TempDir;
@@ -187,18 +187,20 @@ impl LspServer {
         self.stdin.flush().expect("message should flush");
     }
 
-    fn recv(&mut self) -> Value {
+    fn recv_timeout(&mut self, timeout: Duration) -> Value {
         self.pending.pop_front().unwrap_or_else(|| {
             self.messages
-                .recv_timeout(Duration::from_secs(10))
+                .recv_timeout(timeout)
                 .expect("server should send a message")
         })
     }
 
     fn recv_response(&mut self, id: i64) -> Value {
         let mut skipped = Vec::new();
-        for _ in 0..20 {
-            let message = self.recv();
+        let deadline = Instant::now() + Duration::from_secs(10);
+        while Instant::now() < deadline {
+            let timeout = deadline.saturating_duration_since(Instant::now());
+            let message = self.recv_timeout(timeout);
             if message["id"] == id {
                 self.restore_skipped(skipped);
                 return message;
@@ -212,8 +214,10 @@ impl LspServer {
 
     fn recv_method(&mut self, method: &str) -> Value {
         let mut skipped = Vec::new();
-        for _ in 0..20 {
-            let message = self.recv();
+        let deadline = Instant::now() + Duration::from_secs(10);
+        while Instant::now() < deadline {
+            let timeout = deadline.saturating_duration_since(Instant::now());
+            let message = self.recv_timeout(timeout);
             if message["method"] == method {
                 self.restore_skipped(skipped);
                 return message;
