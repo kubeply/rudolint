@@ -848,7 +848,9 @@ fn emits_json_version() {
         .clone();
 
     let output = String::from_utf8(output).expect("stdout should be UTF-8");
-    insta::assert_json_snapshot!("version_json", normalized_json(&output));
+    let output: Value = serde_json::from_str(&output).expect("version output should be JSON");
+    assert_eq!(output["name"], "rudolint");
+    assert_eq!(output["version"], env!("CARGO_PKG_VERSION"));
 }
 
 #[test]
@@ -857,5 +859,8 @@ fn emits_plain_version() {
         .arg("--version")
         .assert()
         .success()
-        .stdout(predicates::str::contains("rudolint 0.1.0"));
+        .stdout(predicates::str::contains(format!(
+            "rudolint {}",
+            env!("CARGO_PKG_VERSION")
+        )));
 }

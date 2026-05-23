@@ -1,8 +1,0 @@
----
-source: crates/rudolint-cli/tests/cli.rs
-expression: normalized_json(&output)
----
-{
-  "name": "rudolint",
-  "version": "0.1.0"
-}
