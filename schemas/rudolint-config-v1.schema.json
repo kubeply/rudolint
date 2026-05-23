@@ -4,6 +4,48 @@
   "title": "rudolint config v1",
   "description": "Project configuration loaded from .rudolint.yaml.",
   "type": "object",
+  "examples": [
+    {
+      "ignore": [
+        "RDL3007"
+      ],
+      "severity": {
+        "RDL3026": "error"
+      },
+      "trusted-registries": [
+        "docker.io",
+        "ghcr.io"
+      ]
+    },
+    {
+      "select": [
+        "RDL",
+        "RDK"
+      ],
+      "per-file-ignores": {
+        "fixtures/**": [
+          "RDL3008"
+        ],
+        "legacy/**/Dockerfile": [
+          "RDL",
+          "RSC"
+        ]
+      }
+    },
+    {
+      "label-schema": {
+        "org.opencontainers.image.created": "rfc3339",
+        "org.opencontainers.image.licenses": "spdx",
+        "org.opencontainers.image.revision": "git-hash",
+        "org.opencontainers.image.source": "url",
+        "org.opencontainers.image.version": "semver"
+      },
+      "strict-labels": true,
+      "allow-entitlements": [
+        "network.host"
+      ]
+    }
+  ],
   "additionalProperties": false,
   "properties": {
     "select": {
