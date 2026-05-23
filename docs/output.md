@@ -37,10 +37,13 @@ The following changes are breaking and require a new schema version:
 - adding a required field to any existing object
 
 Non-breaking documentation clarifications and bug fixes that keep existing v1
-JSON consumers valid may stay on `schemaVersion: "v1"`. Because the v1 schema is
-strict, adding new emitted fields is treated as a compatibility decision and
-should use a new schema version unless the project explicitly relaxes the schema
-first.
+JSON consumers valid may stay on `schemaVersion: "v1"`. Consumers that only
+parse JSON can usually ignore extra fields, but strict-schema validators cannot:
+the v1 schema sets `additionalProperties: false`. Emitting new fields under
+`schemaVersion: "v1"` therefore must not happen unless the project first ships a
+coordinated schema evolution that relaxes the schema, notifies consumers, and
+allows time for adoption. In normal cases, prefer a new schema version for newly
+emitted fields.
 
 Envelope fields:
 
