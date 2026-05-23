@@ -167,7 +167,9 @@ impl Server {
                         return Ok(false);
                     }
                 };
-                self.did_open(connection, params)?;
+                if let Err(error) = self.did_open(connection, params) {
+                    eprintln!("rudolint-lsp: failed to handle textDocument/didOpen: {error}");
+                }
                 Ok(false)
             }
             lsp_types::notification::DidChangeTextDocument::METHOD => {
@@ -195,7 +197,9 @@ impl Server {
                         return Ok(false);
                     }
                 };
-                self.did_close(connection, params)?;
+                if let Err(error) = self.did_close(connection, params) {
+                    eprintln!("rudolint-lsp: failed to handle textDocument/didClose: {error}");
+                }
                 Ok(false)
             }
             _ => Ok(false),
