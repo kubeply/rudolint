@@ -1,3 +1,4 @@
+use std::collections::VecDeque;
 use std::io::{BufRead, BufReader, Read, Write};
 use std::process::{Child, ChildStdin, Command, Stdio};
 use std::sync::mpsc::{self, Receiver};
@@ -30,7 +31,7 @@ fn stdio_server_lints_and_handles_editor_requests() {
             "workspaceFolders": [{ "uri": root_uri, "name": "workspace" }]
         }
     }));
-    let initialize = server.recv();
+    let initialize = server.recv_response(1);
     assert_eq!(initialize["id"], 1);
     assert_eq!(initialize["result"]["serverInfo"]["name"], "rudolint-lsp");
     assert_eq!(initialize["result"]["capabilities"]["textDocumentSync"], 1);
@@ -54,8 +55,7 @@ fn stdio_server_lints_and_handles_editor_requests() {
         "method": "textDocument/hover",
         "params": { "textDocument": { "uri": document_uri } }
     }));
-    let invalid_hover = server.recv();
-    assert_eq!(invalid_hover["id"], 2);
+    let invalid_hover = server.recv_response(2);
     assert_eq!(invalid_hover["error"]["code"], -32602);
 
     let initial_text = "# RDL3007\nFROM alpine:latest\nRUN --mount=type=cache,target=/var/cache/apt apt-get update\n";
@@ -85,8 +85,7 @@ fn stdio_server_lints_and_handles_editor_requests() {
             "position": { "line": 0, "character": 3 }
         }
     }));
-    let hover = server.recv();
-    assert_eq!(hover["id"], 3);
+    let hover = server.recv_response(3);
     assert!(
         hover["result"]["contents"]["value"]
             .as_str()
@@ -107,8 +106,7 @@ fn stdio_server_lints_and_handles_editor_requests() {
             "context": { "diagnostics": [] }
         }
     }));
-    let code_actions = server.recv();
-    assert_eq!(code_actions["id"], 4);
+    let code_actions = server.recv_response(4);
     let action_titles = code_actions["result"]
         .as_array()
         .expect("code actions should be an array")
@@ -149,6 +147,7 @@ struct LspServer {
     child: Child,
     stdin: ChildStdin,
     messages: Receiver<Value>,
+    pending: VecDeque<Value>,
 }
 
 impl LspServer {
@@ -156,7 +155,7 @@ impl LspServer {
         let mut child = Command::new(env!("CARGO_BIN_EXE_rudolint-lsp"))
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
-            .stderr(Stdio::piped())
+            .stderr(Stdio::inherit())
             .spawn()
             .expect("rudolint-lsp should start");
         let stdin = child.stdin.take().expect("stdin should be piped");
@@ -175,6 +174,7 @@ impl LspServer {
             child,
             stdin,
             messages,
+            pending: VecDeque::new(),
         }
     }
 
@@ -187,21 +187,48 @@ impl LspServer {
         self.stdin.flush().expect("message should flush");
     }
 
-    fn recv(&self) -> Value {
-        self.messages
-            .recv_timeout(Duration::from_secs(10))
-            .expect("server should send a message")
+    fn recv(&mut self) -> Value {
+        self.pending.pop_front().unwrap_or_else(|| {
+            self.messages
+                .recv_timeout(Duration::from_secs(10))
+                .expect("server should send a message")
+        })
     }
 
-    fn recv_method(&self, method: &str) -> Value {
-        for _ in 0..10 {
+    fn recv_response(&mut self, id: i64) -> Value {
+        let mut skipped = Vec::new();
+        for _ in 0..20 {
             let message = self.recv();
-            if message["method"] == method {
+            if message["id"] == id {
+                self.restore_skipped(skipped);
                 return message;
             }
+            skipped.push(message);
         }
 
+        self.restore_skipped(skipped);
+        panic!("server did not send response id {id}");
+    }
+
+    fn recv_method(&mut self, method: &str) -> Value {
+        let mut skipped = Vec::new();
+        for _ in 0..20 {
+            let message = self.recv();
+            if message["method"] == method {
+                self.restore_skipped(skipped);
+                return message;
+            }
+            skipped.push(message);
+        }
+
+        self.restore_skipped(skipped);
         panic!("server did not send {method}");
+    }
+
+    fn restore_skipped(&mut self, skipped: Vec<Value>) {
+        for message in skipped.into_iter().rev() {
+            self.pending.push_front(message);
+        }
     }
 
     fn shutdown(&mut self) {
@@ -211,8 +238,7 @@ impl LspServer {
             "method": "shutdown",
             "params": null
         }));
-        let response = self.recv();
-        assert_eq!(response["id"], 99);
+        self.recv_response(99);
         self.send(json!({
             "jsonrpc": "2.0",
             "method": "exit",
