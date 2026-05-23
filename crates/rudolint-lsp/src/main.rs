@@ -88,8 +88,19 @@ impl Server {
             }
             lsp_types::request::HoverRequest::METHOD => {
                 let id = request.id;
-                let params = serde_json::from_value(request.params)
-                    .context("failed to parse textDocument/hover params")?;
+                let params = match serde_json::from_value(request.params) {
+                    Ok(params) => params,
+                    Err(error) => {
+                        return send_response(
+                            connection,
+                            Response::new_err(
+                                id,
+                                ErrorCode::InvalidParams as i32,
+                                error.to_string(),
+                            ),
+                        );
+                    }
+                };
                 let hover = self.hover(params);
                 send_response(
                     connection,
@@ -98,8 +109,19 @@ impl Server {
             }
             lsp_types::request::CodeActionRequest::METHOD => {
                 let id = request.id;
-                let params = serde_json::from_value(request.params)
-                    .context("failed to parse textDocument/codeAction params")?;
+                let params = match serde_json::from_value(request.params) {
+                    Ok(params) => params,
+                    Err(error) => {
+                        return send_response(
+                            connection,
+                            Response::new_err(
+                                id,
+                                ErrorCode::InvalidParams as i32,
+                                error.to_string(),
+                            ),
+                        );
+                    }
+                };
                 match self.code_actions(params) {
                     Ok(actions) => send_response(
                         connection,
@@ -136,20 +158,43 @@ impl Server {
                 std::process::exit(1);
             }
             lsp_types::notification::DidOpenTextDocument::METHOD => {
-                let params = serde_json::from_value(notification.params)
-                    .context("failed to parse textDocument/didOpen params")?;
+                let params = match serde_json::from_value(notification.params) {
+                    Ok(params) => params,
+                    Err(error) => {
+                        eprintln!(
+                            "rudolint-lsp: failed to parse textDocument/didOpen params: {error}"
+                        );
+                        return Ok(false);
+                    }
+                };
                 self.did_open(connection, params)?;
                 Ok(false)
             }
             lsp_types::notification::DidChangeTextDocument::METHOD => {
-                let params = serde_json::from_value(notification.params)
-                    .context("failed to parse textDocument/didChange params")?;
-                self.did_change(connection, params)?;
+                let params = match serde_json::from_value(notification.params) {
+                    Ok(params) => params,
+                    Err(error) => {
+                        eprintln!(
+                            "rudolint-lsp: failed to parse textDocument/didChange params: {error}"
+                        );
+                        return Ok(false);
+                    }
+                };
+                if let Err(error) = self.did_change(connection, params) {
+                    eprintln!("rudolint-lsp: failed to handle textDocument/didChange: {error}");
+                }
                 Ok(false)
             }
             lsp_types::notification::DidCloseTextDocument::METHOD => {
-                let params = serde_json::from_value(notification.params)
-                    .context("failed to parse textDocument/didClose params")?;
+                let params = match serde_json::from_value(notification.params) {
+                    Ok(params) => params,
+                    Err(error) => {
+                        eprintln!(
+                            "rudolint-lsp: failed to parse textDocument/didClose params: {error}"
+                        );
+                        return Ok(false);
+                    }
+                };
                 self.did_close(connection, params)?;
                 Ok(false)
             }
@@ -268,7 +313,10 @@ fn workspace_folders(params: &InitializeParams) -> Vec<WorkspaceFolder> {
         return folders;
     }
 
-    #[allow(deprecated)]
+    #[expect(
+        deprecated,
+        reason = "root_uri is the best fallback for older clients without workspaceFolders"
+    )]
     params
         .root_uri
         .clone()
