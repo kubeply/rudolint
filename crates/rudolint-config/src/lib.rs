@@ -166,6 +166,74 @@ fn discover_from(start: PathBuf) -> Result<Option<PathBuf>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::sync::OnceLock;
+
+    fn config_schema() -> &'static jsonschema::Validator {
+        static SCHEMA: OnceLock<jsonschema::Validator> = OnceLock::new();
+        SCHEMA.get_or_init(|| {
+            let schema = serde_json::from_str(include_str!(
+                "../../../schemas/rudolint-config-v1.schema.json"
+            ))
+            .expect("config schema should be valid JSON");
+            jsonschema::validator_for(&schema).expect("config schema should compile")
+        })
+    }
+
+    fn assert_matches_config_schema(path: &Path) {
+        let raw = std::fs::read_to_string(path)
+            .unwrap_or_else(|err| panic!("failed to read {}: {err}", path.display()));
+        let yaml = serde_yaml::from_str::<serde_yaml::Value>(&raw)
+            .unwrap_or_else(|err| panic!("{} should parse as YAML: {err}", path.display()));
+        let value = serde_json::to_value(yaml)
+            .unwrap_or_else(|err| panic!("{} should convert to JSON: {err}", path.display()));
+        let errors = config_schema()
+            .iter_errors(&value)
+            .map(|error| error.to_string())
+            .collect::<Vec<_>>();
+
+        assert!(
+            errors.is_empty(),
+            "{} should match the v1 config schema:\n{}",
+            path.display(),
+            errors.join("\n")
+        );
+    }
+
+    fn collect_config_paths(root: &Path) -> Vec<PathBuf> {
+        let mut paths = Vec::new();
+        let root_config = root.join("rudolint.yaml");
+        if root_config.is_file() {
+            paths.push(root_config);
+        }
+
+        let fixtures = root.join("fixtures");
+        if fixtures.is_dir() {
+            collect_fixture_config_paths(&fixtures, &mut paths);
+        }
+
+        paths.sort();
+        paths
+    }
+
+    fn collect_fixture_config_paths(dir: &Path, paths: &mut Vec<PathBuf>) {
+        let entries = std::fs::read_dir(dir)
+            .unwrap_or_else(|err| panic!("failed to read {}: {err}", dir.display()));
+
+        for entry in entries {
+            let entry = entry
+                .unwrap_or_else(|err| panic!("failed to read entry in {}: {err}", dir.display()));
+            let path = entry.path();
+            if path.is_dir() {
+                collect_fixture_config_paths(&path, paths);
+            } else if path
+                .file_name()
+                .and_then(|name| name.to_str())
+                .is_some_and(|name| name == "rudolint.yaml" || name == ".rudolint.yaml")
+            {
+                paths.push(path);
+            }
+        }
+    }
 
     #[test]
     fn parses_full_config_schema() {
@@ -214,6 +282,16 @@ per-file-ignores:
         assert!(config.per_file_ignores["fixtures/**"].contains("RDL3000"));
         assert!(config.ignores_for_path("RDL3000", Path::new("fixtures/rules/Dockerfile")));
         assert!(!config.ignores_for_path("RDL3000", Path::new("src/Dockerfile")));
+    }
+
+    #[test]
+    fn repo_config_files_match_v1_schema() {
+        let paths = collect_config_paths(&rudolint_test::workspace_root());
+        assert!(!paths.is_empty(), "expected at least one config file");
+
+        for path in paths {
+            assert_matches_config_schema(&path);
+        }
     }
 
     #[test]

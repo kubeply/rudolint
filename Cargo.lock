@@ -1396,8 +1396,11 @@ version = "0.2.0"
 dependencies = [
  "anyhow",
  "globset",
+ "jsonschema",
  "rudolint-diagnostics",
+ "rudolint-test",
  "serde",
+ "serde_json",
  "serde_yaml",
  "tempfile",
 ]
