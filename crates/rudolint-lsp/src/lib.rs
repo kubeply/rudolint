@@ -431,6 +431,39 @@ mod tests {
         ));
     }
 
+    /// Open-document diagnostics preserve source spans as zero-based LSP ranges.
+    #[test]
+    fn open_document_diagnostics_use_source_ranges() {
+        let linter = DocumentLinter::default();
+        let document = lsp_types::TextDocumentItem::new(
+            lsp_types::Uri::from_str("file:///workspace/Dockerfile").expect("uri should parse"),
+            "dockerfile".to_string(),
+            1,
+            "FROM alpine:latest\nMAINTAINER ops@example.com\n".to_string(),
+        );
+
+        let diagnostics = linter
+            .lint_open_document(&document)
+            .expect("open document should lint");
+        let latest = diagnostic_by_code(&diagnostics, "RDL3007");
+        let maintainer = diagnostic_by_code(&diagnostics, "RDL4000");
+
+        assert_eq!(
+            latest.range,
+            lsp_types::Range::new(
+                lsp_types::Position::new(0, 0),
+                lsp_types::Position::new(0, 18)
+            )
+        );
+        assert_eq!(
+            maintainer.range,
+            lsp_types::Range::new(
+                lsp_types::Position::new(1, 0),
+                lsp_types::Position::new(1, 26)
+            )
+        );
+    }
+
     #[test]
     fn open_document_linting_uses_resolved_settings() {
         let linter = DocumentLinter::new(
@@ -481,6 +514,36 @@ mod tests {
         assert!(diagnostics.iter().any(
             |diagnostic| diagnostic.code == Some(NumberOrString::String("RDL3007".to_string()))
         ));
+    }
+
+    /// Full-change diagnostics preserve source spans after leading document lines.
+    #[test]
+    fn changed_document_diagnostics_use_source_ranges() {
+        let linter = DocumentLinter::default();
+        let params = lsp_types::DidChangeTextDocumentParams {
+            text_document: lsp_types::VersionedTextDocumentIdentifier::new(
+                lsp_types::Uri::from_str("file:///workspace/Dockerfile").expect("uri should parse"),
+                2,
+            ),
+            content_changes: vec![lsp_types::TextDocumentContentChangeEvent {
+                range: None,
+                range_length: None,
+                text: "# comment\nFROM alpine:latest\n".to_string(),
+            }],
+        };
+
+        let diagnostics = linter
+            .lint_changed_document(&params)
+            .expect("full document change should lint");
+        let latest = diagnostic_by_code(&diagnostics, "RDL3007");
+
+        assert_eq!(
+            latest.range,
+            lsp_types::Range::new(
+                lsp_types::Position::new(1, 0),
+                lsp_types::Position::new(1, 18)
+            )
+        );
     }
 
     #[test]
@@ -713,5 +776,16 @@ mod tests {
         .expect("file URL should be built");
 
         lsp_types::Uri::from_str(url.as_str()).expect("uri should parse")
+    }
+
+    /// Returns the first diagnostic with a matching rule code.
+    fn diagnostic_by_code<'a>(
+        diagnostics: &'a [lsp_types::Diagnostic],
+        code: &str,
+    ) -> &'a lsp_types::Diagnostic {
+        diagnostics
+            .iter()
+            .find(|diagnostic| diagnostic.code == Some(NumberOrString::String(code.to_string())))
+            .unwrap_or_else(|| panic!("{code} diagnostic should be emitted"))
     }
 }
