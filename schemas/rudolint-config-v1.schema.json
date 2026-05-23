@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/kubeply/rudolint/schemas/rudolint-config-v1.schema.json",
+  "title": "rudolint config v1",
+  "description": "Project configuration loaded from .rudolint.yaml.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "select": {
+      "description": "Rule code prefixes or exact rule codes to select explicitly.",
+      "$ref": "#/$defs/ruleSelectorList"
+    },
+    "ignore": {
+      "description": "Rule code prefixes or exact rule codes to ignore.",
+      "$ref": "#/$defs/ruleSelectorList"
+    },
+    "extend-ignore": {
+      "description": "Additional rule code prefixes or exact rule codes to ignore without replacing default ignores.",
+      "$ref": "#/$defs/ruleSelectorList"
+    },
+    "severity": {
+      "description": "Per-rule severity overrides keyed by exact rule code.",
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/ruleCode"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/severity"
+      }
+    },
+    "trusted-registries": {
+      "description": "Registry hostnames considered trusted by registry-sensitive rules.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/nonEmptyString"
+      },
+      "uniqueItems": true
+    },
+    "label-schema": {
+      "description": "Required label keys and expected schema values used by label validation rules.",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/labelSchemaKind"
+      }
+    },
+    "strict-labels": {
+      "description": "Reject labels that are not declared in label-schema.",
+      "type": "boolean"
+    },
+    "allow-entitlements": {
+      "description": "BuildKit entitlements allowed by policy.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/buildkitEntitlement"
+      },
+      "uniqueItems": true
+    },
+    "per-file-ignores": {
+      "description": "Rule ignores scoped to path glob patterns.",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/ruleSelectorList"
+      }
+    }
+  },
+  "$defs": {
+    "ruleSelector": {
+      "type": "string",
+      "pattern": "^R[A-Z]{2}([0-9]{4})?$",
+      "description": "Rule family prefix such as RDL or exact rule code such as RDL3007."
+    },
+    "ruleSelectorList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ruleSelector"
+      },
+      "uniqueItems": true
+    },
+    "ruleCode": {
+      "type": "string",
+      "pattern": "^R[A-Z]{2}[0-9]{4}$"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "ignore",
+        "style",
+        "info",
+        "warning",
+        "error"
+      ]
+    },
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "labelSchemaKind": {
+      "type": "string",
+      "enum": [
+        "email",
+        "git-hash",
+        "rfc3339",
+        "semver",
+        "spdx",
+        "text",
+        "url"
+      ]
+    },
+    "buildkitEntitlement": {
+      "type": "string",
+      "enum": [
+        "network.host",
+        "security.insecure"
+      ]
+    }
+  }
+}
