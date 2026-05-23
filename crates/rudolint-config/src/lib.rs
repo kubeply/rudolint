@@ -10,6 +10,7 @@ use serde::Deserialize;
 /// Project configuration loaded from a rudolint configuration file.
 #[derive(Debug, Clone, Default, Deserialize)]
 #[serde(rename_all = "kebab-case")]
+#[serde(deny_unknown_fields)]
 pub struct Config {
     /// Rule code prefixes or exact codes to select explicitly.
     #[serde(default)]
@@ -243,5 +244,18 @@ per-file-ignores:
 
         assert!(message.contains("invalid per-file-ignores pattern"));
         assert!(message.contains("[unterminated"));
+    }
+
+    #[test]
+    fn load_rejects_unknown_config_keys() {
+        let temp = tempfile::TempDir::new().expect("temp dir should be created");
+        let path = temp.path().join(".rudolint.yaml");
+        std::fs::write(&path, "ignroe:\n  - RDL3000\n").expect("config should be written");
+
+        let error = Config::load(Some(&path)).expect_err("config should fail to load");
+        let message = format!("{error:#}");
+
+        assert!(message.contains("unknown field"));
+        assert!(message.contains("ignroe"));
     }
 }
