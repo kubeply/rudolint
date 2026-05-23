@@ -44,3 +44,19 @@ Configuration resolves in this order:
 
 Per-file ignore patterns are matched relative to the loaded config file's
 directory. When no config file is loaded, paths are linted as provided.
+
+## Compatibility Policy
+
+The v1 config schema is a stable contract for `.rudolint.yaml` validation.
+Breaking config changes require a new schema version.
+
+Breaking changes include removing a config key, renaming a key, changing a
+value type, removing an accepted enum value, or changing the meaning of an
+existing value in a way that makes a previously valid config invalid or
+materially different.
+
+Non-breaking changes may extend the v1 schema when they do not invalidate
+existing configs. Examples include adding a new optional key, adding a new
+accepted enum value, or documenting behavior more precisely. Because the schema
+uses strict top-level keys, adding a key is still a deliberate schema update and
+must land with matching runtime support.
