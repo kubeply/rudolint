@@ -126,7 +126,8 @@ contract.
 
 ## Configuration
 
-`.rudolint.yaml`:
+`.rudolint.yaml` is documented in [docs/config.md](docs/config.md), including
+the v1 JSON Schema for editor validation.
 
 ```yaml
 ignore:
@@ -167,6 +168,7 @@ rudolint check . --config .rudolint.yaml
 ## More Docs
 
 - [GitHub Action usage](docs/action.md)
+- [Configuration](docs/config.md)
 - [V1 roadmap](docs/v1-roadmap.md)
 - [Rule roadmap](docs/rule-roadmap.md)
 - [Architecture](docs/architecture.md)
