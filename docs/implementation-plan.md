@@ -815,23 +815,24 @@ these criteria instead:
 Goal: make the GitHub Action discoverable without changing the release or
 runtime contract.
 
-1. Accept the GitHub Marketplace Developer Agreement for the publishing account
-   or organization.
-2. Confirm `action.yml` has Marketplace-ready metadata:
-   - name.
-   - description.
-   - branding.
-   - complete inputs and outputs.
-3. Confirm README and `docs/action.md` include copy-paste examples for:
-   - basic check.
-   - monorepo path check.
-   - SARIF upload.
-   - compatibility profile.
-4. Publish the released action to GitHub Marketplace from the existing release
+1. [ ] Accept the GitHub Marketplace Developer Agreement for the publishing
+   account or organization.
+2. [x] Confirm `action.yml` has Marketplace-ready metadata:
+   - [x] name.
+   - [x] description.
+   - [x] branding.
+   - [x] complete inputs and outputs.
+3. [x] Confirm README and `docs/action.md` include copy-paste examples for:
+   - [x] basic check.
+   - [x] monorepo path check.
+   - [x] SARIF upload.
+   - [x] compatibility profile.
+4. [x] Document the manual Marketplace publication checklist.
+5. [ ] Publish the released action to GitHub Marketplace from the existing release
    tag.
-5. Verify the Marketplace listing points users to the pinned release workflow
+6. [ ] Verify the Marketplace listing points users to the pinned release workflow
    pattern.
-6. Add the Marketplace link to README after publication.
+7. [ ] Add the Marketplace link to README after publication.
 
 Acceptance criteria:
 

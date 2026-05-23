@@ -1,6 +1,10 @@
 name: rudolint
 description: Run the BuildKit-native rudolint Dockerfile linter.
 
+branding:
+  icon: check-circle
+  color: blue
+
 inputs:
   version:
     description: Release tag to install, or latest.

@@ -64,6 +64,66 @@ See [docs/action.md](docs/action.md) for GitHub Action usage.
 See [docs/first-release.md](docs/first-release.md) for first release readiness
 criteria and known limitations.
 
+## GitHub Action
+
+Pin the action and downloaded binary to the same release tag for reproducible CI:
+
+```yaml
+name: Dockerfile lint
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  rudolint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: kubeply/rudolint@<release-tag>
+        with:
+          version: <release-tag>
+```
+
+For monorepos, pass one path per line:
+
+```yaml
+- uses: kubeply/rudolint@<release-tag>
+  with:
+    version: <release-tag>
+    paths: |
+      services/api
+      services/worker/Dockerfile
+```
+
+Upload SARIF to GitHub code scanning:
+
+```yaml
+permissions:
+  contents: read
+  security-events: write
+
+steps:
+  - uses: actions/checkout@v4
+  - uses: kubeply/rudolint@<release-tag>
+    with:
+      version: <release-tag>
+      upload-sarif: "true"
+      sarif-output: rudolint.sarif
+```
+
+Use the compatibility profile when matching established Dockerfile-linter
+expectations matters more than BuildKit-specific coverage:
+
+```yaml
+- uses: kubeply/rudolint@<release-tag>
+  with:
+    version: <release-tag>
+    profile: compat
+    failure-threshold: error
+```
+
 ## Install
 
 Released versions publish checksummed CLI and LSP server binaries for Linux and
