@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/kubeply/rudolint/schemas/rudolint-findings-v1.schema.json",
+  "title": "rudolint findings v1",
+  "description": "JSON findings emitted by `rudolint check --format json`.",
+  "type": "array",
+  "items": {
+    "$ref": "#/$defs/finding"
+  },
+  "$defs": {
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "severity",
+        "message",
+        "path",
+        "primary_span",
+        "labels",
+        "help"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "pattern": "^R[A-Z]{2}[0-9]{4}$",
+          "description": "Stable rule identifier such as RDL3007, RDK1000, or RSC2086."
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "ignore",
+            "style",
+            "info",
+            "warning",
+            "error"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "path": {
+          "type": "string",
+          "description": "Display path for the file that produced the finding."
+        },
+        "primary_span": {
+          "$ref": "#/$defs/span"
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/label"
+          }
+        },
+        "help": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "label": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "span",
+        "message"
+      ],
+      "properties": {
+        "span": {
+          "$ref": "#/$defs/span"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "span": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "start_byte",
+        "end_byte",
+        "start_line",
+        "start_column",
+        "end_line",
+        "end_column"
+      ],
+      "properties": {
+        "start_byte": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end_byte": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "start_line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "start_column": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "end_line": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "end_column": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    }
+  }
+}
