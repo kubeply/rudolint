@@ -15,7 +15,9 @@ rule metadata, result locations, and physical source regions.
 
 ## JSON
 
-`rudolint check --format json` emits a JSON array of findings:
+`rudolint check --format json` emits a JSON array of findings. This output is
+the v1 findings schema surface and is described by
+[`schemas/rudolint-findings-v1.schema.json`](../schemas/rudolint-findings-v1.schema.json).
 
 ```json
 [
