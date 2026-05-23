@@ -1,7 +1,38 @@
+use std::sync::OnceLock;
+
 use predicates::prelude::PredicateBooleanExt;
 use rudolint_test::{normalize_path_prefix, normalized_json, rudolint_cmd};
 use serde_json::Value;
 use tempfile::TempDir;
+
+fn findings_schema() -> &'static jsonschema::Validator {
+    static SCHEMA: OnceLock<jsonschema::Validator> = OnceLock::new();
+    SCHEMA.get_or_init(|| {
+        let schema = serde_json::from_str(include_str!(
+            "../../../schemas/rudolint-findings-v1.schema.json"
+        ))
+        .expect("findings schema should be valid JSON");
+        jsonschema::validator_for(&schema).expect("findings schema should compile")
+    })
+}
+
+fn assert_matches_findings_schema(output: &Value) {
+    let errors = findings_schema()
+        .iter_errors(output)
+        .map(|error| format!("{} at {}", error, error.instance_path()))
+        .collect::<Vec<_>>();
+    assert!(
+        errors.is_empty(),
+        "JSON findings output should match the v1 schema:\n{}",
+        errors.join("\n")
+    );
+}
+
+fn normalized_findings_json(raw: &str) -> Value {
+    let output = normalized_json(raw);
+    assert_matches_findings_schema(&output);
+    output
+}
 
 #[test]
 fn emits_json_findings_for_stdin() {
@@ -15,7 +46,7 @@ fn emits_json_findings_for_stdin() {
         .clone();
 
     let output = String::from_utf8(output).expect("stdout should be UTF-8");
-    insta::assert_json_snapshot!("stdin_json_findings", normalized_json(&output));
+    insta::assert_json_snapshot!("stdin_json_findings", normalized_findings_json(&output));
 }
 
 #[test]
@@ -66,6 +97,7 @@ fn checks_explicit_dockerfile_path() {
     let output = String::from_utf8(output).expect("stdout should be UTF-8");
     let mut output = normalized_json(&output);
     normalize_path_prefix(&mut output, temp.path(), "$TEMP");
+    assert_matches_findings_schema(&output);
     insta::assert_json_snapshot!("explicit_path_json_findings", output);
 }
 
@@ -91,6 +123,7 @@ fn discovers_dockerfiles_in_directory() {
     let output = String::from_utf8(output).expect("stdout should be UTF-8");
     let mut output = normalized_json(&output);
     normalize_path_prefix(&mut output, temp.path(), "$TEMP");
+    assert_matches_findings_schema(&output);
     insta::assert_json_snapshot!("directory_discovery_json_findings", output);
 }
 
@@ -117,6 +150,7 @@ fn emits_json_findings_for_multiple_files() {
     let output = String::from_utf8(output).expect("stdout should be UTF-8");
     let mut output = normalized_json(&output);
     normalize_path_prefix(&mut output, temp.path(), "$TEMP");
+    assert_matches_findings_schema(&output);
     insta::assert_json_snapshot!("multi_file_json_findings", output);
 }
 
@@ -239,6 +273,7 @@ fn explicit_config_can_ignore_rule() {
     let output = String::from_utf8(output).expect("stdout should be UTF-8");
     let mut output = normalized_json(&output);
     normalize_path_prefix(&mut output, temp.path(), "$TEMP");
+    assert_matches_findings_schema(&output);
     insta::assert_json_snapshot!("config_ignore_json_findings", output);
 }
 
@@ -271,6 +306,7 @@ fn explicit_config_can_select_rule_prefix() {
     let output = String::from_utf8(output).expect("stdout should be UTF-8");
     let mut output = normalized_json(&output);
     normalize_path_prefix(&mut output, temp.path(), "$TEMP");
+    assert_matches_findings_schema(&output);
     insta::assert_json_snapshot!("config_select_json_findings", output);
 }
 
@@ -298,6 +334,7 @@ fn config_per_file_ignores_match_paths_relative_to_config() {
     let output = String::from_utf8(output).expect("stdout should be UTF-8");
     let mut output = normalized_json(&output);
     normalize_path_prefix(&mut output, temp.path(), "$TEMP");
+    assert_matches_findings_schema(&output);
     insta::assert_json_snapshot!("config_per_file_ignore_json_findings", output);
 }
 
@@ -329,6 +366,7 @@ fn explicit_config_can_override_severity() {
     let output = String::from_utf8(output).expect("stdout should be UTF-8");
     let mut output = normalized_json(&output);
     normalize_path_prefix(&mut output, temp.path(), "$TEMP");
+    assert_matches_findings_schema(&output);
     insta::assert_json_snapshot!("config_severity_json_findings", output);
 }
 
@@ -357,6 +395,7 @@ fn discovers_nearest_dot_config_from_input_directory() {
     let output = String::from_utf8(output).expect("stdout should be UTF-8");
     let mut output = normalized_json(&output);
     normalize_path_prefix(&mut output, temp.path(), "$TEMP");
+    assert_matches_findings_schema(&output);
     insta::assert_json_snapshot!("discovered_config_json_findings", output);
 }
 
@@ -391,6 +430,7 @@ fn explicit_config_takes_precedence_over_discovered_config() {
     let output = String::from_utf8(output).expect("stdout should be UTF-8");
     let mut output = normalized_json(&output);
     normalize_path_prefix(&mut output, temp.path(), "$TEMP");
+    assert_matches_findings_schema(&output);
     insta::assert_json_snapshot!("explicit_config_precedence_json_findings", output);
 }
 
@@ -496,7 +536,10 @@ fn stdin_filename_changes_display_path() {
         .clone();
 
     let output = String::from_utf8(output).expect("stdout should be UTF-8");
-    insta::assert_json_snapshot!("stdin_filename_json_findings", normalized_json(&output));
+    insta::assert_json_snapshot!(
+        "stdin_filename_json_findings",
+        normalized_findings_json(&output)
+    );
 }
 
 #[test]
