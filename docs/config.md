@@ -30,3 +30,17 @@ the raw schema URL:
 
 Use the same schema URL in CI or editor integrations that accept a JSON Schema
 URI.
+
+## Precedence
+
+Configuration resolves in this order:
+
+| Priority | Source | Behavior |
+| --- | --- | --- |
+| 1 | `--no-config` | Disables config loading and discovery. Defaults are used. This flag conflicts with `--config`. |
+| 2 | `--config <path>` | Loads the explicit file and skips discovery. |
+| 3 | Discovered `.rudolint.yaml` | Walks upward from the input Dockerfile paths or directories and uses the nearest `.rudolint.yaml` found from the first matching start path. |
+| 4 | Defaults | Used when no explicit or discovered config is loaded. |
+
+Per-file ignore patterns are matched relative to the loaded config file's
+directory. When no config file is loaded, paths are linted as provided.
