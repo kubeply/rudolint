@@ -14,7 +14,7 @@ small and boring so each part can be tested independently.
 - `rudolint-dockerfile`: Dockerfile parser and syntax model.
 - `rudolint-fix`: autofix edit generation and patch planning.
 - `rudolint-image`: container image reference parsing.
-- `rudolint-lsp`: language server integration points.
+- `rudolint-lsp`: stdio language server and editor integration primitives.
 - `rudolint-output`: human, JSON, and SARIF renderers.
 - `rudolint-policy`: rule selection, profiles, and compatibility policy.
 - `rudolint-rules`: rule catalog and rule engine.

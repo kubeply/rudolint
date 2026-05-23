@@ -14,7 +14,8 @@ output rendering, and CLI orchestration can evolve independently.
 - `rudolint-dockerfile` parses Dockerfiles into a source-aware syntax model.
 - `rudolint-fix` owns autofix edit generation and patch planning.
 - `rudolint-image` parses container image references.
-- `rudolint-lsp` owns future language server behavior.
+- `rudolint-lsp` owns the stdio language server and editor integration
+  primitives.
 - `rudolint-output` renders diagnostics as human text, JSON, and SARIF.
 - `rudolint-policy` owns rule selection and compatibility profiles.
 - `rudolint-rules` owns the rule catalog and rule engine.
@@ -46,6 +47,13 @@ rudolint-rules
 
 rudolint-output
   -> rudolint-diagnostics
+
+rudolint-lsp
+  -> rudolint-settings
+  -> rudolint-rules
+  -> rudolint-dockerfile
+  -> rudolint-diagnostics
+  -> rudolint-fix
 
 rudolint-fix
   -> rudolint-source

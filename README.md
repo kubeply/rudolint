@@ -124,6 +124,17 @@ Use stdin:
 rudolint check --format json < Dockerfile
 ```
 
+Run the language server while developing:
+
+```bash
+cargo run -p rudolint-lsp --bin rudolint-lsp
+```
+
+The `rudolint-lsp` binary speaks LSP over stdio. Editors should launch it as
+the language server command for Dockerfile buffers; see
+[`crates/rudolint-lsp`](crates/rudolint-lsp/README.md) for the current server
+capabilities and wrapper notes.
+
 Exit codes:
 
 - `0`: no findings at or above the failure threshold.
@@ -234,7 +245,7 @@ The Rust code is organized as a Cargo workspace under `crates/`:
 - `rudolint-dockerfile`: Dockerfile parser and syntax model
 - `rudolint-fix`: autofix edit planning
 - `rudolint-image`: container image reference parsing
-- `rudolint-lsp`: future language server integration
+- `rudolint-lsp`: stdio language server and editor integration primitives
 - `rudolint-output`: human, JSON, and SARIF renderers
 - `rudolint-policy`: rule selection and compatibility profiles
 - `rudolint-rules`: rule catalog and rule engine

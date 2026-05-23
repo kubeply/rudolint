@@ -8,6 +8,7 @@ repository.workspace = true
 
 [dependencies]
 anyhow.workspace = true
+lsp-server.workspace = true
 lsp-types.workspace = true
 rudolint-config.workspace = true
 rudolint-diagnostics.workspace = true
@@ -16,8 +17,8 @@ rudolint-fix.workspace = true
 rudolint-rules.workspace = true
 rudolint-settings.workspace = true
 rudolint-source.workspace = true
+serde_json.workspace = true
 url.workspace = true
 
 [dev-dependencies]
-serde_json.workspace = true
 tempfile.workspace = true
