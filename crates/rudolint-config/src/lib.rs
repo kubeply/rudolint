@@ -180,7 +180,7 @@ mod tests {
     }
 
     fn assert_matches_config_schema(path: &Path) {
-        let raw = std::fs::read_to_string(path)
+        let raw = fs::read_to_string(path)
             .unwrap_or_else(|err| panic!("failed to read {}: {err}", path.display()));
         let yaml = serde_yaml::from_str::<serde_yaml::Value>(&raw)
             .unwrap_or_else(|err| panic!("{} should parse as YAML: {err}", path.display()));
@@ -206,6 +206,11 @@ mod tests {
             paths.push(root_config);
         }
 
+        let hidden_root_config = root.join(".rudolint.yaml");
+        if hidden_root_config.is_file() {
+            paths.push(hidden_root_config);
+        }
+
         let fixtures = root.join("fixtures");
         if fixtures.is_dir() {
             collect_fixture_config_paths(&fixtures, &mut paths);
@@ -216,7 +221,7 @@ mod tests {
     }
 
     fn collect_fixture_config_paths(dir: &Path, paths: &mut Vec<PathBuf>) {
-        let entries = std::fs::read_dir(dir)
+        let entries = fs::read_dir(dir)
             .unwrap_or_else(|err| panic!("failed to read {}: {err}", dir.display()));
 
         for entry in entries {
