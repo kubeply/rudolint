@@ -1,5 +1,8 @@
 # V1 Roadmap
 
+Archived after completion. This file records the work used to prepare the
+stable `v1.0.0` release.
+
 This roadmap tracks the work needed before `rudolint` should publish a stable
 `v1.0.0` release. The v1 goal is contract stability: users should be able to
 depend on the CLI, JSON output, configuration file, GitHub Action, release

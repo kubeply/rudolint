@@ -174,7 +174,7 @@ rudolint check . --config .rudolint.yaml
 
 - [GitHub Action usage](docs/action.md)
 - [Configuration](docs/config.md)
-- [V1 roadmap](docs/v1-roadmap.md)
+- [Archived V1 roadmap](docs/archive/v1-roadmap.md)
 - [Rule roadmap](docs/rule-roadmap.md)
 - [Architecture](docs/architecture.md)
 - [Completed implementation plan](docs/archive/implementation-plan.md)
