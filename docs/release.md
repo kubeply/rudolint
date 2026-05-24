@@ -84,6 +84,37 @@ Do not manually edit the release body unless the workflow output is incorrect.
 Fix the automation first, delete the bad release or tag when needed, and rerun
 from a clean tag.
 
+## Post-Release Verification
+
+After the `Release` workflow succeeds, verify:
+
+- the GitHub Release exists for the pushed tag and is marked as the latest
+  stable release when appropriate.
+- generated `What's Changed` notes are present before the cargo-dist install
+  and artifact sections.
+- release assets were uploaded for every supported target.
+- `sha256.sum` and `.sha256` sidecar files are present.
+- GitHub artifact attestations are visible for uploaded artifacts.
+- the CLI installer works from the release tag:
+
+  ```bash
+  curl --proto '=https' --tlsv1.2 -LsSf \
+    https://github.com/kubeply/rudolint/releases/download/<tag>/rudolint-installer.sh \
+    | sh
+  rudolint --version
+  ```
+
+- the LSP installer works from the release tag:
+
+  ```bash
+  curl --proto '=https' --tlsv1.2 -LsSf \
+    https://github.com/kubeply/rudolint/releases/download/<tag>/rudolint-lsp-installer.sh \
+    | sh
+  ```
+
+- the Marketplace listing points at the intended release.
+- the GitHub Action example works in a throwaway workflow using the release tag.
+
 ## Install Paths
 
 The shell installers download the archive that matches the host platform and
