@@ -236,7 +236,7 @@ jobs:
     name: batch benchmarks
     needs: changes
     if: ${{ needs.changes.outputs.batch == 'true' }}
-    runs-on: depot-ubuntu-24.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - name: Checkout
