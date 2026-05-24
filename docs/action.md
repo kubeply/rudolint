@@ -105,8 +105,12 @@ an explicit tag.
 
 Before `1.0.0`, every released tag is treated as the complete action contract
 for that release. The project does not publish floating major tags such as `v0`
-or `v1` yet; add those only after the action and CLI contracts are stable enough
-to support compatibility expectations.
+or `v1` before `v1.0.0`.
+
+After `v1.0.0`, stable users can pin the action reference to
+`kubeply/rudolint@v1` when they want automatic updates across stable `v1.x.y`
+releases. Keep `version` pinned to an exact release tag for reproducible
+blocking CI unless the workflow intentionally tracks the latest binary.
 
 ## Marketplace
 
@@ -120,8 +124,7 @@ Keep Marketplace examples pinned to an explicit release tag:
     version: <release-tag>
 ```
 
-Do not advertise floating tags such as `v0` or `v1` until the project commits
-to that compatibility policy.
+Do not advertise floating tags such as `v0` or `v1` before `v1.0.0`.
 
 ## Inputs
 
