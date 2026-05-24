@@ -70,6 +70,23 @@ fn implemented_rules_and_docs_are_synchronized() {
 }
 
 #[test]
+fn implemented_rules_appear_in_rule_matrix() {
+    let catalog = RuleEngine::new(Profile::Default, Config::default()).catalog();
+    let matrix_codes = rule_matrix_implemented_codes();
+
+    for rule in catalog
+        .iter()
+        .filter(|rule| rule.status == RuleStatus::Implemented)
+    {
+        assert!(
+            matrix_codes.contains(rule.code),
+            "{} is missing from docs/rule-roadmap.md implemented matrix",
+            rule.code
+        );
+    }
+}
+
+#[test]
 fn implemented_rule_docs_declare_fix_availability() {
     let catalog = RuleEngine::new(Profile::Default, Config::default()).catalog();
     let docs_dir = workspace_root().join("docs/rules");
@@ -126,6 +143,39 @@ fn rule_docs_path(code: &str) -> PathBuf {
     workspace_root()
         .join("docs/rules")
         .join(format!("{code}.md"))
+}
+
+fn rule_matrix_implemented_codes() -> BTreeSet<String> {
+    let roadmap = fs::read_to_string(workspace_root().join("docs/rule-roadmap.md"))
+        .expect("rule roadmap should be readable");
+    let mut in_implemented_section = false;
+    let mut codes = BTreeSet::new();
+
+    for line in roadmap.lines() {
+        if line == "## Implemented V1 Surface" {
+            in_implemented_section = true;
+            continue;
+        }
+
+        if in_implemented_section && line.starts_with("## ") {
+            break;
+        }
+
+        if !in_implemented_section || !line.starts_with("| `") {
+            continue;
+        }
+
+        let Some(rest) = line.strip_prefix("| `") else {
+            continue;
+        };
+        let Some((code, _)) = rest.split_once('`') else {
+            continue;
+        };
+
+        codes.insert(code.to_string());
+    }
+
+    codes
 }
 
 fn workspace_root() -> PathBuf {
