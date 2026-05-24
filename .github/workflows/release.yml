@@ -335,11 +335,7 @@ jobs:
           RELEASE_TAG: ${{ needs.plan.outputs.tag }}
         shell: bash
         run: |
-          if [[ ! "$RELEASE_TAG" =~ ^v1\.[0-9]+\.[0-9]+$ ]]; then
-            echo "Refusing to move v1 for non-stable tag: $RELEASE_TAG" >&2
-            exit 1
-          fi
-
+          scripts/validate-v1-release-tag.sh "$RELEASE_TAG"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git tag --force v1 "$RELEASE_TAG"
