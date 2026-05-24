@@ -103,6 +103,29 @@ fn rule_matrix_entries_are_known_catalog_rules() {
 }
 
 #[test]
+fn planned_shell_rules_stay_out_of_implemented_matrix() {
+    let catalog = RuleEngine::new(Profile::Default, Config::default()).catalog();
+    let implemented_matrix_codes = rule_matrix_implemented_codes();
+    let planned_shell_matrix_codes = rule_matrix_section_codes("## Planned Future Shell Rules");
+
+    for rule in catalog
+        .iter()
+        .filter(|rule| rule.status == RuleStatus::Planned && rule.code.starts_with("RSC"))
+    {
+        assert!(
+            !implemented_matrix_codes.contains(rule.code),
+            "{} is planned shell coverage and must not appear in the implemented v1 matrix",
+            rule.code
+        );
+        assert!(
+            planned_shell_matrix_codes.contains(rule.code),
+            "{} is planned shell coverage and must stay in the planned shell matrix",
+            rule.code
+        );
+    }
+}
+
+#[test]
 fn implemented_rule_docs_declare_fix_availability() {
     let catalog = RuleEngine::new(Profile::Default, Config::default()).catalog();
     let docs_dir = workspace_root().join("docs/rules");
@@ -162,22 +185,26 @@ fn rule_docs_path(code: &str) -> PathBuf {
 }
 
 fn rule_matrix_implemented_codes() -> BTreeSet<String> {
+    rule_matrix_section_codes("## Implemented V1 Surface")
+}
+
+fn rule_matrix_section_codes(heading: &str) -> BTreeSet<String> {
     let roadmap = fs::read_to_string(workspace_root().join("docs/rule-roadmap.md"))
         .expect("rule roadmap should be readable");
-    let mut in_implemented_section = false;
+    let mut in_section = false;
     let mut codes = BTreeSet::new();
 
     for line in roadmap.lines() {
-        if line == "## Implemented V1 Surface" {
-            in_implemented_section = true;
+        if line == heading {
+            in_section = true;
             continue;
         }
 
-        if in_implemented_section && line.starts_with("## ") {
+        if in_section && line.starts_with("## ") {
             break;
         }
 
-        if !in_implemented_section {
+        if !in_section {
             continue;
         }
 
