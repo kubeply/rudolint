@@ -316,6 +316,35 @@ jobs:
 
           gh release create "${{ needs.plan.outputs.tag }}" --target "$RELEASE_COMMIT" $PRERELEASE_FLAG --title "$ANNOUNCEMENT_TITLE" --notes-file "$RUNNER_TEMP/notes.txt" artifacts/*
 
+  update-v1-tag:
+    needs:
+      - plan
+      - host
+    if: ${{ always() && needs.host.result == 'success' && needs.plan.outputs.publishing == 'true' && startsWith(needs.plan.outputs.tag, 'v1.') && !contains(needs.plan.outputs.tag, '-') }}
+    runs-on: "ubuntu-22.04"
+    permissions:
+      "contents": "write"
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+          submodules: recursive
+      - name: Move v1 tag
+        env:
+          RELEASE_TAG: ${{ needs.plan.outputs.tag }}
+        shell: bash
+        run: |
+          if [[ ! "$RELEASE_TAG" =~ ^v1\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Refusing to move v1 for non-stable tag: $RELEASE_TAG" >&2
+            exit 1
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag --force v1 "$RELEASE_TAG"
+          git push origin refs/tags/v1 --force
+
   announce:
     needs:
       - plan
