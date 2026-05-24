@@ -93,23 +93,25 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         shell: bash
         run: |
-          cat > "$RUNNER_TEMP/generated-notes.json" <<'JSON'
+          for tag in v1.0.0 v1.0.1; do
+            cat > "$RUNNER_TEMP/generated-notes.json" <<JSON
           {
-            "body": "## What's Changed\n\n* Example generated change"
+            "body": "## What's Changed\\n\\n* Example generated change for ${tag}"
           }
           JSON
-          cat > "$RUNNER_TEMP/cargo-dist-body.md" <<'MARKDOWN'
+            cat > "$RUNNER_TEMP/cargo-dist-body.md" <<'MARKDOWN'
           cargo-dist installer, download, checksum, and attestation sections
           MARKDOWN
 
-          scripts/compose-release-notes.sh \
-            "$RUNNER_TEMP/generated-notes.json" \
-            "$RUNNER_TEMP/cargo-dist-body.md" \
-            "$RUNNER_TEMP/notes.txt"
+            scripts/compose-release-notes.sh \
+              "$RUNNER_TEMP/generated-notes.json" \
+              "$RUNNER_TEMP/cargo-dist-body.md" \
+              "$RUNNER_TEMP/notes-${tag}.txt"
 
-          grep -F "## What's Changed" "$RUNNER_TEMP/notes.txt"
-          grep -F "## Install, Downloads, Checksums, And Attestations" "$RUNNER_TEMP/notes.txt"
-          grep -F "cargo-dist installer, download, checksum, and attestation sections" "$RUNNER_TEMP/notes.txt"
+            grep -F "Example generated change for ${tag}" "$RUNNER_TEMP/notes-${tag}.txt"
+            grep -F "## Install, Downloads, Checksums, And Attestations" "$RUNNER_TEMP/notes-${tag}.txt"
+            grep -F "cargo-dist installer, download, checksum, and attestation sections" "$RUNNER_TEMP/notes-${tag}.txt"
+          done
 
   # Build and packages all the platform-specific things
   build-local-artifacts:
