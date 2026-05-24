@@ -55,6 +55,40 @@ fn snapshots_legacy_external_suppression_warnings() {
 }
 
 #[test]
+fn snapshots_real_world_corpus_findings() {
+    let cases = [
+        "alpine-packages",
+        "buildkit-cache-mount",
+        "buildkit-secret-mount",
+        "buildkit-ssh-mount",
+        "debian-packages",
+        "generated-labels",
+        "heredoc",
+        "multi-platform-build",
+        "multi-stage-app",
+    ]
+    .into_iter()
+    .map(|fixture| {
+        let path = format!("corpus/real-world/{fixture}/Dockerfile");
+        let source = read_fixture(&path);
+        let document = parse_dockerfile(&source).expect("fixture should parse");
+        let findings = RuleEngine::new(Profile::Default, Config::default())
+            .lint_path(std::path::Path::new(&path), &document);
+
+        serde_json::json!({
+            "fixture": fixture,
+            "findings": findings,
+        })
+    })
+    .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "real_world_corpus_findings",
+        serde_json::to_value(&cases).expect("cases should serialize")
+    );
+}
+
+#[test]
 fn snapshots_initial_shell_rule_findings() {
     let source = read_fixture("rules/RSC.initial-shell-rules/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");

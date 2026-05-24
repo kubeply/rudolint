@@ -1,0 +1,93 @@
+---
+source: crates/rudolint-rules/tests/rule_fixtures.rs
+expression: "serde_json::to_value(&cases).expect(\"cases should serialize\")"
+---
+[
+  {
+    "findings": [
+      {
+        "code": "RDK1003",
+        "help": null,
+        "labels": [],
+        "message": "package install step can use a BuildKit cache mount for repeat builds",
+        "path": "",
+        "primary_span": {
+          "end_byte": 116,
+          "end_column": 19,
+          "end_line": 6,
+          "start_byte": 18,
+          "start_column": 1,
+          "start_line": 3
+        },
+        "severity": "info"
+      }
+    ],
+    "fixture": "alpine-packages"
+  },
+  {
+    "findings": [],
+    "fixture": "buildkit-cache-mount"
+  },
+  {
+    "findings": [],
+    "fixture": "buildkit-secret-mount"
+  },
+  {
+    "findings": [],
+    "fixture": "buildkit-ssh-mount"
+  },
+  {
+    "findings": [
+      {
+        "code": "RDK1003",
+        "help": null,
+        "labels": [],
+        "message": "package install step can use a BuildKit cache mount for repeat builds",
+        "path": "",
+        "primary_span": {
+          "end_byte": 222,
+          "end_column": 35,
+          "end_line": 8,
+          "start_byte": 23,
+          "start_column": 1,
+          "start_line": 3
+        },
+        "severity": "info"
+      }
+    ],
+    "fixture": "debian-packages"
+  },
+  {
+    "findings": [],
+    "fixture": "generated-labels"
+  },
+  {
+    "findings": [],
+    "fixture": "heredoc"
+  },
+  {
+    "findings": [
+      {
+        "code": "RDL3029",
+        "help": null,
+        "labels": [],
+        "message": "avoid `--platform` in FROM; prefer build-time platform selection",
+        "path": "",
+        "primary_span": {
+          "end_byte": 123,
+          "end_column": 70,
+          "end_line": 4,
+          "start_byte": 54,
+          "start_column": 1,
+          "start_line": 4
+        },
+        "severity": "warning"
+      }
+    ],
+    "fixture": "multi-platform-build"
+  },
+  {
+    "findings": [],
+    "fixture": "multi-stage-app"
+  }
+]
