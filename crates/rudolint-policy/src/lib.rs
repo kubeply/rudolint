@@ -178,6 +178,7 @@ mod tests {
         assert!(profile.includes_compatibility_rules());
         assert!(profile.includes_buildkit_native_rules());
         assert!(profile.includes_shell_catalog());
+        assert!(profile.warns_on_legacy_suppressions());
         assert!(!profile.is_strict());
     }
 
@@ -189,6 +190,7 @@ mod tests {
         assert!(profile.includes_compatibility_rules());
         assert!(!profile.includes_buildkit_native_rules());
         assert!(profile.includes_shell_catalog());
+        assert!(!profile.warns_on_legacy_suppressions());
         assert!(!profile.is_strict());
     }
 
@@ -200,6 +202,7 @@ mod tests {
         assert!(profile.includes_compatibility_rules());
         assert!(profile.includes_buildkit_native_rules());
         assert!(profile.includes_shell_catalog());
+        assert!(profile.warns_on_legacy_suppressions());
         assert!(profile.is_strict());
     }
 
