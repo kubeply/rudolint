@@ -115,6 +115,38 @@ After the `Release` workflow succeeds, verify:
 - the Marketplace listing points at the intended release.
 - the GitHub Action example works in a throwaway workflow using the release tag.
 
+## Recovery
+
+If the release workflow fails before creating a GitHub Release:
+
+1. Fix the workflow, metadata, or code problem on `main` through a normal pull
+   request.
+2. Delete the failed remote tag only when the tag should be recreated at a new
+   commit:
+
+   ```bash
+   git push origin :refs/tags/<tag>
+   git tag -d <tag>
+   ```
+
+3. Recreate the tag from the corrected `main` commit and push it again.
+
+If the GitHub Release already exists but is incorrect:
+
+1. Download or record any logs needed for debugging.
+2. Delete the incorrect GitHub Release from the Releases UI or with `gh`:
+
+   ```bash
+   gh release delete <tag> --cleanup-tag
+   ```
+
+3. Fix the automation or metadata on `main`.
+4. Recreate and push the tag from the corrected commit.
+
+Do not move a published stable tag silently. If users may already have consumed
+the release, prefer publishing a new patch tag and documenting the bad release
+instead of rewriting history.
+
 ## Install Paths
 
 The shell installers download the archive that matches the host platform and
