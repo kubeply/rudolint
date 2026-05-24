@@ -1,142 +1,132 @@
-# Rule Roadmap
+# Rule Coverage Matrix
 
-This roadmap tracks the rule families `rudolint` intends to cover.
+This matrix tracks the rule families `rudolint` covers for the v1 supported
+surface and keeps future work separate from implemented rules.
 
 `RDL` compatibility IDs track Hadolint-derived behavior by fixtures and rule
-documentation. Descriptions in this file are intentionally short and
-project-local.
+documentation. `RSC` IDs track shell-analysis rules for `RUN` commands. `RDK`
+IDs track BuildKit-native behavior.
 
-## Implemented Compatibility Rules
+## Implemented V1 Surface
 
-- `RDL1001`
-- `RDL3000`
-- `RDL3001`
-- `RDL3002`
-- `RDL3003`
-- `RDL3004`
-- `RDL3006`
-- `RDL3007`
-- `RDL3008`
-- `RDL3009`
-- `RDL3010`
-- `RDL3011`
-- `RDL3012`
-- `RDL3013`
-- `RDL3014`
-- `RDL3015`
-- `RDL3016`
-- `RDL3018`
-- `RDL3019`
-- `RDL3020`
-- `RDL3021`
-- `RDL3022`
-- `RDL3023`
-- `RDL3024`
-- `RDL3025`
-- `RDL3026`
-- `RDL3027`
-- `RDL3028`
-- `RDL3029`
-- `RDL3030`
-- `RDL3032`
-- `RDL3033`
-- `RDL3034`
-- `RDL3035`
-- `RDL3036`
-- `RDL3037`
-- `RDL3038`
-- `RDL3040`
-- `RDL3041`
-- `RDL3042`
-- `RDL3043`
-- `RDL3044`
-- `RDL3045`
-- `RDL3046`
-- `RDL3047`
-- `RDL3048`
-- `RDL3049`
-- `RDL3050`
-- `RDL3051`
-- `RDL3052`
-- `RDL3053`
-- `RDL3054`
-- `RDL3055`
-- `RDL3056`
-- `RDL3057`
-- `RDL3058`
-- `RDL3059`
-- `RDL3060`
-- `RDL3061`
-- `RDL3062`
-- `RDL3063`
-- `RDL4000`
-- `RDL4001`
-- `RDL4003`
-- `RDL4004`
-- `RDL4005`
-- `RDL4006`
+| Rule ID | Family | Coverage |
+| --- | --- | --- |
+| `RDL1001` | Compatibility | Implemented |
+| `RDL3000` | Compatibility | Implemented |
+| `RDL3001` | Compatibility | Implemented |
+| `RDL3002` | Compatibility | Implemented |
+| `RDL3003` | Compatibility | Implemented |
+| `RDL3004` | Compatibility | Implemented |
+| `RDL3006` | Compatibility | Implemented |
+| `RDL3007` | Compatibility | Implemented |
+| `RDL3008` | Compatibility | Implemented |
+| `RDL3009` | Compatibility | Implemented |
+| `RDL3010` | Compatibility | Implemented |
+| `RDL3011` | Compatibility | Implemented |
+| `RDL3012` | Compatibility | Implemented |
+| `RDL3013` | Compatibility | Implemented |
+| `RDL3014` | Compatibility | Implemented |
+| `RDL3015` | Compatibility | Implemented |
+| `RDL3016` | Compatibility | Implemented |
+| `RDL3018` | Compatibility | Implemented |
+| `RDL3019` | Compatibility | Implemented |
+| `RDL3020` | Compatibility | Implemented |
+| `RDL3021` | Compatibility | Implemented |
+| `RDL3022` | Compatibility | Implemented |
+| `RDL3023` | Compatibility | Implemented |
+| `RDL3024` | Compatibility | Implemented |
+| `RDL3025` | Compatibility | Implemented |
+| `RDL3026` | Compatibility | Implemented |
+| `RDL3027` | Compatibility | Implemented |
+| `RDL3028` | Compatibility | Implemented |
+| `RDL3029` | Compatibility | Implemented |
+| `RDL3030` | Compatibility | Implemented |
+| `RDL3032` | Compatibility | Implemented |
+| `RDL3033` | Compatibility | Implemented |
+| `RDL3034` | Compatibility | Implemented |
+| `RDL3035` | Compatibility | Implemented |
+| `RDL3036` | Compatibility | Implemented |
+| `RDL3037` | Compatibility | Implemented |
+| `RDL3038` | Compatibility | Implemented |
+| `RDL3040` | Compatibility | Implemented |
+| `RDL3041` | Compatibility | Implemented |
+| `RDL3042` | Compatibility | Implemented |
+| `RDL3043` | Compatibility | Implemented |
+| `RDL3044` | Compatibility | Implemented |
+| `RDL3045` | Compatibility | Implemented |
+| `RDL3046` | Compatibility | Implemented |
+| `RDL3047` | Compatibility | Implemented |
+| `RDL3048` | Compatibility | Implemented |
+| `RDL3049` | Compatibility | Implemented |
+| `RDL3050` | Compatibility | Implemented |
+| `RDL3051` | Compatibility | Implemented |
+| `RDL3052` | Compatibility | Implemented |
+| `RDL3053` | Compatibility | Implemented |
+| `RDL3054` | Compatibility | Implemented |
+| `RDL3055` | Compatibility | Implemented |
+| `RDL3056` | Compatibility | Implemented |
+| `RDL3057` | Compatibility | Implemented |
+| `RDL3058` | Compatibility | Implemented |
+| `RDL3059` | Compatibility | Implemented |
+| `RDL3060` | Compatibility | Implemented |
+| `RDL3061` | Compatibility | Implemented |
+| `RDL3062` | Compatibility | Implemented |
+| `RDL3063` | Compatibility | Implemented |
+| `RDL4000` | Compatibility | Implemented |
+| `RDL4001` | Compatibility | Implemented |
+| `RDL4003` | Compatibility | Implemented |
+| `RDL4004` | Compatibility | Implemented |
+| `RDL4005` | Compatibility | Implemented |
+| `RDL4006` | Compatibility | Implemented |
+| `RSC2002` | Shell | Implemented |
+| `RSC2015` | Shell | Implemented |
+| `RSC2046` | Shell | Implemented |
+| `RSC2086` | Shell | Implemented |
+| `RSC2155` | Shell | Implemented |
+| `RSC2164` | Shell | Implemented |
+| `RSC2181` | Shell | Implemented |
+| `RDK1000` | BuildKit | BuildKit feature used without explicit frontend directive |
+| `RDK1001` | BuildKit | Secret-like build input declared as `ARG` or `ENV` |
+| `RDK1002` | BuildKit | Secret-like value passed through `RUN` without secret mount |
+| `RDK1003` | BuildKit | Package install step without cache mount opportunity |
+| `RDK1004` | BuildKit | Secret mount target copied into an image layer |
+| `RDK1005` | BuildKit | SSH mount used without explicit command scoping |
+| `RDK1006` | BuildKit | Cache mount missing stable `id` in multi-stage builds |
+| `RDK1007` | BuildKit | Cache mount sharing mode unsafe for common package managers |
+| `RDK1008` | BuildKit | BuildKit entitlement used without config opt-in |
+| `RDK1009` | BuildKit | Multi-platform build uses host architecture accidentally |
+| `RDK1010` | BuildKit | Frontend version too old for used syntax |
 
-## Planned Compatibility Rules
+## Planned Future Shell Rules
 
-No compatibility rules are currently planned in this roadmap. New compatibility
-IDs should be added here when they are intentionally tracked.
-
-## Implemented Shell Rules
-
-`RSC` rules should come from a dedicated shell-analysis layer for `RUN`
+Shell rules should come from the dedicated shell-analysis layer for `RUN`
 commands. They should not be implemented by ad hoc substring checks.
 
-- `RSC2002`
-- `RSC2015`
-- `RSC2046`
-- `RSC2086`
-- `RSC2155`
-- `RSC2164`
-- `RSC2181`
+| Rule ID | Family | Coverage |
+| --- | --- | --- |
+| `RSC1000` | Shell | Planned |
+| `RSC1001` | Shell | Planned |
+| `RSC1007` | Shell | Planned |
+| `RSC1010` | Shell | Planned |
+| `RSC1018` | Shell | Planned |
+| `RSC1035` | Shell | Planned |
+| `RSC1045` | Shell | Planned |
+| `RSC1065` | Shell | Planned |
+| `RSC1066` | Shell | Planned |
+| `RSC1077` | Shell | Planned |
+| `RSC1078` | Shell | Planned |
+| `RSC1079` | Shell | Planned |
+| `RSC1081` | Shell | Planned |
+| `RSC1083` | Shell | Planned |
+| `RSC1086` | Shell | Planned |
+| `RSC1095` | Shell | Planned |
+| `RSC2026` | Shell | Planned |
+| `RSC2035` | Shell | Planned |
+| `RSC2140` | Shell | Planned |
+| `RSC2154` | Shell | Planned |
+| `RSC2196` | Shell | Planned |
 
-## Planned Shell Rules
+## Planned Native And Compatibility Rules
 
-Initial tracked IDs:
-
-- `RSC1000`
-- `RSC1001`
-- `RSC1007`
-- `RSC1010`
-- `RSC1018`
-- `RSC1035`
-- `RSC1045`
-- `RSC1065`
-- `RSC1066`
-- `RSC1077`
-- `RSC1078`
-- `RSC1079`
-- `RSC1081`
-- `RSC1083`
-- `RSC1086`
-- `RSC1095`
-- `RSC2026`
-- `RSC2035`
-- `RSC2140`
-- `RSC2154`
-- `RSC2196`
-
-## BuildKit-Native Rules
-
-Implemented:
-
-- `RDK1000`: BuildKit feature used without explicit frontend directive.
-- `RDK1001`: Secret-like build input declared as `ARG` or `ENV`.
-- `RDK1002`: Secret-like value passed through `RUN` without secret mount.
-- `RDK1003`: Package install step without cache mount opportunity.
-- `RDK1004`: Secret mount target copied into an image layer.
-- `RDK1005`: SSH mount used without explicit command scoping.
-- `RDK1006`: Cache mount missing stable `id` in multi-stage builds.
-- `RDK1007`: Cache mount sharing mode unsafe for common package managers.
-- `RDK1008`: BuildKit network/security entitlement used without config opt-in.
-- `RDK1009`: Multi-platform build uses host architecture accidentally.
-- `RDK1010`: Frontend version too old for used syntax.
-
-Planned:
-
-No BuildKit-native rules are currently planned in this roadmap. New BuildKit
-IDs should be added here when they are intentionally tracked.
+No compatibility or BuildKit-native rules are currently planned in this roadmap.
+New IDs should be added here only when they are intentionally tracked.
