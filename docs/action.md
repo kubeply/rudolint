@@ -112,6 +112,11 @@ After `v1.0.0`, stable users can pin the action reference to
 releases. Keep `version` pinned to an exact release tag for reproducible
 blocking CI unless the workflow intentionally tracks the latest binary.
 
+The `v1` tag points to the latest stable `v1.x.y` release. It must not point to
+prerelease tags such as `v1.1.0-rc.1`, `v1.1.0-beta.1`, or any tag with a
+SemVer prerelease suffix. Move `v1` only after the stable release workflow has
+finished and post-release verification has passed.
+
 ## Marketplace
 
 The action is published on
