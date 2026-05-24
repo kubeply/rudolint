@@ -90,6 +90,8 @@ fn snapshots_real_world_corpus_findings() {
 
 #[test]
 fn real_world_noise_fixtures_do_not_trigger_findings() {
+    let profiles = [Profile::Default, Profile::HadolintCompat];
+
     for fixture in [
         "noise-clean-runtime",
         "noise-directives-and-comments",
@@ -98,13 +100,17 @@ fn real_world_noise_fixtures_do_not_trigger_findings() {
         let path = format!("corpus/real-world/{fixture}/Dockerfile");
         let source = read_fixture(&path);
         let document = parse_dockerfile(&source).expect("fixture should parse");
-        let findings = RuleEngine::new(Profile::Default, Config::default())
-            .lint_path(std::path::Path::new(&path), &document);
 
-        assert!(
-            findings.is_empty(),
-            "{fixture} should not trigger findings: {findings:#?}"
-        );
+        for profile in profiles {
+            let findings = RuleEngine::new(profile, Config::default())
+                .lint_path(std::path::Path::new(&path), &document);
+
+            assert!(
+                findings.is_empty(),
+                "{fixture} should not trigger findings in {} profile: {findings:#?}",
+                profile.policy().as_str()
+            );
+        }
     }
 }
 

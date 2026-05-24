@@ -132,6 +132,17 @@ fn rule_matrix_profile_coverage_matches_catalog() {
 }
 
 #[test]
+fn implemented_rule_matrix_entries_have_audited_negative_coverage() {
+    for row in rule_matrix_section_rows("## Implemented V1 Surface") {
+        assert!(
+            matches!(row.negative_fixture.as_str(), "yes" | "shared"),
+            "{} must declare focused or shared negative/noise coverage",
+            row.code
+        );
+    }
+}
+
+#[test]
 fn planned_shell_rules_stay_out_of_implemented_matrix() {
     let catalog = RuleEngine::new(Profile::Default, Config::default()).catalog();
     let implemented_matrix_codes = rule_matrix_implemented_codes();
@@ -237,6 +248,7 @@ fn rule_matrix_section_codes(heading: &str) -> BTreeSet<String> {
 struct RuleMatrixRow {
     code: String,
     enabled_profiles: String,
+    negative_fixture: String,
 }
 
 fn rule_matrix_section_rows(heading: &str) -> Vec<RuleMatrixRow> {
@@ -289,10 +301,12 @@ fn rule_matrix_row(line: &str) -> Option<RuleMatrixRow> {
     let code_cell = cells.first()?;
     let code = code_cell.strip_prefix('`')?.strip_suffix('`')?;
     let enabled_profiles = cells.get(2)?;
+    let negative_fixture = cells.get(6)?;
 
     Some(RuleMatrixRow {
         code: code.to_string(),
         enabled_profiles: (*enabled_profiles).to_string(),
+        negative_fixture: (*negative_fixture).to_string(),
     })
 }
 
