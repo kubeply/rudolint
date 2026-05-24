@@ -89,6 +89,27 @@ jobs:
         with:
           name: artifacts-plan-dist-manifest
           path: plan-dist-manifest.json
+      - name: Dry-run release notes composition
+        if: ${{ github.event_name == 'pull_request' }}
+        shell: bash
+        run: |
+          cat > "$RUNNER_TEMP/generated-notes.json" <<'JSON'
+          {
+            "body": "## What's Changed\n\n* Example generated change"
+          }
+          JSON
+          cat > "$RUNNER_TEMP/cargo-dist-body.md" <<'MARKDOWN'
+          cargo-dist installer, download, checksum, and attestation sections
+          MARKDOWN
+
+          scripts/compose-release-notes.sh \
+            "$RUNNER_TEMP/generated-notes.json" \
+            "$RUNNER_TEMP/cargo-dist-body.md" \
+            "$RUNNER_TEMP/notes.txt"
+
+          grep -F "## What's Changed" "$RUNNER_TEMP/notes.txt"
+          grep -F "## Install, Downloads, Checksums, And Attestations" "$RUNNER_TEMP/notes.txt"
+          grep -F "cargo-dist installer, download, checksum, and attestation sections" "$RUNNER_TEMP/notes.txt"
 
   # Build and packages all the platform-specific things
   build-local-artifacts:
@@ -285,15 +306,11 @@ jobs:
             -f target_commitish="$RELEASE_COMMIT" \
             > "$RUNNER_TEMP/generated-notes.json"
 
-          jq -r '.body // ""' "$RUNNER_TEMP/generated-notes.json" > "$RUNNER_TEMP/notes.txt"
-          {
-            echo
-            echo "## Install, Downloads, Checksums, And Attestations"
-            echo
-            # Keep cargo-dist's body intact: it carries installer, direct
-            # download, checksum, and attestation details.
-            printf '%s\n' "$ANNOUNCEMENT_BODY"
-          } >> "$RUNNER_TEMP/notes.txt"
+          printf '%s\n' "$ANNOUNCEMENT_BODY" > "$RUNNER_TEMP/cargo-dist-body.md"
+          scripts/compose-release-notes.sh \
+            "$RUNNER_TEMP/generated-notes.json" \
+            "$RUNNER_TEMP/cargo-dist-body.md" \
+            "$RUNNER_TEMP/notes.txt"
 
           gh release create "${{ needs.plan.outputs.tag }}" --target "$RELEASE_COMMIT" $PRERELEASE_FLAG --title "$ANNOUNCEMENT_TITLE" --notes-file "$RUNNER_TEMP/notes.txt" artifacts/*
 
