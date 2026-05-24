@@ -83,6 +83,16 @@ jobs:
           version: <release-tag>
 ```
 
+After `v1.0.0`, use the stable major action tag when you want automatic action
+wrapper updates across stable `v1.x.y` releases while keeping binary upgrades
+explicit:
+
+```yaml
+- uses: kubeply/rudolint@v1
+  with:
+    version: <release-tag>
+```
+
 For monorepos, pass one path per line:
 
 ```yaml
