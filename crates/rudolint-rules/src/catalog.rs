@@ -3,6 +3,9 @@ use rudolint_policy::PolicyProfile;
 
 pub(crate) fn implemented_rules(profile: PolicyProfile) -> Vec<Box<dyn Rule>> {
     let mut rules = compat::rules();
+    if !profile.warns_on_legacy_suppressions() {
+        rules.retain(|rule| rule.info().code != "RDL1001");
+    }
 
     if profile.includes_buildkit_native_rules() {
         rules.extend(buildkit::rules());

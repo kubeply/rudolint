@@ -115,7 +115,6 @@ expression: snapshot
   },
   "implemented_catalog": {
     "compat": [
-      "RDL1001",
       "RDL3000",
       "RDL3001",
       "RDL3002",

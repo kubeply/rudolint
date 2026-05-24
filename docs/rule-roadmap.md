@@ -37,7 +37,7 @@ Negative fixture statuses are:
 | `RDK1008` | BuildKit | `default` | `warning` | yes | yes | shared | `not-applicable` | yes |
 | `RDK1009` | BuildKit | `default` | `warning` | yes | yes | shared | `not-applicable` | yes |
 | `RDK1010` | BuildKit | `default` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL1001` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `RDL1001` | Compatibility | `default` | `warning` | yes | yes | shared | `not-applicable` | yes |
 | `RDL3000` | Compatibility | `default`, `hadolint-compat` | `error` | yes | yes | shared | `not-applicable` | yes |
 | `RDL3001` | Compatibility | `default`, `hadolint-compat` | `info` | yes | yes | shared | `not-applicable` | yes |
 | `RDL3002` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | yes | `not-applicable` | yes |

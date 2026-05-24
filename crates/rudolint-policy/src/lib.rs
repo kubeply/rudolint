@@ -42,6 +42,14 @@ impl PolicyProfile {
         true
     }
 
+    /// Returns true when legacy external suppression comments should be warned on.
+    pub const fn warns_on_legacy_suppressions(self) -> bool {
+        match self {
+            Self::Default | Self::Strict => true,
+            Self::HadolintCompat => false,
+        }
+    }
+
     /// Returns true for the strict policy profile.
     pub const fn is_strict(self) -> bool {
         matches!(self, Self::Strict)

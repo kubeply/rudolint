@@ -55,6 +55,18 @@ fn snapshots_legacy_external_suppression_warnings() {
 }
 
 #[test]
+fn hadolint_compat_accepts_hadolint_suppression_comments() {
+    let source = read_fixture("rules/legacy-suppressions/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::HadolintCompat, Config::default()).lint(&document);
+
+    assert!(
+        findings.iter().all(|finding| finding.code != "RDL1001"),
+        "hadolint-compat should not warn on hadolint ignore comments"
+    );
+}
+
+#[test]
 fn snapshots_real_world_corpus_findings() {
     let cases = [
         "alpine-packages",
