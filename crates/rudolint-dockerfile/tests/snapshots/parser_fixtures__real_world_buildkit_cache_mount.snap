@@ -1,0 +1,344 @@
+---
+source: crates/rudolint-dockerfile/tests/parser_fixtures.rs
+expression: document_json(&document)
+---
+{
+  "checks": [],
+  "comments": [
+    {
+      "line": 1,
+      "span": {
+        "end_byte": 30,
+        "end_column": 31,
+        "end_line": 1,
+        "start_byte": 0,
+        "start_column": 1,
+        "start_line": 1
+      },
+      "text": "# syntax=docker/dockerfile:1.7"
+    }
+  ],
+  "escape": null,
+  "has_buildkit_features": true,
+  "instructions": [
+    {
+      "arg": null,
+      "args": "python:3.12.7-slim AS wheels",
+      "args_span": {
+        "end_byte": 64,
+        "end_column": 34,
+        "end_line": 2,
+        "start_byte": 36,
+        "start_column": 6,
+        "start_line": 2
+      },
+      "continuations": [],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 64,
+          "end_column": 34,
+          "end_line": 2,
+          "start_byte": 36,
+          "start_column": 6,
+          "start_line": 2
+        },
+        "text": "python:3.12.7-slim AS wheels"
+      },
+      "from": {
+        "alias": "wheels",
+        "digest": null,
+        "flags": [],
+        "image": "python:3.12.7-slim",
+        "platform": null
+      },
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "FROM",
+      "keyword_span": {
+        "end_byte": 35,
+        "end_column": 5,
+        "end_line": 2,
+        "start_byte": 31,
+        "start_column": 1,
+        "start_line": 2
+      },
+      "label": null,
+      "line": 2,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 64,
+        "end_column": 34,
+        "end_line": 2,
+        "start_byte": 31,
+        "start_column": 1,
+        "start_line": 2
+      },
+      "recovery": null,
+      "run": null
+    },
+    {
+      "arg": null,
+      "args": "/src",
+      "args_span": {
+        "end_byte": 78,
+        "end_column": 13,
+        "end_line": 4,
+        "start_byte": 74,
+        "start_column": 9,
+        "start_line": 4
+      },
+      "continuations": [],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 78,
+          "end_column": 13,
+          "end_line": 4,
+          "start_byte": 74,
+          "start_column": 9,
+          "start_line": 4
+        },
+        "text": "/src"
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "WORKDIR",
+      "keyword_span": {
+        "end_byte": 73,
+        "end_column": 8,
+        "end_line": 4,
+        "start_byte": 66,
+        "start_column": 1,
+        "start_line": 4
+      },
+      "label": null,
+      "line": 4,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 78,
+        "end_column": 13,
+        "end_line": 4,
+        "start_byte": 66,
+        "start_column": 1,
+        "start_line": 4
+      },
+      "recovery": null,
+      "run": null
+    },
+    {
+      "arg": null,
+      "args": "requirements.txt .",
+      "args_span": {
+        "end_byte": 102,
+        "end_column": 24,
+        "end_line": 5,
+        "start_byte": 84,
+        "start_column": 6,
+        "start_line": 5
+      },
+      "continuations": [],
+      "copy": {
+        "chmod": null,
+        "chown": null,
+        "destination": ".",
+        "flags": [],
+        "from": null,
+        "kind": "copy",
+        "sources": [
+          "requirements.txt"
+        ]
+      },
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 102,
+          "end_column": 24,
+          "end_line": 5,
+          "start_byte": 84,
+          "start_column": 6,
+          "start_line": 5
+        },
+        "text": "requirements.txt ."
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "COPY",
+      "keyword_span": {
+        "end_byte": 83,
+        "end_column": 5,
+        "end_line": 5,
+        "start_byte": 79,
+        "start_column": 1,
+        "start_line": 5
+      },
+      "label": null,
+      "line": 5,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 102,
+        "end_column": 24,
+        "end_line": 5,
+        "start_byte": 79,
+        "start_column": 1,
+        "start_line": 5
+      },
+      "recovery": null,
+      "run": null
+    },
+    {
+      "arg": null,
+      "args": "--mount=type=cache,target=/root/.cache/pip,id=pip-cache,sharing=locked \\\n    pip wheel --wheel-dir /wheels -r requirements.txt",
+      "args_span": {
+        "end_byte": 233,
+        "end_column": 54,
+        "end_line": 7,
+        "start_byte": 107,
+        "start_column": 5,
+        "start_line": 6
+      },
+      "continuations": [
+        {
+          "escape": "\\",
+          "line": 6,
+          "span": {
+            "end_byte": 179,
+            "end_column": 77,
+            "end_line": 6,
+            "start_byte": 178,
+            "start_column": 76,
+            "start_line": 6
+          }
+        }
+      ],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [
+        [
+          "mount",
+          "type=cache,target=/root/.cache/pip,id=pip-cache,sharing=locked"
+        ]
+      ],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 233,
+          "end_column": 54,
+          "end_line": 7,
+          "start_byte": 107,
+          "start_column": 5,
+          "start_line": 6
+        },
+        "text": "--mount=type=cache,target=/root/.cache/pip,id=pip-cache,sharing=locked \\\n    pip wheel --wheel-dir /wheels -r requirements.txt"
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "RUN",
+      "keyword_span": {
+        "end_byte": 106,
+        "end_column": 4,
+        "end_line": 6,
+        "start_byte": 103,
+        "start_column": 1,
+        "start_line": 6
+      },
+      "label": null,
+      "line": 6,
+      "mounts": [
+        {
+          "options": [
+            [
+              "type",
+              "cache"
+            ],
+            [
+              "target",
+              "/root/.cache/pip"
+            ],
+            [
+              "id",
+              "pip-cache"
+            ],
+            [
+              "sharing",
+              "locked"
+            ]
+          ],
+          "type": "cache"
+        }
+      ],
+      "raw_span": {
+        "end_byte": 233,
+        "end_column": 54,
+        "end_line": 7,
+        "start_byte": 103,
+        "start_column": 1,
+        "start_line": 6
+      },
+      "recovery": null,
+      "run": {
+        "flags": [
+          [
+            "mount",
+            "type=cache,target=/root/.cache/pip,id=pip-cache,sharing=locked"
+          ]
+        ],
+        "mounts": [
+          {
+            "options": [
+              [
+                "type",
+                "cache"
+              ],
+              [
+                "target",
+                "/root/.cache/pip"
+              ],
+              [
+                "id",
+                "pip-cache"
+              ],
+              [
+                "sharing",
+                "locked"
+              ]
+            ],
+            "type": "cache"
+          }
+        ],
+        "network": null,
+        "security": null,
+        "shell": {
+          "span": {
+            "end_byte": 233,
+            "end_column": 54,
+            "end_line": 7,
+            "start_byte": 178,
+            "start_column": 76,
+            "start_line": 6
+          },
+          "text": "\\\n    pip wheel --wheel-dir /wheels -r requirements.txt"
+        }
+      }
+    }
+  ],
+  "syntax": {
+    "image": "docker/dockerfile:1.7",
+    "line": 1
+  }
+}

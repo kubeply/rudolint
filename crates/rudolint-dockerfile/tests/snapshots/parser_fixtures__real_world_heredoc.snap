@@ -1,0 +1,255 @@
+---
+source: crates/rudolint-dockerfile/tests/parser_fixtures.rs
+expression: document_json(&document)
+---
+{
+  "checks": [],
+  "comments": [
+    {
+      "line": 1,
+      "span": {
+        "end_byte": 30,
+        "end_column": 31,
+        "end_line": 1,
+        "start_byte": 0,
+        "start_column": 1,
+        "start_line": 1
+      },
+      "text": "# syntax=docker/dockerfile:1.7"
+    }
+  ],
+  "escape": null,
+  "has_buildkit_features": true,
+  "instructions": [
+    {
+      "arg": null,
+      "args": "busybox:1.36.1",
+      "args_span": {
+        "end_byte": 50,
+        "end_column": 20,
+        "end_line": 2,
+        "start_byte": 36,
+        "start_column": 6,
+        "start_line": 2
+      },
+      "continuations": [],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 50,
+          "end_column": 20,
+          "end_line": 2,
+          "start_byte": 36,
+          "start_column": 6,
+          "start_line": 2
+        },
+        "text": "busybox:1.36.1"
+      },
+      "from": {
+        "alias": null,
+        "digest": null,
+        "flags": [],
+        "image": "busybox:1.36.1",
+        "platform": null
+      },
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "FROM",
+      "keyword_span": {
+        "end_byte": 35,
+        "end_column": 5,
+        "end_line": 2,
+        "start_byte": 31,
+        "start_column": 1,
+        "start_line": 2
+      },
+      "label": null,
+      "line": 2,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 50,
+        "end_column": 20,
+        "end_line": 2,
+        "start_byte": 31,
+        "start_column": 1,
+        "start_line": 2
+      },
+      "recovery": null,
+      "run": null
+    },
+    {
+      "arg": null,
+      "args": "<<'EOF'\nset -eu\nmkdir -p /usr/local/bin\nmkdir -p /etc/app/config\ncat > /usr/local/bin/healthcheck <<'SCRIPT'\n#!/bin/sh\ntest -d /etc/app/config\nSCRIPT\nchmod +x /usr/local/bin/healthcheck\nEOF",
+      "args_span": {
+        "end_byte": 245,
+        "end_column": 4,
+        "end_line": 13,
+        "start_byte": 56,
+        "start_column": 5,
+        "start_line": 4
+      },
+      "continuations": [],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 245,
+          "end_column": 4,
+          "end_line": 13,
+          "start_byte": 56,
+          "start_column": 5,
+          "start_line": 4
+        },
+        "text": "<<'EOF'\nset -eu\nmkdir -p /usr/local/bin\nmkdir -p /etc/app/config\ncat > /usr/local/bin/healthcheck <<'SCRIPT'\n#!/bin/sh\ntest -d /etc/app/config\nSCRIPT\nchmod +x /usr/local/bin/healthcheck\nEOF"
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [
+        {
+          "body": "set -eu\nmkdir -p /usr/local/bin\nmkdir -p /etc/app/config\ncat > /usr/local/bin/healthcheck <<'SCRIPT'\n#!/bin/sh\ntest -d /etc/app/config\nSCRIPT\nchmod +x /usr/local/bin/healthcheck\n",
+          "body_span": {
+            "end_byte": 242,
+            "end_column": 1,
+            "end_line": 13,
+            "start_byte": 64,
+            "start_column": 1,
+            "start_line": 5
+          },
+          "delimiter": "EOF",
+          "quoted": true,
+          "target_instruction": "RUN"
+        },
+        {
+          "body": "#!/bin/sh\ntest -d /etc/app/config\n",
+          "body_span": {
+            "end_byte": 199,
+            "end_column": 1,
+            "end_line": 11,
+            "start_byte": 165,
+            "start_column": 1,
+            "start_line": 9
+          },
+          "delimiter": "SCRIPT",
+          "quoted": true,
+          "target_instruction": "RUN"
+        }
+      ],
+      "keyword": "RUN",
+      "keyword_span": {
+        "end_byte": 55,
+        "end_column": 4,
+        "end_line": 4,
+        "start_byte": 52,
+        "start_column": 1,
+        "start_line": 4
+      },
+      "label": null,
+      "line": 4,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 245,
+        "end_column": 4,
+        "end_line": 13,
+        "start_byte": 52,
+        "start_column": 1,
+        "start_line": 4
+      },
+      "recovery": null,
+      "run": {
+        "flags": [],
+        "mounts": [],
+        "network": null,
+        "security": null,
+        "shell": {
+          "span": {
+            "end_byte": 245,
+            "end_column": 4,
+            "end_line": 13,
+            "start_byte": 56,
+            "start_column": 5,
+            "start_line": 4
+          },
+          "text": "<<'EOF'\nset -eu\nmkdir -p /usr/local/bin\nmkdir -p /etc/app/config\ncat > /usr/local/bin/healthcheck <<'SCRIPT'\n#!/bin/sh\ntest -d /etc/app/config\nSCRIPT\nchmod +x /usr/local/bin/healthcheck\nEOF"
+        }
+      }
+    },
+    {
+      "arg": null,
+      "args": "CMD [\"/usr/local/bin/healthcheck\"]",
+      "args_span": {
+        "end_byte": 293,
+        "end_column": 47,
+        "end_line": 15,
+        "start_byte": 259,
+        "start_column": 13,
+        "start_line": 15
+      },
+      "continuations": [],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 293,
+          "end_column": 47,
+          "end_line": 15,
+          "start_byte": 259,
+          "start_column": 13,
+          "start_line": 15
+        },
+        "text": "CMD [\"/usr/local/bin/healthcheck\"]"
+      },
+      "from": null,
+      "healthcheck": {
+        "command": {
+          "span": {
+            "end_byte": 293,
+            "end_column": 47,
+            "end_line": 15,
+            "start_byte": 263,
+            "start_column": 17,
+            "start_line": 15
+          },
+          "text": "[\"/usr/local/bin/healthcheck\"]"
+        },
+        "flags": []
+      },
+      "heredocs": [],
+      "keyword": "HEALTHCHECK",
+      "keyword_span": {
+        "end_byte": 258,
+        "end_column": 12,
+        "end_line": 15,
+        "start_byte": 247,
+        "start_column": 1,
+        "start_line": 15
+      },
+      "label": null,
+      "line": 15,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 293,
+        "end_column": 47,
+        "end_line": 15,
+        "start_byte": 247,
+        "start_column": 1,
+        "start_line": 15
+      },
+      "recovery": null,
+      "run": null
+    }
+  ],
+  "syntax": {
+    "image": "docker/dockerfile:1.7",
+    "line": 1
+  }
+}

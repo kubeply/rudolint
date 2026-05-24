@@ -37,6 +37,47 @@ fn snapshots_parser_matrix() {
     }
 }
 
+#[test]
+fn snapshots_real_world_corpus() {
+    for (snapshot, fixture) in [
+        (
+            "real_world_alpine_packages",
+            "corpus/real-world/alpine-packages/Dockerfile",
+        ),
+        (
+            "real_world_buildkit_cache_mount",
+            "corpus/real-world/buildkit-cache-mount/Dockerfile",
+        ),
+        (
+            "real_world_buildkit_secret_mount",
+            "corpus/real-world/buildkit-secret-mount/Dockerfile",
+        ),
+        (
+            "real_world_buildkit_ssh_mount",
+            "corpus/real-world/buildkit-ssh-mount/Dockerfile",
+        ),
+        (
+            "real_world_debian_packages",
+            "corpus/real-world/debian-packages/Dockerfile",
+        ),
+        (
+            "real_world_generated_labels",
+            "corpus/real-world/generated-labels/Dockerfile",
+        ),
+        ("real_world_heredoc", "corpus/real-world/heredoc/Dockerfile"),
+        (
+            "real_world_multi_platform_build",
+            "corpus/real-world/multi-platform-build/Dockerfile",
+        ),
+        (
+            "real_world_multi_stage_app",
+            "corpus/real-world/multi-stage-app/Dockerfile",
+        ),
+    ] {
+        snapshot_parser_fixture(snapshot, fixture);
+    }
+}
+
 fn snapshot_parser_fixture(snapshot: &str, fixture: &str) {
     let source = read_fixture(fixture);
     let document = parse_dockerfile(&source).expect("fixture should parse");

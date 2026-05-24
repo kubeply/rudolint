@@ -1,0 +1,418 @@
+---
+source: crates/rudolint-dockerfile/tests/parser_fixtures.rs
+expression: document_json(&document)
+---
+{
+  "checks": [],
+  "comments": [],
+  "escape": null,
+  "has_buildkit_features": false,
+  "instructions": [
+    {
+      "arg": null,
+      "args": "alpine:3.20",
+      "args_span": {
+        "end_byte": 16,
+        "end_column": 17,
+        "end_line": 1,
+        "start_byte": 5,
+        "start_column": 6,
+        "start_line": 1
+      },
+      "continuations": [],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 16,
+          "end_column": 17,
+          "end_line": 1,
+          "start_byte": 5,
+          "start_column": 6,
+          "start_line": 1
+        },
+        "text": "alpine:3.20"
+      },
+      "from": {
+        "alias": null,
+        "digest": null,
+        "flags": [],
+        "image": "alpine:3.20",
+        "platform": null
+      },
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "FROM",
+      "keyword_span": {
+        "end_byte": 4,
+        "end_column": 5,
+        "end_line": 1,
+        "start_byte": 0,
+        "start_column": 1,
+        "start_line": 1
+      },
+      "label": null,
+      "line": 1,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 16,
+        "end_column": 17,
+        "end_line": 1,
+        "start_byte": 0,
+        "start_column": 1,
+        "start_line": 1
+      },
+      "recovery": null,
+      "run": null
+    },
+    {
+      "arg": {
+        "default": "0000000000000000000000000000000000000000",
+        "name": "VCS_REF"
+      },
+      "args": "VCS_REF=0000000000000000000000000000000000000000",
+      "args_span": {
+        "end_byte": 70,
+        "end_column": 53,
+        "end_line": 3,
+        "start_byte": 22,
+        "start_column": 5,
+        "start_line": 3
+      },
+      "continuations": [],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 70,
+          "end_column": 53,
+          "end_line": 3,
+          "start_byte": 22,
+          "start_column": 5,
+          "start_line": 3
+        },
+        "text": "VCS_REF=0000000000000000000000000000000000000000"
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "ARG",
+      "keyword_span": {
+        "end_byte": 21,
+        "end_column": 4,
+        "end_line": 3,
+        "start_byte": 18,
+        "start_column": 1,
+        "start_line": 3
+      },
+      "label": null,
+      "line": 3,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 70,
+        "end_column": 53,
+        "end_line": 3,
+        "start_byte": 18,
+        "start_column": 1,
+        "start_line": 3
+      },
+      "recovery": null,
+      "run": null
+    },
+    {
+      "arg": {
+        "default": "2026-01-01T00:00:00Z",
+        "name": "BUILD_DATE"
+      },
+      "args": "BUILD_DATE=2026-01-01T00:00:00Z",
+      "args_span": {
+        "end_byte": 106,
+        "end_column": 36,
+        "end_line": 4,
+        "start_byte": 75,
+        "start_column": 5,
+        "start_line": 4
+      },
+      "continuations": [],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 106,
+          "end_column": 36,
+          "end_line": 4,
+          "start_byte": 75,
+          "start_column": 5,
+          "start_line": 4
+        },
+        "text": "BUILD_DATE=2026-01-01T00:00:00Z"
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "ARG",
+      "keyword_span": {
+        "end_byte": 74,
+        "end_column": 4,
+        "end_line": 4,
+        "start_byte": 71,
+        "start_column": 1,
+        "start_line": 4
+      },
+      "label": null,
+      "line": 4,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 106,
+        "end_column": 36,
+        "end_line": 4,
+        "start_byte": 71,
+        "start_column": 1,
+        "start_line": 4
+      },
+      "recovery": null,
+      "run": null
+    },
+    {
+      "arg": {
+        "default": "0.0.0",
+        "name": "VERSION"
+      },
+      "args": "VERSION=0.0.0",
+      "args_span": {
+        "end_byte": 124,
+        "end_column": 18,
+        "end_line": 5,
+        "start_byte": 111,
+        "start_column": 5,
+        "start_line": 5
+      },
+      "continuations": [],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 124,
+          "end_column": 18,
+          "end_line": 5,
+          "start_byte": 111,
+          "start_column": 5,
+          "start_line": 5
+        },
+        "text": "VERSION=0.0.0"
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "ARG",
+      "keyword_span": {
+        "end_byte": 110,
+        "end_column": 4,
+        "end_line": 5,
+        "start_byte": 107,
+        "start_column": 1,
+        "start_line": 5
+      },
+      "label": null,
+      "line": 5,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 124,
+        "end_column": 18,
+        "end_line": 5,
+        "start_byte": 107,
+        "start_column": 1,
+        "start_line": 5
+      },
+      "recovery": null,
+      "run": null
+    },
+    {
+      "arg": null,
+      "args": "org.opencontainers.image.created=$BUILD_DATE \\\n      org.opencontainers.image.revision=$VCS_REF \\\n      org.opencontainers.image.version=$VERSION \\\n      org.opencontainers.image.source=\"https://github.com/kubeply/rudolint\" \\\n      org.opencontainers.image.licenses=\"Apache-2.0\"",
+      "args_span": {
+        "end_byte": 409,
+        "end_column": 53,
+        "end_line": 10,
+        "start_byte": 131,
+        "start_column": 7,
+        "start_line": 6
+      },
+      "continuations": [
+        {
+          "escape": "\\",
+          "line": 6,
+          "span": {
+            "end_byte": 177,
+            "end_column": 53,
+            "end_line": 6,
+            "start_byte": 176,
+            "start_column": 52,
+            "start_line": 6
+          }
+        },
+        {
+          "escape": "\\",
+          "line": 7,
+          "span": {
+            "end_byte": 228,
+            "end_column": 51,
+            "end_line": 7,
+            "start_byte": 227,
+            "start_column": 50,
+            "start_line": 7
+          }
+        },
+        {
+          "escape": "\\",
+          "line": 8,
+          "span": {
+            "end_byte": 278,
+            "end_column": 50,
+            "end_line": 8,
+            "start_byte": 277,
+            "start_column": 49,
+            "start_line": 8
+          }
+        },
+        {
+          "escape": "\\",
+          "line": 9,
+          "span": {
+            "end_byte": 356,
+            "end_column": 78,
+            "end_line": 9,
+            "start_byte": 355,
+            "start_column": 77,
+            "start_line": 9
+          }
+        }
+      ],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 409,
+          "end_column": 53,
+          "end_line": 10,
+          "start_byte": 131,
+          "start_column": 7,
+          "start_line": 6
+        },
+        "text": "org.opencontainers.image.created=$BUILD_DATE \\\n      org.opencontainers.image.revision=$VCS_REF \\\n      org.opencontainers.image.version=$VERSION \\\n      org.opencontainers.image.source=\"https://github.com/kubeply/rudolint\" \\\n      org.opencontainers.image.licenses=\"Apache-2.0\""
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "LABEL",
+      "keyword_span": {
+        "end_byte": 130,
+        "end_column": 6,
+        "end_line": 6,
+        "start_byte": 125,
+        "start_column": 1,
+        "start_line": 6
+      },
+      "label": {
+        "pairs": [
+          {
+            "key": "org.opencontainers.image.created",
+            "value": "$BUILD_DATE"
+          },
+          {
+            "key": "org.opencontainers.image.revision",
+            "value": "$VCS_REF"
+          },
+          {
+            "key": "org.opencontainers.image.version",
+            "value": "$VERSION"
+          },
+          {
+            "key": "org.opencontainers.image.source",
+            "value": "https://github.com/kubeply/rudolint"
+          },
+          {
+            "key": "org.opencontainers.image.licenses",
+            "value": "Apache-2.0"
+          }
+        ]
+      },
+      "line": 6,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 409,
+        "end_column": 53,
+        "end_line": 10,
+        "start_byte": 125,
+        "start_column": 1,
+        "start_line": 6
+      },
+      "recovery": null,
+      "run": null
+    },
+    {
+      "arg": null,
+      "args": "[\"sh\"]",
+      "args_span": {
+        "end_byte": 421,
+        "end_column": 11,
+        "end_line": 12,
+        "start_byte": 415,
+        "start_column": 5,
+        "start_line": 12
+      },
+      "continuations": [],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "json",
+        "values": [
+          "sh"
+        ]
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "CMD",
+      "keyword_span": {
+        "end_byte": 414,
+        "end_column": 4,
+        "end_line": 12,
+        "start_byte": 411,
+        "start_column": 1,
+        "start_line": 12
+      },
+      "label": null,
+      "line": 12,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 421,
+        "end_column": 11,
+        "end_line": 12,
+        "start_byte": 411,
+        "start_column": 1,
+        "start_line": 12
+      },
+      "recovery": null,
+      "run": null
+    }
+  ],
+  "syntax": null
+}

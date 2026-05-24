@@ -1,0 +1,277 @@
+---
+source: crates/rudolint-dockerfile/tests/parser_fixtures.rs
+expression: document_json(&document)
+---
+{
+  "checks": [],
+  "comments": [],
+  "escape": null,
+  "has_buildkit_features": false,
+  "instructions": [
+    {
+      "arg": null,
+      "args": "alpine:3.20",
+      "args_span": {
+        "end_byte": 16,
+        "end_column": 17,
+        "end_line": 1,
+        "start_byte": 5,
+        "start_column": 6,
+        "start_line": 1
+      },
+      "continuations": [],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 16,
+          "end_column": 17,
+          "end_line": 1,
+          "start_byte": 5,
+          "start_column": 6,
+          "start_line": 1
+        },
+        "text": "alpine:3.20"
+      },
+      "from": {
+        "alias": null,
+        "digest": null,
+        "flags": [],
+        "image": "alpine:3.20",
+        "platform": null
+      },
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "FROM",
+      "keyword_span": {
+        "end_byte": 4,
+        "end_column": 5,
+        "end_line": 1,
+        "start_byte": 0,
+        "start_column": 1,
+        "start_line": 1
+      },
+      "label": null,
+      "line": 1,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 16,
+        "end_column": 17,
+        "end_line": 1,
+        "start_byte": 0,
+        "start_column": 1,
+        "start_line": 1
+      },
+      "recovery": null,
+      "run": null
+    },
+    {
+      "arg": null,
+      "args": "apk add --no-cache \\\n    ca-certificates=20240705-r0 \\\n    curl=8.12.1-r0 \\\n    tini=0.19.0-r3",
+      "args_span": {
+        "end_byte": 116,
+        "end_column": 19,
+        "end_line": 6,
+        "start_byte": 22,
+        "start_column": 5,
+        "start_line": 3
+      },
+      "continuations": [
+        {
+          "escape": "\\",
+          "line": 3,
+          "span": {
+            "end_byte": 42,
+            "end_column": 25,
+            "end_line": 3,
+            "start_byte": 41,
+            "start_column": 24,
+            "start_line": 3
+          }
+        },
+        {
+          "escape": "\\",
+          "line": 4,
+          "span": {
+            "end_byte": 76,
+            "end_column": 34,
+            "end_line": 4,
+            "start_byte": 75,
+            "start_column": 33,
+            "start_line": 4
+          }
+        },
+        {
+          "escape": "\\",
+          "line": 5,
+          "span": {
+            "end_byte": 97,
+            "end_column": 21,
+            "end_line": 5,
+            "start_byte": 96,
+            "start_column": 20,
+            "start_line": 5
+          }
+        }
+      ],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 116,
+          "end_column": 19,
+          "end_line": 6,
+          "start_byte": 22,
+          "start_column": 5,
+          "start_line": 3
+        },
+        "text": "apk add --no-cache \\\n    ca-certificates=20240705-r0 \\\n    curl=8.12.1-r0 \\\n    tini=0.19.0-r3"
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "RUN",
+      "keyword_span": {
+        "end_byte": 21,
+        "end_column": 4,
+        "end_line": 3,
+        "start_byte": 18,
+        "start_column": 1,
+        "start_line": 3
+      },
+      "label": null,
+      "line": 3,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 116,
+        "end_column": 19,
+        "end_line": 6,
+        "start_byte": 18,
+        "start_column": 1,
+        "start_line": 3
+      },
+      "recovery": null,
+      "run": {
+        "flags": [],
+        "mounts": [],
+        "network": null,
+        "security": null,
+        "shell": {
+          "span": {
+            "end_byte": 116,
+            "end_column": 19,
+            "end_line": 6,
+            "start_byte": 22,
+            "start_column": 5,
+            "start_line": 3
+          },
+          "text": "apk add --no-cache \\\n    ca-certificates=20240705-r0 \\\n    curl=8.12.1-r0 \\\n    tini=0.19.0-r3"
+        }
+      }
+    },
+    {
+      "arg": null,
+      "args": "[\"/sbin/tini\", \"--\"]",
+      "args_span": {
+        "end_byte": 149,
+        "end_column": 32,
+        "end_line": 8,
+        "start_byte": 129,
+        "start_column": 12,
+        "start_line": 8
+      },
+      "continuations": [],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "json",
+        "values": [
+          "/sbin/tini",
+          "--"
+        ]
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "ENTRYPOINT",
+      "keyword_span": {
+        "end_byte": 128,
+        "end_column": 11,
+        "end_line": 8,
+        "start_byte": 118,
+        "start_column": 1,
+        "start_line": 8
+      },
+      "label": null,
+      "line": 8,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 149,
+        "end_column": 32,
+        "end_line": 8,
+        "start_byte": 118,
+        "start_column": 1,
+        "start_line": 8
+      },
+      "recovery": null,
+      "run": null
+    },
+    {
+      "arg": null,
+      "args": "[\"sh\"]",
+      "args_span": {
+        "end_byte": 160,
+        "end_column": 11,
+        "end_line": 9,
+        "start_byte": 154,
+        "start_column": 5,
+        "start_line": 9
+      },
+      "continuations": [],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "json",
+        "values": [
+          "sh"
+        ]
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "CMD",
+      "keyword_span": {
+        "end_byte": 153,
+        "end_column": 4,
+        "end_line": 9,
+        "start_byte": 150,
+        "start_column": 1,
+        "start_line": 9
+      },
+      "label": null,
+      "line": 9,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 160,
+        "end_column": 11,
+        "end_line": 9,
+        "start_byte": 150,
+        "start_column": 1,
+        "start_line": 9
+      },
+      "recovery": null,
+      "run": null
+    }
+  ],
+  "syntax": null
+}

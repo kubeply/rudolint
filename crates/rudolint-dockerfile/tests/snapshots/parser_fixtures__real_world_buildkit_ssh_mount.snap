@@ -1,0 +1,256 @@
+---
+source: crates/rudolint-dockerfile/tests/parser_fixtures.rs
+expression: document_json(&document)
+---
+{
+  "checks": [],
+  "comments": [
+    {
+      "line": 1,
+      "span": {
+        "end_byte": 30,
+        "end_column": 31,
+        "end_line": 1,
+        "start_byte": 0,
+        "start_column": 1,
+        "start_line": 1
+      },
+      "text": "# syntax=docker/dockerfile:1.7"
+    }
+  ],
+  "escape": null,
+  "has_buildkit_features": true,
+  "instructions": [
+    {
+      "arg": null,
+      "args": "alpine/git:2.45.2 AS source",
+      "args_span": {
+        "end_byte": 63,
+        "end_column": 33,
+        "end_line": 2,
+        "start_byte": 36,
+        "start_column": 6,
+        "start_line": 2
+      },
+      "continuations": [],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 63,
+          "end_column": 33,
+          "end_line": 2,
+          "start_byte": 36,
+          "start_column": 6,
+          "start_line": 2
+        },
+        "text": "alpine/git:2.45.2 AS source"
+      },
+      "from": {
+        "alias": "source",
+        "digest": null,
+        "flags": [],
+        "image": "alpine/git:2.45.2",
+        "platform": null
+      },
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "FROM",
+      "keyword_span": {
+        "end_byte": 35,
+        "end_column": 5,
+        "end_line": 2,
+        "start_byte": 31,
+        "start_column": 1,
+        "start_line": 2
+      },
+      "label": null,
+      "line": 2,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 63,
+        "end_column": 33,
+        "end_line": 2,
+        "start_byte": 31,
+        "start_column": 1,
+        "start_line": 2
+      },
+      "recovery": null,
+      "run": null
+    },
+    {
+      "arg": null,
+      "args": "/src",
+      "args_span": {
+        "end_byte": 77,
+        "end_column": 13,
+        "end_line": 4,
+        "start_byte": 73,
+        "start_column": 9,
+        "start_line": 4
+      },
+      "continuations": [],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 77,
+          "end_column": 13,
+          "end_line": 4,
+          "start_byte": 73,
+          "start_column": 9,
+          "start_line": 4
+        },
+        "text": "/src"
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "WORKDIR",
+      "keyword_span": {
+        "end_byte": 72,
+        "end_column": 8,
+        "end_line": 4,
+        "start_byte": 65,
+        "start_column": 1,
+        "start_line": 4
+      },
+      "label": null,
+      "line": 4,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 77,
+        "end_column": 13,
+        "end_line": 4,
+        "start_byte": 65,
+        "start_column": 1,
+        "start_line": 4
+      },
+      "recovery": null,
+      "run": null
+    },
+    {
+      "arg": null,
+      "args": "--mount=type=ssh \\\n    git clone git@github.com:example/private-module.git module",
+      "args_span": {
+        "end_byte": 163,
+        "end_column": 63,
+        "end_line": 6,
+        "start_byte": 82,
+        "start_column": 5,
+        "start_line": 5
+      },
+      "continuations": [
+        {
+          "escape": "\\",
+          "line": 5,
+          "span": {
+            "end_byte": 100,
+            "end_column": 23,
+            "end_line": 5,
+            "start_byte": 99,
+            "start_column": 22,
+            "start_line": 5
+          }
+        }
+      ],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [
+        [
+          "mount",
+          "type=ssh"
+        ]
+      ],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 163,
+          "end_column": 63,
+          "end_line": 6,
+          "start_byte": 82,
+          "start_column": 5,
+          "start_line": 5
+        },
+        "text": "--mount=type=ssh \\\n    git clone git@github.com:example/private-module.git module"
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "RUN",
+      "keyword_span": {
+        "end_byte": 81,
+        "end_column": 4,
+        "end_line": 5,
+        "start_byte": 78,
+        "start_column": 1,
+        "start_line": 5
+      },
+      "label": null,
+      "line": 5,
+      "mounts": [
+        {
+          "options": [
+            [
+              "type",
+              "ssh"
+            ]
+          ],
+          "type": "ssh"
+        }
+      ],
+      "raw_span": {
+        "end_byte": 163,
+        "end_column": 63,
+        "end_line": 6,
+        "start_byte": 78,
+        "start_column": 1,
+        "start_line": 5
+      },
+      "recovery": null,
+      "run": {
+        "flags": [
+          [
+            "mount",
+            "type=ssh"
+          ]
+        ],
+        "mounts": [
+          {
+            "options": [
+              [
+                "type",
+                "ssh"
+              ]
+            ],
+            "type": "ssh"
+          }
+        ],
+        "network": null,
+        "security": null,
+        "shell": {
+          "span": {
+            "end_byte": 163,
+            "end_column": 63,
+            "end_line": 6,
+            "start_byte": 99,
+            "start_column": 22,
+            "start_line": 5
+          },
+          "text": "\\\n    git clone git@github.com:example/private-module.git module"
+        }
+      }
+    }
+  ],
+  "syntax": {
+    "image": "docker/dockerfile:1.7",
+    "line": 1
+  }
+}

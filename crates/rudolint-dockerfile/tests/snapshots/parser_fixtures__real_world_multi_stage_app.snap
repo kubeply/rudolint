@@ -1,0 +1,957 @@
+---
+source: crates/rudolint-dockerfile/tests/parser_fixtures.rs
+expression: document_json(&document)
+---
+{
+  "checks": [],
+  "comments": [
+    {
+      "line": 1,
+      "span": {
+        "end_byte": 30,
+        "end_column": 31,
+        "end_line": 1,
+        "start_byte": 0,
+        "start_column": 1,
+        "start_line": 1
+      },
+      "text": "# syntax=docker/dockerfile:1.7"
+    }
+  ],
+  "escape": null,
+  "has_buildkit_features": true,
+  "instructions": [
+    {
+      "arg": null,
+      "args": "node:22.11.0-bookworm-slim AS deps",
+      "args_span": {
+        "end_byte": 70,
+        "end_column": 40,
+        "end_line": 2,
+        "start_byte": 36,
+        "start_column": 6,
+        "start_line": 2
+      },
+      "continuations": [],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 70,
+          "end_column": 40,
+          "end_line": 2,
+          "start_byte": 36,
+          "start_column": 6,
+          "start_line": 2
+        },
+        "text": "node:22.11.0-bookworm-slim AS deps"
+      },
+      "from": {
+        "alias": "deps",
+        "digest": null,
+        "flags": [],
+        "image": "node:22.11.0-bookworm-slim",
+        "platform": null
+      },
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "FROM",
+      "keyword_span": {
+        "end_byte": 35,
+        "end_column": 5,
+        "end_line": 2,
+        "start_byte": 31,
+        "start_column": 1,
+        "start_line": 2
+      },
+      "label": null,
+      "line": 2,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 70,
+        "end_column": 40,
+        "end_line": 2,
+        "start_byte": 31,
+        "start_column": 1,
+        "start_line": 2
+      },
+      "recovery": null,
+      "run": null
+    },
+    {
+      "arg": null,
+      "args": "/app",
+      "args_span": {
+        "end_byte": 84,
+        "end_column": 13,
+        "end_line": 4,
+        "start_byte": 80,
+        "start_column": 9,
+        "start_line": 4
+      },
+      "continuations": [],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 84,
+          "end_column": 13,
+          "end_line": 4,
+          "start_byte": 80,
+          "start_column": 9,
+          "start_line": 4
+        },
+        "text": "/app"
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "WORKDIR",
+      "keyword_span": {
+        "end_byte": 79,
+        "end_column": 8,
+        "end_line": 4,
+        "start_byte": 72,
+        "start_column": 1,
+        "start_line": 4
+      },
+      "label": null,
+      "line": 4,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 84,
+        "end_column": 13,
+        "end_line": 4,
+        "start_byte": 72,
+        "start_column": 1,
+        "start_line": 4
+      },
+      "recovery": null,
+      "run": null
+    },
+    {
+      "arg": null,
+      "args": "package.json package-lock.json ./",
+      "args_span": {
+        "end_byte": 123,
+        "end_column": 39,
+        "end_line": 5,
+        "start_byte": 90,
+        "start_column": 6,
+        "start_line": 5
+      },
+      "continuations": [],
+      "copy": {
+        "chmod": null,
+        "chown": null,
+        "destination": "./",
+        "flags": [],
+        "from": null,
+        "kind": "copy",
+        "sources": [
+          "package.json",
+          "package-lock.json"
+        ]
+      },
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 123,
+          "end_column": 39,
+          "end_line": 5,
+          "start_byte": 90,
+          "start_column": 6,
+          "start_line": 5
+        },
+        "text": "package.json package-lock.json ./"
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "COPY",
+      "keyword_span": {
+        "end_byte": 89,
+        "end_column": 5,
+        "end_line": 5,
+        "start_byte": 85,
+        "start_column": 1,
+        "start_line": 5
+      },
+      "label": null,
+      "line": 5,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 123,
+        "end_column": 39,
+        "end_line": 5,
+        "start_byte": 85,
+        "start_column": 1,
+        "start_line": 5
+      },
+      "recovery": null,
+      "run": null
+    },
+    {
+      "arg": null,
+      "args": "--mount=type=cache,target=/root/.npm,id=npm-cache,sharing=locked \\\n    npm ci",
+      "args_span": {
+        "end_byte": 205,
+        "end_column": 11,
+        "end_line": 7,
+        "start_byte": 128,
+        "start_column": 5,
+        "start_line": 6
+      },
+      "continuations": [
+        {
+          "escape": "\\",
+          "line": 6,
+          "span": {
+            "end_byte": 194,
+            "end_column": 71,
+            "end_line": 6,
+            "start_byte": 193,
+            "start_column": 70,
+            "start_line": 6
+          }
+        }
+      ],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [
+        [
+          "mount",
+          "type=cache,target=/root/.npm,id=npm-cache,sharing=locked"
+        ]
+      ],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 205,
+          "end_column": 11,
+          "end_line": 7,
+          "start_byte": 128,
+          "start_column": 5,
+          "start_line": 6
+        },
+        "text": "--mount=type=cache,target=/root/.npm,id=npm-cache,sharing=locked \\\n    npm ci"
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "RUN",
+      "keyword_span": {
+        "end_byte": 127,
+        "end_column": 4,
+        "end_line": 6,
+        "start_byte": 124,
+        "start_column": 1,
+        "start_line": 6
+      },
+      "label": null,
+      "line": 6,
+      "mounts": [
+        {
+          "options": [
+            [
+              "type",
+              "cache"
+            ],
+            [
+              "target",
+              "/root/.npm"
+            ],
+            [
+              "id",
+              "npm-cache"
+            ],
+            [
+              "sharing",
+              "locked"
+            ]
+          ],
+          "type": "cache"
+        }
+      ],
+      "raw_span": {
+        "end_byte": 205,
+        "end_column": 11,
+        "end_line": 7,
+        "start_byte": 124,
+        "start_column": 1,
+        "start_line": 6
+      },
+      "recovery": null,
+      "run": {
+        "flags": [
+          [
+            "mount",
+            "type=cache,target=/root/.npm,id=npm-cache,sharing=locked"
+          ]
+        ],
+        "mounts": [
+          {
+            "options": [
+              [
+                "type",
+                "cache"
+              ],
+              [
+                "target",
+                "/root/.npm"
+              ],
+              [
+                "id",
+                "npm-cache"
+              ],
+              [
+                "sharing",
+                "locked"
+              ]
+            ],
+            "type": "cache"
+          }
+        ],
+        "network": null,
+        "security": null,
+        "shell": {
+          "span": {
+            "end_byte": 205,
+            "end_column": 11,
+            "end_line": 7,
+            "start_byte": 193,
+            "start_column": 70,
+            "start_line": 6
+          },
+          "text": "\\\n    npm ci"
+        }
+      }
+    },
+    {
+      "arg": null,
+      "args": "node:22.11.0-bookworm-slim AS build",
+      "args_span": {
+        "end_byte": 247,
+        "end_column": 41,
+        "end_line": 9,
+        "start_byte": 212,
+        "start_column": 6,
+        "start_line": 9
+      },
+      "continuations": [],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 247,
+          "end_column": 41,
+          "end_line": 9,
+          "start_byte": 212,
+          "start_column": 6,
+          "start_line": 9
+        },
+        "text": "node:22.11.0-bookworm-slim AS build"
+      },
+      "from": {
+        "alias": "build",
+        "digest": null,
+        "flags": [],
+        "image": "node:22.11.0-bookworm-slim",
+        "platform": null
+      },
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "FROM",
+      "keyword_span": {
+        "end_byte": 211,
+        "end_column": 5,
+        "end_line": 9,
+        "start_byte": 207,
+        "start_column": 1,
+        "start_line": 9
+      },
+      "label": null,
+      "line": 9,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 247,
+        "end_column": 41,
+        "end_line": 9,
+        "start_byte": 207,
+        "start_column": 1,
+        "start_line": 9
+      },
+      "recovery": null,
+      "run": null
+    },
+    {
+      "arg": null,
+      "args": "/app",
+      "args_span": {
+        "end_byte": 260,
+        "end_column": 13,
+        "end_line": 10,
+        "start_byte": 256,
+        "start_column": 9,
+        "start_line": 10
+      },
+      "continuations": [],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 260,
+          "end_column": 13,
+          "end_line": 10,
+          "start_byte": 256,
+          "start_column": 9,
+          "start_line": 10
+        },
+        "text": "/app"
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "WORKDIR",
+      "keyword_span": {
+        "end_byte": 255,
+        "end_column": 8,
+        "end_line": 10,
+        "start_byte": 248,
+        "start_column": 1,
+        "start_line": 10
+      },
+      "label": null,
+      "line": 10,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 260,
+        "end_column": 13,
+        "end_line": 10,
+        "start_byte": 248,
+        "start_column": 1,
+        "start_line": 10
+      },
+      "recovery": null,
+      "run": null
+    },
+    {
+      "arg": null,
+      "args": "--from=deps /app/node_modules ./node_modules",
+      "args_span": {
+        "end_byte": 310,
+        "end_column": 50,
+        "end_line": 11,
+        "start_byte": 266,
+        "start_column": 6,
+        "start_line": 11
+      },
+      "continuations": [],
+      "copy": {
+        "chmod": null,
+        "chown": null,
+        "destination": "./node_modules",
+        "flags": [
+          [
+            "from",
+            "deps"
+          ]
+        ],
+        "from": "deps",
+        "kind": "copy",
+        "sources": [
+          "/app/node_modules"
+        ]
+      },
+      "env": null,
+      "expose": null,
+      "flags": [
+        [
+          "from",
+          "deps"
+        ]
+      ],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 310,
+          "end_column": 50,
+          "end_line": 11,
+          "start_byte": 266,
+          "start_column": 6,
+          "start_line": 11
+        },
+        "text": "--from=deps /app/node_modules ./node_modules"
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "COPY",
+      "keyword_span": {
+        "end_byte": 265,
+        "end_column": 5,
+        "end_line": 11,
+        "start_byte": 261,
+        "start_column": 1,
+        "start_line": 11
+      },
+      "label": null,
+      "line": 11,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 310,
+        "end_column": 50,
+        "end_line": 11,
+        "start_byte": 261,
+        "start_column": 1,
+        "start_line": 11
+      },
+      "recovery": null,
+      "run": null
+    },
+    {
+      "arg": null,
+      "args": ". .",
+      "args_span": {
+        "end_byte": 319,
+        "end_column": 9,
+        "end_line": 12,
+        "start_byte": 316,
+        "start_column": 6,
+        "start_line": 12
+      },
+      "continuations": [],
+      "copy": {
+        "chmod": null,
+        "chown": null,
+        "destination": ".",
+        "flags": [],
+        "from": null,
+        "kind": "copy",
+        "sources": [
+          "."
+        ]
+      },
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 319,
+          "end_column": 9,
+          "end_line": 12,
+          "start_byte": 316,
+          "start_column": 6,
+          "start_line": 12
+        },
+        "text": ". ."
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "COPY",
+      "keyword_span": {
+        "end_byte": 315,
+        "end_column": 5,
+        "end_line": 12,
+        "start_byte": 311,
+        "start_column": 1,
+        "start_line": 12
+      },
+      "label": null,
+      "line": 12,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 319,
+        "end_column": 9,
+        "end_line": 12,
+        "start_byte": 311,
+        "start_column": 1,
+        "start_line": 12
+      },
+      "recovery": null,
+      "run": null
+    },
+    {
+      "arg": null,
+      "args": "npm run build",
+      "args_span": {
+        "end_byte": 337,
+        "end_column": 18,
+        "end_line": 13,
+        "start_byte": 324,
+        "start_column": 5,
+        "start_line": 13
+      },
+      "continuations": [],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 337,
+          "end_column": 18,
+          "end_line": 13,
+          "start_byte": 324,
+          "start_column": 5,
+          "start_line": 13
+        },
+        "text": "npm run build"
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "RUN",
+      "keyword_span": {
+        "end_byte": 323,
+        "end_column": 4,
+        "end_line": 13,
+        "start_byte": 320,
+        "start_column": 1,
+        "start_line": 13
+      },
+      "label": null,
+      "line": 13,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 337,
+        "end_column": 18,
+        "end_line": 13,
+        "start_byte": 320,
+        "start_column": 1,
+        "start_line": 13
+      },
+      "recovery": null,
+      "run": {
+        "flags": [],
+        "mounts": [],
+        "network": null,
+        "security": null,
+        "shell": {
+          "span": {
+            "end_byte": 337,
+            "end_column": 18,
+            "end_line": 13,
+            "start_byte": 324,
+            "start_column": 5,
+            "start_line": 13
+          },
+          "text": "npm run build"
+        }
+      }
+    },
+    {
+      "arg": null,
+      "args": "gcr.io/distroless/nodejs22-debian12:nonroot",
+      "args_span": {
+        "end_byte": 387,
+        "end_column": 49,
+        "end_line": 15,
+        "start_byte": 344,
+        "start_column": 6,
+        "start_line": 15
+      },
+      "continuations": [],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 387,
+          "end_column": 49,
+          "end_line": 15,
+          "start_byte": 344,
+          "start_column": 6,
+          "start_line": 15
+        },
+        "text": "gcr.io/distroless/nodejs22-debian12:nonroot"
+      },
+      "from": {
+        "alias": null,
+        "digest": null,
+        "flags": [],
+        "image": "gcr.io/distroless/nodejs22-debian12:nonroot",
+        "platform": null
+      },
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "FROM",
+      "keyword_span": {
+        "end_byte": 343,
+        "end_column": 5,
+        "end_line": 15,
+        "start_byte": 339,
+        "start_column": 1,
+        "start_line": 15
+      },
+      "label": null,
+      "line": 15,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 387,
+        "end_column": 49,
+        "end_line": 15,
+        "start_byte": 339,
+        "start_column": 1,
+        "start_line": 15
+      },
+      "recovery": null,
+      "run": null
+    },
+    {
+      "arg": null,
+      "args": "/app",
+      "args_span": {
+        "end_byte": 400,
+        "end_column": 13,
+        "end_line": 16,
+        "start_byte": 396,
+        "start_column": 9,
+        "start_line": 16
+      },
+      "continuations": [],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 400,
+          "end_column": 13,
+          "end_line": 16,
+          "start_byte": 396,
+          "start_column": 9,
+          "start_line": 16
+        },
+        "text": "/app"
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "WORKDIR",
+      "keyword_span": {
+        "end_byte": 395,
+        "end_column": 8,
+        "end_line": 16,
+        "start_byte": 388,
+        "start_column": 1,
+        "start_line": 16
+      },
+      "label": null,
+      "line": 16,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 400,
+        "end_column": 13,
+        "end_line": 16,
+        "start_byte": 388,
+        "start_column": 1,
+        "start_line": 16
+      },
+      "recovery": null,
+      "run": null
+    },
+    {
+      "arg": null,
+      "args": "--from=build /app/dist ./dist",
+      "args_span": {
+        "end_byte": 435,
+        "end_column": 35,
+        "end_line": 17,
+        "start_byte": 406,
+        "start_column": 6,
+        "start_line": 17
+      },
+      "continuations": [],
+      "copy": {
+        "chmod": null,
+        "chown": null,
+        "destination": "./dist",
+        "flags": [
+          [
+            "from",
+            "build"
+          ]
+        ],
+        "from": "build",
+        "kind": "copy",
+        "sources": [
+          "/app/dist"
+        ]
+      },
+      "env": null,
+      "expose": null,
+      "flags": [
+        [
+          "from",
+          "build"
+        ]
+      ],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 435,
+          "end_column": 35,
+          "end_line": 17,
+          "start_byte": 406,
+          "start_column": 6,
+          "start_line": 17
+        },
+        "text": "--from=build /app/dist ./dist"
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "COPY",
+      "keyword_span": {
+        "end_byte": 405,
+        "end_column": 5,
+        "end_line": 17,
+        "start_byte": 401,
+        "start_column": 1,
+        "start_line": 17
+      },
+      "label": null,
+      "line": 17,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 435,
+        "end_column": 35,
+        "end_line": 17,
+        "start_byte": 401,
+        "start_column": 1,
+        "start_line": 17
+      },
+      "recovery": null,
+      "run": null
+    },
+    {
+      "arg": null,
+      "args": "nonroot",
+      "args_span": {
+        "end_byte": 448,
+        "end_column": 13,
+        "end_line": 18,
+        "start_byte": 441,
+        "start_column": 6,
+        "start_line": 18
+      },
+      "continuations": [],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 448,
+          "end_column": 13,
+          "end_line": 18,
+          "start_byte": 441,
+          "start_column": 6,
+          "start_line": 18
+        },
+        "text": "nonroot"
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "USER",
+      "keyword_span": {
+        "end_byte": 440,
+        "end_column": 5,
+        "end_line": 18,
+        "start_byte": 436,
+        "start_column": 1,
+        "start_line": 18
+      },
+      "label": null,
+      "line": 18,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 448,
+        "end_column": 13,
+        "end_line": 18,
+        "start_byte": 436,
+        "start_column": 1,
+        "start_line": 18
+      },
+      "recovery": null,
+      "run": null
+    },
+    {
+      "arg": null,
+      "args": "[\"dist/server.js\"]",
+      "args_span": {
+        "end_byte": 471,
+        "end_column": 23,
+        "end_line": 19,
+        "start_byte": 453,
+        "start_column": 5,
+        "start_line": 19
+      },
+      "continuations": [],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "json",
+        "values": [
+          "dist/server.js"
+        ]
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "CMD",
+      "keyword_span": {
+        "end_byte": 452,
+        "end_column": 4,
+        "end_line": 19,
+        "start_byte": 449,
+        "start_column": 1,
+        "start_line": 19
+      },
+      "label": null,
+      "line": 19,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 471,
+        "end_column": 23,
+        "end_line": 19,
+        "start_byte": 449,
+        "start_column": 1,
+        "start_line": 19
+      },
+      "recovery": null,
+      "run": null
+    }
+  ],
+  "syntax": {
+    "image": "docker/dockerfile:1.7",
+    "line": 1
+  }
+}
