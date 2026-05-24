@@ -89,6 +89,26 @@ fn snapshots_real_world_corpus_findings() {
 }
 
 #[test]
+fn real_world_noise_fixtures_do_not_trigger_findings() {
+    for fixture in [
+        "noise-clean-runtime",
+        "noise-directives-and-comments",
+        "noise-metadata-runtime",
+    ] {
+        let path = format!("corpus/real-world/{fixture}/Dockerfile");
+        let source = read_fixture(&path);
+        let document = parse_dockerfile(&source).expect("fixture should parse");
+        let findings = RuleEngine::new(Profile::Default, Config::default())
+            .lint_path(std::path::Path::new(&path), &document);
+
+        assert!(
+            findings.is_empty(),
+            "{fixture} should not trigger findings: {findings:#?}"
+        );
+    }
+}
+
+#[test]
 fn snapshots_initial_shell_rule_findings() {
     let source = read_fixture("rules/RSC.initial-shell-rules/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
