@@ -87,6 +87,22 @@ fn implemented_rules_appear_in_rule_matrix() {
 }
 
 #[test]
+fn rule_matrix_entries_are_known_catalog_rules() {
+    let catalog = RuleEngine::new(Profile::Default, Config::default()).catalog();
+    let catalog_codes = catalog
+        .iter()
+        .map(|rule| rule.code.to_string())
+        .collect::<BTreeSet<_>>();
+
+    for code in rule_matrix_codes() {
+        assert!(
+            catalog_codes.contains(&code),
+            "{code} appears in docs/rule-roadmap.md but is not in the catalog"
+        );
+    }
+}
+
+#[test]
 fn implemented_rule_docs_declare_fix_availability() {
     let catalog = RuleEngine::new(Profile::Default, Config::default()).catalog();
     let docs_dir = workspace_root().join("docs/rules");
@@ -161,21 +177,32 @@ fn rule_matrix_implemented_codes() -> BTreeSet<String> {
             break;
         }
 
-        if !in_implemented_section || !line.starts_with("| `") {
+        if !in_implemented_section {
             continue;
         }
 
-        let Some(rest) = line.strip_prefix("| `") else {
-            continue;
-        };
-        let Some((code, _)) = rest.split_once('`') else {
-            continue;
-        };
-
-        codes.insert(code.to_string());
+        codes.extend(rule_matrix_row_code(line).map(str::to_string));
     }
 
     codes
+}
+
+fn rule_matrix_codes() -> BTreeSet<String> {
+    let roadmap = fs::read_to_string(workspace_root().join("docs/rule-roadmap.md"))
+        .expect("rule roadmap should be readable");
+
+    roadmap
+        .lines()
+        .filter_map(rule_matrix_row_code)
+        .map(str::to_string)
+        .collect()
+}
+
+fn rule_matrix_row_code(line: &str) -> Option<&str> {
+    let rest = line.strip_prefix("| `")?;
+    let (code, _) = rest.split_once('`')?;
+
+    Some(code)
 }
 
 fn workspace_root() -> PathBuf {
