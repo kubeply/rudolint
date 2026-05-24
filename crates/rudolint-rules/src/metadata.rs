@@ -15,7 +15,7 @@ pub struct RuleMetadata {
     pub summary: &'static str,
     /// Default severity before configuration overrides are applied.
     pub default_severity: Severity,
-    /// Policy profile that owns the rule.
+    /// Primary policy family for the rule.
     pub profile: PolicyProfile,
     /// Broad rule category.
     pub category: RuleCategory,

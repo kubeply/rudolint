@@ -103,6 +103,35 @@ fn rule_matrix_entries_are_known_catalog_rules() {
 }
 
 #[test]
+fn rule_matrix_profile_coverage_matches_catalog() {
+    let default_codes = implemented_catalog_codes(Profile::Default);
+    let compat_codes = implemented_catalog_codes(Profile::HadolintCompat);
+
+    for row in rule_matrix_section_rows("## Implemented V1 Surface") {
+        let expected_profiles = match (
+            default_codes.contains(row.code.as_str()),
+            compat_codes.contains(row.code.as_str()),
+        ) {
+            (true, true) => "`default`, `hadolint-compat`",
+            (true, false) => "`default`",
+            (false, true) => "`hadolint-compat`",
+            (false, false) => {
+                panic!(
+                    "{} appears in the implemented matrix but no profile enables it",
+                    row.code
+                )
+            }
+        };
+
+        assert_eq!(
+            row.enabled_profiles, expected_profiles,
+            "{} has stale profile coverage in docs/rule-roadmap.md",
+            row.code
+        );
+    }
+}
+
+#[test]
 fn planned_shell_rules_stay_out_of_implemented_matrix() {
     let catalog = RuleEngine::new(Profile::Default, Config::default()).catalog();
     let implemented_matrix_codes = rule_matrix_implemented_codes();
@@ -188,11 +217,33 @@ fn rule_matrix_implemented_codes() -> BTreeSet<String> {
     rule_matrix_section_codes("## Implemented V1 Surface")
 }
 
+fn implemented_catalog_codes(profile: Profile) -> BTreeSet<String> {
+    RuleEngine::new(profile, Config::default())
+        .catalog()
+        .into_iter()
+        .filter(|rule| rule.status == RuleStatus::Implemented)
+        .map(|rule| rule.code.to_string())
+        .collect()
+}
+
 fn rule_matrix_section_codes(heading: &str) -> BTreeSet<String> {
+    rule_matrix_section_rows(heading)
+        .into_iter()
+        .map(|row| row.code)
+        .collect()
+}
+
+#[derive(Debug)]
+struct RuleMatrixRow {
+    code: String,
+    enabled_profiles: String,
+}
+
+fn rule_matrix_section_rows(heading: &str) -> Vec<RuleMatrixRow> {
     let roadmap = fs::read_to_string(workspace_root().join("docs/rule-roadmap.md"))
         .expect("rule roadmap should be readable");
     let mut in_section = false;
-    let mut codes = BTreeSet::new();
+    let mut rows = Vec::new();
 
     for line in roadmap.lines() {
         if line == heading {
@@ -208,10 +259,12 @@ fn rule_matrix_section_codes(heading: &str) -> BTreeSet<String> {
             continue;
         }
 
-        codes.extend(rule_matrix_row_code(line).map(str::to_string));
+        if let Some(row) = rule_matrix_row(line) {
+            rows.push(row);
+        }
     }
 
-    codes
+    rows
 }
 
 fn rule_matrix_codes() -> BTreeSet<String> {
@@ -220,16 +273,27 @@ fn rule_matrix_codes() -> BTreeSet<String> {
 
     roadmap
         .lines()
-        .filter_map(rule_matrix_row_code)
-        .map(str::to_string)
+        .filter_map(rule_matrix_row)
+        .map(|row| row.code)
         .collect()
 }
 
-fn rule_matrix_row_code(line: &str) -> Option<&str> {
-    let rest = line.strip_prefix("| `")?;
-    let (code, _) = rest.split_once('`')?;
+fn rule_matrix_row(line: &str) -> Option<RuleMatrixRow> {
+    let cells = line
+        .trim()
+        .trim_matches('|')
+        .split('|')
+        .map(str::trim)
+        .collect::<Vec<_>>();
 
-    Some(code)
+    let code_cell = cells.first()?;
+    let code = code_cell.strip_prefix('`')?.strip_suffix('`')?;
+    let enabled_profiles = cells.get(2)?;
+
+    Some(RuleMatrixRow {
+        code: code.to_string(),
+        enabled_profiles: (*enabled_profiles).to_string(),
+    })
 }
 
 fn workspace_root() -> PathBuf {
