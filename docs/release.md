@@ -50,6 +50,40 @@ The release also carries the `action.yml` contract from the same git tag.
 Pull requests run `dist plan` only. They verify release metadata without
 building or publishing release artifacts.
 
+## V1 Release Process
+
+Use this process for `v1.0.0` and later stable releases:
+
+1. Start from a clean checkout of `main` and fetch the latest remote state:
+
+   ```bash
+   git switch main
+   git pull --ff-only origin main
+   ```
+
+2. Confirm the version in `Cargo.toml` and package metadata matches the
+   intended release tag.
+3. Confirm required branch checks are green on `main`, including quality,
+   benchmarks, release plan, and CodeRabbit-gated PRs already merged into
+   `main`.
+4. Create and push the release tag:
+
+   ```bash
+   git tag v1.0.0
+   git push origin v1.0.0
+   ```
+
+5. Wait for the `Release` workflow for that tag to finish. The workflow creates
+   GitHub-generated `What's Changed` notes, appends the cargo-dist install and
+   artifact sections, uploads archives, uploads checksums, and emits
+   attestations.
+6. Run the post-release verification checklist in this document before
+   announcing the release or updating Marketplace-facing guidance.
+
+Do not manually edit the release body unless the workflow output is incorrect.
+Fix the automation first, delete the bad release or tag when needed, and rerun
+from a clean tag.
+
 ## Install Paths
 
 The shell installers download the archive that matches the host platform and
