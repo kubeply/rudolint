@@ -138,6 +138,78 @@ mod tests {
     }
 
     #[test]
+    fn real_world_corpus_fixtures_are_self_contained() {
+        let corpus = fixture_path("corpus/real-world");
+        let mut fixture_dirs = fs::read_dir(&corpus)
+            .unwrap_or_else(|err| panic!("failed to read {}: {err}", corpus.display()))
+            .map(|entry| {
+                entry
+                    .expect("fixture directory entry should be readable")
+                    .path()
+            })
+            .filter(|path| path.is_dir())
+            .collect::<Vec<_>>();
+        fixture_dirs.sort();
+
+        assert!(
+            !fixture_dirs.is_empty(),
+            "real-world corpus should contain fixture directories"
+        );
+
+        for fixture_dir in fixture_dirs {
+            let dockerfile = fixture_dir.join("Dockerfile");
+            let metadata = fixture_dir.join("metadata.md");
+
+            assert!(
+                dockerfile.is_file(),
+                "{} should contain a Dockerfile",
+                fixture_dir.display()
+            );
+            assert!(
+                metadata.is_file(),
+                "{} should contain metadata.md",
+                fixture_dir.display()
+            );
+
+            let dockerfile_source = fs::read_to_string(&dockerfile)
+                .unwrap_or_else(|err| panic!("failed to read {}: {err}", dockerfile.display()));
+            let metadata_source = fs::read_to_string(&metadata)
+                .unwrap_or_else(|err| panic!("failed to read {}: {err}", metadata.display()));
+
+            assert!(
+                !dockerfile_source.trim().is_empty(),
+                "{} should not be empty",
+                dockerfile.display()
+            );
+            assert!(
+                !metadata_source.trim().is_empty(),
+                "{} should not be empty",
+                metadata.display()
+            );
+
+            let mut files = fs::read_dir(&fixture_dir)
+                .unwrap_or_else(|err| panic!("failed to read {}: {err}", fixture_dir.display()))
+                .map(|entry| entry.expect("fixture file entry should be readable").path())
+                .filter(|path| path.is_file())
+                .map(|path| {
+                    path.file_name()
+                        .expect("fixture file should have a name")
+                        .to_string_lossy()
+                        .into_owned()
+                })
+                .collect::<Vec<_>>();
+            files.sort();
+
+            assert_eq!(
+                files,
+                ["Dockerfile".to_string(), "metadata.md".to_string()],
+                "{} should be self-contained and avoid support files that require network, Docker, or package manager setup",
+                fixture_dir.display()
+            );
+        }
+    }
+
+    #[test]
     fn snapshot_name_normalizes_parts() {
         assert_eq!(
             snapshot_name(&["RDL3007", "No Latest Tag"]),
