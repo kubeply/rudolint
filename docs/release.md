@@ -242,18 +242,31 @@ release tags because the listing is managed through GitHub's release UI.
 
 ## GitHub Action Versioning
 
-The GitHub Action and binary artifacts are versioned together. Release tags
+The GitHub Action and binary artifacts are released together. Release tags
 should point at a commit where `action.yml`, release docs, and generated
 artifacts agree on the same user-facing contract.
 
-Recommended workflow usage pins both sides to the same tag:
+Recommended workflow usage relies on the stable major action tag:
+
+```yaml
+- uses: kubeply/rudolint@v1
+```
+
+The `version` input defaults to `latest`, so this form downloads the latest
+released linter binary and keeps the action wrapper aligned with stable
+releases. Set `version` only when a workflow needs a specific linter release:
+
+```yaml
+- uses: kubeply/rudolint@v1
+  with:
+    version: <release-tag>
+```
+
+For fully reproducible CI, users can pin both the action reference and
+downloaded binary to the same release tag:
 
 ```yaml
 - uses: kubeply/rudolint@<release-tag>
   with:
     version: <release-tag>
 ```
-
-`version: latest` is supported for workflows that intentionally track the newest
-binary, but blocking CI should prefer an explicit tag so action behavior and the
-downloaded binary move together only during planned upgrades.

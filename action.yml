@@ -7,7 +7,7 @@ branding:
 
 inputs:
   version:
-    description: Release tag to install, or latest.
+    description: Release tag to install. Defaults to latest; set only to pin a specific linter release.
     required: false
     default: latest
   repository:

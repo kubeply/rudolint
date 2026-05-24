@@ -19,23 +19,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: kubeply/rudolint@<action-tag>
-        with:
-          version: <release-tag>
+      - uses: kubeply/rudolint@v1
 ```
 
-Use the same released tag for `<action-tag>` and `<release-tag>`. Use
-`version: latest` only when workflows should track the newest rudolint release
-automatically.
+The `v1` action tag tracks the latest stable `v1.x.y` action wrapper. The
+`version` input defaults to `latest`, so normal workflows also download the
+latest released `rudolint` binary.
+
+Set `version` only when a workflow needs a specific linter release:
+
+```yaml
+- uses: kubeply/rudolint@v1
+  with:
+    version: <release-tag>
+```
 
 ## Monorepo Paths
 
 `paths` accepts one path per line:
 
 ```yaml
-- uses: kubeply/rudolint@<action-tag>
+- uses: kubeply/rudolint@v1
   with:
-    version: <release-tag>
     paths: |
       services/api
       services/worker/Dockerfile
@@ -50,9 +55,8 @@ BuildKit-native recommendations. This is useful during migration from Hadolint
 or for repositories that are not ready to enforce BuildKit behavior yet.
 
 ```yaml
-- uses: kubeply/rudolint@<action-tag>
+- uses: kubeply/rudolint@v1
   with:
-    version: <release-tag>
     profile: hadolint-compat
     failure-threshold: error
 ```
@@ -71,9 +75,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: kubeply/rudolint@<action-tag>
+      - uses: kubeply/rudolint@v1
         with:
-          version: <release-tag>
           upload-sarif: "true"
           sarif-output: rudolint.sarif
 ```
@@ -88,18 +91,16 @@ Rust inside the action path.
 
 ## Versioning Policy
 
-`action.yml` is released from the same repository and tag as the `rudolint`
-binary artifacts. For reproducible CI, pin both the action reference and the
-downloaded binary to the same release tag:
+`action.yml` is released from the same repository as the `rudolint` binary
+artifacts. The recommended default is the stable major action tag:
 
 ```yaml
-- uses: kubeply/rudolint@<release-tag>
-  with:
-    version: <release-tag>
+- uses: kubeply/rudolint@v1
 ```
 
-After `v1.0.0`, stable action wrapper updates can use the moving `v1` tag while
-keeping binary upgrades explicit:
+This keeps most workflows on the latest stable action wrapper and latest
+released linter binary. Pin `version` only when the linter binary must stay on
+a specific release:
 
 ```yaml
 - uses: kubeply/rudolint@v1
@@ -107,18 +108,14 @@ keeping binary upgrades explicit:
     version: <release-tag>
 ```
 
-Use `version: latest` only when a workflow should automatically pick up newer
-`rudolint` releases while keeping the checked-out action implementation pinned.
-This can be useful for non-blocking advisory jobs, but blocking CI should prefer
-an explicit tag.
+For fully reproducible CI, pin both the action reference and downloaded binary
+to the same release tag:
 
-Before `1.0.0`, every released tag is treated as the complete action contract
-for that release. The project does not publish floating major tags such as `v0`
-or `v1` before `v1.0.0`.
-
-Use the `@v1` mode when stable action wrapper updates are acceptable. Keep
-`version` pinned to an exact release tag for reproducible blocking CI unless
-the workflow intentionally tracks the latest binary.
+```yaml
+- uses: kubeply/rudolint@<release-tag>
+  with:
+    version: <release-tag>
+```
 
 The `v1` tag points to the latest stable `v1.x.y` release. It must not point to
 prerelease tags such as `v1.1.0-rc.1`, `v1.1.0-beta.1`, or any tag with a
@@ -129,20 +126,18 @@ finished and post-release verification has passed.
 
 The action is published on
 [GitHub Marketplace](https://github.com/marketplace/actions/rudolint).
-Keep Marketplace examples pinned to an explicit release tag:
+Marketplace examples should use the common `v1` form:
 
 ```yaml
-- uses: kubeply/rudolint@<release-tag>
-  with:
-    version: <release-tag>
+- uses: kubeply/rudolint@v1
 ```
 
-Do not advertise floating tags such as `v0` or `v1` before `v1.0.0`.
+Show `version` only when documenting how to pin a specific linter release.
 
 ## Inputs
 
-- `version` (optional): release tag to install, or `latest`. Default:
-  `latest`.
+- `version` (optional): release tag to install. Set this only to pin a
+  specific linter release. Default: `latest`.
 - `repository` (optional): repository in `owner/repo` format that publishes
   rudolint release artifacts. Default: `kubeply/rudolint`.
 - `paths` (optional): newline-separated Dockerfile paths or directories.

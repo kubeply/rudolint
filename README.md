@@ -63,7 +63,9 @@ Exit codes:
 
 ## GitHub Action
 
-Pin the action and downloaded binary to the same release tag for reproducible CI:
+Use the stable major action tag for normal CI. By default, the action downloads
+the latest released `rudolint` binary, so the wrapper and linter stay aligned
+across stable releases:
 
 ```yaml
 name: Dockerfile lint
@@ -78,14 +80,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: kubeply/rudolint@<release-tag>
-        with:
-          version: <release-tag>
+      - uses: kubeply/rudolint@v1
 ```
 
-After `v1.0.0`, use the stable major action tag when you want automatic action
-wrapper updates across stable `v1.x.y` releases while keeping binary upgrades
-explicit:
+Set `version` only when you want to pin a specific linter release:
 
 ```yaml
 - uses: kubeply/rudolint@v1
@@ -96,9 +94,8 @@ explicit:
 For monorepos, pass one path per line:
 
 ```yaml
-- uses: kubeply/rudolint@<release-tag>
+- uses: kubeply/rudolint@v1
   with:
-    version: <release-tag>
     paths: |
       services/api
       services/worker/Dockerfile
@@ -113,9 +110,8 @@ permissions:
 
 steps:
   - uses: actions/checkout@v4
-  - uses: kubeply/rudolint@<release-tag>
+  - uses: kubeply/rudolint@v1
     with:
-      version: <release-tag>
       upload-sarif: "true"
       sarif-output: rudolint.sarif
 ```
@@ -127,9 +123,8 @@ recommendations yet. See [docs/action.md](docs/action.md) for the full action
 contract.
 
 ```yaml
-- uses: kubeply/rudolint@<release-tag>
+- uses: kubeply/rudolint@v1
   with:
-    version: <release-tag>
     profile: hadolint-compat
     failure-threshold: error
 ```
