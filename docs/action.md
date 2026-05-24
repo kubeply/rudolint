@@ -98,6 +98,15 @@ downloaded binary to the same release tag:
     version: <release-tag>
 ```
 
+After `v1.0.0`, stable action wrapper updates can use the moving `v1` tag while
+keeping binary upgrades explicit:
+
+```yaml
+- uses: kubeply/rudolint@v1
+  with:
+    version: <release-tag>
+```
+
 Use `version: latest` only when a workflow should automatically pick up newer
 `rudolint` releases while keeping the checked-out action implementation pinned.
 This can be useful for non-blocking advisory jobs, but blocking CI should prefer
@@ -107,10 +116,9 @@ Before `1.0.0`, every released tag is treated as the complete action contract
 for that release. The project does not publish floating major tags such as `v0`
 or `v1` before `v1.0.0`.
 
-After `v1.0.0`, stable users can pin the action reference to
-`kubeply/rudolint@v1` when they want automatic updates across stable `v1.x.y`
-releases. Keep `version` pinned to an exact release tag for reproducible
-blocking CI unless the workflow intentionally tracks the latest binary.
+Use the `@v1` mode when stable action wrapper updates are acceptable. Keep
+`version` pinned to an exact release tag for reproducible blocking CI unless
+the workflow intentionally tracks the latest binary.
 
 The `v1` tag points to the latest stable `v1.x.y` release. It must not point to
 prerelease tags such as `v1.1.0-rc.1`, `v1.1.0-beta.1`, or any tag with a
