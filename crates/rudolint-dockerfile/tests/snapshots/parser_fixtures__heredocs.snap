@@ -237,6 +237,281 @@ expression: document_json(&document)
           "text": "<<'SCRIPT'\necho quoted\nSCRIPT"
         }
       }
+    },
+    {
+      "arg": null,
+      "args": "<<\"FILE\" /usr/local/bin/generated\n#!/usr/bin/env sh\necho generated\nFILE",
+      "args_span": {
+        "end_byte": 152,
+        "end_column": 5,
+        "end_line": 11,
+        "start_byte": 81,
+        "start_column": 6,
+        "start_line": 8
+      },
+      "continuations": [],
+      "copy": {
+        "chmod": null,
+        "chown": null,
+        "destination": "/usr/local/bin/generated",
+        "flags": [],
+        "from": null,
+        "kind": "copy",
+        "sources": [
+          "<<\"FILE\""
+        ]
+      },
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 152,
+          "end_column": 5,
+          "end_line": 11,
+          "start_byte": 81,
+          "start_column": 6,
+          "start_line": 8
+        },
+        "text": "<<\"FILE\" /usr/local/bin/generated\n#!/usr/bin/env sh\necho generated\nFILE"
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [
+        {
+          "body": "#!/usr/bin/env sh\necho generated\n",
+          "body_span": {
+            "end_byte": 148,
+            "end_column": 1,
+            "end_line": 11,
+            "start_byte": 115,
+            "start_column": 1,
+            "start_line": 9
+          },
+          "delimiter": "FILE",
+          "quoted": true,
+          "target_instruction": "COPY"
+        }
+      ],
+      "keyword": "COPY",
+      "keyword_span": {
+        "end_byte": 80,
+        "end_column": 5,
+        "end_line": 8,
+        "start_byte": 76,
+        "start_column": 1,
+        "start_line": 8
+      },
+      "label": null,
+      "line": 8,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 152,
+        "end_column": 5,
+        "end_line": 11,
+        "start_byte": 76,
+        "start_column": 1,
+        "start_line": 8
+      },
+      "recovery": null,
+      "run": null
+    },
+    {
+      "arg": null,
+      "args": "<<FIRST <<SECOND /etc/generated/\nfirst body\nFIRST\nsecond body\nSECOND",
+      "args_span": {
+        "end_byte": 226,
+        "end_column": 7,
+        "end_line": 16,
+        "start_byte": 158,
+        "start_column": 6,
+        "start_line": 12
+      },
+      "continuations": [],
+      "copy": {
+        "chmod": null,
+        "chown": null,
+        "destination": "/etc/generated/",
+        "flags": [],
+        "from": null,
+        "kind": "copy",
+        "sources": [
+          "<<FIRST",
+          "<<SECOND"
+        ]
+      },
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 226,
+          "end_column": 7,
+          "end_line": 16,
+          "start_byte": 158,
+          "start_column": 6,
+          "start_line": 12
+        },
+        "text": "<<FIRST <<SECOND /etc/generated/\nfirst body\nFIRST\nsecond body\nSECOND"
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [
+        {
+          "body": "first body\n",
+          "body_span": {
+            "end_byte": 202,
+            "end_column": 1,
+            "end_line": 14,
+            "start_byte": 191,
+            "start_column": 1,
+            "start_line": 13
+          },
+          "delimiter": "FIRST",
+          "quoted": false,
+          "target_instruction": "COPY"
+        },
+        {
+          "body": "second body\n",
+          "body_span": {
+            "end_byte": 220,
+            "end_column": 1,
+            "end_line": 16,
+            "start_byte": 208,
+            "start_column": 1,
+            "start_line": 15
+          },
+          "delimiter": "SECOND",
+          "quoted": false,
+          "target_instruction": "COPY"
+        }
+      ],
+      "keyword": "COPY",
+      "keyword_span": {
+        "end_byte": 157,
+        "end_column": 5,
+        "end_line": 12,
+        "start_byte": 153,
+        "start_column": 1,
+        "start_line": 12
+      },
+      "label": null,
+      "line": 12,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 226,
+        "end_column": 7,
+        "end_line": 16,
+        "start_byte": 153,
+        "start_column": 1,
+        "start_line": 12
+      },
+      "recovery": null,
+      "run": null
+    },
+    {
+      "arg": null,
+      "args": "--chmod=755 \\\n  <<'SCRIPT' /usr/local/bin/continued\n#!/usr/bin/env sh\necho continued\nSCRIPT",
+      "args_span": {
+        "end_byte": 323,
+        "end_column": 7,
+        "end_line": 21,
+        "start_byte": 232,
+        "start_column": 6,
+        "start_line": 17
+      },
+      "continuations": [
+        {
+          "escape": "\\",
+          "line": 17,
+          "span": {
+            "end_byte": 245,
+            "end_column": 19,
+            "end_line": 17,
+            "start_byte": 244,
+            "start_column": 18,
+            "start_line": 17
+          }
+        }
+      ],
+      "copy": {
+        "chmod": "755",
+        "chown": null,
+        "destination": "/usr/local/bin/continued",
+        "flags": [
+          [
+            "chmod",
+            "755"
+          ]
+        ],
+        "from": null,
+        "kind": "copy",
+        "sources": [
+          "<<'SCRIPT'"
+        ]
+      },
+      "env": null,
+      "expose": null,
+      "flags": [
+        [
+          "chmod",
+          "755"
+        ]
+      ],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 323,
+          "end_column": 7,
+          "end_line": 21,
+          "start_byte": 232,
+          "start_column": 6,
+          "start_line": 17
+        },
+        "text": "--chmod=755 \\\n  <<'SCRIPT' /usr/local/bin/continued\n#!/usr/bin/env sh\necho continued\nSCRIPT"
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [
+        {
+          "body": "#!/usr/bin/env sh\necho continued\n",
+          "body_span": {
+            "end_byte": 317,
+            "end_column": 1,
+            "end_line": 21,
+            "start_byte": 284,
+            "start_column": 1,
+            "start_line": 19
+          },
+          "delimiter": "SCRIPT",
+          "quoted": true,
+          "target_instruction": "COPY"
+        }
+      ],
+      "keyword": "COPY",
+      "keyword_span": {
+        "end_byte": 231,
+        "end_column": 5,
+        "end_line": 17,
+        "start_byte": 227,
+        "start_column": 1,
+        "start_line": 17
+      },
+      "label": null,
+      "line": 17,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 323,
+        "end_column": 7,
+        "end_line": 21,
+        "start_byte": 227,
+        "start_column": 1,
+        "start_line": 17
+      },
+      "recovery": null,
+      "run": null
     }
   ],
   "syntax": null

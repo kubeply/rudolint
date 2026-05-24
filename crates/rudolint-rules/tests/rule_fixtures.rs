@@ -506,6 +506,44 @@ fn snapshots_rdl3021_copy_multiple_destination_slash_fixture() {
 }
 
 #[test]
+fn copy_heredocs_do_not_treat_bodies_as_copy_operands() {
+    let source = r#"FROM alpine:3.20
+COPY <<"SCRIPT" /usr/local/bin/generated
+#!/usr/bin/env sh
+tar -xf app.tar.gz
+echo "$UNQUOTED"
+SCRIPT
+COPY <<FIRST <<SECOND /etc/generated/
+first body
+FIRST
+second body
+SECOND
+COPY --chmod=755 \
+  <<'SCRIPT' /usr/local/bin/continued
+#!/usr/bin/env sh
+echo continued
+SCRIPT
+"#;
+    let document = parse_dockerfile(source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default()).lint(&document);
+    let blocked_codes = findings
+        .iter()
+        .filter(|finding| {
+            matches!(
+                finding.code.as_str(),
+                "RDL3010" | "RDL3020" | "RDL3021" | "RDL3045"
+            )
+        })
+        .map(|finding| finding.code.as_str())
+        .collect::<Vec<_>>();
+
+    assert!(
+        blocked_codes.is_empty(),
+        "COPY heredoc bodies should not be parsed as operands: {blocked_codes:?}"
+    );
+}
+
+#[test]
 fn snapshots_rdl3022_copy_from_previous_stage_fixture() {
     let source = read_fixture("rules/RDL3022.copy-from-previous-stage/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");

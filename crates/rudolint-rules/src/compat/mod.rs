@@ -440,12 +440,12 @@ impl Rule for UseAddForArchives {
     fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
         doc.instructions
             .iter()
-            .filter(|instruction| instruction.keyword == "COPY")
-            .filter(|instruction| !copy_uses_from_flag(&instruction.args))
             .filter(|instruction| {
-                add_sources(&instruction.args)
-                    .iter()
-                    .any(|source| is_archive_source(source))
+                instruction.copy.as_ref().is_some_and(|copy| {
+                    copy.kind == CopyKind::Copy
+                        && copy.from.is_none()
+                        && copy.sources.iter().any(|source| is_archive_source(source))
+                })
             })
             .map(|instruction| {
                 diagnostic(
@@ -457,21 +457,6 @@ impl Rule for UseAddForArchives {
             })
             .collect()
     }
-}
-
-fn copy_uses_from_flag(args: &str) -> bool {
-    let mut parts = args.split_whitespace();
-    while let Some(part) = parts.next() {
-        if part.starts_with("--from=") {
-            return true;
-        }
-
-        if part == "--from" && parts.next().is_some() {
-            return true;
-        }
-    }
-
-    false
 }
 
 rule_metadata!(
@@ -733,12 +718,14 @@ impl Rule for PreferCopy {
     fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
         doc.instructions
             .iter()
-            .filter(|instruction| instruction.keyword == "ADD")
             .filter(|instruction| {
-                let sources = add_sources(&instruction.args);
-                !sources
-                    .iter()
-                    .all(|source| is_url_source(source) || is_archive_source(source))
+                instruction.copy.as_ref().is_some_and(|copy| {
+                    copy.kind == CopyKind::Add
+                        && !copy
+                            .sources
+                            .iter()
+                            .all(|source| is_url_source(source) || is_archive_source(source))
+                })
             })
             .map(|instruction| {
                 diagnostic(
@@ -2590,19 +2577,6 @@ fn image_needs_explicit_tag(image: &str, stage_aliases: &BTreeSet<String>) -> bo
     }
 
     !image.rsplit('/').next().unwrap_or("").contains(':')
-}
-
-fn add_sources(args: &str) -> Vec<&str> {
-    let mut parts = args
-        .split_whitespace()
-        .filter(|part| !part.starts_with("--"))
-        .collect::<Vec<_>>();
-    if parts.len() <= 1 {
-        return Vec::new();
-    }
-
-    parts.pop();
-    parts
 }
 
 fn is_url_source(source: &str) -> bool {

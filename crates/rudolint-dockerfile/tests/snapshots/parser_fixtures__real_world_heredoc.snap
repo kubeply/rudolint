@@ -125,20 +125,6 @@ expression: document_json(&document)
           "delimiter": "EOF",
           "quoted": true,
           "target_instruction": "RUN"
-        },
-        {
-          "body": "#!/bin/sh\ntest -d /etc/app/config\n",
-          "body_span": {
-            "end_byte": 199,
-            "end_column": 1,
-            "end_line": 11,
-            "start_byte": 165,
-            "start_column": 1,
-            "start_line": 9
-          },
-          "delimiter": "SCRIPT",
-          "quoted": true,
-          "target_instruction": "RUN"
         }
       ],
       "keyword": "RUN",

@@ -483,7 +483,10 @@ fn parse_instruction(
         (!args.is_empty()).then(|| source_file.span(args_start, args_start + args.len()));
     let form = parse_instruction_form(&args, args_span);
     let continuations = parse_continuations(raw, line, start_byte, source_file, escape_character);
-    let flags = parse_flags(&args);
+    let heredocs = parse_heredocs(raw, start_byte, &keyword, source_file)?;
+    let copy_operand_args = matches!(keyword.as_str(), "COPY" | "ADD")
+        .then(|| copy_operand_args(&args, escape_character, !heredocs.is_empty()));
+    let flags = parse_flags(copy_operand_args.as_deref().unwrap_or(&args));
     let from = (keyword == "FROM")
         .then(|| parse_from(&args, &flags))
         .flatten();
@@ -494,16 +497,19 @@ fn parse_instruction(
         .collect::<Vec<_>>();
     let run =
         (keyword == "RUN").then(|| parse_run(&args, args_start, &flags, &mounts, source_file));
-    let copy =
-        matches!(keyword.as_str(), "COPY" | "ADD").then(|| parse_copy(&keyword, &args, &flags));
+    let copy = matches!(keyword.as_str(), "COPY" | "ADD").then(|| {
+        parse_copy(
+            &keyword,
+            copy_operand_args.as_deref().unwrap_or(&args),
+            &flags,
+        )
+    });
     let healthcheck = (keyword == "HEALTHCHECK")
         .then(|| parse_healthcheck(&args, args_start, &flags, source_file));
     let arg = (keyword == "ARG").then(|| parse_arg(&args)).flatten();
     let env = (keyword == "ENV").then(|| parse_env(&args)).flatten();
     let label = (keyword == "LABEL").then(|| parse_label(&args)).flatten();
     let expose = (keyword == "EXPOSE").then(|| parse_expose(&args));
-    let heredocs = parse_heredocs(raw, start_byte, &keyword, source_file)?;
-
     Ok(Some(Instruction {
         keyword,
         keyword_span,
@@ -829,6 +835,29 @@ fn strip_leading_flags(args: &str, args_start: usize) -> (&str, usize) {
     }
 }
 
+fn copy_operand_args(args: &str, escape_character: char, has_heredoc: bool) -> String {
+    let mut header = String::new();
+    for line in args.split('\n') {
+        let trimmed = line.trim_end();
+        if continues(line, escape_character) {
+            header.push_str(trimmed.trim_end_matches(escape_character).trim_end());
+            header.push(' ');
+        } else {
+            header.push_str(line);
+            header.push('\n');
+        }
+
+        if !has_heredoc {
+            continue;
+        }
+        if heredoc_delimiters(line).is_ok_and(|delimiters| !delimiters.is_empty()) {
+            break;
+        }
+    }
+
+    header.trim().to_string()
+}
+
 fn parse_copy(keyword: &str, args: &str, flags: &[(String, String)]) -> CopyInstruction {
     let from = flags
         .iter()
@@ -1000,43 +1029,63 @@ fn parse_heredocs(
                 message: error.to_string(),
             })?;
 
+    let Some(first_opener) = re.find(raw) else {
+        return Ok(Vec::new());
+    };
+    let Some(body_start_relative) = raw[first_opener.end()..]
+        .find('\n')
+        .map(|index| first_opener.end() + index + 1)
+    else {
+        return Ok(Vec::new());
+    };
+
+    let openers = re
+        .captures_iter(&raw[..body_start_relative])
+        .filter_map(|captures| {
+            let delimiter = captures.name("delimiter")?.as_str().to_string();
+            let quoted = captures
+                .name("quote")
+                .is_some_and(|quote| !quote.as_str().is_empty());
+            Some((delimiter, quoted))
+        })
+        .collect::<Vec<_>>();
+
+    let mut body_start = body_start_relative;
     let mut heredocs = Vec::new();
-    for captures in re.captures_iter(raw) {
-        let Some(delimiter_match) = captures.name("delimiter") else {
-            continue;
-        };
-        let delimiter = delimiter_match.as_str();
-        let quoted = captures
-            .name("quote")
-            .is_some_and(|quote| !quote.as_str().is_empty());
-        let Some(opener) = captures.get(0) else {
-            continue;
-        };
-        let Some(body_start_relative) = raw[opener.end()..]
-            .find('\n')
-            .map(|index| opener.end() + index + 1)
-        else {
-            continue;
-        };
-        let closing_marker = format!("\n{delimiter}");
-        let closing_start_relative = raw[body_start_relative..]
-            .find(&closing_marker)
-            .map(|index| body_start_relative + index + 1)
-            .unwrap_or(raw.len());
-        let body = raw[body_start_relative..closing_start_relative].to_string();
+    for (delimiter, quoted) in openers {
+        let closing_start_relative =
+            find_heredoc_closing(raw, body_start, &delimiter).unwrap_or(raw.len());
+        let body = raw[body_start..closing_start_relative].to_string();
         heredocs.push(Heredoc {
-            delimiter: delimiter.to_string(),
+            delimiter: delimiter.clone(),
             quoted,
             target_instruction: target_instruction.to_string(),
             body,
-            body_span: source_file.span(
-                start_byte + body_start_relative,
-                start_byte + closing_start_relative,
-            ),
+            body_span: source_file
+                .span(start_byte + body_start, start_byte + closing_start_relative),
         });
+        body_start = heredoc_body_start_after_closing(raw, closing_start_relative);
     }
 
     Ok(heredocs)
+}
+
+fn find_heredoc_closing(raw: &str, body_start: usize, delimiter: &str) -> Option<usize> {
+    raw[body_start..]
+        .lines()
+        .scan(body_start, |line_start, line| {
+            let current_start = *line_start;
+            *line_start += line.len() + 1;
+            Some((current_start, line))
+        })
+        .find_map(|(line_start, line)| (line.trim() == delimiter).then_some(line_start))
+}
+
+fn heredoc_body_start_after_closing(raw: &str, closing_start: usize) -> usize {
+    raw[closing_start..]
+        .find('\n')
+        .map(|newline| closing_start + newline + 1)
+        .unwrap_or(raw.len())
 }
 
 impl Instruction {

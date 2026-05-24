@@ -106,6 +106,54 @@ fn json_findings_do_not_emit_internal_only_fields() {
 }
 
 #[test]
+fn copy_heredoc_operands_do_not_emit_copy_operand_findings() {
+    let temp = TempDir::new().expect("temp dir should be created");
+    let dockerfile = temp.path().join("Dockerfile");
+    std::fs::write(
+        &dockerfile,
+        r#"FROM alpine:3.20
+COPY --from=builder \
+  /out/app /app
+COPY <<"SCRIPT" /usr/local/bin/generated
+#!/usr/bin/env sh
+tar -xf app.tar.gz
+echo "$UNQUOTED"
+SCRIPT
+COPY --chmod=755 \
+  <<'SCRIPT' /usr/local/bin/continued
+#!/usr/bin/env sh
+echo continued
+SCRIPT
+USER 1000
+"#,
+    )
+    .expect("fixture should be written");
+
+    let assert = rudolint_cmd()
+        .args(["check", "--format", "json", "--exit-zero"])
+        .arg(&dockerfile)
+        .assert()
+        .success();
+    let output = assert.get_output().stdout.clone();
+    let output = String::from_utf8(output).expect("stdout should be UTF-8");
+    let output = normalized_json(&output);
+    let findings = output
+        .get("findings")
+        .and_then(Value::as_array)
+        .expect("findings should be an array");
+    let blocked_codes = findings
+        .iter()
+        .filter_map(|finding| finding.get("code").and_then(Value::as_str))
+        .filter(|code| matches!(*code, "RDL3010" | "RDL3021" | "RDL3045"))
+        .collect::<Vec<_>>();
+
+    assert!(
+        blocked_codes.is_empty(),
+        "COPY heredoc and continuation operands should not emit copy operand findings: {blocked_codes:?}"
+    );
+}
+
+#[test]
 fn emits_sarif_findings_for_stdin() {
     let output = rudolint_cmd()
         .args(["check", "--format", "sarif", "--failure-threshold", "error"])

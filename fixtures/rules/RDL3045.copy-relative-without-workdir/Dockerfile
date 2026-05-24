@@ -3,6 +3,15 @@ COPY app.py app/
 COPY app.py /app/
 COPY app.py $APP_HOME/
 COPY app.py C:\app
+COPY <<"FILE" /generated.sh
+#!/usr/bin/env sh
+echo generated
+FILE
+COPY --chmod=755 \
+  <<'SCRIPT' /continued.sh
+#!/usr/bin/env sh
+echo continued
+SCRIPT
 WORKDIR /app
 COPY app.py .
 
