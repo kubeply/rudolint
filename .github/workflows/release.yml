@@ -279,8 +279,19 @@ jobs:
           ANNOUNCEMENT_BODY: "${{ fromJson(steps.host.outputs.manifest).announcement_github_body }}"
           RELEASE_COMMIT: "${{ github.sha }}"
         run: |
-          # Write and read notes from a file to avoid quoting breaking things
-          echo "$ANNOUNCEMENT_BODY" > $RUNNER_TEMP/notes.txt
+          gh api "repos/${GITHUB_REPOSITORY}/releases/generate-notes" \
+            --method POST \
+            -f tag_name="${{ needs.plan.outputs.tag }}" \
+            -f target_commitish="$RELEASE_COMMIT" \
+            > "$RUNNER_TEMP/generated-notes.json"
+
+          jq -r '.body // ""' "$RUNNER_TEMP/generated-notes.json" > "$RUNNER_TEMP/notes.txt"
+          {
+            echo
+            echo "## Install"
+            echo
+            echo "$ANNOUNCEMENT_BODY"
+          } >> "$RUNNER_TEMP/notes.txt"
 
           gh release create "${{ needs.plan.outputs.tag }}" --target "$RELEASE_COMMIT" $PRERELEASE_FLAG --title "$ANNOUNCEMENT_TITLE" --notes-file "$RUNNER_TEMP/notes.txt" artifacts/*
 
