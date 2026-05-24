@@ -483,7 +483,7 @@ fn parse_instruction(
         (!args.is_empty()).then(|| source_file.span(args_start, args_start + args.len()));
     let form = parse_instruction_form(&args, args_span);
     let continuations = parse_continuations(raw, line, start_byte, source_file, escape_character);
-    let heredocs = parse_heredocs(raw, start_byte, &keyword, source_file)?;
+    let heredocs = parse_heredocs(raw, start_byte, &keyword, source_file, escape_character)?;
     let copy_operand_args = matches!(keyword.as_str(), "COPY" | "ADD")
         .then(|| copy_operand_args(&args, escape_character, !heredocs.is_empty()));
     let flags = parse_flags(copy_operand_args.as_deref().unwrap_or(&args));
@@ -839,7 +839,8 @@ fn copy_operand_args(args: &str, escape_character: char, has_heredoc: bool) -> S
     let mut header = String::new();
     for line in args.split('\n') {
         let trimmed = line.trim_end();
-        if continues(line, escape_character) {
+        let continued = continues(line, escape_character);
+        if continued {
             header.push_str(trimmed.trim_end_matches(escape_character).trim_end());
             header.push(' ');
         } else {
@@ -850,7 +851,7 @@ fn copy_operand_args(args: &str, escape_character: char, has_heredoc: bool) -> S
         if !has_heredoc {
             continue;
         }
-        if heredoc_delimiters(line).is_ok_and(|delimiters| !delimiters.is_empty()) {
+        if !continued && heredoc_delimiters(line).is_ok_and(|delimiters| !delimiters.is_empty()) {
             break;
         }
     }
@@ -1022,6 +1023,7 @@ fn parse_heredocs(
     start_byte: usize,
     target_instruction: &str,
     source_file: &SourceFile,
+    escape_character: char,
 ) -> Result<Vec<Heredoc>, ParserError> {
     let re =
         Regex::new(r#"(?P<prefix><<-?\s*)(?P<quote>['"]?)(?P<delimiter>[A-Za-z_][A-Za-z0-9_-]*)"#)
@@ -1029,13 +1031,10 @@ fn parse_heredocs(
                 message: error.to_string(),
             })?;
 
-    let Some(first_opener) = re.find(raw) else {
+    if !re.is_match(raw) {
         return Ok(Vec::new());
-    };
-    let Some(body_start_relative) = raw[first_opener.end()..]
-        .find('\n')
-        .map(|index| first_opener.end() + index + 1)
-    else {
+    }
+    let Some(body_start_relative) = heredoc_body_start(raw, escape_character) else {
         return Ok(Vec::new());
     };
 
@@ -1068,6 +1067,21 @@ fn parse_heredocs(
     }
 
     Ok(heredocs)
+}
+
+fn heredoc_body_start(raw: &str, escape_character: char) -> Option<usize> {
+    let mut offset = 0;
+    for line in raw.split('\n') {
+        let line_end = offset + line.len();
+        if continues(line, escape_character) {
+            offset = line_end.saturating_add(1);
+            continue;
+        }
+
+        return (line_end < raw.len()).then_some(line_end + 1);
+    }
+
+    None
 }
 
 fn find_heredoc_closing(raw: &str, body_start: usize, delimiter: &str) -> Option<usize> {

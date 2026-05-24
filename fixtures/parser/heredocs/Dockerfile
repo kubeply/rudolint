@@ -19,3 +19,9 @@ COPY --chmod=755 \
 #!/usr/bin/env sh
 echo continued
 SCRIPT
+COPY <<FIRST \
+  <<SECOND /etc/continued-generated/
+first continued body
+FIRST
+second continued body
+SECOND

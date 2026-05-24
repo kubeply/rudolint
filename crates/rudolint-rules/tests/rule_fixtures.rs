@@ -523,6 +523,12 @@ COPY --chmod=755 \
 #!/usr/bin/env sh
 echo continued
 SCRIPT
+COPY <<FIRST \
+  <<SECOND /etc/continued-generated/
+first continued body
+FIRST
+second continued body
+SECOND
 "#;
     let document = parse_dockerfile(source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default()).lint(&document);

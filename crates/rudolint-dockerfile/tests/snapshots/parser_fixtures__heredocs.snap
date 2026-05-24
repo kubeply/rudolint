@@ -512,6 +512,113 @@ expression: document_json(&document)
       },
       "recovery": null,
       "run": null
+    },
+    {
+      "arg": null,
+      "args": "<<FIRST \\\n  <<SECOND /etc/continued-generated/\nfirst continued body\nFIRST\nsecond continued body\nSECOND",
+      "args_span": {
+        "end_byte": 431,
+        "end_column": 7,
+        "end_line": 27,
+        "start_byte": 329,
+        "start_column": 6,
+        "start_line": 22
+      },
+      "continuations": [
+        {
+          "escape": "\\",
+          "line": 22,
+          "span": {
+            "end_byte": 338,
+            "end_column": 15,
+            "end_line": 22,
+            "start_byte": 337,
+            "start_column": 14,
+            "start_line": 22
+          }
+        }
+      ],
+      "copy": {
+        "chmod": null,
+        "chown": null,
+        "destination": "/etc/continued-generated/",
+        "flags": [],
+        "from": null,
+        "kind": "copy",
+        "sources": [
+          "<<FIRST",
+          "<<SECOND"
+        ]
+      },
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 431,
+          "end_column": 7,
+          "end_line": 27,
+          "start_byte": 329,
+          "start_column": 6,
+          "start_line": 22
+        },
+        "text": "<<FIRST \\\n  <<SECOND /etc/continued-generated/\nfirst continued body\nFIRST\nsecond continued body\nSECOND"
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [
+        {
+          "body": "first continued body\n",
+          "body_span": {
+            "end_byte": 397,
+            "end_column": 1,
+            "end_line": 25,
+            "start_byte": 376,
+            "start_column": 1,
+            "start_line": 24
+          },
+          "delimiter": "FIRST",
+          "quoted": false,
+          "target_instruction": "COPY"
+        },
+        {
+          "body": "second continued body\n",
+          "body_span": {
+            "end_byte": 425,
+            "end_column": 1,
+            "end_line": 27,
+            "start_byte": 403,
+            "start_column": 1,
+            "start_line": 26
+          },
+          "delimiter": "SECOND",
+          "quoted": false,
+          "target_instruction": "COPY"
+        }
+      ],
+      "keyword": "COPY",
+      "keyword_span": {
+        "end_byte": 328,
+        "end_column": 5,
+        "end_line": 22,
+        "start_byte": 324,
+        "start_column": 1,
+        "start_line": 22
+      },
+      "label": null,
+      "line": 22,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 431,
+        "end_column": 7,
+        "end_line": 27,
+        "start_byte": 324,
+        "start_column": 1,
+        "start_line": 22
+      },
+      "recovery": null,
+      "run": null
     }
   ],
   "syntax": null
