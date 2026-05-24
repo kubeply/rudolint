@@ -28,6 +28,26 @@ fn catalog_codes_are_unique_and_have_metadata() {
 }
 
 #[test]
+fn implemented_rules_have_docs_pages() {
+    let catalog = RuleEngine::new(Profile::Default, Config::default()).catalog();
+
+    for rule in catalog
+        .iter()
+        .filter(|rule| rule.status == RuleStatus::Implemented)
+    {
+        let path = rule_docs_path(rule.code);
+        let docs = fs::read_to_string(&path)
+            .unwrap_or_else(|error| panic!("{} is missing docs at {path:?}: {error}", rule.code));
+
+        assert!(
+            !docs.trim().is_empty(),
+            "{} docs at {path:?} must not be empty",
+            rule.code
+        );
+    }
+}
+
+#[test]
 fn implemented_rules_and_docs_are_synchronized() {
     let catalog = RuleEngine::new(Profile::Default, Config::default()).catalog();
     let implemented_codes = catalog
@@ -100,6 +120,12 @@ fn documented_rule_codes() -> BTreeSet<String> {
             (stem.starts_with("RD") || stem.starts_with("RS")).then(|| stem.to_string())
         })
         .collect()
+}
+
+fn rule_docs_path(code: &str) -> PathBuf {
+    workspace_root()
+        .join("docs/rules")
+        .join(format!("{code}.md"))
 }
 
 fn workspace_root() -> PathBuf {
