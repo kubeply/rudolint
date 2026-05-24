@@ -848,10 +848,7 @@ fn copy_operand_args(args: &str, escape_character: char, has_heredoc: bool) -> S
             header.push('\n');
         }
 
-        if !has_heredoc {
-            continue;
-        }
-        if !continued && heredoc_delimiters(line).is_ok_and(|delimiters| !delimiters.is_empty()) {
+        if has_heredoc && !continued {
             break;
         }
     }
