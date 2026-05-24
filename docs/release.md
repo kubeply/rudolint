@@ -113,6 +113,9 @@ After the `Release` workflow succeeds, verify:
   ```
 
 - the Marketplace listing points at the intended release.
+- the Marketplace listing examples use the intended action tag pattern:
+  exact release tags for reproducible workflows, or `v1` only after the stable
+  major tag has moved to the verified release.
 - the GitHub Action example works in a throwaway workflow using the release tag.
 
 ## Recovery
