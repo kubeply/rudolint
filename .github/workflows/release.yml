@@ -288,9 +288,11 @@ jobs:
           jq -r '.body // ""' "$RUNNER_TEMP/generated-notes.json" > "$RUNNER_TEMP/notes.txt"
           {
             echo
-            echo "## Install"
+            echo "## Install, Downloads, Checksums, And Attestations"
             echo
-            echo "$ANNOUNCEMENT_BODY"
+            # Keep cargo-dist's body intact: it carries installer, direct
+            # download, checksum, and attestation details.
+            printf '%s\n' "$ANNOUNCEMENT_BODY"
           } >> "$RUNNER_TEMP/notes.txt"
 
           gh release create "${{ needs.plan.outputs.tag }}" --target "$RELEASE_COMMIT" $PRERELEASE_FLAG --title "$ANNOUNCEMENT_TITLE" --notes-file "$RUNNER_TEMP/notes.txt" artifacts/*
