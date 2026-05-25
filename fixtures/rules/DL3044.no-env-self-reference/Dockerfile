@@ -1,4 +1,5 @@
 FROM alpine:3.20
+ENV PATH=/usr/local/bin:$PATH
 ENV APP_HOME=/app PATH=$APP_HOME/bin:$PATH
 ENV NODE_VERSION=22 PATH=/opt/node-${NODE_VERSION}/bin:$PATH
 ENV SELF=$SELF

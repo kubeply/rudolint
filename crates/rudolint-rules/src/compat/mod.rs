@@ -1494,7 +1494,7 @@ impl Rule for NoEnvSelfReference {
     }
 
     fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
-        let mut known_variables = BTreeSet::new();
+        let mut known_variables = BTreeSet::from(["PATH".to_string()]);
         let mut findings = Vec::new();
 
         for instruction in &doc.instructions {
