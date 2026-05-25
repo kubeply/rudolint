@@ -325,6 +325,11 @@ pub fn tokenize(shell: &str) -> Vec<ShellToken> {
             continue;
         }
 
+        if bytes[index] == b'#' {
+            index = skip_shell_comment(shell, index);
+            continue;
+        }
+
         if let Some((operator, end)) = read_operator(shell, index) {
             tokens.push(ShellToken {
                 text: operator.to_string(),
@@ -424,6 +429,12 @@ pub fn tokenize(shell: &str) -> Vec<ShellToken> {
     }
 
     tokens
+}
+
+fn skip_shell_comment(shell: &str, start: usize) -> usize {
+    shell[start..]
+        .find('\n')
+        .map_or(shell.len(), |offset| start + offset + 1)
 }
 
 /// Detects package manager commands mentioned in shell command text.
@@ -793,6 +804,7 @@ mod tests {
             "printf escaped\\ value",
             "printf \\$PATH \"$PATH\"",
             "cmd 2>/tmp/error || true",
+            "apt-get install curl # keep image small\n&& rm -rf /var/lib/apt/lists/*",
         ];
         let values = cases
             .iter()
@@ -836,6 +848,7 @@ mod tests {
             "mount -t proc proc /proc;ifconfig",
             "echo $(uname -m) | tee /tmp/arch",
             "cat < input.txt > output.txt && rm input.txt",
+            "apt-get install curl # keep image small\n&& rm -rf /var/lib/apt/lists/*",
         ];
         let values = cases
             .iter()

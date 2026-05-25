@@ -1,6 +1,5 @@
 ---
 source: crates/rudolint-shell/src/lib.rs
-assertion_line: 825
 expression: values
 ---
 [
@@ -440,6 +439,88 @@ expression: values
           "start": 20
         },
         "text": "true"
+      }
+    ]
+  },
+  {
+    "shell": "apt-get install curl # keep image small\n&& rm -rf /var/lib/apt/lists/*",
+    "tokens": [
+      {
+        "expansions": [],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "apt-get",
+        "span": {
+          "end": 7,
+          "start": 0
+        },
+        "text": "apt-get"
+      },
+      {
+        "expansions": [],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "install",
+        "span": {
+          "end": 15,
+          "start": 8
+        },
+        "text": "install"
+      },
+      {
+        "expansions": [],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "curl",
+        "span": {
+          "end": 20,
+          "start": 16
+        },
+        "text": "curl"
+      },
+      {
+        "expansions": [],
+        "kind": "Separator",
+        "quote": "None",
+        "raw": "&&",
+        "span": {
+          "end": 42,
+          "start": 40
+        },
+        "text": "&&"
+      },
+      {
+        "expansions": [],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "rm",
+        "span": {
+          "end": 45,
+          "start": 43
+        },
+        "text": "rm"
+      },
+      {
+        "expansions": [],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "-rf",
+        "span": {
+          "end": 49,
+          "start": 46
+        },
+        "text": "-rf"
+      },
+      {
+        "expansions": [],
+        "kind": "Word",
+        "quote": "None",
+        "raw": "/var/lib/apt/lists/*",
+        "span": {
+          "end": 70,
+          "start": 50
+        },
+        "text": "/var/lib/apt/lists/*"
       }
     ]
   }

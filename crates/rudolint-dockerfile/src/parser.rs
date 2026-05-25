@@ -321,6 +321,13 @@ pub fn parse_dockerfile(source: &str) -> Result<Dockerfile, ParserError> {
         }
 
         if !current.is_empty() {
+            if trimmed.starts_with('#') {
+                current.push('\n');
+                current.push_str(line);
+                byte_offset += segment.len();
+                index += 1;
+                continue;
+            }
             current.push('\n');
         }
         current.push_str(line);

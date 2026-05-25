@@ -1,6 +1,5 @@
 ---
 source: crates/rudolint-shell/src/lib.rs
-assertion_line: 856
 expression: values
 ---
 [
@@ -393,5 +392,76 @@ expression: values
       }
     ],
     "shell": "cat < input.txt > output.txt && rm input.txt"
+  },
+  {
+    "commands": [
+      {
+        "argument_facts": [
+          {
+            "quote": "None",
+            "raw": "install",
+            "span": {
+              "end": 15,
+              "start": 8
+            },
+            "text": "install"
+          },
+          {
+            "quote": "None",
+            "raw": "curl",
+            "span": {
+              "end": 20,
+              "start": 16
+            },
+            "text": "curl"
+          }
+        ],
+        "arguments": [
+          "install",
+          "curl"
+        ],
+        "command": "apt-get",
+        "command_span": {
+          "end": 7,
+          "start": 0
+        },
+        "command_word": "apt-get",
+        "env": []
+      },
+      {
+        "argument_facts": [
+          {
+            "quote": "None",
+            "raw": "-rf",
+            "span": {
+              "end": 49,
+              "start": 46
+            },
+            "text": "-rf"
+          },
+          {
+            "quote": "None",
+            "raw": "/var/lib/apt/lists/*",
+            "span": {
+              "end": 70,
+              "start": 50
+            },
+            "text": "/var/lib/apt/lists/*"
+          }
+        ],
+        "arguments": [
+          "-rf",
+          "/var/lib/apt/lists/*"
+        ],
+        "command": "rm",
+        "command_span": {
+          "end": 45,
+          "start": 43
+        },
+        "command_word": "rm",
+        "env": []
+      }
+    ],
+    "shell": "apt-get install curl # keep image small\n&& rm -rf /var/lib/apt/lists/*"
   }
 ]

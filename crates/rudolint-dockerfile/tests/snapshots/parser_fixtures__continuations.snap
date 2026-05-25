@@ -162,6 +162,113 @@ expression: document_json(&document)
           "text": "apk add \\\n    curl \\\n    git"
         }
       }
+    },
+    {
+      "arg": null,
+      "args": "apt-get update \\\n    && apt-get install -y --no-install-recommends unzip \\\n    # Comment-only lines do not end continued instructions.\n    && apt-get clean \\\n    && rm -rf /var/lib/apt/lists/*",
+      "args_span": {
+        "end_byte": 246,
+        "end_column": 35,
+        "end_line": 9,
+        "start_byte": 54,
+        "start_column": 5,
+        "start_line": 5
+      },
+      "continuations": [
+        {
+          "escape": "\\",
+          "line": 5,
+          "span": {
+            "end_byte": 70,
+            "end_column": 21,
+            "end_line": 5,
+            "start_byte": 69,
+            "start_column": 20,
+            "start_line": 5
+          }
+        },
+        {
+          "escape": "\\",
+          "line": 6,
+          "span": {
+            "end_byte": 128,
+            "end_column": 58,
+            "end_line": 6,
+            "start_byte": 127,
+            "start_column": 57,
+            "start_line": 6
+          }
+        },
+        {
+          "escape": "\\",
+          "line": 8,
+          "span": {
+            "end_byte": 211,
+            "end_column": 23,
+            "end_line": 8,
+            "start_byte": 210,
+            "start_column": 22,
+            "start_line": 8
+          }
+        }
+      ],
+      "copy": null,
+      "env": null,
+      "expose": null,
+      "flags": [],
+      "form": {
+        "kind": "shell",
+        "span": {
+          "end_byte": 246,
+          "end_column": 35,
+          "end_line": 9,
+          "start_byte": 54,
+          "start_column": 5,
+          "start_line": 5
+        },
+        "text": "apt-get update \\\n    && apt-get install -y --no-install-recommends unzip \\\n    # Comment-only lines do not end continued instructions.\n    && apt-get clean \\\n    && rm -rf /var/lib/apt/lists/*"
+      },
+      "from": null,
+      "healthcheck": null,
+      "heredocs": [],
+      "keyword": "RUN",
+      "keyword_span": {
+        "end_byte": 53,
+        "end_column": 4,
+        "end_line": 5,
+        "start_byte": 50,
+        "start_column": 1,
+        "start_line": 5
+      },
+      "label": null,
+      "line": 5,
+      "mounts": [],
+      "raw_span": {
+        "end_byte": 246,
+        "end_column": 35,
+        "end_line": 9,
+        "start_byte": 50,
+        "start_column": 1,
+        "start_line": 5
+      },
+      "recovery": null,
+      "run": {
+        "flags": [],
+        "mounts": [],
+        "network": null,
+        "security": null,
+        "shell": {
+          "span": {
+            "end_byte": 246,
+            "end_column": 35,
+            "end_line": 9,
+            "start_byte": 54,
+            "start_column": 5,
+            "start_line": 5
+          },
+          "text": "apt-get update \\\n    && apt-get install -y --no-install-recommends unzip \\\n    # Comment-only lines do not end continued instructions.\n    && apt-get clean \\\n    && rm -rf /var/lib/apt/lists/*"
+        }
+      }
     }
   ],
   "syntax": null
