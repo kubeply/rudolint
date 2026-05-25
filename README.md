@@ -20,7 +20,7 @@ workflows.
 | Dockerfile parsing | Source-aware parsing for instructions, flags, heredocs, comments, and stage aliases. |
 | BuildKit support | Frontend syntax directives, cache mounts, secret mounts, SSH mounts, insecure entitlements, and Buildx platform checks. |
 | Rule profiles | `default` runs Hadolint-style compatibility rules plus BuildKit-native rules. `hadolint-compat` runs Hadolint-style and shell-style rules without BuildKit-native `RDK` diagnostics. |
-| CI output | Human output for terminals, JSON for automation, and SARIF for GitHub code scanning. |
+| CI output | Text output for terminals, JSON for automation, and SARIF for GitHub code scanning. |
 | Configuration | `.rudolint.yaml` supports ignored rules, severity overrides, per-file ignores, selected rule prefixes, and trusted registries. |
 | GitHub Action | A [Marketplace action](https://github.com/marketplace/actions/rudolint) downloads checksummed release binaries and runs `rudolint` without compiling Rust in user workflows. |
 | Language server | `rudolint-lsp` speaks LSP over stdio for editor diagnostics. |
@@ -45,6 +45,9 @@ Check a repository:
 ```bash
 rudolint check .
 ```
+
+Default output is grouped by file and uses colors automatically in terminals.
+Use `--color never` when plain text is preferred.
 
 Write SARIF for CI:
 

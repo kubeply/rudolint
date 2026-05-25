@@ -1,11 +1,46 @@
 use std::path::PathBuf;
 
+use clap::builder::Styles;
+use clap::builder::styling::{AnsiColor, Color, Style};
 use clap::{Args, Parser, Subcommand, ValueEnum};
 use rudolint_diagnostics::Severity;
 use rudolint_rules::Profile;
 
+fn check_after_help() -> String {
+    format!(
+        "\
+Finding category legend:
+  {}    exits non-zero by default
+  {}  exits non-zero by default
+  {}     advisory finding
+  {}    formatting or convention finding
+
+Use --color never to disable ANSI colors in output.
+",
+        styled("x error", AnsiColor::Red),
+        styled("! warning", AnsiColor::Yellow),
+        styled("i info", AnsiColor::Cyan),
+        styled("~ style", AnsiColor::Magenta),
+    )
+}
+
+fn styled(text: &str, color: AnsiColor) -> String {
+    let style = Style::new().fg_color(Some(Color::Ansi(color))).bold();
+    format!("{}{text}{}", style.render(), style.render_reset())
+}
+
+fn cli_styles() -> Styles {
+    Styles::styled()
+        .literal(
+            Style::new()
+                .fg_color(Some(Color::Ansi(AnsiColor::BrightBlack)))
+                .bold(),
+        )
+        .placeholder(Style::new())
+}
+
 #[derive(Debug, Parser)]
-#[command(author, about, disable_version_flag = true)]
+#[command(author, about, disable_version_flag = true, styles = cli_styles())]
 pub struct Cli {
     /// Print version information.
     #[arg(long, global = true)]
@@ -36,13 +71,18 @@ impl Default for Command {
 }
 
 #[derive(Debug, Clone, Args)]
+#[command(after_help = check_after_help(), styles = cli_styles())]
 pub struct CheckArgs {
     /// Dockerfile paths or directories. Directories are searched recursively.
     pub paths: Vec<PathBuf>,
 
     /// Output format.
-    #[arg(long, value_enum, default_value_t = OutputFormat::Human)]
+    #[arg(long, value_enum, default_value_t = OutputFormat::Text)]
     pub format: OutputFormat,
+
+    /// When to use ANSI colors in output.
+    #[arg(long, value_enum, default_value_t = ColorChoice::Auto)]
+    pub color: ColorChoice,
 
     /// Rule profile.
     #[arg(long, value_enum, default_value_t = Profile::Default)]
@@ -76,7 +116,7 @@ pub struct CheckArgs {
     #[arg(long)]
     pub verbose: bool,
 
-    /// Include source excerpts in human output.
+    /// Include source excerpts in output.
     #[arg(long)]
     pub show_source: bool,
 
@@ -93,7 +133,8 @@ impl Default for CheckArgs {
     fn default() -> Self {
         Self {
             paths: Vec::new(),
-            format: OutputFormat::Human,
+            format: OutputFormat::Text,
+            color: ColorChoice::Auto,
             profile: Profile::Default,
             config: None,
             no_config: false,
@@ -142,14 +183,23 @@ pub enum RulesOutputFormat {
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
 pub enum OutputFormat {
-    Human,
+    #[value(alias = "human")]
+    Text,
     Json,
     Sarif,
 }
 
+#[derive(Debug, Clone, Copy, ValueEnum)]
+pub enum ColorChoice {
+    Auto,
+    Always,
+    Never,
+}
+
 #[cfg(test)]
 mod tests {
-    use clap::Parser;
+    use clap::builder::styling::AnsiColor;
+    use clap::{CommandFactory, Parser};
     use rudolint_rules::Profile;
 
     use super::{Cli, Command};
@@ -171,5 +221,74 @@ mod tests {
             .expect_err("compat should no longer parse");
 
         assert_eq!(error.kind(), clap::error::ErrorKind::InvalidValue);
+    }
+
+    #[test]
+    fn check_help_includes_finding_category_legend() {
+        let mut command = Cli::command();
+        let check = command
+            .find_subcommand_mut("check")
+            .expect("check subcommand should exist");
+        let help = check.render_long_help().to_string();
+
+        assert!(help.contains("Finding category legend:"));
+        assert!(help.contains("x error"));
+        assert!(help.contains("! warning"));
+        assert!(help.contains("--color never"));
+    }
+
+    #[test]
+    fn check_help_legend_uses_clap_color_policy() {
+        let mut command = Cli::command().color(clap::ColorChoice::Always);
+        let check = command
+            .find_subcommand_mut("check")
+            .expect("check subcommand should exist");
+        let help = check.render_long_help().ansi().to_string();
+
+        assert!(help.contains(&super::styled("x error", AnsiColor::Red)));
+        assert!(help.contains(&super::styled("! warning", AnsiColor::Yellow)));
+        assert!(help.contains(&super::styled("i info", AnsiColor::Cyan)));
+        assert!(help.contains(&super::styled("~ style", AnsiColor::Magenta)));
+    }
+
+    #[test]
+    fn check_help_styles_option_literals_but_not_placeholders() {
+        let mut command = Cli::command().color(clap::ColorChoice::Always);
+        let check = command
+            .find_subcommand_mut("check")
+            .expect("check subcommand should exist");
+        let help = check.render_long_help().ansi().to_string();
+
+        assert!(help.contains("\x1b[1m\x1b[90m--format\x1b[0m"));
+        assert!(help.contains("<FORMAT>"));
+        assert!(!help.contains("\x1b[1m\x1b[90m<FORMAT>\x1b[0m"));
+    }
+
+    #[test]
+    fn check_format_uses_text_value_and_accepts_human_alias() {
+        let cli = Cli::try_parse_from(["rudolint", "check", "--format", "text"])
+            .expect("text output format should parse");
+
+        let Some(Command::Check(args)) = cli.command else {
+            panic!("expected check command");
+        };
+        assert!(matches!(args.format, super::OutputFormat::Text));
+
+        let cli = Cli::try_parse_from(["rudolint", "check", "--format", "human"])
+            .expect("human output format alias should parse");
+
+        let Some(Command::Check(args)) = cli.command else {
+            panic!("expected check command");
+        };
+        assert!(matches!(args.format, super::OutputFormat::Text));
+
+        let mut command = Cli::command();
+        let check = command
+            .find_subcommand_mut("check")
+            .expect("check subcommand should exist");
+        let help = check.render_long_help().to_string();
+        assert!(help.contains("[default: text]"));
+        assert!(help.contains("[possible values: text, json, sarif]"));
+        assert!(!help.contains("[possible values: human, json, sarif]"));
     }
 }

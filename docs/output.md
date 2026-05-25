@@ -1,7 +1,7 @@
 # Output Formats
 
-`rudolint check` supports `human`, `json`, and `sarif` output. The default is
-`human`.
+`rudolint check` supports `text`, `json`, and `sarif` output. The default is
+`text`.
 
 ## Stability
 
@@ -128,14 +128,24 @@ result includes:
 The tool driver includes `rudolint` metadata and rule entries for every emitted
 finding code.
 
-## Human
+## Text
 
-Human output is grouped by file:
+Text output is grouped by file and starts with a compact run summary:
 
 ```text
-Dockerfile:
-  1:1 warning DL3007 avoid using latest tag
+rudolint found 2 findings in 1 file (1 error, 1 warning)
+
+Dockerfile
+  ! warning DL3007    1:1   avoid mutable latest base image tags
+  x error   DL3000    2:1   WORKDIR should be absolute
 ```
 
-`--show-source` appends compact source excerpts to human output only. JSON and
+Output uses ANSI color automatically when stdout is a terminal. Use
+`--color always` to force colors or `--color never` to disable them. `NO_COLOR`
+and `CLICOLOR=0` disable automatic colors.
+
+`rudolint check --help` includes the finding category legend with the same
+severity markers and colors used by text output when colored help is enabled.
+
+`--show-source` appends compact source excerpts to the default output. JSON and
 SARIF already carry machine-readable source spans.

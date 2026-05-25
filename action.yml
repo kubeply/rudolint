@@ -29,7 +29,7 @@ inputs:
   format:
     description: Output format when upload-sarif is false.
     required: false
-    default: human
+    default: text
   failure-threshold:
     description: Minimum severity that exits non-zero.
     required: false
@@ -181,8 +181,8 @@ runs:
           findings_count="$(jq 'if type == "array" then length else .findings | length end' "$output_file")"
         elif [[ "$output_format" == "sarif" ]] && command -v jq >/dev/null 2>&1; then
           findings_count="$(jq '.runs[0].results | length' "$output_file")"
-        elif [[ "$output_format" == "human" ]]; then
-          findings_count="$(grep -Ec '^[[:space:]]+[0-9]+:[0-9]+[[:space:]]' "$output_file" || true)"
+        elif [[ "$output_format" == "text" || "$output_format" == "human" ]]; then
+          findings_count="$(grep -Ec '^[[:space:]]+[x!i~-][[:space:]]+(error|warning|info|style|ignore)[[:space:]]+' "$output_file" || true)"
         fi
 
         {

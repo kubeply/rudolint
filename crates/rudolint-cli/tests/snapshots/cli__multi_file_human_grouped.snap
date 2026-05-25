@@ -2,8 +2,11 @@
 source: crates/rudolint-cli/tests/cli.rs
 expression: "output.replace(temp_path, \"$TEMP\")"
 ---
-$TEMP/Dockerfile:
-  1:1 warning DL3007 avoid mutable latest base image tags
-$TEMP/Dockerfile.api:
-  1:1 warning DL3006 base image should use an explicit tag or digest
-  2:1 error DL3000 WORKDIR should be absolute
+rudolint found 3 findings in 2 files (1 error, 2 warnings)
+
+$TEMP/Dockerfile
+  ! warning DL3007     1:1   avoid mutable latest base image tags
+
+$TEMP/Dockerfile.api
+  ! warning DL3006     1:1   base image should use an explicit tag or digest
+  x error   DL3000     2:1   WORKDIR should be absolute

@@ -145,8 +145,8 @@ Show `version` only when documenting how to pin a specific linter release.
 - `config` (optional): `.rudolint.yaml` path. Default: empty, which lets
   rudolint use its normal config discovery.
 - `profile` (optional): `default` or `hadolint-compat`. Default: `default`.
-- `format` (optional): `human`, `json`, or `sarif` when `upload-sarif` is
-  false. Default: `human`.
+- `format` (optional): `text`, `json`, or `sarif` when `upload-sarif` is
+  false. Default: `text`.
 - `failure-threshold` (optional): `ignore`, `style`, `info`, `warning`, or
   `error`. Default: `warning`.
 - `sarif-output` (optional): SARIF path to write when `upload-sarif` is true.

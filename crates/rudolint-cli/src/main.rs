@@ -1,8 +1,9 @@
 mod cli;
 
 use std::collections::BTreeMap;
+use std::env;
 use std::fs;
-use std::io::{self, Read};
+use std::io::{self, IsTerminal, Read};
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
@@ -10,7 +11,7 @@ use anyhow::Context;
 use clap::Parser;
 use ignore::WalkBuilder;
 
-use crate::cli::{Cli, Command, OutputFormat, RulesOutputFormat};
+use crate::cli::{Cli, ColorChoice, Command, OutputFormat, RulesOutputFormat};
 use rudolint_config::Config;
 use rudolint_diagnostics::Finding;
 use rudolint_dockerfile::parse_dockerfile;
@@ -128,7 +129,12 @@ fn run_check(args: cli::CheckArgs) -> Result<ExitCode, AppError> {
 
     if !args.quiet {
         let mut rendered = match args.format {
-            OutputFormat::Human => rudolint_output::human(&findings),
+            OutputFormat::Text => rudolint_output::human_with_options(
+                &findings,
+                rudolint_output::HumanOptions {
+                    color: should_colorize(args.color),
+                },
+            ),
             OutputFormat::Json => {
                 if args.fix {
                     rudolint_output::json_with_fixes(&findings, &fixes).map_err(|error| {
@@ -144,10 +150,10 @@ fn run_check(args: cli::CheckArgs) -> Result<ExitCode, AppError> {
                 AppError::internal(format!("failed to render SARIF output: {error}"))
             })?,
         };
-        if args.show_source && matches!(args.format, OutputFormat::Human) {
+        if args.show_source && matches!(args.format, OutputFormat::Text) {
             rendered.push_str(&source_excerpt(&findings, &sources));
         }
-        if args.fix && matches!(args.format, OutputFormat::Human) {
+        if args.fix && matches!(args.format, OutputFormat::Text) {
             rendered.push_str(&render_fix_section(args.dry_run, &fixes));
         }
         print!("{rendered}");
@@ -172,6 +178,18 @@ fn run_check(args: cli::CheckArgs) -> Result<ExitCode, AppError> {
     }
 
     Ok(ExitCode::SUCCESS)
+}
+
+fn should_colorize(choice: ColorChoice) -> bool {
+    match choice {
+        ColorChoice::Always => true,
+        ColorChoice::Never => false,
+        ColorChoice::Auto => {
+            env::var_os("NO_COLOR").is_none()
+                && env::var_os("CLICOLOR").is_none_or(|value| value != "0")
+                && io::stdout().is_terminal()
+        }
+    }
 }
 
 fn run_rules(args: cli::RulesArgs) -> Result<ExitCode, AppError> {

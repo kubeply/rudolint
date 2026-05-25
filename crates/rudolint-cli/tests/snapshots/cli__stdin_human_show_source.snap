@@ -2,9 +2,11 @@
 source: crates/rudolint-cli/tests/cli.rs
 expression: output
 ---
-<stdin>:
-  1:1 warning DL3007 avoid mutable latest base image tags
-  2:1 error DL3000 WORKDIR should be absolute
+rudolint found 2 findings in 1 file (1 error, 1 warning)
+
+<stdin>
+  ! warning DL3007     1:1   avoid mutable latest base image tags
+  x error   DL3000     2:1   WORKDIR should be absolute
   |
   1 | FROM alpine:latest
   | ^

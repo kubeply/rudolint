@@ -2,8 +2,10 @@
 source: crates/rudolint-cli/tests/cli.rs
 expression: output
 ---
-<stdin>:
-  2:1 info RDK1000 BuildKit features are used without an explicit # syntax directive
+rudolint found 1 finding in 1 file (1 info)
+
+<stdin>
+  i info    RDK1000    2:1   BuildKit features are used without an explicit # syntax directive
 fixes: dry-run mode is enabled; 1 fix(es) available
 title: insert BuildKit syntax directive
 applicability: safe
