@@ -3001,9 +3001,19 @@ fn wget_has_progress_control(arguments: &[String]) -> bool {
                 | "-a"
                 | "--append-output"
         ) || option_name.starts_with("--progress")
+            || short_option_bundle_contains(option_name, 'q')
             || argument.starts_with("-o")
             || argument.starts_with("-a")
     })
+}
+
+fn short_option_bundle_contains(argument: &str, option: char) -> bool {
+    argument.starts_with('-')
+        && !argument.starts_with("--")
+        && argument
+            .chars()
+            .skip(1)
+            .any(|character| character == option)
 }
 
 fn is_valid_docker_label_key(key: &str) -> bool {

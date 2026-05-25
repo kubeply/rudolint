@@ -1,6 +1,5 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
-assertion_line: 820
 expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
 ---
 [
@@ -27,12 +26,12 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "avoid wget without `--progress=dot:giga`, `-q`, or `-nv`",
     "path": "",
     "primary_span": {
-      "end_byte": 813,
+      "end_byte": 864,
       "end_column": 52,
-      "end_line": 15,
-      "start_byte": 762,
+      "end_line": 16,
+      "start_byte": 813,
       "start_column": 1,
-      "start_line": 15
+      "start_line": 16
     },
     "severity": "info"
   }
