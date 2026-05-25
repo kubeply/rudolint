@@ -101,24 +101,14 @@ impl Rule for UnquotedCommandSubstitution {
 
     fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
         shell_findings(doc, |instruction, program| {
-            program
-                .tokens
-                .iter()
-                .any(|token| {
-                    token.quote == QuoteKind::None
-                        && token
-                            .expansions
-                            .iter()
-                            .any(|expansion| expansion.kind == ShellExpansionKind::Command)
-                })
-                .then(|| {
-                    diagnostic(
-                        "SC2046",
-                        Severity::Warning,
-                        "quote command substitutions to prevent word splitting",
-                        instruction,
-                    )
-                })
+            has_unquoted_command_substitution(program).then(|| {
+                diagnostic(
+                    "SC2046",
+                    Severity::Warning,
+                    "quote command substitutions to prevent word splitting",
+                    instruction,
+                )
+            })
         })
     }
 }
@@ -427,7 +417,9 @@ fn push_if_enabled(
 
 fn has_unquoted_command_substitution(program: &ShellProgram) -> bool {
     program.tokens.iter().any(|token| {
-        token.quote == QuoteKind::None
+        token.kind == ShellTokenKind::Word
+            && token.quote == QuoteKind::None
+            && !is_assignment_word(&token.text)
             && token
                 .expansions
                 .iter()

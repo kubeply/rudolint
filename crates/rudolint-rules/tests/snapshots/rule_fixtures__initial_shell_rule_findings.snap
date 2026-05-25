@@ -1,6 +1,5 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
-assertion_line: 146
 expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
 ---
 [
@@ -59,12 +58,12 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "A && B || C is not a safe conditional expression",
     "path": "",
     "primary_span": {
-      "end_byte": 482,
+      "end_byte": 686,
       "end_column": 42,
-      "end_line": 16,
-      "start_byte": 441,
+      "end_line": 19,
+      "start_byte": 645,
       "start_column": 1,
-      "start_line": 16
+      "start_line": 19
     },
     "severity": "warning"
   },
@@ -75,12 +74,12 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "declare and assign separately to avoid masking command failures",
     "path": "",
     "primary_span": {
-      "end_byte": 733,
+      "end_byte": 937,
       "end_column": 31,
-      "end_line": 22,
-      "start_byte": 703,
+      "end_line": 25,
+      "start_byte": 907,
       "start_column": 1,
-      "start_line": 22
+      "start_line": 25
     },
     "severity": "warning"
   },
@@ -91,12 +90,12 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "check cd exit status before running more commands",
     "path": "",
     "primary_span": {
-      "end_byte": 866,
+      "end_byte": 1070,
       "end_column": 18,
-      "end_line": 26,
-      "start_byte": 849,
+      "end_line": 29,
+      "start_byte": 1053,
       "start_column": 1,
-      "start_line": 26
+      "start_line": 29
     },
     "severity": "warning"
   },
@@ -107,12 +106,12 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "check command exit status directly instead of testing $?",
     "path": "",
     "primary_span": {
-      "end_byte": 1060,
+      "end_byte": 1264,
       "end_column": 24,
-      "end_line": 32,
-      "start_byte": 1037,
+      "end_line": 35,
+      "start_byte": 1241,
       "start_column": 1,
-      "start_line": 32
+      "start_line": 35
     },
     "severity": "warning"
   }

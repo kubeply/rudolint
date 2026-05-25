@@ -12,6 +12,9 @@ RUN echo "$HOME"
 RUN echo $(id -u)
 # Good SC2046: quoted command substitution.
 RUN echo "$(id -u)"
+# Good SC2046: command substitution in simple assignments does not split.
+RUN SYSTEM=$(uname -s | tr '[:upper:]' '[:lower:]')
+RUN PLATFORM=$([ "$(uname -m)" = "aarch64" ] && echo "arm64" || echo "amd64")
 # SC2015: &&/|| chain.
 RUN test -d /app && cd /app || mkdir /app
 # Good SC2015: no fallback branch.
