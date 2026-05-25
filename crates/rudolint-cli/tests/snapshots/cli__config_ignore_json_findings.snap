@@ -5,7 +5,7 @@ expression: output
 {
   "findings": [
     {
-      "code": "RDL3007",
+      "code": "DL3007",
       "help": null,
       "labels": [],
       "message": "avoid mutable latest base image tags",

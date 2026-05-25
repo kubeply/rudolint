@@ -82,7 +82,7 @@ pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
 
 rule_metadata!(
     InlineIgnore,
-    "RDL1001",
+    "RUD1001",
     "legacy-external-suppression",
     Severity::Warning,
     "warn on legacy external linter suppression comments"
@@ -104,7 +104,7 @@ impl Rule for InlineIgnore {
 fn legacy_suppression_comment(comment: &Comment) -> Option<Finding> {
     LegacySuppression::parse_comment(comment.line, &comment.text)?;
     Some(Finding::with_span(
-        "RDL1001",
+        "RUD1001",
         Severity::Warning,
         "prefer native rudolint suppression comments over legacy external suppressions",
         comment.span,
@@ -113,7 +113,7 @@ fn legacy_suppression_comment(comment: &Comment) -> Option<Finding> {
 
 rule_metadata!(
     DisallowedContainerCommands,
-    "RDL3001",
+    "DL3001",
     "disallowed-container-commands",
     Severity::Info,
     "avoid commands that rarely make sense during Docker builds"
@@ -133,7 +133,7 @@ impl Rule for DisallowedContainerCommands {
                     .into_iter()
                     .map(|command| {
                         diagnostic(
-                            "RDL3001",
+                            "DL3001",
                             Severity::Info,
                             format!(
                                 "avoid running `{}` in Docker build containers",
@@ -150,7 +150,7 @@ impl Rule for DisallowedContainerCommands {
 
 rule_metadata!(
     AbsoluteWorkdir,
-    "RDL3000",
+    "DL3000",
     "absolute-workdir",
     Severity::Error,
     "require absolute WORKDIR paths"
@@ -171,7 +171,7 @@ impl Rule for AbsoluteWorkdir {
             })
             .map(|instruction| {
                 diagnostic(
-                    "RDL3000",
+                    "DL3000",
                     Severity::Error,
                     "WORKDIR should be absolute",
                     instruction,
@@ -183,7 +183,7 @@ impl Rule for AbsoluteWorkdir {
 
 rule_metadata!(
     LastUserNotRoot,
-    "RDL3002",
+    "DL3002",
     "final-user-not-root",
     Severity::Warning,
     "require the final USER to be non-root"
@@ -206,7 +206,7 @@ impl Rule for LastUserNotRoot {
         let user = last_user.args.trim();
         if matches!(user, "root" | "0" | "0:0") {
             vec![diagnostic(
-                "RDL3002",
+                "DL3002",
                 Severity::Warning,
                 "the final image user should not be root",
                 last_user,
@@ -219,7 +219,7 @@ impl Rule for LastUserNotRoot {
 
 rule_metadata!(
     UseWorkdirForCd,
-    "RDL3003",
+    "DL3003",
     "use-workdir-for-cd",
     Severity::Warning,
     "prefer WORKDIR over RUN cd"
@@ -241,7 +241,7 @@ impl Rule for UseWorkdirForCd {
             })
             .map(|instruction| {
                 diagnostic(
-                    "RDL3003",
+                    "DL3003",
                     Severity::Warning,
                     "use WORKDIR instead of RUN cd",
                     instruction,
@@ -253,7 +253,7 @@ impl Rule for UseWorkdirForCd {
 
 rule_metadata!(
     NoSudo,
-    "RDL3004",
+    "DL3004",
     "no-sudo",
     Severity::Error,
     "avoid sudo in Docker builds"
@@ -275,7 +275,7 @@ impl Rule for NoSudo {
             })
             .map(|instruction| {
                 diagnostic(
-                    "RDL3004",
+                    "DL3004",
                     Severity::Error,
                     "avoid sudo in Docker builds; use USER or a privilege-drop tool instead",
                     instruction,
@@ -287,7 +287,7 @@ impl Rule for NoSudo {
 
 rule_metadata!(
     ExplicitFromTag,
-    "RDL3006",
+    "DL3006",
     "explicit-from-tag",
     Severity::Warning,
     "require explicit image tags in FROM"
@@ -313,7 +313,7 @@ impl Rule for ExplicitFromTag {
 
             if image_needs_explicit_tag(image, &stage_aliases) {
                 findings.push(diagnostic(
-                    "RDL3006",
+                    "DL3006",
                     Severity::Warning,
                     "base image should use an explicit tag or digest",
                     instruction,
@@ -331,7 +331,7 @@ impl Rule for ExplicitFromTag {
 
 rule_metadata!(
     NoLatestTag,
-    "RDL3007",
+    "DL3007",
     "no-latest-tag",
     Severity::Warning,
     "reject latest base image tags"
@@ -353,7 +353,7 @@ impl Rule for NoLatestTag {
             })
             .map(|instruction| {
                 diagnostic(
-                    "RDL3007",
+                    "DL3007",
                     Severity::Warning,
                     "avoid mutable latest base image tags",
                     instruction,
@@ -365,7 +365,7 @@ impl Rule for NoLatestTag {
 
 rule_metadata!(
     PinAptGetInstallVersions,
-    "RDL3008",
+    "DL3008",
     "pin-apt-get-install-versions",
     Severity::Warning,
     "pin versions in apt-get install"
@@ -383,7 +383,7 @@ impl Rule for PinAptGetInstallVersions {
             .filter(|instruction| apt_get_install_has_unpinned_packages(&instruction.args))
             .map(|instruction| {
                 diagnostic(
-                    "RDL3008",
+                    "DL3008",
                     Severity::Warning,
                     "pin versions in apt-get install",
                     instruction,
@@ -395,7 +395,7 @@ impl Rule for PinAptGetInstallVersions {
 
 rule_metadata!(
     CleanAptLists,
-    "RDL3009",
+    "DL3009",
     "clean-apt-lists",
     Severity::Info,
     "delete apt-get package lists after use"
@@ -414,7 +414,7 @@ impl Rule for CleanAptLists {
             .filter(|instruction| !removes_apt_lists(&instruction.args))
             .map(|instruction| {
                 diagnostic(
-                    "RDL3009",
+                    "DL3009",
                     Severity::Info,
                     "delete apt-get package lists after use",
                     instruction,
@@ -426,7 +426,7 @@ impl Rule for CleanAptLists {
 
 rule_metadata!(
     UseAddForArchives,
-    "RDL3010",
+    "DL3010",
     "use-add-for-archives",
     Severity::Info,
     "use ADD for extracting local archives"
@@ -449,7 +449,7 @@ impl Rule for UseAddForArchives {
             })
             .map(|instruction| {
                 diagnostic(
-                    "RDL3010",
+                    "DL3010",
                     Severity::Info,
                     "use ADD when local archive extraction is intended",
                     instruction,
@@ -461,7 +461,7 @@ impl Rule for UseAddForArchives {
 
 rule_metadata!(
     ValidExposePort,
-    "RDL3011",
+    "DL3011",
     "valid-expose-port",
     Severity::Error,
     "validate EXPOSE port numbers"
@@ -485,7 +485,7 @@ impl Rule for ValidExposePort {
                         let valid = port.parse::<u32>().is_ok_and(|value| value <= 65535);
                         (!valid).then(|| {
                             diagnostic(
-                                "RDL3011",
+                                "DL3011",
                                 Severity::Error,
                                 format!("invalid exposed port `{port}`"),
                                 instruction,
@@ -500,7 +500,7 @@ impl Rule for ValidExposePort {
 
 rule_metadata!(
     SingleHealthcheck,
-    "RDL3012",
+    "DL3012",
     "single-healthcheck",
     Severity::Error,
     "allow only one HEALTHCHECK instruction"
@@ -515,7 +515,7 @@ impl Rule for SingleHealthcheck {
         duplicates(
             doc,
             "HEALTHCHECK",
-            "RDL3012",
+            "DL3012",
             Severity::Error,
             "only one HEALTHCHECK is allowed",
         )
@@ -524,7 +524,7 @@ impl Rule for SingleHealthcheck {
 
 rule_metadata!(
     PinPipVersions,
-    "RDL3013",
+    "DL3013",
     "pin-pip-versions",
     Severity::Warning,
     "pin versions in pip install"
@@ -542,7 +542,7 @@ impl Rule for PinPipVersions {
             .filter(|instruction| pip_install_has_unpinned_packages(&instruction.args))
             .map(|instruction| {
                 diagnostic(
-                    "RDL3013",
+                    "DL3013",
                     Severity::Warning,
                     "pin versions in pip install",
                     instruction,
@@ -554,7 +554,7 @@ impl Rule for PinPipVersions {
 
 rule_metadata!(
     AptGetInstallAssumeYes,
-    "RDL3014",
+    "DL3014",
     "apt-get-install-assume-yes",
     Severity::Warning,
     "use -y with apt-get install"
@@ -572,7 +572,7 @@ impl Rule for AptGetInstallAssumeYes {
             .filter(|instruction| apt_get_install_missing_yes(&instruction.args))
             .map(|instruction| {
                 diagnostic(
-                    "RDL3014",
+                    "DL3014",
                     Severity::Warning,
                     "use -y with apt-get install",
                     instruction,
@@ -584,7 +584,7 @@ impl Rule for AptGetInstallAssumeYes {
 
 rule_metadata!(
     AptGetNoInstallRecommends,
-    "RDL3015",
+    "DL3015",
     "apt-get-no-install-recommends",
     Severity::Info,
     "avoid recommended packages in apt-get install"
@@ -602,7 +602,7 @@ impl Rule for AptGetNoInstallRecommends {
             .filter(|instruction| apt_get_install_missing_no_install_recommends(&instruction.args))
             .map(|instruction| {
                 diagnostic(
-                    "RDL3015",
+                    "DL3015",
                     Severity::Info,
                     "use --no-install-recommends with apt-get install",
                     instruction,
@@ -614,7 +614,7 @@ impl Rule for AptGetNoInstallRecommends {
 
 rule_metadata!(
     PinNpmVersions,
-    "RDL3016",
+    "DL3016",
     "pin-npm-versions",
     Severity::Warning,
     "pin versions in npm install"
@@ -632,7 +632,7 @@ impl Rule for PinNpmVersions {
             .filter(|instruction| npm_install_has_unpinned_packages(&instruction.args))
             .map(|instruction| {
                 diagnostic(
-                    "RDL3016",
+                    "DL3016",
                     Severity::Warning,
                     "pin versions in npm install",
                     instruction,
@@ -644,7 +644,7 @@ impl Rule for PinNpmVersions {
 
 rule_metadata!(
     PinApkVersions,
-    "RDL3018",
+    "DL3018",
     "pin-apk-versions",
     Severity::Warning,
     "pin versions in apk add"
@@ -662,7 +662,7 @@ impl Rule for PinApkVersions {
             .filter(|instruction| apk_add_has_unpinned_packages(&instruction.args))
             .map(|instruction| {
                 diagnostic(
-                    "RDL3018",
+                    "DL3018",
                     Severity::Warning,
                     "pin versions in apk add",
                     instruction,
@@ -674,7 +674,7 @@ impl Rule for PinApkVersions {
 
 rule_metadata!(
     ApkAddNoCache,
-    "RDL3019",
+    "DL3019",
     "apk-add-no-cache",
     Severity::Info,
     "use --no-cache with apk add"
@@ -692,7 +692,7 @@ impl Rule for ApkAddNoCache {
             .filter(|instruction| apk_add_missing_no_cache(&instruction.args))
             .map(|instruction| {
                 diagnostic(
-                    "RDL3019",
+                    "DL3019",
                     Severity::Info,
                     "use `apk add --no-cache` to avoid persisting the apk package cache",
                     instruction,
@@ -704,7 +704,7 @@ impl Rule for ApkAddNoCache {
 
 rule_metadata!(
     PreferCopy,
-    "RDL3020",
+    "DL3020",
     "prefer-copy",
     Severity::Error,
     "prefer COPY for plain local files"
@@ -729,7 +729,7 @@ impl Rule for PreferCopy {
             })
             .map(|instruction| {
                 diagnostic(
-                    "RDL3020",
+                    "DL3020",
                     Severity::Error,
                     "use COPY for local files unless archive extraction or remote fetch is intended",
                     instruction,
@@ -741,7 +741,7 @@ impl Rule for PreferCopy {
 
 rule_metadata!(
     CopyMultipleDestinationSlash,
-    "RDL3021",
+    "DL3021",
     "copy-multiple-destination-slash",
     Severity::Error,
     "require trailing slash for COPY destinations with multiple sources"
@@ -758,7 +758,7 @@ impl Rule for CopyMultipleDestinationSlash {
             .filter(|instruction| copy_multiple_sources_without_directory_destination(instruction))
             .map(|instruction| {
                 diagnostic(
-                    "RDL3021",
+                    "DL3021",
                     Severity::Error,
                     "`COPY` with multiple sources requires the destination to end with `/`",
                     instruction,
@@ -770,7 +770,7 @@ impl Rule for CopyMultipleDestinationSlash {
 
 rule_metadata!(
     CopyFromPreviousStage,
-    "RDL3022",
+    "DL3022",
     "copy-from-previous-stage",
     Severity::Warning,
     "require COPY --from references to resolve to previous build stages"
@@ -801,7 +801,7 @@ impl Rule for CopyFromPreviousStage {
 
             if copy_from_reference_is_unresolved(instruction, &previous_aliases, stage_count) {
                 findings.push(diagnostic(
-                    "RDL3022",
+                    "DL3022",
                     Severity::Warning,
                     "`COPY --from` should reference a previously defined `FROM` alias",
                     instruction,
@@ -815,7 +815,7 @@ impl Rule for CopyFromPreviousStage {
 
 rule_metadata!(
     CopyFromOwnStage,
-    "RDL3023",
+    "DL3023",
     "copy-from-own-stage",
     Severity::Error,
     "forbid COPY --from references to the current stage"
@@ -846,7 +846,7 @@ impl Rule for CopyFromOwnStage {
                 current_stage_index,
             ) {
                 findings.push(diagnostic(
-                    "RDL3023",
+                    "DL3023",
                     Severity::Error,
                     "`COPY --from` cannot reference the current build stage",
                     instruction,
@@ -860,7 +860,7 @@ impl Rule for CopyFromOwnStage {
 
 rule_metadata!(
     UniqueStageNames,
-    "RDL3024",
+    "DL3024",
     "unique-stage-names",
     Severity::Error,
     "require unique multi-stage aliases"
@@ -880,7 +880,7 @@ impl Rule for UniqueStageNames {
             };
             if !seen.insert(alias.clone()) {
                 findings.push(diagnostic(
-                    "RDL3024",
+                    "DL3024",
                     Severity::Error,
                     format!("stage alias `{alias}` is defined more than once"),
                     instruction,
@@ -893,7 +893,7 @@ impl Rule for UniqueStageNames {
 
 rule_metadata!(
     JsonEntrypoints,
-    "RDL3025",
+    "DL3025",
     "json-entrypoints",
     Severity::Warning,
     "prefer JSON form for CMD and ENTRYPOINT",
@@ -912,7 +912,7 @@ impl Rule for JsonEntrypoints {
             .filter(|instruction| !instruction.args.trim_start().starts_with('['))
             .map(|instruction| {
                 diagnostic(
-                    "RDL3025",
+                    "DL3025",
                     Severity::Warning,
                     "use exec/JSON form for CMD and ENTRYPOINT",
                     instruction,
@@ -937,7 +937,7 @@ impl Rule for JsonEntrypoints {
 
 rule_metadata!(
     TrustedRegistries,
-    "RDL3026",
+    "DL3026",
     "trusted-registries",
     Severity::Error,
     "restrict FROM images to trusted registries"
@@ -969,7 +969,7 @@ impl Rule for TrustedRegistries {
 
             if !from_image_uses_trusted_registry(&from.image, &stage_aliases, config) {
                 findings.push(diagnostic(
-                    "RDL3026",
+                    "DL3026",
                     Severity::Error,
                     format!("base image `{}` is not from a trusted registry", from.image),
                     instruction,
@@ -987,7 +987,7 @@ impl Rule for TrustedRegistries {
 
 rule_metadata!(
     UseAptGet,
-    "RDL3027",
+    "DL3027",
     "use-apt-get",
     Severity::Warning,
     "prefer apt-get or apt-cache over apt"
@@ -1005,7 +1005,7 @@ impl Rule for UseAptGet {
             .filter(|instruction| shell_uses_apt(&instruction.args))
             .map(|instruction| {
                 diagnostic(
-                    "RDL3027",
+                    "DL3027",
                     Severity::Warning,
                     "use apt-get or apt-cache instead of apt in Docker builds",
                     instruction,
@@ -1017,7 +1017,7 @@ impl Rule for UseAptGet {
 
 rule_metadata!(
     PinGemVersions,
-    "RDL3028",
+    "DL3028",
     "pin-gem-versions",
     Severity::Warning,
     "pin versions in gem install"
@@ -1035,7 +1035,7 @@ impl Rule for PinGemVersions {
             .filter(|instruction| gem_install_has_unpinned_packages(&instruction.args))
             .map(|instruction| {
                 diagnostic(
-                    "RDL3028",
+                    "DL3028",
                     Severity::Warning,
                     "pin versions in gem install",
                     instruction,
@@ -1047,7 +1047,7 @@ impl Rule for PinGemVersions {
 
 rule_metadata!(
     NoFromPlatformFlag,
-    "RDL3029",
+    "DL3029",
     "no-from-platform-flag",
     Severity::Warning,
     "avoid --platform in FROM"
@@ -1065,7 +1065,7 @@ impl Rule for NoFromPlatformFlag {
             .filter(|instruction| instruction.has_flag("platform"))
             .map(|instruction| {
                 diagnostic(
-                    "RDL3029",
+                    "DL3029",
                     Severity::Warning,
                     "avoid `--platform` in FROM; prefer build-time platform selection",
                     instruction,
@@ -1077,7 +1077,7 @@ impl Rule for NoFromPlatformFlag {
 
 rule_metadata!(
     YumInstallAssumeYes,
-    "RDL3030",
+    "DL3030",
     "yum-install-assume-yes",
     Severity::Warning,
     "use -y with yum install"
@@ -1095,7 +1095,7 @@ impl Rule for YumInstallAssumeYes {
             .filter(|instruction| yum_install_missing_yes(&instruction.args))
             .map(|instruction| {
                 diagnostic(
-                    "RDL3030",
+                    "DL3030",
                     Severity::Warning,
                     "use `yum install -y` to avoid interactive prompts",
                     instruction,
@@ -1107,7 +1107,7 @@ impl Rule for YumInstallAssumeYes {
 
 rule_metadata!(
     YumCleanAll,
-    "RDL3032",
+    "DL3032",
     "yum-clean-all",
     Severity::Info,
     "clean yum metadata after installs"
@@ -1125,7 +1125,7 @@ impl Rule for YumCleanAll {
             .filter(|instruction| yum_install_missing_clean_all(&instruction.args))
             .map(|instruction| {
                 diagnostic(
-                    "RDL3032",
+                    "DL3032",
                     Severity::Info,
                     "clean yum metadata with `yum clean all` in the same RUN layer",
                     instruction,
@@ -1137,7 +1137,7 @@ impl Rule for YumCleanAll {
 
 rule_metadata!(
     PinYumVersions,
-    "RDL3033",
+    "DL3033",
     "pin-yum-versions",
     Severity::Warning,
     "pin versions in yum install"
@@ -1155,7 +1155,7 @@ impl Rule for PinYumVersions {
             .filter(|instruction| yum_install_has_unpinned_packages(&instruction.args))
             .map(|instruction| {
                 diagnostic(
-                    "RDL3033",
+                    "DL3033",
                     Severity::Warning,
                     "pin versions in yum install",
                     instruction,
@@ -1167,7 +1167,7 @@ impl Rule for PinYumVersions {
 
 rule_metadata!(
     ZypperInstallAssumeYes,
-    "RDL3034",
+    "DL3034",
     "zypper-install-assume-yes",
     Severity::Warning,
     "use a non-interactive flag with zypper install"
@@ -1185,7 +1185,7 @@ impl Rule for ZypperInstallAssumeYes {
             .filter(|instruction| zypper_install_missing_yes(&instruction.args))
             .map(|instruction| {
                 diagnostic(
-                    "RDL3034",
+                    "DL3034",
                     Severity::Warning,
                     "use `-y`, `-n`, or `--non-interactive` with `zypper install` to avoid interactive prompts",
                     instruction,
@@ -1197,7 +1197,7 @@ impl Rule for ZypperInstallAssumeYes {
 
 rule_metadata!(
     NoZypperDistUpgrade,
-    "RDL3035",
+    "DL3035",
     "no-zypper-dist-upgrade",
     Severity::Warning,
     "avoid zypper dist-upgrade"
@@ -1215,7 +1215,7 @@ impl Rule for NoZypperDistUpgrade {
             .filter(|instruction| shell_uses_zypper_dist_upgrade(&instruction.args))
             .map(|instruction| {
                 diagnostic(
-                    "RDL3035",
+                    "DL3035",
                     Severity::Warning,
                     "avoid `zypper dist-upgrade` in Docker builds",
                     instruction,
@@ -1227,7 +1227,7 @@ impl Rule for NoZypperDistUpgrade {
 
 rule_metadata!(
     ZypperClean,
-    "RDL3036",
+    "DL3036",
     "zypper-clean",
     Severity::Warning,
     "clean zypper metadata after use"
@@ -1245,7 +1245,7 @@ impl Rule for ZypperClean {
             .filter(|instruction| zypper_use_missing_clean(&instruction.args))
             .map(|instruction| {
                 diagnostic(
-                    "RDL3036",
+                    "DL3036",
                     Severity::Warning,
                     "clean zypper metadata with `zypper clean` in the same RUN layer",
                     instruction,
@@ -1257,7 +1257,7 @@ impl Rule for ZypperClean {
 
 rule_metadata!(
     PinZypperVersions,
-    "RDL3037",
+    "DL3037",
     "pin-zypper-versions",
     Severity::Warning,
     "pin versions in zypper install"
@@ -1275,7 +1275,7 @@ impl Rule for PinZypperVersions {
             .filter(|instruction| zypper_install_has_unpinned_packages(&instruction.args))
             .map(|instruction| {
                 diagnostic(
-                    "RDL3037",
+                    "DL3037",
                     Severity::Warning,
                     "pin versions in zypper install",
                     instruction,
@@ -1287,7 +1287,7 @@ impl Rule for PinZypperVersions {
 
 rule_metadata!(
     DnfInstallAssumeYes,
-    "RDL3038",
+    "DL3038",
     "dnf-install-assume-yes",
     Severity::Warning,
     "use -y with dnf install"
@@ -1305,7 +1305,7 @@ impl Rule for DnfInstallAssumeYes {
             .filter(|instruction| dnf_install_missing_yes(&instruction.args))
             .map(|instruction| {
                 diagnostic(
-                    "RDL3038",
+                    "DL3038",
                     Severity::Warning,
                     "use `dnf install -y` to avoid interactive prompts",
                     instruction,
@@ -1317,7 +1317,7 @@ impl Rule for DnfInstallAssumeYes {
 
 rule_metadata!(
     DnfCleanAll,
-    "RDL3040",
+    "DL3040",
     "dnf-clean-all",
     Severity::Info,
     "clean dnf metadata after installs"
@@ -1335,7 +1335,7 @@ impl Rule for DnfCleanAll {
             .filter(|instruction| dnf_install_missing_clean_all(&instruction.args))
             .map(|instruction| {
                 diagnostic(
-                    "RDL3040",
+                    "DL3040",
                     Severity::Info,
                     "clean dnf metadata with `dnf clean all` in the same RUN layer",
                     instruction,
@@ -1347,7 +1347,7 @@ impl Rule for DnfCleanAll {
 
 rule_metadata!(
     PinDnfVersions,
-    "RDL3041",
+    "DL3041",
     "pin-dnf-versions",
     Severity::Warning,
     "pin versions in dnf install"
@@ -1365,7 +1365,7 @@ impl Rule for PinDnfVersions {
             .filter(|instruction| dnf_install_has_unpinned_packages(&instruction.args))
             .map(|instruction| {
                 diagnostic(
-                    "RDL3041",
+                    "DL3041",
                     Severity::Warning,
                     "pin versions in dnf install",
                     instruction,
@@ -1377,7 +1377,7 @@ impl Rule for PinDnfVersions {
 
 rule_metadata!(
     PipNoCacheDir,
-    "RDL3042",
+    "DL3042",
     "pip-no-cache-dir",
     Severity::Warning,
     "avoid pip cache directories"
@@ -1436,7 +1436,7 @@ impl Rule for PipNoCacheDir {
                         ) =>
                 {
                     findings.push(diagnostic(
-                        "RDL3042",
+                        "DL3042",
                         Severity::Warning,
                         "avoid pip cache directories by using `pip install --no-cache-dir`",
                         instruction,
@@ -1452,7 +1452,7 @@ impl Rule for PipNoCacheDir {
 
 rule_metadata!(
     NoOnbuildTrigger,
-    "RDL3043",
+    "DL3043",
     "no-onbuild-trigger",
     Severity::Error,
     "reject ONBUILD triggers for ONBUILD, FROM, or MAINTAINER"
@@ -1470,7 +1470,7 @@ impl Rule for NoOnbuildTrigger {
             .filter(|instruction| onbuild_has_disallowed_trigger(&instruction.args))
             .map(|instruction| {
                 diagnostic(
-                    "RDL3043",
+                    "DL3043",
                     Severity::Error,
                     "`ONBUILD`, `FROM`, or `MAINTAINER` triggered from within `ONBUILD` instruction",
                     instruction,
@@ -1482,7 +1482,7 @@ impl Rule for NoOnbuildTrigger {
 
 rule_metadata!(
     NoEnvSelfReference,
-    "RDL3044",
+    "DL3044",
     "no-env-self-reference",
     Severity::Error,
     "reject same-statement ENV references"
@@ -1508,7 +1508,7 @@ impl Rule for NoEnvSelfReference {
 
             if env_references_same_statement_variable(env, &known_variables) {
                 findings.push(diagnostic(
-                    "RDL3044",
+                    "DL3044",
                     Severity::Error,
                     "do not refer to an environment variable within the same `ENV` statement where it is defined",
                     instruction,
@@ -1528,7 +1528,7 @@ impl Rule for NoEnvSelfReference {
 
 rule_metadata!(
     CopyRelativeWithoutWorkdir,
-    "RDL3045",
+    "DL3045",
     "copy-relative-without-workdir",
     Severity::Warning,
     "avoid COPY to relative destinations without WORKDIR"
@@ -1594,7 +1594,7 @@ impl Rule for CopyRelativeWithoutWorkdir {
                         }) =>
                 {
                     findings.push(diagnostic(
-                        "RDL3045",
+                        "DL3045",
                         Severity::Warning,
                         "`COPY` to a relative destination without `WORKDIR` set",
                         instruction,
@@ -1610,7 +1610,7 @@ impl Rule for CopyRelativeWithoutWorkdir {
 
 rule_metadata!(
     UseraddNoLogInit,
-    "RDL3046",
+    "DL3046",
     "useradd-no-log-init",
     Severity::Warning,
     "use no-log-init with high useradd UIDs"
@@ -1630,7 +1630,7 @@ impl Rule for UseraddNoLogInit {
             .filter(|(_, shell)| useradd_missing_no_log_init(shell))
             .map(|(instruction, _)| {
                 diagnostic(
-                    "RDL3046",
+                    "DL3046",
                     Severity::Warning,
                     "`useradd` without flag `-l` and high UID will result in excessively large image",
                     instruction,
@@ -1642,7 +1642,7 @@ impl Rule for UseraddNoLogInit {
 
 rule_metadata!(
     WgetProgress,
-    "RDL3047",
+    "DL3047",
     "wget-progress",
     Severity::Info,
     "avoid noisy wget progress output"
@@ -1662,7 +1662,7 @@ impl Rule for WgetProgress {
             .filter(|(_, shell)| wget_missing_progress_control(shell))
             .map(|(instruction, _)| {
                 diagnostic(
-                    "RDL3047",
+                    "DL3047",
                     Severity::Info,
                     "avoid wget without `--progress=dot:giga`, `-q`, or `-nv`",
                     instruction,
@@ -1674,7 +1674,7 @@ impl Rule for WgetProgress {
 
 rule_metadata!(
     ValidLabelKey,
-    "RDL3048",
+    "DL3048",
     "valid-label-key",
     Severity::Style,
     "reject invalid label keys"
@@ -1696,7 +1696,7 @@ impl Rule for ValidLabelKey {
                     .filter(|pair| !is_valid_docker_label_key(&pair.key))
                 {
                     findings.push(diagnostic(
-                        "RDL3048",
+                        "DL3048",
                         Severity::Style,
                         format!("invalid label key `{}`", pair.key),
                         instruction,
@@ -1711,7 +1711,7 @@ impl Rule for ValidLabelKey {
 
 rule_metadata!(
     MissingRequiredLabels,
-    "RDL3049",
+    "DL3049",
     "missing-required-labels",
     Severity::Info,
     "require configured labels"
@@ -1737,7 +1737,7 @@ impl Rule for MissingRequiredLabels {
 
 rule_metadata!(
     NoSuperfluousLabels,
-    "RDL3050",
+    "DL3050",
     "no-superfluous-labels",
     Severity::Info,
     "reject labels outside the configured label schema"
@@ -1769,7 +1769,7 @@ impl Rule for NoSuperfluousLabels {
             })
             .map(|instruction| {
                 diagnostic(
-                    "RDL3050",
+                    "DL3050",
                     Severity::Info,
                     "superfluous label(s) present",
                     instruction,
@@ -1781,7 +1781,7 @@ impl Rule for NoSuperfluousLabels {
 
 rule_metadata!(
     NoEmptyLabels,
-    "RDL3051",
+    "DL3051",
     "no-empty-labels",
     Severity::Warning,
     "reject empty configured label values"
@@ -1810,7 +1810,7 @@ impl Rule for NoEmptyLabels {
                         && docker_label_value_is_empty(&pair.value)
                 }) {
                     findings.push(diagnostic(
-                        "RDL3051",
+                        "DL3051",
                         Severity::Warning,
                         format!("configured label `{}` value is empty", pair.key),
                         instruction,
@@ -1825,7 +1825,7 @@ impl Rule for NoEmptyLabels {
 
 rule_metadata!(
     ValidUrlLabels,
-    "RDL3052",
+    "DL3052",
     "valid-url-labels",
     Severity::Warning,
     "validate URL label values"
@@ -1861,7 +1861,7 @@ impl Rule for ValidUrlLabels {
             })
             .map(|instruction| {
                 diagnostic(
-                    "RDL3052",
+                    "DL3052",
                     Severity::Warning,
                     "configured URL label is not a valid URL",
                     instruction,
@@ -1873,7 +1873,7 @@ impl Rule for ValidUrlLabels {
 
 rule_metadata!(
     ValidRfc3339Labels,
-    "RDL3053",
+    "DL3053",
     "valid-rfc3339-labels",
     Severity::Warning,
     "validate RFC3339 label values"
@@ -1909,7 +1909,7 @@ impl Rule for ValidRfc3339Labels {
             })
             .map(|instruction| {
                 diagnostic(
-                    "RDL3053",
+                    "DL3053",
                     Severity::Warning,
                     "configured RFC3339 label is not a valid timestamp",
                     instruction,
@@ -1921,7 +1921,7 @@ impl Rule for ValidRfc3339Labels {
 
 rule_metadata!(
     ValidSpdxLabels,
-    "RDL3054",
+    "DL3054",
     "valid-spdx-labels",
     Severity::Warning,
     "validate SPDX license label values"
@@ -1957,7 +1957,7 @@ impl Rule for ValidSpdxLabels {
             })
             .map(|instruction| {
                 diagnostic(
-                    "RDL3054",
+                    "DL3054",
                     Severity::Warning,
                     "configured SPDX label is not a valid SPDX expression",
                     instruction,
@@ -1969,7 +1969,7 @@ impl Rule for ValidSpdxLabels {
 
 rule_metadata!(
     ValidGitHashLabels,
-    "RDL3055",
+    "DL3055",
     "valid-git-hash-labels",
     Severity::Warning,
     "validate git hash label values"
@@ -2005,7 +2005,7 @@ impl Rule for ValidGitHashLabels {
             })
             .map(|instruction| {
                 diagnostic(
-                    "RDL3055",
+                    "DL3055",
                     Severity::Warning,
                     "configured git hash label is not a valid git hash",
                     instruction,
@@ -2017,7 +2017,7 @@ impl Rule for ValidGitHashLabels {
 
 rule_metadata!(
     ValidSemverLabels,
-    "RDL3056",
+    "DL3056",
     "valid-semver-labels",
     Severity::Warning,
     "validate semantic version label values"
@@ -2053,7 +2053,7 @@ impl Rule for ValidSemverLabels {
             })
             .map(|instruction| {
                 diagnostic(
-                    "RDL3056",
+                    "DL3056",
                     Severity::Warning,
                     "configured semantic version label is not valid semver",
                     instruction,
@@ -2065,7 +2065,7 @@ impl Rule for ValidSemverLabels {
 
 rule_metadata!(
     MissingHealthcheck,
-    "RDL3057",
+    "DL3057",
     "missing-healthcheck",
     Severity::Ignore,
     "require HEALTHCHECK instructions"
@@ -2082,7 +2082,7 @@ impl Rule for MissingHealthcheck {
 
     fn check_with_config(&self, doc: &Dockerfile, config: &Config) -> Vec<Finding> {
         if config
-            .severity_override("RDL3057")
+            .severity_override("DL3057")
             .is_none_or(|severity| severity == Severity::Ignore)
         {
             return Vec::new();
@@ -2094,7 +2094,7 @@ impl Rule for MissingHealthcheck {
 
 rule_metadata!(
     ValidEmailLabels,
-    "RDL3058",
+    "DL3058",
     "valid-email-labels",
     Severity::Warning,
     "validate email label values"
@@ -2130,7 +2130,7 @@ impl Rule for ValidEmailLabels {
             })
             .map(|instruction| {
                 diagnostic(
-                    "RDL3058",
+                    "DL3058",
                     Severity::Warning,
                     "configured email label is not a valid email address",
                     instruction,
@@ -2142,7 +2142,7 @@ impl Rule for ValidEmailLabels {
 
 rule_metadata!(
     ConsecutiveRun,
-    "RDL3059",
+    "DL3059",
     "consecutive-run",
     Severity::Info,
     "combine consecutive RUN instructions"
@@ -2167,7 +2167,7 @@ impl Rule for ConsecutiveRun {
                 && consecutive_run_instructions_should_be_combined(previous, instruction)
             {
                 findings.push(diagnostic(
-                    "RDL3059",
+                    "DL3059",
                     Severity::Info,
                     "combine consecutive RUN instructions to reduce image layers",
                     instruction,
@@ -2183,7 +2183,7 @@ impl Rule for ConsecutiveRun {
 
 rule_metadata!(
     YarnCacheClean,
-    "RDL3060",
+    "DL3060",
     "yarn-cache-clean",
     Severity::Info,
     "clean yarn cache after yarn install"
@@ -2202,7 +2202,7 @@ impl Rule for YarnCacheClean {
             })
             .map(|instruction| {
                 diagnostic(
-                    "RDL3060",
+                    "DL3060",
                     Severity::Info,
                     "`yarn cache clean` missing after `yarn install` was run",
                     instruction,
@@ -2214,7 +2214,7 @@ impl Rule for YarnCacheClean {
 
 rule_metadata!(
     InstructionOrder,
-    "RDL3061",
+    "DL3061",
     "instruction-order",
     Severity::Error,
     "require Dockerfiles to begin with FROM, ARG, or comments"
@@ -2237,7 +2237,7 @@ impl Rule for InstructionOrder {
                 "ARG" if !seen_from => None,
                 _ if seen_from => None,
                 _ => Some(diagnostic(
-                    "RDL3061",
+                    "DL3061",
                     Severity::Error,
                     "Dockerfile must begin with FROM, ARG, or comment",
                     instruction,
@@ -2249,7 +2249,7 @@ impl Rule for InstructionOrder {
 
 rule_metadata!(
     PinGoVersions,
-    "RDL3062",
+    "DL3062",
     "pin-go-versions",
     Severity::Warning,
     "pin Go package versions"
@@ -2268,7 +2268,7 @@ impl Rule for PinGoVersions {
             })
             .map(|instruction| {
                 diagnostic(
-                    "RDL3062",
+                    "DL3062",
                     Severity::Warning,
                     "pin versions in go package commands",
                     instruction,
@@ -2280,7 +2280,7 @@ impl Rule for PinGoVersions {
 
 rule_metadata!(
     ReservedStageName,
-    "RDL3063",
+    "DL3063",
     "reserved-stage-name",
     Severity::Warning,
     "avoid reserved stage names"
@@ -2306,7 +2306,7 @@ impl Rule for ReservedStageName {
             })
             .map(|instruction| {
                 diagnostic(
-                    "RDL3063",
+                    "DL3063",
                     Severity::Warning,
                     "stage name should not be a reserved word",
                     instruction,
@@ -2318,7 +2318,7 @@ impl Rule for ReservedStageName {
 
 rule_metadata!(
     DeprecatedMaintainer,
-    "RDL4000",
+    "DL4000",
     "deprecated-maintainer",
     Severity::Error,
     "reject deprecated MAINTAINER instructions",
@@ -2336,7 +2336,7 @@ impl Rule for DeprecatedMaintainer {
             .filter(|instruction| instruction.keyword == "MAINTAINER")
             .map(|instruction| {
                 diagnostic(
-                    "RDL4000",
+                    "DL4000",
                     Severity::Error,
                     "use OCI labels instead of MAINTAINER",
                     instruction,
@@ -2373,7 +2373,7 @@ impl Rule for DeprecatedMaintainer {
 
 rule_metadata!(
     EitherWgetOrCurl,
-    "RDL4001",
+    "DL4001",
     "either-wget-or-curl",
     Severity::Warning,
     "use either wget or curl in a stage"
@@ -2412,7 +2412,7 @@ impl Rule for EitherWgetOrCurl {
 
             if seen_curl && seen_wget && !mixed_tools_reported {
                 findings.push(diagnostic(
-                    "RDL4001",
+                    "DL4001",
                     Severity::Warning,
                     "either use wget or curl but not both",
                     instruction,
@@ -2427,7 +2427,7 @@ impl Rule for EitherWgetOrCurl {
 
 rule_metadata!(
     UseShellForDefaultShell,
-    "RDL4005",
+    "DL4005",
     "use-shell-for-default-shell",
     Severity::Warning,
     "use SHELL to change the default shell"
@@ -2446,7 +2446,7 @@ impl Rule for UseShellForDefaultShell {
             })
             .map(|instruction| {
                 diagnostic(
-                    "RDL4005",
+                    "DL4005",
                     Severity::Warning,
                     "use SHELL to change the default shell",
                     instruction,
@@ -2458,7 +2458,7 @@ impl Rule for UseShellForDefaultShell {
 
 rule_metadata!(
     PipefailBeforePipe,
-    "RDL4006",
+    "DL4006",
     "pipefail-before-pipe",
     Severity::Warning,
     "set pipefail before RUN instructions with pipes"
@@ -2479,7 +2479,7 @@ impl Rule for PipefailBeforePipe {
                 "SHELL" => shell_handles_pipes = shell_instruction_handles_pipes(instruction),
                 "RUN" if !shell_handles_pipes && run_has_pipe(instruction) => {
                     findings.push(diagnostic(
-                        "RDL4006",
+                        "DL4006",
                         Severity::Warning,
                         "set the SHELL option -o pipefail before RUN with a pipe in it",
                         instruction,
@@ -2495,7 +2495,7 @@ impl Rule for PipefailBeforePipe {
 
 rule_metadata!(
     SingleCmd,
-    "RDL4003",
+    "DL4003",
     "single-cmd",
     Severity::Warning,
     "allow only one CMD instruction"
@@ -2510,7 +2510,7 @@ impl Rule for SingleCmd {
         duplicates(
             doc,
             "CMD",
-            "RDL4003",
+            "DL4003",
             Severity::Warning,
             "only the final CMD is used",
         )
@@ -2519,7 +2519,7 @@ impl Rule for SingleCmd {
 
 rule_metadata!(
     SingleEntrypoint,
-    "RDL4004",
+    "DL4004",
     "single-entrypoint",
     Severity::Error,
     "allow only one ENTRYPOINT instruction"
@@ -2534,7 +2534,7 @@ impl Rule for SingleEntrypoint {
         duplicates(
             doc,
             "ENTRYPOINT",
-            "RDL4004",
+            "DL4004",
             Severity::Error,
             "only the final ENTRYPOINT is used",
         )
@@ -3580,7 +3580,7 @@ fn missing_healthcheck_findings(doc: &Dockerfile) -> Vec<Finding> {
         .filter_map(|(_, stage)| doc.instructions.get(stage.instruction_index))
         .map(|instruction| {
             diagnostic(
-                "RDL3057",
+                "DL3057",
                 Severity::Ignore,
                 "HEALTHCHECK instruction is missing",
                 instruction,
@@ -3675,7 +3675,7 @@ fn missing_required_labels(doc: &Dockerfile, config: &Config) -> Vec<Finding> {
                 .unwrap_or(1);
             required.difference(labels).map(move |label| {
                 Finding::new(
-                    "RDL3049",
+                    "DL3049",
                     Severity::Info,
                     format!("Label `{label}` is missing"),
                     line,

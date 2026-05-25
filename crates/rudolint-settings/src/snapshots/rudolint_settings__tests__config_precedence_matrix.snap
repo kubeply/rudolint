@@ -5,12 +5,12 @@ expression: snapshot
 {
   "discovered_config_error": true,
   "explicit_config": {
-    "ignores_rdl3000": false,
-    "ignores_rdl3007": true,
+    "ignores_dl3000": false,
+    "ignores_dl3007": true,
     "path": "explicit.yaml"
   },
   "no_config": {
-    "ignores_rdl3000": false,
+    "ignores_dl3000": false,
     "path": null
   }
 }

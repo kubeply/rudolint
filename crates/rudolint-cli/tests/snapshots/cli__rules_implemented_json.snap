@@ -1,8 +1,405 @@
 ---
 source: crates/rudolint-cli/tests/cli.rs
+assertion_line: 892
 expression: normalized_json(&output)
 ---
 [
+  {
+    "code": "DL3000",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "require absolute WORKDIR paths"
+  },
+  {
+    "code": "DL3001",
+    "severity": "info",
+    "status": "implemented",
+    "summary": "avoid commands that rarely make sense during Docker builds"
+  },
+  {
+    "code": "DL3002",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "require the final USER to be non-root"
+  },
+  {
+    "code": "DL3003",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "prefer WORKDIR over RUN cd"
+  },
+  {
+    "code": "DL3004",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "avoid sudo in Docker builds"
+  },
+  {
+    "code": "DL3006",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "require explicit image tags in FROM"
+  },
+  {
+    "code": "DL3007",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "reject latest base image tags"
+  },
+  {
+    "code": "DL3008",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "pin versions in apt-get install"
+  },
+  {
+    "code": "DL3009",
+    "severity": "info",
+    "status": "implemented",
+    "summary": "delete apt-get package lists after use"
+  },
+  {
+    "code": "DL3010",
+    "severity": "info",
+    "status": "implemented",
+    "summary": "use ADD for extracting local archives"
+  },
+  {
+    "code": "DL3011",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "validate EXPOSE port numbers"
+  },
+  {
+    "code": "DL3012",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "allow only one HEALTHCHECK instruction"
+  },
+  {
+    "code": "DL3013",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "pin versions in pip install"
+  },
+  {
+    "code": "DL3014",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "use -y with apt-get install"
+  },
+  {
+    "code": "DL3015",
+    "severity": "info",
+    "status": "implemented",
+    "summary": "avoid recommended packages in apt-get install"
+  },
+  {
+    "code": "DL3016",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "pin versions in npm install"
+  },
+  {
+    "code": "DL3018",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "pin versions in apk add"
+  },
+  {
+    "code": "DL3019",
+    "severity": "info",
+    "status": "implemented",
+    "summary": "use --no-cache with apk add"
+  },
+  {
+    "code": "DL3020",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "prefer COPY for plain local files"
+  },
+  {
+    "code": "DL3021",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "require trailing slash for COPY destinations with multiple sources"
+  },
+  {
+    "code": "DL3022",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "require COPY --from references to resolve to previous build stages"
+  },
+  {
+    "code": "DL3023",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "forbid COPY --from references to the current stage"
+  },
+  {
+    "code": "DL3024",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "require unique multi-stage aliases"
+  },
+  {
+    "code": "DL3025",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "prefer JSON form for CMD and ENTRYPOINT"
+  },
+  {
+    "code": "DL3026",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "restrict FROM images to trusted registries"
+  },
+  {
+    "code": "DL3027",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "prefer apt-get or apt-cache over apt"
+  },
+  {
+    "code": "DL3028",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "pin versions in gem install"
+  },
+  {
+    "code": "DL3029",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "avoid --platform in FROM"
+  },
+  {
+    "code": "DL3030",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "use -y with yum install"
+  },
+  {
+    "code": "DL3032",
+    "severity": "info",
+    "status": "implemented",
+    "summary": "clean yum metadata after installs"
+  },
+  {
+    "code": "DL3033",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "pin versions in yum install"
+  },
+  {
+    "code": "DL3034",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "use a non-interactive flag with zypper install"
+  },
+  {
+    "code": "DL3035",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "avoid zypper dist-upgrade"
+  },
+  {
+    "code": "DL3036",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "clean zypper metadata after use"
+  },
+  {
+    "code": "DL3037",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "pin versions in zypper install"
+  },
+  {
+    "code": "DL3038",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "use -y with dnf install"
+  },
+  {
+    "code": "DL3040",
+    "severity": "info",
+    "status": "implemented",
+    "summary": "clean dnf metadata after installs"
+  },
+  {
+    "code": "DL3041",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "pin versions in dnf install"
+  },
+  {
+    "code": "DL3042",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "avoid pip cache directories"
+  },
+  {
+    "code": "DL3043",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "reject ONBUILD triggers for ONBUILD, FROM, or MAINTAINER"
+  },
+  {
+    "code": "DL3044",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "reject same-statement ENV references"
+  },
+  {
+    "code": "DL3045",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "avoid COPY to relative destinations without WORKDIR"
+  },
+  {
+    "code": "DL3046",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "use no-log-init with high useradd UIDs"
+  },
+  {
+    "code": "DL3047",
+    "severity": "info",
+    "status": "implemented",
+    "summary": "avoid noisy wget progress output"
+  },
+  {
+    "code": "DL3048",
+    "severity": "style",
+    "status": "implemented",
+    "summary": "reject invalid label keys"
+  },
+  {
+    "code": "DL3049",
+    "severity": "info",
+    "status": "implemented",
+    "summary": "require configured labels"
+  },
+  {
+    "code": "DL3050",
+    "severity": "info",
+    "status": "implemented",
+    "summary": "reject labels outside the configured label schema"
+  },
+  {
+    "code": "DL3051",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "reject empty configured label values"
+  },
+  {
+    "code": "DL3052",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "validate URL label values"
+  },
+  {
+    "code": "DL3053",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "validate RFC3339 label values"
+  },
+  {
+    "code": "DL3054",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "validate SPDX license label values"
+  },
+  {
+    "code": "DL3055",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "validate git hash label values"
+  },
+  {
+    "code": "DL3056",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "validate semantic version label values"
+  },
+  {
+    "code": "DL3057",
+    "severity": "ignore",
+    "status": "implemented",
+    "summary": "require HEALTHCHECK instructions"
+  },
+  {
+    "code": "DL3058",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "validate email label values"
+  },
+  {
+    "code": "DL3059",
+    "severity": "info",
+    "status": "implemented",
+    "summary": "combine consecutive RUN instructions"
+  },
+  {
+    "code": "DL3060",
+    "severity": "info",
+    "status": "implemented",
+    "summary": "clean yarn cache after yarn install"
+  },
+  {
+    "code": "DL3061",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "require Dockerfiles to begin with FROM, ARG, or comments"
+  },
+  {
+    "code": "DL3062",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "pin Go package versions"
+  },
+  {
+    "code": "DL3063",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "avoid reserved stage names"
+  },
+  {
+    "code": "DL4000",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "reject deprecated MAINTAINER instructions"
+  },
+  {
+    "code": "DL4001",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "use either wget or curl in a stage"
+  },
+  {
+    "code": "DL4003",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "allow only one CMD instruction"
+  },
+  {
+    "code": "DL4004",
+    "severity": "error",
+    "status": "implemented",
+    "summary": "allow only one ENTRYPOINT instruction"
+  },
+  {
+    "code": "DL4005",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "use SHELL to change the default shell"
+  },
+  {
+    "code": "DL4006",
+    "severity": "warning",
+    "status": "implemented",
+    "summary": "set pipefail before RUN instructions with pipes"
+  },
   {
     "code": "RDK1000",
     "severity": "info",
@@ -70,445 +467,49 @@ expression: normalized_json(&output)
     "summary": "require a new enough Dockerfile frontend for used syntax"
   },
   {
-    "code": "RDL1001",
+    "code": "RUD1001",
     "severity": "warning",
     "status": "implemented",
     "summary": "warn on legacy external linter suppression comments"
   },
   {
-    "code": "RDL3000",
-    "severity": "error",
-    "status": "implemented",
-    "summary": "require absolute WORKDIR paths"
-  },
-  {
-    "code": "RDL3001",
-    "severity": "info",
-    "status": "implemented",
-    "summary": "avoid commands that rarely make sense during Docker builds"
-  },
-  {
-    "code": "RDL3002",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "require the final USER to be non-root"
-  },
-  {
-    "code": "RDL3003",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "prefer WORKDIR over RUN cd"
-  },
-  {
-    "code": "RDL3004",
-    "severity": "error",
-    "status": "implemented",
-    "summary": "avoid sudo in Docker builds"
-  },
-  {
-    "code": "RDL3006",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "require explicit image tags in FROM"
-  },
-  {
-    "code": "RDL3007",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "reject latest base image tags"
-  },
-  {
-    "code": "RDL3008",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "pin versions in apt-get install"
-  },
-  {
-    "code": "RDL3009",
-    "severity": "info",
-    "status": "implemented",
-    "summary": "delete apt-get package lists after use"
-  },
-  {
-    "code": "RDL3010",
-    "severity": "info",
-    "status": "implemented",
-    "summary": "use ADD for extracting local archives"
-  },
-  {
-    "code": "RDL3011",
-    "severity": "error",
-    "status": "implemented",
-    "summary": "validate EXPOSE port numbers"
-  },
-  {
-    "code": "RDL3012",
-    "severity": "error",
-    "status": "implemented",
-    "summary": "allow only one HEALTHCHECK instruction"
-  },
-  {
-    "code": "RDL3013",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "pin versions in pip install"
-  },
-  {
-    "code": "RDL3014",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "use -y with apt-get install"
-  },
-  {
-    "code": "RDL3015",
-    "severity": "info",
-    "status": "implemented",
-    "summary": "avoid recommended packages in apt-get install"
-  },
-  {
-    "code": "RDL3016",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "pin versions in npm install"
-  },
-  {
-    "code": "RDL3018",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "pin versions in apk add"
-  },
-  {
-    "code": "RDL3019",
-    "severity": "info",
-    "status": "implemented",
-    "summary": "use --no-cache with apk add"
-  },
-  {
-    "code": "RDL3020",
-    "severity": "error",
-    "status": "implemented",
-    "summary": "prefer COPY for plain local files"
-  },
-  {
-    "code": "RDL3021",
-    "severity": "error",
-    "status": "implemented",
-    "summary": "require trailing slash for COPY destinations with multiple sources"
-  },
-  {
-    "code": "RDL3022",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "require COPY --from references to resolve to previous build stages"
-  },
-  {
-    "code": "RDL3023",
-    "severity": "error",
-    "status": "implemented",
-    "summary": "forbid COPY --from references to the current stage"
-  },
-  {
-    "code": "RDL3024",
-    "severity": "error",
-    "status": "implemented",
-    "summary": "require unique multi-stage aliases"
-  },
-  {
-    "code": "RDL3025",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "prefer JSON form for CMD and ENTRYPOINT"
-  },
-  {
-    "code": "RDL3026",
-    "severity": "error",
-    "status": "implemented",
-    "summary": "restrict FROM images to trusted registries"
-  },
-  {
-    "code": "RDL3027",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "prefer apt-get or apt-cache over apt"
-  },
-  {
-    "code": "RDL3028",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "pin versions in gem install"
-  },
-  {
-    "code": "RDL3029",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "avoid --platform in FROM"
-  },
-  {
-    "code": "RDL3030",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "use -y with yum install"
-  },
-  {
-    "code": "RDL3032",
-    "severity": "info",
-    "status": "implemented",
-    "summary": "clean yum metadata after installs"
-  },
-  {
-    "code": "RDL3033",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "pin versions in yum install"
-  },
-  {
-    "code": "RDL3034",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "use a non-interactive flag with zypper install"
-  },
-  {
-    "code": "RDL3035",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "avoid zypper dist-upgrade"
-  },
-  {
-    "code": "RDL3036",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "clean zypper metadata after use"
-  },
-  {
-    "code": "RDL3037",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "pin versions in zypper install"
-  },
-  {
-    "code": "RDL3038",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "use -y with dnf install"
-  },
-  {
-    "code": "RDL3040",
-    "severity": "info",
-    "status": "implemented",
-    "summary": "clean dnf metadata after installs"
-  },
-  {
-    "code": "RDL3041",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "pin versions in dnf install"
-  },
-  {
-    "code": "RDL3042",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "avoid pip cache directories"
-  },
-  {
-    "code": "RDL3043",
-    "severity": "error",
-    "status": "implemented",
-    "summary": "reject ONBUILD triggers for ONBUILD, FROM, or MAINTAINER"
-  },
-  {
-    "code": "RDL3044",
-    "severity": "error",
-    "status": "implemented",
-    "summary": "reject same-statement ENV references"
-  },
-  {
-    "code": "RDL3045",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "avoid COPY to relative destinations without WORKDIR"
-  },
-  {
-    "code": "RDL3046",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "use no-log-init with high useradd UIDs"
-  },
-  {
-    "code": "RDL3047",
-    "severity": "info",
-    "status": "implemented",
-    "summary": "avoid noisy wget progress output"
-  },
-  {
-    "code": "RDL3048",
-    "severity": "style",
-    "status": "implemented",
-    "summary": "reject invalid label keys"
-  },
-  {
-    "code": "RDL3049",
-    "severity": "info",
-    "status": "implemented",
-    "summary": "require configured labels"
-  },
-  {
-    "code": "RDL3050",
-    "severity": "info",
-    "status": "implemented",
-    "summary": "reject labels outside the configured label schema"
-  },
-  {
-    "code": "RDL3051",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "reject empty configured label values"
-  },
-  {
-    "code": "RDL3052",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "validate URL label values"
-  },
-  {
-    "code": "RDL3053",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "validate RFC3339 label values"
-  },
-  {
-    "code": "RDL3054",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "validate SPDX license label values"
-  },
-  {
-    "code": "RDL3055",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "validate git hash label values"
-  },
-  {
-    "code": "RDL3056",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "validate semantic version label values"
-  },
-  {
-    "code": "RDL3057",
-    "severity": "ignore",
-    "status": "implemented",
-    "summary": "require HEALTHCHECK instructions"
-  },
-  {
-    "code": "RDL3058",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "validate email label values"
-  },
-  {
-    "code": "RDL3059",
-    "severity": "info",
-    "status": "implemented",
-    "summary": "combine consecutive RUN instructions"
-  },
-  {
-    "code": "RDL3060",
-    "severity": "info",
-    "status": "implemented",
-    "summary": "clean yarn cache after yarn install"
-  },
-  {
-    "code": "RDL3061",
-    "severity": "error",
-    "status": "implemented",
-    "summary": "require Dockerfiles to begin with FROM, ARG, or comments"
-  },
-  {
-    "code": "RDL3062",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "pin Go package versions"
-  },
-  {
-    "code": "RDL3063",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "avoid reserved stage names"
-  },
-  {
-    "code": "RDL4000",
-    "severity": "error",
-    "status": "implemented",
-    "summary": "reject deprecated MAINTAINER instructions"
-  },
-  {
-    "code": "RDL4001",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "use either wget or curl in a stage"
-  },
-  {
-    "code": "RDL4003",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "allow only one CMD instruction"
-  },
-  {
-    "code": "RDL4004",
-    "severity": "error",
-    "status": "implemented",
-    "summary": "allow only one ENTRYPOINT instruction"
-  },
-  {
-    "code": "RDL4005",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "use SHELL to change the default shell"
-  },
-  {
-    "code": "RDL4006",
-    "severity": "warning",
-    "status": "implemented",
-    "summary": "set pipefail before RUN instructions with pipes"
-  },
-  {
-    "code": "RSC2002",
+    "code": "SC2002",
     "severity": "warning",
     "status": "implemented",
     "summary": "avoid piping cat output when the next command can read files directly"
   },
   {
-    "code": "RSC2015",
+    "code": "SC2015",
     "severity": "warning",
     "status": "implemented",
     "summary": "avoid using A && B || C as a conditional expression"
   },
   {
-    "code": "RSC2046",
+    "code": "SC2046",
     "severity": "warning",
     "status": "implemented",
     "summary": "quote command substitutions to prevent word splitting"
   },
   {
-    "code": "RSC2086",
+    "code": "SC2086",
     "severity": "warning",
     "status": "implemented",
     "summary": "quote variable expansions to prevent word splitting and globbing"
   },
   {
-    "code": "RSC2155",
+    "code": "SC2155",
     "severity": "warning",
     "status": "implemented",
     "summary": "declare and assign separately to avoid masking command failures"
   },
   {
-    "code": "RSC2164",
+    "code": "SC2164",
     "severity": "warning",
     "status": "implemented",
     "summary": "check cd exit status before running more commands"
   },
   {
-    "code": "RSC2181",
+    "code": "SC2181",
     "severity": "warning",
     "status": "implemented",
     "summary": "check command exit status directly instead of testing $?"

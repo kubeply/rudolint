@@ -61,7 +61,7 @@ This layer is intentionally thin at the baseline stage.
 deterministic and must not perform network or filesystem access unless the CLI
 explicitly enables repository-wide analysis.
 
-Compatibility rules live under `RDL` and `RSC`. BuildKit-native rules live under
+Hadolint-compatible rules live under `DL`, ShellCheck-style rules live under `SC`, and BuildKit-native rules live under
 `RDK`.
 
 ## Output

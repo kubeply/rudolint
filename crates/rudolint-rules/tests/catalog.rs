@@ -150,7 +150,7 @@ fn planned_shell_rules_stay_out_of_implemented_matrix() {
 
     for rule in catalog
         .iter()
-        .filter(|rule| rule.status == RuleStatus::Planned && rule.code.starts_with("RSC"))
+        .filter(|rule| rule.status == RuleStatus::Planned && rule.code.starts_with("SC"))
     {
         assert!(
             !implemented_matrix_codes.contains(rule.code),
@@ -213,7 +213,11 @@ fn documented_rule_codes() -> BTreeSet<String> {
         .filter_map(|entry| {
             let path = entry.expect("rules docs entry should be readable").path();
             let stem = path.file_stem()?.to_str()?;
-            (stem.starts_with("RD") || stem.starts_with("RS")).then(|| stem.to_string())
+            (stem.starts_with("DL")
+                || stem.starts_with("SC")
+                || stem.starts_with("RDK")
+                || stem.starts_with("RUD"))
+            .then(|| stem.to_string())
         })
         .collect()
 }

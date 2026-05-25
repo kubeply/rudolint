@@ -1,0 +1,87 @@
+---
+source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 724
+expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
+---
+[
+  {
+    "code": "DL3041",
+    "help": null,
+    "labels": [],
+    "message": "pin versions in dnf install",
+    "path": "",
+    "primary_span": {
+      "end_byte": 38,
+      "end_column": 24,
+      "end_line": 2,
+      "start_byte": 15,
+      "start_column": 1,
+      "start_line": 2
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3041",
+    "help": null,
+    "labels": [],
+    "message": "pin versions in dnf install",
+    "path": "",
+    "primary_span": {
+      "end_byte": 103,
+      "end_column": 35,
+      "end_line": 4,
+      "start_byte": 69,
+      "start_column": 1,
+      "start_line": 4
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3041",
+    "help": null,
+    "labels": [],
+    "message": "pin versions in dnf install",
+    "path": "",
+    "primary_span": {
+      "end_byte": 177,
+      "end_column": 34,
+      "end_line": 6,
+      "start_byte": 144,
+      "start_column": 1,
+      "start_line": 6
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3041",
+    "help": null,
+    "labels": [],
+    "message": "pin versions in dnf install",
+    "path": "",
+    "primary_span": {
+      "end_byte": 261,
+      "end_column": 35,
+      "end_line": 9,
+      "start_byte": 227,
+      "start_column": 1,
+      "start_line": 9
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3041",
+    "help": null,
+    "labels": [],
+    "message": "pin versions in dnf install",
+    "path": "",
+    "primary_span": {
+      "end_byte": 283,
+      "end_column": 22,
+      "end_line": 10,
+      "start_byte": 262,
+      "start_column": 1,
+      "start_line": 10
+    },
+    "severity": "warning"
+  }
+]

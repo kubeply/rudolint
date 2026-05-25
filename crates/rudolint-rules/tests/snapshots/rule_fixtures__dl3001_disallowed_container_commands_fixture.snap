@@ -1,0 +1,103 @@
+---
+source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 83
+expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
+---
+[
+  {
+    "code": "DL3001",
+    "help": null,
+    "labels": [],
+    "message": "avoid running `ssh` in Docker build containers",
+    "path": "",
+    "primary_span": {
+      "end_byte": 34,
+      "end_column": 18,
+      "end_line": 2,
+      "start_byte": 17,
+      "start_column": 1,
+      "start_line": 2
+    },
+    "severity": "info"
+  },
+  {
+    "code": "DL3001",
+    "help": null,
+    "labels": [],
+    "message": "avoid running `vim` in Docker build containers",
+    "path": "",
+    "primary_span": {
+      "end_byte": 85,
+      "end_column": 24,
+      "end_line": 4,
+      "start_byte": 62,
+      "start_column": 1,
+      "start_line": 4
+    },
+    "severity": "info"
+  },
+  {
+    "code": "DL3001",
+    "help": null,
+    "labels": [],
+    "message": "avoid running `service` in Docker build containers",
+    "path": "",
+    "primary_span": {
+      "end_byte": 126,
+      "end_column": 41,
+      "end_line": 5,
+      "start_byte": 86,
+      "start_column": 1,
+      "start_line": 5
+    },
+    "severity": "info"
+  },
+  {
+    "code": "DL3001",
+    "help": null,
+    "labels": [],
+    "message": "avoid running `ps` in Docker build containers",
+    "path": "",
+    "primary_span": {
+      "end_byte": 150,
+      "end_column": 24,
+      "end_line": 6,
+      "start_byte": 127,
+      "start_column": 1,
+      "start_line": 6
+    },
+    "severity": "info"
+  },
+  {
+    "code": "DL3001",
+    "help": null,
+    "labels": [],
+    "message": "avoid running `mount` in Docker build containers",
+    "path": "",
+    "primary_span": {
+      "end_byte": 210,
+      "end_column": 39,
+      "end_line": 8,
+      "start_byte": 172,
+      "start_column": 1,
+      "start_line": 8
+    },
+    "severity": "info"
+  },
+  {
+    "code": "DL3001",
+    "help": null,
+    "labels": [],
+    "message": "avoid running `ifconfig` in Docker build containers",
+    "path": "",
+    "primary_span": {
+      "end_byte": 210,
+      "end_column": 39,
+      "end_line": 8,
+      "start_byte": 172,
+      "start_column": 1,
+      "start_line": 8
+    },
+    "severity": "info"
+  }
+]

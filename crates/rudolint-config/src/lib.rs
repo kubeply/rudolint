@@ -74,7 +74,7 @@ impl Config {
     /// Returns true when `code` is selected by configuration.
     ///
     /// An empty select list means all rules selected by the active profile are enabled.
-    /// Entries may be exact rule codes such as `RDL3000` or prefixes such as `RDK`.
+    /// Entries may be exact rule codes such as `DL3000` or prefixes such as `RDK`.
     pub fn selects(&self, code: &str) -> bool {
         self.select.is_empty() || code_matches_any(code, &self.select)
     }
@@ -245,13 +245,13 @@ mod tests {
         let config = serde_yaml::from_str::<Config>(
             r#"
 select:
-  - RDL
+  - DL
 ignore:
-  - RDL1001
+  - RUD1001
 extend-ignore:
-  - RDL3007
+  - DL3007
 severity:
-  RDL3000: error
+  DL3000: error
 trusted-registries:
   - ghcr.io
 label-schema:
@@ -262,17 +262,17 @@ allow-entitlements:
   - security.insecure
 per-file-ignores:
   fixtures/**:
-    - RDL3000
+    - DL3000
 "#,
         )
         .expect("config should parse");
 
-        assert!(config.select.contains("RDL"));
-        assert!(config.selects("RDL3000"));
+        assert!(config.select.contains("DL"));
+        assert!(config.selects("DL3000"));
         assert!(!config.selects("RDK1000"));
-        assert!(config.ignores("RDL1001"));
-        assert!(config.ignores("RDL3007"));
-        assert_eq!(config.severity_override("RDL3000"), Some(Severity::Error));
+        assert!(config.ignores("RUD1001"));
+        assert!(config.ignores("DL3007"));
+        assert_eq!(config.severity_override("DL3000"), Some(Severity::Error));
         assert_eq!(config.trusted_registries, ["ghcr.io"]);
         assert_eq!(
             config.label_schema["org.opencontainers.image.title"],
@@ -284,9 +284,9 @@ per-file-ignores:
         );
         assert!(config.strict_labels);
         assert!(config.allow_entitlements.contains("security.insecure"));
-        assert!(config.per_file_ignores["fixtures/**"].contains("RDL3000"));
-        assert!(config.ignores_for_path("RDL3000", Path::new("fixtures/rules/Dockerfile")));
-        assert!(!config.ignores_for_path("RDL3000", Path::new("src/Dockerfile")));
+        assert!(config.per_file_ignores["fixtures/**"].contains("DL3000"));
+        assert!(config.ignores_for_path("DL3000", Path::new("fixtures/rules/Dockerfile")));
+        assert!(!config.ignores_for_path("DL3000", Path::new("src/Dockerfile")));
     }
 
     #[test]
@@ -303,7 +303,7 @@ per-file-ignores:
     fn parse_errors_include_line_and_column_when_available() {
         let temp = tempfile::TempDir::new().expect("temp dir should be created");
         let path = temp.path().join(".rudolint.yaml");
-        std::fs::write(&path, "ignore: [RDL3000\n").expect("config should be written");
+        std::fs::write(&path, "ignore: [DL3000\n").expect("config should be written");
 
         let error = Config::load(Some(&path)).expect_err("config should fail to parse");
         let message = format!("{error:#}");
@@ -318,7 +318,7 @@ per-file-ignores:
         let path = temp.path().join(".rudolint.yaml");
         std::fs::write(
             &path,
-            "per-file-ignores:\n  '[unterminated':\n    - RDL3000\n",
+            "per-file-ignores:\n  '[unterminated':\n    - DL3000\n",
         )
         .expect("config should be written");
 
@@ -333,7 +333,7 @@ per-file-ignores:
     fn load_rejects_unknown_config_keys() {
         let temp = tempfile::TempDir::new().expect("temp dir should be created");
         let path = temp.path().join(".rudolint.yaml");
-        std::fs::write(&path, "ignroe:\n  - RDL3000\n").expect("config should be written");
+        std::fs::write(&path, "ignroe:\n  - DL3000\n").expect("config should be written");
 
         let error = Config::load(Some(&path)).expect_err("config should fail to load");
         let message = format!("{error:#}");

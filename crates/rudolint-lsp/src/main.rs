@@ -412,15 +412,16 @@ fn token_at_byte(line: &str, byte_index: usize) -> Option<&str> {
 
 fn is_rule_code(token: &str) -> bool {
     let upper = token.to_ascii_uppercase();
-    let Some(prefix) = upper.get(..3) else {
+    let Some(digits) = upper
+        .strip_prefix("DL")
+        .or_else(|| upper.strip_prefix("SC"))
+        .or_else(|| upper.strip_prefix("RDK"))
+        .or_else(|| upper.strip_prefix("RUD"))
+    else {
         return false;
     };
 
-    matches!(prefix, "RDL" | "RDK" | "RSC")
-        && upper.len() == 7
-        && upper[3..]
-            .chars()
-            .all(|character| character.is_ascii_digit())
+    digits.len() == 4 && digits.chars().all(|character| character.is_ascii_digit())
 }
 
 #[cfg(test)]
@@ -431,11 +432,11 @@ mod tests {
 
     #[test]
     fn finds_rule_code_at_cursor_position() {
-        let text = "# hadolint ignore=RDL3007\nFROM alpine:latest\n";
+        let text = "# hadolint ignore=DL3007\nFROM alpine:latest\n";
 
         assert_eq!(
             rule_code_at_position(text, Position::new(0, 20)).as_deref(),
-            Some("RDL3007")
+            Some("DL3007")
         );
     }
 
@@ -458,6 +459,6 @@ mod tests {
 
     #[test]
     fn token_lookup_handles_cursor_at_end_of_token() {
-        assert_eq!(token_at_byte("ignore=RDL3007", 14), Some("RDL3007"));
+        assert_eq!(token_at_byte("ignore=DL3007", 13), Some("DL3007"));
     }
 }

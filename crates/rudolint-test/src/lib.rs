@@ -212,8 +212,8 @@ mod tests {
     #[test]
     fn snapshot_name_normalizes_parts() {
         assert_eq!(
-            snapshot_name(&["RDL3007", "No Latest Tag"]),
-            "rdl3007__no_latest_tag"
+            snapshot_name(&["DL3007", "No Latest Tag"]),
+            "dl3007__no_latest_tag"
         );
     }
 

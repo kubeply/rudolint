@@ -18,7 +18,7 @@ fn parity_oracle_is_available() {
 fn normalizes_hadolint_json_oracle_output() {
     let oracle = env::var("RUDOLINT_ORACLE_BIN")
         .expect("set RUDOLINT_ORACLE_BIN to run compatibility oracle tests");
-    let fixture = fixture_path("compat/RDL3007.no-latest-tag/Dockerfile");
+    let fixture = fixture_path("compat/DL3007.no-latest-tag/Dockerfile");
 
     let output = Command::new(oracle)
         .args(["-f", "json"])
@@ -39,5 +39,5 @@ fn normalizes_hadolint_json_oracle_output() {
 
     let stdout = String::from_utf8(output.stdout).expect("oracle stdout should be UTF-8");
     let normalized = normalized_json(&stdout);
-    insta::assert_json_snapshot!("hadolint_rdl3007_oracle", normalized);
+    insta::assert_json_snapshot!("hadolint_dl3007_oracle", normalized);
 }

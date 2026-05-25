@@ -61,8 +61,12 @@ fn hadolint_compat_accepts_hadolint_suppression_comments() {
     let findings = RuleEngine::new(Profile::HadolintCompat, Config::default()).lint(&document);
 
     assert!(
-        findings.iter().all(|finding| finding.code != "RDL1001"),
+        findings.iter().all(|finding| finding.code != "RUD1001"),
         "hadolint-compat should not warn on hadolint ignore comments"
+    );
+    assert!(
+        findings.iter().all(|finding| finding.code != "DL3007"),
+        "hadolint-compat should honor hadolint ignore comments"
     );
 }
 
@@ -128,10 +132,10 @@ fn real_world_noise_fixtures_do_not_trigger_findings() {
 
 #[test]
 fn snapshots_initial_shell_rule_findings() {
-    let source = read_fixture("rules/RSC.initial-shell-rules/Dockerfile");
+    let source = read_fixture("rules/SC.initial-shell-rules/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let shell_codes = BTreeSet::from([
-        "RSC2002", "RSC2015", "RSC2046", "RSC2086", "RSC2155", "RSC2164", "RSC2181",
+        "SC2002", "SC2015", "SC2046", "SC2086", "SC2155", "SC2164", "SC2181",
     ]);
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
@@ -146,62 +150,62 @@ fn snapshots_initial_shell_rule_findings() {
 }
 
 #[test]
-fn snapshots_rdl1001_legacy_suppression_fixture() {
-    let source = read_fixture("rules/RDL1001.legacy-suppression/Dockerfile");
+fn snapshots_rud1001_legacy_suppression_fixture() {
+    let source = read_fixture("rules/RUD1001.legacy-suppression/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL1001")
+        .filter(|finding| finding.code == "RUD1001")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl1001_legacy_suppression_fixture",
+        "rud1001_legacy_suppression_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3001_disallowed_container_commands_fixture() {
-    let source = read_fixture("rules/RDL3001.disallowed-container-commands/Dockerfile");
+fn snapshots_dl3001_disallowed_container_commands_fixture() {
+    let source = read_fixture("rules/DL3001.disallowed-container-commands/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3001")
+        .filter(|finding| finding.code == "DL3001")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3001_disallowed_container_commands_fixture",
+        "dl3001_disallowed_container_commands_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3000_absolute_workdir_fixture() {
-    let source = read_fixture("rules/RDL3000.absolute-workdir/Dockerfile");
+fn snapshots_dl3000_absolute_workdir_fixture() {
+    let source = read_fixture("rules/DL3000.absolute-workdir/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3000")
+        .filter(|finding| finding.code == "DL3000")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3000_absolute_workdir_fixture",
+        "dl3000_absolute_workdir_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3002_final_user_not_root_fixture() {
+fn snapshots_dl3002_final_user_not_root_fixture() {
     let fixtures = [
-        "RDL3002.no-user",
-        "RDL3002.switches-away-from-root",
-        "RDL3002.numeric-non-root",
-        "RDL3002.final-root-name",
-        "RDL3002.final-root-id",
-        "RDL3002.final-root-group",
+        "DL3002.no-user",
+        "DL3002.switches-away-from-root",
+        "DL3002.numeric-non-root",
+        "DL3002.final-root-name",
+        "DL3002.final-root-id",
+        "DL3002.final-root-group",
     ];
 
     let cases = fixtures
@@ -212,7 +216,7 @@ fn snapshots_rdl3002_final_user_not_root_fixture() {
             let findings = RuleEngine::new(Profile::Default, Config::default())
                 .lint(&document)
                 .into_iter()
-                .filter(|finding| finding.code == "RDL3002")
+                .filter(|finding| finding.code == "DL3002")
                 .collect::<Vec<_>>();
 
             serde_json::json!({
@@ -223,146 +227,146 @@ fn snapshots_rdl3002_final_user_not_root_fixture() {
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3002_final_user_not_root_fixture",
+        "dl3002_final_user_not_root_fixture",
         serde_json::to_value(&cases).expect("cases should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3003_use_workdir_for_cd_fixture() {
-    let source = read_fixture("rules/RDL3003.use-workdir-for-cd/Dockerfile");
+fn snapshots_dl3003_use_workdir_for_cd_fixture() {
+    let source = read_fixture("rules/DL3003.use-workdir-for-cd/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3003")
+        .filter(|finding| finding.code == "DL3003")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3003_use_workdir_for_cd_fixture",
+        "dl3003_use_workdir_for_cd_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3004_no_sudo_fixture() {
-    let source = read_fixture("rules/RDL3004.no-sudo/Dockerfile");
+fn snapshots_dl3004_no_sudo_fixture() {
+    let source = read_fixture("rules/DL3004.no-sudo/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3004")
+        .filter(|finding| finding.code == "DL3004")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3004_no_sudo_fixture",
+        "dl3004_no_sudo_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3006_explicit_from_tag_fixture() {
-    let source = read_fixture("rules/RDL3006.explicit-from-tag/Dockerfile");
+fn snapshots_dl3006_explicit_from_tag_fixture() {
+    let source = read_fixture("rules/DL3006.explicit-from-tag/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3006")
+        .filter(|finding| finding.code == "DL3006")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3006_explicit_from_tag_fixture",
+        "dl3006_explicit_from_tag_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3007_no_latest_tag_fixture() {
-    let source = read_fixture("rules/RDL3007.no-latest-tag/Dockerfile");
+fn snapshots_dl3007_no_latest_tag_fixture() {
+    let source = read_fixture("rules/DL3007.no-latest-tag/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3007")
+        .filter(|finding| finding.code == "DL3007")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3007_no_latest_tag_fixture",
+        "dl3007_no_latest_tag_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3008_pin_apt_get_install_versions_fixture() {
-    let source = read_fixture("rules/RDL3008.pin-apt-get-install-versions/Dockerfile");
+fn snapshots_dl3008_pin_apt_get_install_versions_fixture() {
+    let source = read_fixture("rules/DL3008.pin-apt-get-install-versions/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3008")
+        .filter(|finding| finding.code == "DL3008")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3008_pin_apt_get_install_versions_fixture",
+        "dl3008_pin_apt_get_install_versions_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3009_clean_apt_lists_fixture() {
-    let source = read_fixture("rules/RDL3009.clean-apt-lists/Dockerfile");
+fn snapshots_dl3009_clean_apt_lists_fixture() {
+    let source = read_fixture("rules/DL3009.clean-apt-lists/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3009")
+        .filter(|finding| finding.code == "DL3009")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3009_clean_apt_lists_fixture",
+        "dl3009_clean_apt_lists_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3010_use_add_for_archives_fixture() {
-    let source = read_fixture("rules/RDL3010.use-add-for-archives/Dockerfile");
+fn snapshots_dl3010_use_add_for_archives_fixture() {
+    let source = read_fixture("rules/DL3010.use-add-for-archives/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3010")
+        .filter(|finding| finding.code == "DL3010")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3010_use_add_for_archives_fixture",
+        "dl3010_use_add_for_archives_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3011_valid_expose_port_fixture() {
-    let source = read_fixture("rules/RDL3011.expose-port-validation/Dockerfile");
+fn snapshots_dl3011_valid_expose_port_fixture() {
+    let source = read_fixture("rules/DL3011.expose-port-validation/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3011")
+        .filter(|finding| finding.code == "DL3011")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3011_valid_expose_port_fixture",
+        "dl3011_valid_expose_port_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3012_healthcheck_cardinality_fixture() {
+fn snapshots_dl3012_healthcheck_cardinality_fixture() {
     let fixtures = [
-        "RDL3012.no-healthcheck",
-        "RDL3012.single-healthcheck-cmd",
-        "RDL3012.single-healthcheck-none",
-        "RDL3012.duplicate-healthcheck",
+        "DL3012.no-healthcheck",
+        "DL3012.single-healthcheck-cmd",
+        "DL3012.single-healthcheck-none",
+        "DL3012.duplicate-healthcheck",
     ];
 
     let cases = fixtures
@@ -373,7 +377,7 @@ fn snapshots_rdl3012_healthcheck_cardinality_fixture() {
             let findings = RuleEngine::new(Profile::Default, Config::default())
                 .lint(&document)
                 .into_iter()
-                .filter(|finding| finding.code == "RDL3012")
+                .filter(|finding| finding.code == "DL3012")
                 .collect::<Vec<_>>();
 
             serde_json::json!({
@@ -384,135 +388,135 @@ fn snapshots_rdl3012_healthcheck_cardinality_fixture() {
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3012_healthcheck_cardinality_fixture",
+        "dl3012_healthcheck_cardinality_fixture",
         serde_json::to_value(&cases).expect("cases should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3013_pin_pip_versions_fixture() {
-    let source = read_fixture("rules/RDL3013.pin-pip-versions/Dockerfile");
+fn snapshots_dl3013_pin_pip_versions_fixture() {
+    let source = read_fixture("rules/DL3013.pin-pip-versions/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3013")
+        .filter(|finding| finding.code == "DL3013")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3013_pin_pip_versions_fixture",
+        "dl3013_pin_pip_versions_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3014_apt_get_install_assume_yes_fixture() {
-    let source = read_fixture("rules/RDL3014.apt-get-install-assume-yes/Dockerfile");
+fn snapshots_dl3014_apt_get_install_assume_yes_fixture() {
+    let source = read_fixture("rules/DL3014.apt-get-install-assume-yes/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3014")
+        .filter(|finding| finding.code == "DL3014")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3014_apt_get_install_assume_yes_fixture",
+        "dl3014_apt_get_install_assume_yes_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3015_apt_get_no_install_recommends_fixture() {
-    let source = read_fixture("rules/RDL3015.apt-get-no-install-recommends/Dockerfile");
+fn snapshots_dl3015_apt_get_no_install_recommends_fixture() {
+    let source = read_fixture("rules/DL3015.apt-get-no-install-recommends/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3015")
+        .filter(|finding| finding.code == "DL3015")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3015_apt_get_no_install_recommends_fixture",
+        "dl3015_apt_get_no_install_recommends_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3016_pin_npm_versions_fixture() {
-    let source = read_fixture("rules/RDL3016.pin-npm-versions/Dockerfile");
+fn snapshots_dl3016_pin_npm_versions_fixture() {
+    let source = read_fixture("rules/DL3016.pin-npm-versions/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3016")
+        .filter(|finding| finding.code == "DL3016")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3016_pin_npm_versions_fixture",
+        "dl3016_pin_npm_versions_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3018_pin_apk_versions_fixture() {
-    let source = read_fixture("rules/RDL3018.pin-apk-versions/Dockerfile");
+fn snapshots_dl3018_pin_apk_versions_fixture() {
+    let source = read_fixture("rules/DL3018.pin-apk-versions/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3018")
+        .filter(|finding| finding.code == "DL3018")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3018_pin_apk_versions_fixture",
+        "dl3018_pin_apk_versions_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3019_apk_add_no_cache_fixture() {
-    let source = read_fixture("rules/RDL3019.apk-add-no-cache/Dockerfile");
+fn snapshots_dl3019_apk_add_no_cache_fixture() {
+    let source = read_fixture("rules/DL3019.apk-add-no-cache/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3019")
+        .filter(|finding| finding.code == "DL3019")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3019_apk_add_no_cache_fixture",
+        "dl3019_apk_add_no_cache_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3020_prefer_copy_fixture() {
-    let source = read_fixture("rules/RDL3020.prefer-copy/Dockerfile");
+fn snapshots_dl3020_prefer_copy_fixture() {
+    let source = read_fixture("rules/DL3020.prefer-copy/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3020")
+        .filter(|finding| finding.code == "DL3020")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3020_prefer_copy_fixture",
+        "dl3020_prefer_copy_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3021_copy_multiple_destination_slash_fixture() {
-    let source = read_fixture("rules/RDL3021.copy-multiple-destination-slash/Dockerfile");
+fn snapshots_dl3021_copy_multiple_destination_slash_fixture() {
+    let source = read_fixture("rules/DL3021.copy-multiple-destination-slash/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3021")
+        .filter(|finding| finding.code == "DL3021")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3021_copy_multiple_destination_slash_fixture",
+        "dl3021_copy_multiple_destination_slash_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
@@ -549,7 +553,7 @@ SECOND
         .filter(|finding| {
             matches!(
                 finding.code.as_str(),
-                "RDL3010" | "RDL3020" | "RDL3021" | "RDL3045"
+                "DL3010" | "DL3020" | "DL3021" | "DL3045"
             )
         })
         .map(|finding| finding.code.as_str())
@@ -562,62 +566,62 @@ SECOND
 }
 
 #[test]
-fn snapshots_rdl3022_copy_from_previous_stage_fixture() {
-    let source = read_fixture("rules/RDL3022.copy-from-previous-stage/Dockerfile");
+fn snapshots_dl3022_copy_from_previous_stage_fixture() {
+    let source = read_fixture("rules/DL3022.copy-from-previous-stage/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3022")
+        .filter(|finding| finding.code == "DL3022")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3022_copy_from_previous_stage_fixture",
+        "dl3022_copy_from_previous_stage_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3023_copy_from_own_stage_fixture() {
-    let source = read_fixture("rules/RDL3023.copy-from-own-stage/Dockerfile");
+fn snapshots_dl3023_copy_from_own_stage_fixture() {
+    let source = read_fixture("rules/DL3023.copy-from-own-stage/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3023")
+        .filter(|finding| finding.code == "DL3023")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3023_copy_from_own_stage_fixture",
+        "dl3023_copy_from_own_stage_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3024_unique_stage_names_fixture() {
-    let source = read_fixture("rules/RDL3024.unique-stage-names/Dockerfile");
+fn snapshots_dl3024_unique_stage_names_fixture() {
+    let source = read_fixture("rules/DL3024.unique-stage-names/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3024")
+        .filter(|finding| finding.code == "DL3024")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3024_unique_stage_names_fixture",
+        "dl3024_unique_stage_names_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3025_json_entrypoints_fixture() {
-    let source = read_fixture("rules/RDL3025.json-entrypoints/Dockerfile");
+fn snapshots_dl3025_json_entrypoints_fixture() {
+    let source = read_fixture("rules/DL3025.json-entrypoints/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let engine = RuleEngine::new(Profile::Default, Config::default());
     let findings = engine
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3025")
+        .filter(|finding| finding.code == "DL3025")
         .collect::<Vec<_>>();
     let fixes = engine
         .fixes(&document)
@@ -626,7 +630,7 @@ fn snapshots_rdl3025_json_entrypoints_fixture() {
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3025_json_entrypoints_fixture",
+        "dl3025_json_entrypoints_fixture",
         serde_json::json!({
             "findings": findings,
             "fixes": fixes,
@@ -635,8 +639,8 @@ fn snapshots_rdl3025_json_entrypoints_fixture() {
 }
 
 #[test]
-fn snapshots_rdl3026_trusted_registries_fixture() {
-    let source = read_fixture("rules/RDL3026.trusted-registries/Dockerfile");
+fn snapshots_dl3026_trusted_registries_fixture() {
+    let source = read_fixture("rules/DL3026.trusted-registries/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let config = Config {
         trusted_registries: vec!["ghcr.io".to_string(), "localhost:5000".to_string()],
@@ -645,338 +649,338 @@ fn snapshots_rdl3026_trusted_registries_fixture() {
     let findings = RuleEngine::new(Profile::Default, config)
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3026")
+        .filter(|finding| finding.code == "DL3026")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3026_trusted_registries_fixture",
+        "dl3026_trusted_registries_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3027_use_apt_get_fixture() {
-    let source = read_fixture("rules/RDL3027.use-apt-get/Dockerfile");
+fn snapshots_dl3027_use_apt_get_fixture() {
+    let source = read_fixture("rules/DL3027.use-apt-get/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3027")
+        .filter(|finding| finding.code == "DL3027")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3027_use_apt_get_fixture",
+        "dl3027_use_apt_get_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3028_pin_gem_versions_fixture() {
-    let source = read_fixture("rules/RDL3028.pin-gem-versions/Dockerfile");
+fn snapshots_dl3028_pin_gem_versions_fixture() {
+    let source = read_fixture("rules/DL3028.pin-gem-versions/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3028")
+        .filter(|finding| finding.code == "DL3028")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3028_pin_gem_versions_fixture",
+        "dl3028_pin_gem_versions_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3029_no_from_platform_flag_fixture() {
-    let source = read_fixture("rules/RDL3029.no-from-platform-flag/Dockerfile");
+fn snapshots_dl3029_no_from_platform_flag_fixture() {
+    let source = read_fixture("rules/DL3029.no-from-platform-flag/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3029")
+        .filter(|finding| finding.code == "DL3029")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3029_no_from_platform_flag_fixture",
+        "dl3029_no_from_platform_flag_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3030_yum_install_assume_yes_fixture() {
-    let source = read_fixture("rules/RDL3030.yum-install-assume-yes/Dockerfile");
+fn snapshots_dl3030_yum_install_assume_yes_fixture() {
+    let source = read_fixture("rules/DL3030.yum-install-assume-yes/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3030")
+        .filter(|finding| finding.code == "DL3030")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3030_yum_install_assume_yes_fixture",
+        "dl3030_yum_install_assume_yes_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3032_yum_clean_all_fixture() {
-    let source = read_fixture("rules/RDL3032.yum-clean-all/Dockerfile");
+fn snapshots_dl3032_yum_clean_all_fixture() {
+    let source = read_fixture("rules/DL3032.yum-clean-all/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3032")
+        .filter(|finding| finding.code == "DL3032")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3032_yum_clean_all_fixture",
+        "dl3032_yum_clean_all_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3033_pin_yum_versions_fixture() {
-    let source = read_fixture("rules/RDL3033.pin-yum-versions/Dockerfile");
+fn snapshots_dl3033_pin_yum_versions_fixture() {
+    let source = read_fixture("rules/DL3033.pin-yum-versions/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3033")
+        .filter(|finding| finding.code == "DL3033")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3033_pin_yum_versions_fixture",
+        "dl3033_pin_yum_versions_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3034_zypper_install_assume_yes_fixture() {
-    let source = read_fixture("rules/RDL3034.zypper-install-assume-yes/Dockerfile");
+fn snapshots_dl3034_zypper_install_assume_yes_fixture() {
+    let source = read_fixture("rules/DL3034.zypper-install-assume-yes/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3034")
+        .filter(|finding| finding.code == "DL3034")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3034_zypper_install_assume_yes_fixture",
+        "dl3034_zypper_install_assume_yes_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3035_no_zypper_dist_upgrade_fixture() {
-    let source = read_fixture("rules/RDL3035.no-zypper-dist-upgrade/Dockerfile");
+fn snapshots_dl3035_no_zypper_dist_upgrade_fixture() {
+    let source = read_fixture("rules/DL3035.no-zypper-dist-upgrade/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3035")
+        .filter(|finding| finding.code == "DL3035")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3035_no_zypper_dist_upgrade_fixture",
+        "dl3035_no_zypper_dist_upgrade_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3036_zypper_clean_fixture() {
-    let source = read_fixture("rules/RDL3036.zypper-clean/Dockerfile");
+fn snapshots_dl3036_zypper_clean_fixture() {
+    let source = read_fixture("rules/DL3036.zypper-clean/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3036")
+        .filter(|finding| finding.code == "DL3036")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3036_zypper_clean_fixture",
+        "dl3036_zypper_clean_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3037_pin_zypper_versions_fixture() {
-    let source = read_fixture("rules/RDL3037.pin-zypper-versions/Dockerfile");
+fn snapshots_dl3037_pin_zypper_versions_fixture() {
+    let source = read_fixture("rules/DL3037.pin-zypper-versions/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3037")
+        .filter(|finding| finding.code == "DL3037")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3037_pin_zypper_versions_fixture",
+        "dl3037_pin_zypper_versions_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3038_dnf_install_assume_yes_fixture() {
-    let source = read_fixture("rules/RDL3038.dnf-install-assume-yes/Dockerfile");
+fn snapshots_dl3038_dnf_install_assume_yes_fixture() {
+    let source = read_fixture("rules/DL3038.dnf-install-assume-yes/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3038")
+        .filter(|finding| finding.code == "DL3038")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3038_dnf_install_assume_yes_fixture",
+        "dl3038_dnf_install_assume_yes_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3040_dnf_clean_all_fixture() {
-    let source = read_fixture("rules/RDL3040.dnf-clean-all/Dockerfile");
+fn snapshots_dl3040_dnf_clean_all_fixture() {
+    let source = read_fixture("rules/DL3040.dnf-clean-all/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3040")
+        .filter(|finding| finding.code == "DL3040")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3040_dnf_clean_all_fixture",
+        "dl3040_dnf_clean_all_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3041_pin_dnf_versions_fixture() {
-    let source = read_fixture("rules/RDL3041.pin-dnf-versions/Dockerfile");
+fn snapshots_dl3041_pin_dnf_versions_fixture() {
+    let source = read_fixture("rules/DL3041.pin-dnf-versions/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3041")
+        .filter(|finding| finding.code == "DL3041")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3041_pin_dnf_versions_fixture",
+        "dl3041_pin_dnf_versions_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3042_pip_no_cache_dir_fixture() {
-    let source = read_fixture("rules/RDL3042.pip-no-cache-dir/Dockerfile");
+fn snapshots_dl3042_pip_no_cache_dir_fixture() {
+    let source = read_fixture("rules/DL3042.pip-no-cache-dir/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3042")
+        .filter(|finding| finding.code == "DL3042")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3042_pip_no_cache_dir_fixture",
+        "dl3042_pip_no_cache_dir_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3043_no_onbuild_trigger_fixture() {
-    let source = read_fixture("rules/RDL3043.no-onbuild-trigger/Dockerfile");
+fn snapshots_dl3043_no_onbuild_trigger_fixture() {
+    let source = read_fixture("rules/DL3043.no-onbuild-trigger/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3043")
+        .filter(|finding| finding.code == "DL3043")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3043_no_onbuild_trigger_fixture",
+        "dl3043_no_onbuild_trigger_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3044_no_env_self_reference_fixture() {
-    let source = read_fixture("rules/RDL3044.no-env-self-reference/Dockerfile");
+fn snapshots_dl3044_no_env_self_reference_fixture() {
+    let source = read_fixture("rules/DL3044.no-env-self-reference/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3044")
+        .filter(|finding| finding.code == "DL3044")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3044_no_env_self_reference_fixture",
+        "dl3044_no_env_self_reference_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3045_copy_relative_without_workdir_fixture() {
-    let source = read_fixture("rules/RDL3045.copy-relative-without-workdir/Dockerfile");
+fn snapshots_dl3045_copy_relative_without_workdir_fixture() {
+    let source = read_fixture("rules/DL3045.copy-relative-without-workdir/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3045")
+        .filter(|finding| finding.code == "DL3045")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3045_copy_relative_without_workdir_fixture",
+        "dl3045_copy_relative_without_workdir_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3046_useradd_no_log_init_fixture() {
-    let source = read_fixture("rules/RDL3046.useradd-no-log-init/Dockerfile");
+fn snapshots_dl3046_useradd_no_log_init_fixture() {
+    let source = read_fixture("rules/DL3046.useradd-no-log-init/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3046")
+        .filter(|finding| finding.code == "DL3046")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3046_useradd_no_log_init_fixture",
+        "dl3046_useradd_no_log_init_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3047_wget_progress_fixture() {
-    let source = read_fixture("rules/RDL3047.wget-progress/Dockerfile");
+fn snapshots_dl3047_wget_progress_fixture() {
+    let source = read_fixture("rules/DL3047.wget-progress/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3047")
+        .filter(|finding| finding.code == "DL3047")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3047_wget_progress_fixture",
+        "dl3047_wget_progress_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3048_valid_label_key_fixture() {
-    let source = read_fixture("rules/RDL3048.valid-label-key/Dockerfile");
+fn snapshots_dl3048_valid_label_key_fixture() {
+    let source = read_fixture("rules/DL3048.valid-label-key/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3048")
+        .filter(|finding| finding.code == "DL3048")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3048_valid_label_key_fixture",
+        "dl3048_valid_label_key_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3049_missing_required_labels_fixture() {
-    let source = read_fixture("rules/RDL3049.missing-required-labels/Dockerfile");
+fn snapshots_dl3049_missing_required_labels_fixture() {
+    let source = read_fixture("rules/DL3049.missing-required-labels/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let config = Config {
         label_schema: BTreeMap::from([
@@ -994,18 +998,18 @@ fn snapshots_rdl3049_missing_required_labels_fixture() {
     let findings = RuleEngine::new(Profile::Default, config)
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3049")
+        .filter(|finding| finding.code == "DL3049")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3049_missing_required_labels_fixture",
+        "dl3049_missing_required_labels_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3050_no_superfluous_labels_fixture() {
-    let source = read_fixture("rules/RDL3050.no-superfluous-labels/Dockerfile");
+fn snapshots_dl3050_no_superfluous_labels_fixture() {
+    let source = read_fixture("rules/DL3050.no-superfluous-labels/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let config = Config {
         label_schema: BTreeMap::from([
@@ -1024,18 +1028,18 @@ fn snapshots_rdl3050_no_superfluous_labels_fixture() {
     let findings = RuleEngine::new(Profile::Default, config)
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3050")
+        .filter(|finding| finding.code == "DL3050")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3050_no_superfluous_labels_fixture",
+        "dl3050_no_superfluous_labels_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3051_no_empty_labels_fixture() {
-    let source = read_fixture("rules/RDL3051.no-empty-labels/Dockerfile");
+fn snapshots_dl3051_no_empty_labels_fixture() {
+    let source = read_fixture("rules/DL3051.no-empty-labels/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let config = Config {
         label_schema: BTreeMap::from([
@@ -1053,18 +1057,18 @@ fn snapshots_rdl3051_no_empty_labels_fixture() {
     let findings = RuleEngine::new(Profile::Default, config)
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3051")
+        .filter(|finding| finding.code == "DL3051")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3051_no_empty_labels_fixture",
+        "dl3051_no_empty_labels_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3052_valid_url_labels_fixture() {
-    let source = read_fixture("rules/RDL3052.valid-url-labels/Dockerfile");
+fn snapshots_dl3052_valid_url_labels_fixture() {
+    let source = read_fixture("rules/DL3052.valid-url-labels/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let config = Config {
         label_schema: BTreeMap::from([
@@ -1082,18 +1086,18 @@ fn snapshots_rdl3052_valid_url_labels_fixture() {
     let findings = RuleEngine::new(Profile::Default, config)
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3052")
+        .filter(|finding| finding.code == "DL3052")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3052_valid_url_labels_fixture",
+        "dl3052_valid_url_labels_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3053_valid_rfc3339_labels_fixture() {
-    let source = read_fixture("rules/RDL3053.valid-rfc3339-labels/Dockerfile");
+fn snapshots_dl3053_valid_rfc3339_labels_fixture() {
+    let source = read_fixture("rules/DL3053.valid-rfc3339-labels/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let config = Config {
         label_schema: BTreeMap::from([
@@ -1111,18 +1115,18 @@ fn snapshots_rdl3053_valid_rfc3339_labels_fixture() {
     let findings = RuleEngine::new(Profile::Default, config)
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3053")
+        .filter(|finding| finding.code == "DL3053")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3053_valid_rfc3339_labels_fixture",
+        "dl3053_valid_rfc3339_labels_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3054_spdx_labels_validation_fixture() {
-    let source = read_fixture("rules/RDL3054.spdx-labels-validation/Dockerfile");
+fn snapshots_dl3054_spdx_labels_validation_fixture() {
+    let source = read_fixture("rules/DL3054.spdx-labels-validation/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let config = Config {
         label_schema: BTreeMap::from([
@@ -1140,18 +1144,18 @@ fn snapshots_rdl3054_spdx_labels_validation_fixture() {
     let findings = RuleEngine::new(Profile::Default, config)
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3054")
+        .filter(|finding| finding.code == "DL3054")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3054_spdx_labels_validation_fixture",
+        "dl3054_spdx_labels_validation_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3055_valid_git_hash_labels_fixture() {
-    let source = read_fixture("rules/RDL3055.valid-git-hash-labels/Dockerfile");
+fn snapshots_dl3055_valid_git_hash_labels_fixture() {
+    let source = read_fixture("rules/DL3055.valid-git-hash-labels/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let config = Config {
         label_schema: BTreeMap::from([
@@ -1169,18 +1173,18 @@ fn snapshots_rdl3055_valid_git_hash_labels_fixture() {
     let findings = RuleEngine::new(Profile::Default, config)
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3055")
+        .filter(|finding| finding.code == "DL3055")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3055_valid_git_hash_labels_fixture",
+        "dl3055_valid_git_hash_labels_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3056_valid_semver_labels_fixture() {
-    let source = read_fixture("rules/RDL3056.valid-semver-labels/Dockerfile");
+fn snapshots_dl3056_valid_semver_labels_fixture() {
+    let source = read_fixture("rules/DL3056.valid-semver-labels/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let config = Config {
         label_schema: BTreeMap::from([
@@ -1198,38 +1202,38 @@ fn snapshots_rdl3056_valid_semver_labels_fixture() {
     let findings = RuleEngine::new(Profile::Default, config)
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3056")
+        .filter(|finding| finding.code == "DL3056")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3056_valid_semver_labels_fixture",
+        "dl3056_valid_semver_labels_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3057_missing_healthcheck_fixture() {
-    let source = read_fixture("rules/RDL3057.missing-healthcheck/Dockerfile");
+fn snapshots_dl3057_missing_healthcheck_fixture() {
+    let source = read_fixture("rules/DL3057.missing-healthcheck/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let config = Config {
-        severity: BTreeMap::from([("RDL3057".to_string(), Severity::Warning)]),
+        severity: BTreeMap::from([("DL3057".to_string(), Severity::Warning)]),
         ..Config::default()
     };
     let findings = RuleEngine::new(Profile::Default, config)
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3057")
+        .filter(|finding| finding.code == "DL3057")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3057_missing_healthcheck_fixture",
+        "dl3057_missing_healthcheck_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3058_valid_email_labels_fixture() {
-    let source = read_fixture("rules/RDL3058.valid-email-labels/Dockerfile");
+fn snapshots_dl3058_valid_email_labels_fixture() {
+    let source = read_fixture("rules/DL3058.valid-email-labels/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let config = Config {
         label_schema: BTreeMap::from([
@@ -1247,104 +1251,104 @@ fn snapshots_rdl3058_valid_email_labels_fixture() {
     let findings = RuleEngine::new(Profile::Default, config)
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3058")
+        .filter(|finding| finding.code == "DL3058")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3058_valid_email_labels_fixture",
+        "dl3058_valid_email_labels_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3059_consecutive_run_fixture() {
-    let source = read_fixture("rules/RDL3059.consecutive-run/Dockerfile");
+fn snapshots_dl3059_consecutive_run_fixture() {
+    let source = read_fixture("rules/DL3059.consecutive-run/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3059")
+        .filter(|finding| finding.code == "DL3059")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3059_consecutive_run_fixture",
+        "dl3059_consecutive_run_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3060_yarn_cache_clean_fixture() {
-    let source = read_fixture("rules/RDL3060.yarn-cache-clean/Dockerfile");
+fn snapshots_dl3060_yarn_cache_clean_fixture() {
+    let source = read_fixture("rules/DL3060.yarn-cache-clean/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3060")
+        .filter(|finding| finding.code == "DL3060")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3060_yarn_cache_clean_fixture",
+        "dl3060_yarn_cache_clean_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3061_instruction_order_fixture() {
-    let source = read_fixture("rules/RDL3061.instruction-order/Dockerfile");
+fn snapshots_dl3061_instruction_order_fixture() {
+    let source = read_fixture("rules/DL3061.instruction-order/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3061")
+        .filter(|finding| finding.code == "DL3061")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3061_instruction_order_fixture",
+        "dl3061_instruction_order_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3062_pin_go_versions_fixture() {
-    let source = read_fixture("rules/RDL3062.pin-go-versions/Dockerfile");
+fn snapshots_dl3062_pin_go_versions_fixture() {
+    let source = read_fixture("rules/DL3062.pin-go-versions/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3062")
+        .filter(|finding| finding.code == "DL3062")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3062_pin_go_versions_fixture",
+        "dl3062_pin_go_versions_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl3063_reserved_stage_name_fixture() {
-    let source = read_fixture("rules/RDL3063.reserved-stage-name/Dockerfile");
+fn snapshots_dl3063_reserved_stage_name_fixture() {
+    let source = read_fixture("rules/DL3063.reserved-stage-name/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL3063")
+        .filter(|finding| finding.code == "DL3063")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl3063_reserved_stage_name_fixture",
+        "dl3063_reserved_stage_name_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl4000_deprecated_maintainer_fixture() {
-    let source = read_fixture("rules/RDL4000.deprecated-maintainer/Dockerfile");
+fn snapshots_dl4000_deprecated_maintainer_fixture() {
+    let source = read_fixture("rules/DL4000.deprecated-maintainer/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let engine = RuleEngine::new(Profile::Default, Config::default());
     let findings = engine
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL4000")
+        .filter(|finding| finding.code == "DL4000")
         .collect::<Vec<_>>();
     let fixes = engine
         .fixes(&document)
@@ -1353,7 +1357,7 @@ fn snapshots_rdl4000_deprecated_maintainer_fixture() {
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl4000_deprecated_maintainer_fixture",
+        "dl4000_deprecated_maintainer_fixture",
         serde_json::json!({
             "findings": findings,
             "fixes": fixes,
@@ -1362,28 +1366,24 @@ fn snapshots_rdl4000_deprecated_maintainer_fixture() {
 }
 
 #[test]
-fn snapshots_rdl4001_either_wget_or_curl_fixture() {
-    let source = read_fixture("rules/RDL4001.either-wget-or-curl/Dockerfile");
+fn snapshots_dl4001_either_wget_or_curl_fixture() {
+    let source = read_fixture("rules/DL4001.either-wget-or-curl/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL4001")
+        .filter(|finding| finding.code == "DL4001")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl4001_either_wget_or_curl_fixture",
+        "dl4001_either_wget_or_curl_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl4003_cmd_cardinality_fixture() {
-    let fixtures = [
-        "RDL4003.no-cmd",
-        "RDL4003.single-cmd",
-        "RDL4003.duplicate-cmd",
-    ];
+fn snapshots_dl4003_cmd_cardinality_fixture() {
+    let fixtures = ["DL4003.no-cmd", "DL4003.single-cmd", "DL4003.duplicate-cmd"];
 
     let cases = fixtures
         .into_iter()
@@ -1393,7 +1393,7 @@ fn snapshots_rdl4003_cmd_cardinality_fixture() {
             let findings = RuleEngine::new(Profile::Default, Config::default())
                 .lint(&document)
                 .into_iter()
-                .filter(|finding| finding.code == "RDL4003")
+                .filter(|finding| finding.code == "DL4003")
                 .collect::<Vec<_>>();
 
             serde_json::json!({
@@ -1404,17 +1404,17 @@ fn snapshots_rdl4003_cmd_cardinality_fixture() {
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl4003_cmd_cardinality_fixture",
+        "dl4003_cmd_cardinality_fixture",
         serde_json::to_value(&cases).expect("cases should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl4004_entrypoint_cardinality_fixture() {
+fn snapshots_dl4004_entrypoint_cardinality_fixture() {
     let fixtures = [
-        "RDL4004.no-entrypoint",
-        "RDL4004.single-entrypoint",
-        "RDL4004.duplicate-entrypoint",
+        "DL4004.no-entrypoint",
+        "DL4004.single-entrypoint",
+        "DL4004.duplicate-entrypoint",
     ];
 
     let cases = fixtures
@@ -1425,7 +1425,7 @@ fn snapshots_rdl4004_entrypoint_cardinality_fixture() {
             let findings = RuleEngine::new(Profile::Default, Config::default())
                 .lint(&document)
                 .into_iter()
-                .filter(|finding| finding.code == "RDL4004")
+                .filter(|finding| finding.code == "DL4004")
                 .collect::<Vec<_>>();
 
             serde_json::json!({
@@ -1436,39 +1436,39 @@ fn snapshots_rdl4004_entrypoint_cardinality_fixture() {
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl4004_entrypoint_cardinality_fixture",
+        "dl4004_entrypoint_cardinality_fixture",
         serde_json::to_value(&cases).expect("cases should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl4005_use_shell_for_default_shell_fixture() {
-    let source = read_fixture("rules/RDL4005.use-shell-for-default-shell/Dockerfile");
+fn snapshots_dl4005_use_shell_for_default_shell_fixture() {
+    let source = read_fixture("rules/DL4005.use-shell-for-default-shell/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL4005")
+        .filter(|finding| finding.code == "DL4005")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl4005_use_shell_for_default_shell_fixture",
+        "dl4005_use_shell_for_default_shell_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
 
 #[test]
-fn snapshots_rdl4006_pipefail_before_pipe_fixture() {
-    let source = read_fixture("rules/RDL4006.pipefail-before-pipe/Dockerfile");
+fn snapshots_dl4006_pipefail_before_pipe_fixture() {
+    let source = read_fixture("rules/DL4006.pipefail-before-pipe/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
     let findings = RuleEngine::new(Profile::Default, Config::default())
         .lint(&document)
         .into_iter()
-        .filter(|finding| finding.code == "RDL4006")
+        .filter(|finding| finding.code == "DL4006")
         .collect::<Vec<_>>();
 
     insta::assert_json_snapshot!(
-        "rdl4006_pipefail_before_pipe_fixture",
+        "dl4006_pipefail_before_pipe_fixture",
         serde_json::to_value(&findings).expect("findings should serialize")
     );
 }
@@ -1634,12 +1634,12 @@ fn snapshots_rule_selection_matrix() {
     let compat_engine = RuleEngine::new(Profile::HadolintCompat, Config::default());
 
     let ignore_config = Config {
-        ignore: BTreeSet::from(["RDL3000".to_string()]),
+        ignore: BTreeSet::from(["DL3000".to_string()]),
         ..Config::default()
     };
 
     let severity_config = Config {
-        severity: BTreeMap::from([("RDL3007".to_string(), Severity::Error)]),
+        severity: BTreeMap::from([("DL3007".to_string(), Severity::Error)]),
         ..Config::default()
     };
 
@@ -1651,7 +1651,7 @@ fn snapshots_rule_selection_matrix() {
     let per_file_ignore_config = Config {
         per_file_ignores: BTreeMap::from([(
             "rules/**".to_string(),
-            BTreeSet::from(["RDL3000".to_string()]),
+            BTreeSet::from(["DL3000".to_string()]),
         )]),
         ..Config::default()
     };
@@ -1666,16 +1666,16 @@ fn snapshots_rule_selection_matrix() {
             "compat": implemented_codes(&compat_engine.catalog()),
         },
         "config_filters": {
-            "ignore_rdl3000": finding_codes(
+            "ignore_dl3000": finding_codes(
                 &RuleEngine::new(Profile::Default, ignore_config).lint(&document)
             ),
-            "severity_override_rdl3007": finding_codes(
+            "severity_override_dl3007": finding_codes(
                 &RuleEngine::new(Profile::HadolintCompat, severity_config).lint(&document)
             ),
             "select_rdk": finding_codes(
                 &RuleEngine::new(Profile::Default, select_config).lint(&document)
             ),
-            "per_file_ignore_rdl3000": finding_codes(
+            "per_file_ignore_dl3000": finding_codes(
                 &RuleEngine::new(Profile::Default, per_file_ignore_config)
                     .lint_path(std::path::Path::new("rules/default-basic/Dockerfile"), &document)
             ),

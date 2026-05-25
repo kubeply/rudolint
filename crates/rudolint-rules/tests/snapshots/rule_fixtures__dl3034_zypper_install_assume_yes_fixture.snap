@@ -1,0 +1,87 @@
+---
+source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 628
+expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
+---
+[
+  {
+    "code": "DL3034",
+    "help": null,
+    "labels": [],
+    "message": "use `-y`, `-n`, or `--non-interactive` with `zypper install` to avoid interactive prompts",
+    "path": "",
+    "primary_span": {
+      "end_byte": 47,
+      "end_column": 24,
+      "end_line": 2,
+      "start_byte": 24,
+      "start_column": 1,
+      "start_line": 2
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3034",
+    "help": null,
+    "labels": [],
+    "message": "use `-y`, `-n`, or `--non-interactive` with `zypper install` to avoid interactive prompts",
+    "path": "",
+    "primary_span": {
+      "end_byte": 230,
+      "end_column": 35,
+      "end_line": 8,
+      "start_byte": 196,
+      "start_column": 1,
+      "start_line": 8
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3034",
+    "help": null,
+    "labels": [],
+    "message": "use `-y`, `-n`, or `--non-interactive` with `zypper install` to avoid interactive prompts",
+    "path": "",
+    "primary_span": {
+      "end_byte": 265,
+      "end_column": 35,
+      "end_line": 9,
+      "start_byte": 231,
+      "start_column": 1,
+      "start_line": 9
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3034",
+    "help": null,
+    "labels": [],
+    "message": "use `-y`, `-n`, or `--non-interactive` with `zypper install` to avoid interactive prompts",
+    "path": "",
+    "primary_span": {
+      "end_byte": 375,
+      "end_column": 33,
+      "end_line": 12,
+      "start_byte": 343,
+      "start_column": 1,
+      "start_line": 12
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3034",
+    "help": null,
+    "labels": [],
+    "message": "use `-y`, `-n`, or `--non-interactive` with `zypper install` to avoid interactive prompts",
+    "path": "",
+    "primary_span": {
+      "end_byte": 441,
+      "end_column": 20,
+      "end_line": 14,
+      "start_byte": 422,
+      "start_column": 1,
+      "start_line": 14
+    },
+    "severity": "warning"
+  }
+]

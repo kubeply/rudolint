@@ -58,7 +58,7 @@ fn stdio_server_lints_and_handles_editor_requests() {
     let invalid_hover = server.recv_response(2);
     assert_eq!(invalid_hover["error"]["code"], -32602);
 
-    let initial_text = "# RDL3007\nFROM alpine:latest\nRUN --mount=type=cache,target=/var/cache/apt apt-get update\n";
+    let initial_text = "# DL3007\nFROM alpine:latest\nRUN --mount=type=cache,target=/var/cache/apt apt-get update\n";
     server.send(json!({
         "jsonrpc": "2.0",
         "method": "textDocument/didOpen",
@@ -74,7 +74,7 @@ fn stdio_server_lints_and_handles_editor_requests() {
     let diagnostics = server.recv_method("textDocument/publishDiagnostics");
     assert_eq!(diagnostics["params"]["uri"], document_uri);
     assert_eq!(diagnostics["params"]["version"], 1);
-    assert!(diagnostic_codes(&diagnostics).contains(&"RDL3007".to_string()));
+    assert!(diagnostic_codes(&diagnostics).contains(&"DL3007".to_string()));
 
     server.send(json!({
         "jsonrpc": "2.0",
@@ -90,7 +90,7 @@ fn stdio_server_lints_and_handles_editor_requests() {
         hover["result"]["contents"]["value"]
             .as_str()
             .expect("hover should contain markdown")
-            .contains("RDL3007")
+            .contains("DL3007")
     );
 
     server.send(json!({
@@ -125,7 +125,7 @@ fn stdio_server_lints_and_handles_editor_requests() {
     }));
     let changed = server.recv_method("textDocument/publishDiagnostics");
     assert_eq!(changed["params"]["version"], 2);
-    assert!(!diagnostic_codes(&changed).contains(&"RDL3007".to_string()));
+    assert!(!diagnostic_codes(&changed).contains(&"DL3007".to_string()));
 
     server.send(json!({
         "jsonrpc": "2.0",

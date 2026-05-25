@@ -22,15 +22,15 @@ pub(crate) fn implemented_catalog() -> Vec<RuleInfo> {
 
 pub(crate) fn planned_catalog() -> Vec<&'static str> {
     vec![
-        "RSC1000", "RSC1001", "RSC1007", "RSC1010", "RSC1018", "RSC1035", "RSC1045", "RSC1065",
-        "RSC1066", "RSC1077", "RSC1078", "RSC1079", "RSC1081", "RSC1083", "RSC1086", "RSC1095",
-        "RSC2026", "RSC2035", "RSC2140", "RSC2154", "RSC2196",
+        "SC1000", "SC1001", "SC1007", "SC1010", "SC1018", "SC1035", "SC1045", "SC1065", "SC1066",
+        "SC1077", "SC1078", "SC1079", "SC1081", "SC1083", "SC1086", "SC1095", "SC2026", "SC2035",
+        "SC2140", "SC2154", "SC2196",
     ]
 }
 
 rule_metadata!(
     UselessCat,
-    "RSC2002",
+    "SC2002",
     "avoid-useless-cat",
     Severity::Warning,
     "avoid piping cat output when the next command can read files directly"
@@ -49,7 +49,7 @@ impl Rule for UselessCat {
                 .any(|invocation| invocation_is_useless_cat(program, invocation))
                 .then(|| {
                     diagnostic(
-                        "RSC2002",
+                        "SC2002",
                         Severity::Warning,
                         "avoid piping cat output when the next command can read files directly",
                         instruction,
@@ -61,7 +61,7 @@ impl Rule for UselessCat {
 
 rule_metadata!(
     CommandChainAsCondition,
-    "RSC2015",
+    "SC2015",
     "command-chain-as-condition",
     Severity::Warning,
     "avoid using A && B || C as a conditional expression"
@@ -76,7 +76,7 @@ impl Rule for CommandChainAsCondition {
         shell_findings(doc, |instruction, program| {
             has_and_or_chain(program).then(|| {
                 diagnostic(
-                    "RSC2015",
+                    "SC2015",
                     Severity::Warning,
                     "A && B || C is not a safe conditional expression",
                     instruction,
@@ -88,7 +88,7 @@ impl Rule for CommandChainAsCondition {
 
 rule_metadata!(
     UnquotedCommandSubstitution,
-    "RSC2046",
+    "SC2046",
     "quote-command-substitutions",
     Severity::Warning,
     "quote command substitutions to prevent word splitting"
@@ -113,7 +113,7 @@ impl Rule for UnquotedCommandSubstitution {
                 })
                 .then(|| {
                     diagnostic(
-                        "RSC2046",
+                        "SC2046",
                         Severity::Warning,
                         "quote command substitutions to prevent word splitting",
                         instruction,
@@ -125,7 +125,7 @@ impl Rule for UnquotedCommandSubstitution {
 
 rule_metadata!(
     UnquotedVariableExpansion,
-    "RSC2086",
+    "SC2086",
     "quote-variable-expansions",
     Severity::Warning,
     "quote variable expansions to prevent word splitting and globbing"
@@ -152,7 +152,7 @@ impl Rule for UnquotedVariableExpansion {
                 })
                 .then(|| {
                     diagnostic(
-                        "RSC2086",
+                        "SC2086",
                         Severity::Warning,
                         "quote variable expansions to prevent word splitting and globbing",
                         instruction,
@@ -164,7 +164,7 @@ impl Rule for UnquotedVariableExpansion {
 
 rule_metadata!(
     DeclareAndAssignSeparately,
-    "RSC2155",
+    "SC2155",
     "declare-and-assign-separately",
     Severity::Warning,
     "declare and assign separately to avoid masking command failures"
@@ -183,7 +183,7 @@ impl Rule for DeclareAndAssignSeparately {
                 .any(invocation_declares_assignment_with_command_substitution)
                 .then(|| {
                     diagnostic(
-                        "RSC2155",
+                        "SC2155",
                         Severity::Warning,
                         "declare and assign separately to avoid masking command failures",
                         instruction,
@@ -195,7 +195,7 @@ impl Rule for DeclareAndAssignSeparately {
 
 rule_metadata!(
     CheckCdExitStatus,
-    "RSC2164",
+    "SC2164",
     "check-cd-exit-status",
     Severity::Warning,
     "check cd exit status before running more commands"
@@ -214,7 +214,7 @@ impl Rule for CheckCdExitStatus {
                 .any(|invocation| cd_without_checked_continuation(program, invocation))
                 .then(|| {
                     diagnostic(
-                        "RSC2164",
+                        "SC2164",
                         Severity::Warning,
                         "check cd exit status before running more commands",
                         instruction,
@@ -226,7 +226,7 @@ impl Rule for CheckCdExitStatus {
 
 rule_metadata!(
     CheckExitCodeDirectly,
-    "RSC2181",
+    "SC2181",
     "check-exit-code-directly",
     Severity::Warning,
     "check command exit status directly instead of testing $?"
@@ -245,7 +245,7 @@ impl Rule for CheckExitCodeDirectly {
                 .any(invocation_tests_previous_exit_status)
                 .then(|| {
                     diagnostic(
-                        "RSC2181",
+                        "SC2181",
                         Severity::Warning,
                         "check command exit status directly instead of testing $?",
                         instruction,
@@ -294,7 +294,7 @@ fn lint_program(
     findings: &mut Vec<Finding>,
 ) {
     push_if_enabled(
-        "RSC2002",
+        "SC2002",
         config,
         path,
         findings,
@@ -304,7 +304,7 @@ fn lint_program(
             .any(|invocation| invocation_is_useless_cat(program, invocation))
             .then(|| {
                 diagnostic(
-                    "RSC2002",
+                    "SC2002",
                     Severity::Warning,
                     "avoid piping cat output when the next command can read files directly",
                     instruction,
@@ -312,13 +312,13 @@ fn lint_program(
             }),
     );
     push_if_enabled(
-        "RSC2015",
+        "SC2015",
         config,
         path,
         findings,
         has_and_or_chain(program).then(|| {
             diagnostic(
-                "RSC2015",
+                "SC2015",
                 Severity::Warning,
                 "A && B || C is not a safe conditional expression",
                 instruction,
@@ -326,13 +326,13 @@ fn lint_program(
         }),
     );
     push_if_enabled(
-        "RSC2046",
+        "SC2046",
         config,
         path,
         findings,
         has_unquoted_command_substitution(program).then(|| {
             diagnostic(
-                "RSC2046",
+                "SC2046",
                 Severity::Warning,
                 "quote command substitutions to prevent word splitting",
                 instruction,
@@ -340,13 +340,13 @@ fn lint_program(
         }),
     );
     push_if_enabled(
-        "RSC2086",
+        "SC2086",
         config,
         path,
         findings,
         has_unquoted_variable_expansion(program).then(|| {
             diagnostic(
-                "RSC2086",
+                "SC2086",
                 Severity::Warning,
                 "quote variable expansions to prevent word splitting and globbing",
                 instruction,
@@ -354,7 +354,7 @@ fn lint_program(
         }),
     );
     push_if_enabled(
-        "RSC2155",
+        "SC2155",
         config,
         path,
         findings,
@@ -364,7 +364,7 @@ fn lint_program(
             .any(invocation_declares_assignment_with_command_substitution)
             .then(|| {
                 diagnostic(
-                    "RSC2155",
+                    "SC2155",
                     Severity::Warning,
                     "declare and assign separately to avoid masking command failures",
                     instruction,
@@ -372,7 +372,7 @@ fn lint_program(
             }),
     );
     push_if_enabled(
-        "RSC2164",
+        "SC2164",
         config,
         path,
         findings,
@@ -382,7 +382,7 @@ fn lint_program(
             .any(|invocation| cd_without_checked_continuation(program, invocation))
             .then(|| {
                 diagnostic(
-                    "RSC2164",
+                    "SC2164",
                     Severity::Warning,
                     "check cd exit status before running more commands",
                     instruction,
@@ -390,7 +390,7 @@ fn lint_program(
             }),
     );
     push_if_enabled(
-        "RSC2181",
+        "SC2181",
         config,
         path,
         findings,
@@ -400,7 +400,7 @@ fn lint_program(
             .any(invocation_tests_previous_exit_status)
             .then(|| {
                 diagnostic(
-                    "RSC2181",
+                    "SC2181",
                     Severity::Warning,
                     "check command exit status directly instead of testing $?",
                     instruction,

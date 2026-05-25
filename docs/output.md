@@ -56,7 +56,7 @@ Finding fields:
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `code` | string | Stable rule identifier such as `RDL3007`, `RDK1000`, or `RSC2086`. |
+| `code` | string | Stable rule identifier such as `DL3007`, `RDK1000`, or `SC2086`. |
 | `severity` | string | One of `ignore`, `style`, `info`, `warning`, or `error`. |
 | `message` | string | Human-readable diagnostic message. |
 | `path` | string | Display path for the Dockerfile that produced the finding. |
@@ -81,7 +81,7 @@ offsets:
   "schemaVersion": "v1",
   "findings": [
     {
-      "code": "RDL3007",
+      "code": "DL3007",
       "message": "avoid using latest tag",
       "severity": "warning",
       "path": "Dockerfile",
@@ -134,7 +134,7 @@ Human output is grouped by file:
 
 ```text
 Dockerfile:
-  1:1 warning RDL3007 avoid using latest tag
+  1:1 warning DL3007 avoid using latest tag
 ```
 
 `--show-source` appends compact source excerpts to human output only. JSON and

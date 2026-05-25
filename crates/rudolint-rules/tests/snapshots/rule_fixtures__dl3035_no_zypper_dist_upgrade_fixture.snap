@@ -1,0 +1,55 @@
+---
+source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 644
+expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
+---
+[
+  {
+    "code": "DL3035",
+    "help": null,
+    "labels": [],
+    "message": "avoid `zypper dist-upgrade` in Docker builds",
+    "path": "",
+    "primary_span": {
+      "end_byte": 103,
+      "end_column": 27,
+      "end_line": 4,
+      "start_byte": 77,
+      "start_column": 1,
+      "start_line": 4
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3035",
+    "help": null,
+    "labels": [],
+    "message": "avoid `zypper dist-upgrade` in Docker builds",
+    "path": "",
+    "primary_span": {
+      "end_byte": 121,
+      "end_column": 18,
+      "end_line": 5,
+      "start_byte": 104,
+      "start_column": 1,
+      "start_line": 5
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3035",
+    "help": null,
+    "labels": [],
+    "message": "avoid `zypper dist-upgrade` in Docker builds",
+    "path": "",
+    "primary_span": {
+      "end_byte": 191,
+      "end_column": 38,
+      "end_line": 7,
+      "start_byte": 154,
+      "start_column": 1,
+      "start_line": 7
+    },
+    "severity": "warning"
+  }
+]

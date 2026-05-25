@@ -7,7 +7,7 @@ use crate::RuleStatus;
 /// Stable metadata describing a rule in the catalog.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RuleMetadata {
-    /// Stable rule code, such as `RDL3000`.
+    /// Stable rule code, such as `DL3000`.
     pub code: &'static str,
     /// Human-readable rule name used in docs and catalog output.
     pub name: &'static str,
@@ -87,6 +87,8 @@ pub enum RuleCategory {
     Compatibility,
     /// BuildKit-native policy rules.
     BuildKit,
+    /// Rudolint-native migration or project policy rules.
+    Rudolint,
     /// Shell-analysis catalog entries.
     Shell,
 }
@@ -97,6 +99,7 @@ impl RuleCategory {
         match self {
             Self::Compatibility => "compatibility",
             Self::BuildKit => "buildkit",
+            Self::Rudolint => "rudolint",
             Self::Shell => "shell",
         }
     }
@@ -161,7 +164,9 @@ pub(crate) fn diagnostic(
 fn category_for_code(code: &str) -> RuleCategory {
     if code.starts_with("RDK") {
         RuleCategory::BuildKit
-    } else if code.starts_with("RSC") {
+    } else if code.starts_with("RUD") {
+        RuleCategory::Rudolint
+    } else if code.starts_with("SC") {
         RuleCategory::Shell
     } else {
         RuleCategory::Compatibility
@@ -169,7 +174,7 @@ fn category_for_code(code: &str) -> RuleCategory {
 }
 
 fn profile_for_code(code: &str) -> PolicyProfile {
-    if code.starts_with("RDL") || code.starts_with("RSC") {
+    if code.starts_with("DL") || code.starts_with("SC") {
         PolicyProfile::HadolintCompat
     } else {
         PolicyProfile::Default

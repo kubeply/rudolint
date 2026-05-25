@@ -1,0 +1,55 @@
+---
+source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 924
+expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
+---
+[
+  {
+    "code": "DL3051",
+    "help": null,
+    "labels": [],
+    "message": "configured label `org.opencontainers.image.title` value is empty",
+    "path": "",
+    "primary_span": {
+      "end_byte": 56,
+      "end_column": 40,
+      "end_line": 2,
+      "start_byte": 17,
+      "start_column": 1,
+      "start_line": 2
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3051",
+    "help": null,
+    "labels": [],
+    "message": "configured label `org.opencontainers.image.title` value is empty",
+    "path": "",
+    "primary_span": {
+      "end_byte": 99,
+      "end_column": 43,
+      "end_line": 3,
+      "start_byte": 57,
+      "start_column": 1,
+      "start_line": 3
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3051",
+    "help": null,
+    "labels": [],
+    "message": "configured label `org.opencontainers.image.source` value is empty",
+    "path": "",
+    "primary_span": {
+      "end_byte": 138,
+      "end_column": 39,
+      "end_line": 4,
+      "start_byte": 100,
+      "start_column": 1,
+      "start_line": 4
+    },
+    "severity": "warning"
+  }
+]

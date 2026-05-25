@@ -40,9 +40,9 @@ need to change.
    - `3`: unexpected internal error.
 5. Use `.rudolint.yaml` as the canonical discovered config file. Explicit
    `--config` always wins. Do not discover non-dot-prefixed `rudolint.yaml`.
-6. Be explicit about rule provenance. `RDL` compatibility rules come from
+6. Be explicit about rule provenance. `DL` compatibility rules come from
    Hadolint behavior and should be documented that way. Project-native rules
-   remain under `RDK` for BuildKit behavior and `RSC` for shell behavior.
+   remain under `RDK` for BuildKit behavior and `SC` for shell behavior.
 7. The GitHub Action downloads released binaries only. It must not compile Rust
    in user workflows.
 8. Release targets should be broad from day one, with Linux and macOS for
@@ -481,31 +481,31 @@ Acceptance criteria:
 
 Goal: make the tool useful on common Dockerfiles before chasing edge cases.
 
-1. Tighten existing `RDL1001` fixture coverage.
-2. Tighten existing `RDL3000` fixture coverage for absolute `WORKDIR`.
-3. Tighten existing `RDL3002` fixture coverage for final root user.
-4. Tighten existing `RDL3006` fixture coverage for missing base image tags.
-5. Tighten existing `RDL3007` fixture coverage for `latest` tags.
-6. Tighten existing `RDL3011` fixture coverage for invalid `EXPOSE`.
-7. Tighten existing `RDL3012` fixture coverage for duplicate `HEALTHCHECK`.
-8. Tighten existing `RDL3020` fixture coverage for `ADD` vs `COPY`.
-9. Tighten existing `RDL3024` fixture coverage for duplicate stage aliases.
-10. Tighten existing `RDL3025` fixture coverage for shell-form entrypoints.
-11. Tighten existing `RDL4000` fixture coverage for `MAINTAINER`.
-12. Tighten existing `RDL4003` fixture coverage for duplicate `CMD`.
-13. Tighten existing `RDL4004` fixture coverage for duplicate `ENTRYPOINT`.
-14. Implement `RDL3001` with fixtures.
-15. Implement `RDL3003` with fixtures.
-16. Implement `RDL3004` with fixtures.
-17. Implement `RDL3008` with fixtures.
-18. Implement `RDL3009` with fixtures.
-19. Implement `RDL3010` with fixtures.
-20. Implement `RDL3013` with fixtures.
-21. Implement `RDL3014` with fixtures.
-22. Implement `RDL3015` with fixtures.
-23. Implement `RDL3016` with fixtures.
-24. Implement `RDL3018` with fixtures.
-25. Implement `RDL3019` with fixtures.
+1. Tighten existing `RUD1001` fixture coverage.
+2. Tighten existing `DL3000` fixture coverage for absolute `WORKDIR`.
+3. Tighten existing `DL3002` fixture coverage for final root user.
+4. Tighten existing `DL3006` fixture coverage for missing base image tags.
+5. Tighten existing `DL3007` fixture coverage for `latest` tags.
+6. Tighten existing `DL3011` fixture coverage for invalid `EXPOSE`.
+7. Tighten existing `DL3012` fixture coverage for duplicate `HEALTHCHECK`.
+8. Tighten existing `DL3020` fixture coverage for `ADD` vs `COPY`.
+9. Tighten existing `DL3024` fixture coverage for duplicate stage aliases.
+10. Tighten existing `DL3025` fixture coverage for shell-form entrypoints.
+11. Tighten existing `DL4000` fixture coverage for `MAINTAINER`.
+12. Tighten existing `DL4003` fixture coverage for duplicate `CMD`.
+13. Tighten existing `DL4004` fixture coverage for duplicate `ENTRYPOINT`.
+14. Implement `DL3001` with fixtures.
+15. Implement `DL3003` with fixtures.
+16. Implement `DL3004` with fixtures.
+17. Implement `DL3008` with fixtures.
+18. Implement `DL3009` with fixtures.
+19. Implement `DL3010` with fixtures.
+20. Implement `DL3013` with fixtures.
+21. Implement `DL3014` with fixtures.
+22. Implement `DL3015` with fixtures.
+23. Implement `DL3016` with fixtures.
+24. Implement `DL3018` with fixtures.
+25. Implement `DL3019` with fixtures.
 
 Acceptance criteria:
 
@@ -513,55 +513,55 @@ Acceptance criteria:
 - Every rule has at least one positive and one negative fixture.
 - Every rule has a tested fix, manual suggestion, or no-fix rationale.
 - Compatibility profile output is snapshot-tested.
-- `RDL` rule docs identify Hadolint compatibility provenance.
+- `DL` rule docs identify Hadolint compatibility provenance.
 
 ## Milestone 11: Compatibility Rule Batch 2
 
 Goal: cover copy, add, package-manager, and metadata rules after parser and
 semantic facts are solid.
 
-1. Implement `RDL3021` with fixtures.
-2. Implement `RDL3022` with fixtures.
-3. Implement `RDL3023` with fixtures.
-4. Implement `RDL3026` with fixtures.
-5. Implement `RDL3027` with fixtures.
-6. Implement `RDL3028` with fixtures.
-7. Implement `RDL3029` with fixtures.
-8. Implement `RDL3030` with fixtures.
-9. Implement `RDL3032` with fixtures.
-10. Implement `RDL3033` with fixtures.
-11. Implement `RDL3034` with fixtures.
-12. Implement `RDL3035` with fixtures.
-13. Implement `RDL3036` with fixtures.
-14. Implement `RDL3037` with fixtures.
-15. Implement `RDL3038` with fixtures.
-16. Implement `RDL3040` with fixtures.
-17. Implement `RDL3041` with fixtures.
-18. Implement `RDL3042` with fixtures.
-19. Implement `RDL3043` with fixtures.
-20. Implement `RDL3044` with fixtures.
-21. Implement `RDL3045` with fixtures.
-22. Implement `RDL3046` with fixtures.
-23. Implement `RDL3047` with fixtures.
-24. Implement `RDL3048` with fixtures.
-25. Implement `RDL3049` with fixtures.
-26. Implement `RDL3050` with fixtures.
-27. Implement `RDL3051` with fixtures.
-28. Implement `RDL3052` with fixtures.
-29. Implement `RDL3053` with fixtures.
-30. Implement `RDL3054` with fixtures.
-31. Implement `RDL3055` with fixtures.
-32. Implement `RDL3056` with fixtures.
-33. Implement `RDL3057` with fixtures.
-34. Implement `RDL3058` with fixtures.
-35. Implement `RDL3059` with fixtures.
-36. Implement `RDL3060` with fixtures.
-37. Implement `RDL3061` with fixtures.
-38. Implement `RDL3062` with fixtures.
-39. Implement `RDL3063` with fixtures.
-40. Implement `RDL4001` with fixtures.
-41. Implement `RDL4005` with fixtures.
-42. Implement `RDL4006` with fixtures.
+1. Implement `DL3021` with fixtures.
+2. Implement `DL3022` with fixtures.
+3. Implement `DL3023` with fixtures.
+4. Implement `DL3026` with fixtures.
+5. Implement `DL3027` with fixtures.
+6. Implement `DL3028` with fixtures.
+7. Implement `DL3029` with fixtures.
+8. Implement `DL3030` with fixtures.
+9. Implement `DL3032` with fixtures.
+10. Implement `DL3033` with fixtures.
+11. Implement `DL3034` with fixtures.
+12. Implement `DL3035` with fixtures.
+13. Implement `DL3036` with fixtures.
+14. Implement `DL3037` with fixtures.
+15. Implement `DL3038` with fixtures.
+16. Implement `DL3040` with fixtures.
+17. Implement `DL3041` with fixtures.
+18. Implement `DL3042` with fixtures.
+19. Implement `DL3043` with fixtures.
+20. Implement `DL3044` with fixtures.
+21. Implement `DL3045` with fixtures.
+22. Implement `DL3046` with fixtures.
+23. Implement `DL3047` with fixtures.
+24. Implement `DL3048` with fixtures.
+25. Implement `DL3049` with fixtures.
+26. Implement `DL3050` with fixtures.
+27. Implement `DL3051` with fixtures.
+28. Implement `DL3052` with fixtures.
+29. Implement `DL3053` with fixtures.
+30. Implement `DL3054` with fixtures.
+31. Implement `DL3055` with fixtures.
+32. Implement `DL3056` with fixtures.
+33. Implement `DL3057` with fixtures.
+34. Implement `DL3058` with fixtures.
+35. Implement `DL3059` with fixtures.
+36. Implement `DL3060` with fixtures.
+37. Implement `DL3061` with fixtures.
+38. Implement `DL3062` with fixtures.
+39. Implement `DL3063` with fixtures.
+40. Implement `DL4001` with fixtures.
+41. Implement `DL4005` with fixtures.
+42. Implement `DL4006` with fixtures.
 
 Acceptance criteria:
 
@@ -629,15 +629,15 @@ false positives.
 11. [x] Recognize command substitutions.
 12. [x] Build package-manager command facts on top of shell tokens.
 13. [x] Add shell fixture snapshots.
-14. [x] Implement `RSC2086` after quoting facts are reliable.
-15. [x] Implement `RSC2046` after command substitution facts are reliable.
-16. [x] Implement `RSC2015` after command-chain facts are reliable.
-17. [x] Implement `RSC2164` after `cd` command facts are reliable.
-18. [x] Implement `RSC2155` after assignment facts are reliable.
-19. [x] Add the low-risk tracked `RSC` follow-up batch (`RSC2002`, `RSC2181`)
+14. [x] Implement `SC2086` after quoting facts are reliable.
+15. [x] Implement `SC2046` after command substitution facts are reliable.
+16. [x] Implement `SC2015` after command-chain facts are reliable.
+17. [x] Implement `SC2164` after `cd` command facts are reliable.
+18. [x] Implement `SC2155` after assignment facts are reliable.
+19. [x] Add the low-risk tracked `SC` follow-up batch (`SC2002`, `SC2181`)
     after fixture coverage shows low false-positive risk.
 
-Additional tracked `RSC` IDs remain in `docs/rule-roadmap.md` and should move
+Additional tracked `SC` IDs remain in `docs/rule-roadmap.md` and should move
 into future implementation milestones only when fixture coverage demonstrates
 low false-positive risk.
 
@@ -853,7 +853,7 @@ Acceptance criteria:
 - Do not add shell diagnostics by substring matching.
 - Do not let output renderers influence rule behavior.
 - Do not make the GitHub Action compile Rust in user workflows.
-- Keep Hadolint-derived compatibility behavior in `RDL`.
-- Keep shell behavior in `RSC`.
+- Keep Hadolint-derived compatibility behavior in `DL`.
+- Keep shell behavior in `SC`.
 - Keep BuildKit-native behavior in `RDK`.
 - Keep runtime linting independent from external oracle tools.

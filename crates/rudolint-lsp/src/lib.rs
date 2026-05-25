@@ -327,7 +327,7 @@ mod tests {
     #[test]
     fn converts_finding_to_lsp_diagnostic() {
         let finding = Finding::with_span(
-            "RDL3007",
+            "DL3007",
             Severity::Warning,
             "Avoid latest tag",
             Span {
@@ -350,7 +350,7 @@ mod tests {
         assert_eq!(diagnostic.severity, Some(DiagnosticSeverity::WARNING));
         assert_eq!(
             diagnostic.code,
-            Some(NumberOrString::String("RDL3007".to_string()))
+            Some(NumberOrString::String("DL3007".to_string()))
         );
         assert_eq!(diagnostic.source.as_deref(), Some("rudolint"));
         assert_eq!(diagnostic.message, "Avoid latest tag\n\nPin the image tag.");
@@ -358,19 +358,19 @@ mod tests {
 
     #[test]
     fn converts_many_findings_without_reordering() {
-        let first = Finding::new("RDL3000", Severity::Error, "Use absolute WORKDIR", 1, 1);
-        let second = Finding::new("RDL4000", Severity::Info, "MAINTAINER is deprecated", 3, 1);
+        let first = Finding::new("DL3000", Severity::Error, "Use absolute WORKDIR", 1, 1);
+        let second = Finding::new("DL4000", Severity::Info, "MAINTAINER is deprecated", 3, 1);
 
         let diagnostics = diagnostics(&[first, second]);
 
         assert_eq!(diagnostics.len(), 2);
         assert_eq!(
             diagnostics[0].code,
-            Some(NumberOrString::String("RDL3000".to_string()))
+            Some(NumberOrString::String("DL3000".to_string()))
         );
         assert_eq!(
             diagnostics[1].code,
-            Some(NumberOrString::String("RDL4000".to_string()))
+            Some(NumberOrString::String("DL4000".to_string()))
         );
         assert_eq!(
             diagnostics[1].severity,
@@ -398,7 +398,7 @@ mod tests {
     #[test]
     fn marks_ignored_severity_as_unnecessary_hint() {
         let diagnostic = diagnostic(&Finding::new(
-            "RDL3007",
+            "DL3007",
             Severity::Ignore,
             "Avoid latest tag",
             1,
@@ -427,7 +427,7 @@ mod tests {
             .expect("open document should lint");
 
         assert!(diagnostics.iter().any(
-            |diagnostic| diagnostic.code == Some(NumberOrString::String("RDL3007".to_string()))
+            |diagnostic| diagnostic.code == Some(NumberOrString::String("DL3007".to_string()))
         ));
     }
 
@@ -445,8 +445,8 @@ mod tests {
         let diagnostics = linter
             .lint_open_document(&document)
             .expect("open document should lint");
-        let latest = diagnostic_by_code(&diagnostics, "RDL3007");
-        let maintainer = diagnostic_by_code(&diagnostics, "RDL4000");
+        let latest = diagnostic_by_code(&diagnostics, "DL3007");
+        let maintainer = diagnostic_by_code(&diagnostics, "DL4000");
 
         assert_eq!(
             latest.range,
@@ -470,7 +470,7 @@ mod tests {
             rudolint_rules::Profile::Default,
             Settings {
                 config: Config {
-                    ignore: BTreeSet::from(["RDL3007".to_string()]),
+                    ignore: BTreeSet::from(["DL3007".to_string()]),
                     ..Config::default()
                 },
                 config_path: None,
@@ -488,7 +488,7 @@ mod tests {
             .expect("open document should lint");
 
         assert!(diagnostics.iter().all(
-            |diagnostic| diagnostic.code != Some(NumberOrString::String("RDL3007".to_string()))
+            |diagnostic| diagnostic.code != Some(NumberOrString::String("DL3007".to_string()))
         ));
     }
 
@@ -512,7 +512,7 @@ mod tests {
             .expect("full document change should lint");
 
         assert!(diagnostics.iter().any(
-            |diagnostic| diagnostic.code == Some(NumberOrString::String("RDL3007".to_string()))
+            |diagnostic| diagnostic.code == Some(NumberOrString::String("DL3007".to_string()))
         ));
     }
 
@@ -535,7 +535,7 @@ mod tests {
         let diagnostics = linter
             .lint_changed_document(&params)
             .expect("full document change should lint");
-        let latest = diagnostic_by_code(&diagnostics, "RDL3007");
+        let latest = diagnostic_by_code(&diagnostics, "DL3007");
 
         assert_eq!(
             latest.range,
@@ -624,7 +624,7 @@ mod tests {
     #[test]
     fn discovers_config_from_document_uri() {
         let temp = tempfile::TempDir::new().expect("temp dir should be created");
-        std::fs::write(temp.path().join(".rudolint.yaml"), "ignore:\n  - RDL3007\n")
+        std::fs::write(temp.path().join(".rudolint.yaml"), "ignore:\n  - DL3007\n")
             .expect("config should be written");
         let dockerfile = temp.path().join("Dockerfile");
         std::fs::write(&dockerfile, "FROM alpine:latest\n").expect("Dockerfile should be written");
@@ -643,14 +643,14 @@ mod tests {
             .expect("open document should lint");
 
         assert!(diagnostics.iter().all(
-            |diagnostic| diagnostic.code != Some(NumberOrString::String("RDL3007".to_string()))
+            |diagnostic| diagnostic.code != Some(NumberOrString::String("DL3007".to_string()))
         ));
     }
 
     #[test]
     fn discovers_config_from_workspace_folders() {
         let temp = tempfile::TempDir::new().expect("temp dir should be created");
-        std::fs::write(temp.path().join(".rudolint.yaml"), "ignore:\n  - RDL3007\n")
+        std::fs::write(temp.path().join(".rudolint.yaml"), "ignore:\n  - DL3007\n")
             .expect("config should be written");
         let workspace = lsp_types::WorkspaceFolder {
             uri: file_uri(temp.path()),
@@ -672,7 +672,7 @@ mod tests {
             .expect("open document should lint");
 
         assert!(diagnostics.iter().all(
-            |diagnostic| diagnostic.code != Some(NumberOrString::String("RDL3007".to_string()))
+            |diagnostic| diagnostic.code != Some(NumberOrString::String("DL3007".to_string()))
         ));
     }
 
@@ -681,14 +681,14 @@ mod tests {
         let linter = DocumentLinter::default();
 
         let hover = linter
-            .hover_for_rule("rdl3007")
+            .hover_for_rule("dl3007")
             .expect("rule hover should be built");
 
         let lsp_types::HoverContents::Markup(content) = hover.contents else {
             panic!("hover should use markup content");
         };
         assert_eq!(content.kind, lsp_types::MarkupKind::Markdown);
-        assert!(content.value.contains("**RDL3007**"));
+        assert!(content.value.contains("**DL3007**"));
         assert!(content.value.contains("Severity: `warning`"));
         assert!(content.value.contains("Rule documentation"));
     }
@@ -697,7 +697,7 @@ mod tests {
     fn skips_unknown_rule_hover() {
         let linter = DocumentLinter::default();
 
-        assert!(linter.hover_for_rule("RDL9999").is_none());
+        assert!(linter.hover_for_rule("DL9999").is_none());
     }
 
     /// Safe rule fixes are surfaced as LSP quick-fix workspace edits.

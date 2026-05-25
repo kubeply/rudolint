@@ -150,7 +150,7 @@ USER 1000
     let blocked_codes = findings
         .iter()
         .filter_map(|finding| finding.get("code").and_then(Value::as_str))
-        .filter(|code| matches!(*code, "RDL3010" | "RDL3021" | "RDL3045"))
+        .filter(|code| matches!(*code, "DL3010" | "DL3021" | "DL3045"))
         .collect::<Vec<_>>();
 
     assert!(
@@ -361,7 +361,7 @@ fn explicit_config_can_ignore_rule() {
     let config = temp.path().join(".rudolint.yaml");
     std::fs::write(&dockerfile, "FROM alpine:latest\nWORKDIR app\n")
         .expect("fixture should be written");
-    std::fs::write(&config, "ignore:\n  - RDL3000\n").expect("config should be written");
+    std::fs::write(&config, "ignore:\n  - DL3000\n").expect("config should be written");
 
     let output = rudolint_cmd()
         .args([
@@ -394,7 +394,7 @@ fn explicit_config_can_select_rule_prefix() {
     let config = temp.path().join(".rudolint.yaml");
     std::fs::write(&dockerfile, "FROM alpine:latest\nWORKDIR app\n")
         .expect("fixture should be written");
-    std::fs::write(&config, "select:\n  - RDL3000\n").expect("config should be written");
+    std::fs::write(&config, "select:\n  - DL3000\n").expect("config should be written");
 
     let output = rudolint_cmd()
         .args([
@@ -429,7 +429,7 @@ fn config_per_file_ignores_match_paths_relative_to_config() {
     let config = temp.path().join(".rudolint.yaml");
     std::fs::write(&dockerfile, "FROM alpine:latest\nWORKDIR app\n")
         .expect("fixture should be written");
-    std::fs::write(&config, "per-file-ignores:\n  service/**:\n    - RDL3000\n")
+    std::fs::write(&config, "per-file-ignores:\n  service/**:\n    - DL3000\n")
         .expect("config should be written");
 
     let output = rudolint_cmd()
@@ -454,7 +454,7 @@ fn explicit_config_can_override_severity() {
     let dockerfile = temp.path().join("Dockerfile");
     let config = temp.path().join(".rudolint.yaml");
     std::fs::write(&dockerfile, "FROM alpine:latest\n").expect("fixture should be written");
-    std::fs::write(&config, "severity:\n  RDL3007: error\n").expect("config should be written");
+    std::fs::write(&config, "severity:\n  DL3007: error\n").expect("config should be written");
 
     let output = rudolint_cmd()
         .args([
@@ -485,7 +485,7 @@ fn discovers_nearest_dot_config_from_input_directory() {
     let temp = TempDir::new().expect("temp dir should be created");
     let nested = temp.path().join("service");
     std::fs::create_dir(&nested).expect("nested dir should be created");
-    std::fs::write(temp.path().join(".rudolint.yaml"), "ignore:\n  - RDL3000\n")
+    std::fs::write(temp.path().join(".rudolint.yaml"), "ignore:\n  - DL3000\n")
         .expect("config should be written");
     std::fs::write(
         nested.join("Dockerfile"),
@@ -514,9 +514,9 @@ fn explicit_config_takes_precedence_over_discovered_config() {
     let temp = TempDir::new().expect("temp dir should be created");
     let dockerfile = temp.path().join("Dockerfile");
     let explicit = temp.path().join("explicit.yaml");
-    std::fs::write(temp.path().join(".rudolint.yaml"), "ignore:\n  - RDL3000\n")
+    std::fs::write(temp.path().join(".rudolint.yaml"), "ignore:\n  - DL3000\n")
         .expect("discovered config should be written");
-    std::fs::write(&explicit, "ignore:\n  - RDL3007\n").expect("explicit config should be written");
+    std::fs::write(&explicit, "ignore:\n  - DL3007\n").expect("explicit config should be written");
     std::fs::write(&dockerfile, "FROM alpine:latest\nWORKDIR app\n")
         .expect("fixture should be written");
 
@@ -548,7 +548,7 @@ fn explicit_config_takes_precedence_over_discovered_config() {
 fn no_config_disables_discovery() {
     let temp = TempDir::new().expect("temp dir should be created");
     let dockerfile = temp.path().join("Dockerfile");
-    std::fs::write(temp.path().join(".rudolint.yaml"), "ignore:\n  - RDL3000\n")
+    std::fs::write(temp.path().join(".rudolint.yaml"), "ignore:\n  - DL3000\n")
         .expect("config should be written");
     std::fs::write(&dockerfile, "FROM alpine:latest\nWORKDIR app\n")
         .expect("fixture should be written");
@@ -566,7 +566,7 @@ fn config_parse_errors_include_line_and_column() {
     let dockerfile = temp.path().join("Dockerfile");
     let config = temp.path().join(".rudolint.yaml");
     std::fs::write(&dockerfile, "FROM alpine:3.20\n").expect("fixture should be written");
-    std::fs::write(&config, "ignore: [RDL3000\n").expect("config should be written");
+    std::fs::write(&config, "ignore: [DL3000\n").expect("config should be written");
 
     rudolint_cmd()
         .args(["check"])
@@ -616,7 +616,7 @@ fn no_config_flag_is_accepted() {
 fn config_and_no_config_conflict() {
     let temp = TempDir::new().expect("temp dir should be created");
     let config = temp.path().join(".rudolint.yaml");
-    std::fs::write(&config, "ignore:\n  - RDL3000\n").expect("config should be written");
+    std::fs::write(&config, "ignore:\n  - DL3000\n").expect("config should be written");
 
     rudolint_cmd()
         .args(["check", "--no-config", "--config"])
@@ -900,53 +900,53 @@ fn emits_rules_implemented_text() {
         .success()
         .stdout(predicates::str::contains("RDK1000"))
         .stdout(predicates::str::contains("implemented"))
-        .stdout(predicates::str::contains("RDL3015"))
-        .stdout(predicates::str::contains("RDL3016"))
-        .stdout(predicates::str::contains("RDL3018"))
-        .stdout(predicates::str::contains("RDL3019"))
-        .stdout(predicates::str::contains("RDL3021"))
-        .stdout(predicates::str::contains("RDL3022"))
-        .stdout(predicates::str::contains("RDL3023"))
-        .stdout(predicates::str::contains("RDL3026"))
-        .stdout(predicates::str::contains("RDL3027"))
-        .stdout(predicates::str::contains("RDL3028"))
-        .stdout(predicates::str::contains("RDL3029"))
-        .stdout(predicates::str::contains("RDL3030"))
-        .stdout(predicates::str::contains("RDL3032"))
-        .stdout(predicates::str::contains("RDL3033"))
-        .stdout(predicates::str::contains("RDL3034"))
-        .stdout(predicates::str::contains("RDL3035"))
-        .stdout(predicates::str::contains("RDL3036"))
-        .stdout(predicates::str::contains("RDL3037"))
-        .stdout(predicates::str::contains("RDL3038"))
-        .stdout(predicates::str::contains("RDL3040"))
-        .stdout(predicates::str::contains("RDL3041"))
-        .stdout(predicates::str::contains("RDL3042"))
-        .stdout(predicates::str::contains("RDL3043"))
-        .stdout(predicates::str::contains("RDL3044"))
-        .stdout(predicates::str::contains("RDL3045"))
-        .stdout(predicates::str::contains("RDL3046"))
-        .stdout(predicates::str::contains("RDL3047"))
-        .stdout(predicates::str::contains("RDL3048"))
-        .stdout(predicates::str::contains("RDL3049"))
-        .stdout(predicates::str::contains("RDL3050"))
-        .stdout(predicates::str::contains("RDL3051"))
-        .stdout(predicates::str::contains("RDL3052"))
-        .stdout(predicates::str::contains("RDL3053"))
-        .stdout(predicates::str::contains("RDL3054"))
-        .stdout(predicates::str::contains("RDL3055"))
-        .stdout(predicates::str::contains("RDL3056"))
-        .stdout(predicates::str::contains("RDL3057"))
-        .stdout(predicates::str::contains("RDL3058"))
-        .stdout(predicates::str::contains("RDL3059"))
-        .stdout(predicates::str::contains("RDL3060"))
-        .stdout(predicates::str::contains("RDL3061"))
-        .stdout(predicates::str::contains("RDL3062"))
-        .stdout(predicates::str::contains("RDL3063"))
-        .stdout(predicates::str::contains("RDL4001"))
-        .stdout(predicates::str::contains("RDL4005"))
-        .stdout(predicates::str::contains("RDL4006"))
-        .stdout(predicates::str::contains("RSC1000").not());
+        .stdout(predicates::str::contains("DL3015"))
+        .stdout(predicates::str::contains("DL3016"))
+        .stdout(predicates::str::contains("DL3018"))
+        .stdout(predicates::str::contains("DL3019"))
+        .stdout(predicates::str::contains("DL3021"))
+        .stdout(predicates::str::contains("DL3022"))
+        .stdout(predicates::str::contains("DL3023"))
+        .stdout(predicates::str::contains("DL3026"))
+        .stdout(predicates::str::contains("DL3027"))
+        .stdout(predicates::str::contains("DL3028"))
+        .stdout(predicates::str::contains("DL3029"))
+        .stdout(predicates::str::contains("DL3030"))
+        .stdout(predicates::str::contains("DL3032"))
+        .stdout(predicates::str::contains("DL3033"))
+        .stdout(predicates::str::contains("DL3034"))
+        .stdout(predicates::str::contains("DL3035"))
+        .stdout(predicates::str::contains("DL3036"))
+        .stdout(predicates::str::contains("DL3037"))
+        .stdout(predicates::str::contains("DL3038"))
+        .stdout(predicates::str::contains("DL3040"))
+        .stdout(predicates::str::contains("DL3041"))
+        .stdout(predicates::str::contains("DL3042"))
+        .stdout(predicates::str::contains("DL3043"))
+        .stdout(predicates::str::contains("DL3044"))
+        .stdout(predicates::str::contains("DL3045"))
+        .stdout(predicates::str::contains("DL3046"))
+        .stdout(predicates::str::contains("DL3047"))
+        .stdout(predicates::str::contains("DL3048"))
+        .stdout(predicates::str::contains("DL3049"))
+        .stdout(predicates::str::contains("DL3050"))
+        .stdout(predicates::str::contains("DL3051"))
+        .stdout(predicates::str::contains("DL3052"))
+        .stdout(predicates::str::contains("DL3053"))
+        .stdout(predicates::str::contains("DL3054"))
+        .stdout(predicates::str::contains("DL3055"))
+        .stdout(predicates::str::contains("DL3056"))
+        .stdout(predicates::str::contains("DL3057"))
+        .stdout(predicates::str::contains("DL3058"))
+        .stdout(predicates::str::contains("DL3059"))
+        .stdout(predicates::str::contains("DL3060"))
+        .stdout(predicates::str::contains("DL3061"))
+        .stdout(predicates::str::contains("DL3062"))
+        .stdout(predicates::str::contains("DL3063"))
+        .stdout(predicates::str::contains("DL4001"))
+        .stdout(predicates::str::contains("DL4005"))
+        .stdout(predicates::str::contains("DL4006"))
+        .stdout(predicates::str::contains("SC1000").not());
 }
 
 #[test]
@@ -966,16 +966,16 @@ fn emits_full_rules_json() {
 #[test]
 fn explains_rule() {
     rudolint_cmd()
-        .args(["explain", "RDL3007"])
+        .args(["explain", "DL3007"])
         .assert()
         .success()
-        .stdout(predicates::str::contains("RDL3007"))
+        .stdout(predicates::str::contains("DL3007"))
         .stdout(predicates::str::contains("reject latest base image tags"));
 }
 
 #[test]
 fn unknown_explain_rule_exits_with_code_two() {
-    rudolint_cmd().args(["explain", "RDL9999"]).assert().code(2);
+    rudolint_cmd().args(["explain", "DL9999"]).assert().code(2);
 }
 
 #[test]

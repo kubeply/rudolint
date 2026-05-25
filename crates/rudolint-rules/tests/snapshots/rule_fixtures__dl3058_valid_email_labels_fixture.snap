@@ -1,0 +1,55 @@
+---
+source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 1118
+expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
+---
+[
+  {
+    "code": "DL3058",
+    "help": null,
+    "labels": [],
+    "message": "configured email label is not a valid email address",
+    "path": "",
+    "primary_span": {
+      "end_byte": 198,
+      "end_column": 54,
+      "end_line": 4,
+      "start_byte": 145,
+      "start_column": 1,
+      "start_line": 4
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3058",
+    "help": null,
+    "labels": [],
+    "message": "configured email label is not a valid email address",
+    "path": "",
+    "primary_span": {
+      "end_byte": 245,
+      "end_column": 47,
+      "end_line": 5,
+      "start_byte": 199,
+      "start_column": 1,
+      "start_line": 5
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3058",
+    "help": null,
+    "labels": [],
+    "message": "configured email label is not a valid email address",
+    "path": "",
+    "primary_span": {
+      "end_byte": 299,
+      "end_column": 54,
+      "end_line": 6,
+      "start_byte": 246,
+      "start_column": 1,
+      "start_line": 6
+    },
+    "severity": "warning"
+  }
+]

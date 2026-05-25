@@ -1,0 +1,55 @@
+---
+source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 311
+expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
+---
+[
+  {
+    "code": "DL3013",
+    "help": null,
+    "labels": [],
+    "message": "pin versions in pip install",
+    "path": "",
+    "primary_span": {
+      "end_byte": 43,
+      "end_column": 22,
+      "end_line": 2,
+      "start_byte": 22,
+      "start_column": 1,
+      "start_line": 2
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3013",
+    "help": null,
+    "labels": [],
+    "message": "pin versions in pip install",
+    "path": "",
+    "primary_span": {
+      "end_byte": 127,
+      "end_column": 55,
+      "end_line": 4,
+      "start_byte": 73,
+      "start_column": 1,
+      "start_line": 4
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3013",
+    "help": null,
+    "labels": [],
+    "message": "pin versions in pip install",
+    "path": "",
+    "primary_span": {
+      "end_byte": 495,
+      "end_column": 46,
+      "end_line": 12,
+      "start_byte": 450,
+      "start_column": 1,
+      "start_line": 12
+    },
+    "severity": "warning"
+  }
+]

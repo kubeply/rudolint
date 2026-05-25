@@ -27,7 +27,7 @@ expression: normalized_json(&output)
           "message": {
             "text": "avoid mutable latest base image tags"
           },
-          "ruleId": "RDL3007"
+          "ruleId": "DL3007"
         },
         {
           "level": "error",
@@ -49,7 +49,7 @@ expression: normalized_json(&output)
           "message": {
             "text": "WORKDIR should be absolute"
           },
-          "ruleId": "RDL3000"
+          "ruleId": "DL3000"
         }
       ],
       "tool": {
@@ -61,18 +61,18 @@ expression: normalized_json(&output)
               "defaultConfiguration": {
                 "level": "warning"
               },
-              "id": "RDL3007",
+              "id": "DL3007",
               "shortDescription": {
-                "text": "RDL3007"
+                "text": "DL3007"
               }
             },
             {
               "defaultConfiguration": {
                 "level": "error"
               },
-              "id": "RDL3000",
+              "id": "DL3000",
               "shortDescription": {
-                "text": "RDL3000"
+                "text": "DL3000"
               }
             }
           ]

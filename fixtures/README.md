@@ -24,7 +24,7 @@ exercise.
   `corpus/<case-name>/` when a benchmark case needs multiple files.
 
 Use lowercase names with hyphens for descriptive parts, for example
-`rules/RDL3007.no-latest-tag/Dockerfile`,
+`rules/DL3007.no-latest-tag/Dockerfile`,
 `buildkit/multi-stage-cache/Dockerfile`, or
 `corpus/large-image-scan/Dockerfile`.
 

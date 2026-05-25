@@ -1,0 +1,71 @@
+---
+source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 1150
+expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
+---
+[
+  {
+    "code": "DL3060",
+    "help": null,
+    "labels": [],
+    "message": "`yarn cache clean` missing after `yarn install` was run",
+    "path": "",
+    "primary_span": {
+      "end_byte": 36,
+      "end_column": 17,
+      "end_line": 2,
+      "start_byte": 20,
+      "start_column": 1,
+      "start_line": 2
+    },
+    "severity": "info"
+  },
+  {
+    "code": "DL3060",
+    "help": null,
+    "labels": [],
+    "message": "`yarn cache clean` missing after `yarn install` was run",
+    "path": "",
+    "primary_span": {
+      "end_byte": 110,
+      "end_column": 37,
+      "end_line": 4,
+      "start_byte": 74,
+      "start_column": 1,
+      "start_line": 4
+    },
+    "severity": "info"
+  },
+  {
+    "code": "DL3060",
+    "help": null,
+    "labels": [],
+    "message": "`yarn cache clean` missing after `yarn install` was run",
+    "path": "",
+    "primary_span": {
+      "end_byte": 138,
+      "end_column": 28,
+      "end_line": 5,
+      "start_byte": 111,
+      "start_column": 1,
+      "start_line": 5
+    },
+    "severity": "info"
+  },
+  {
+    "code": "DL3060",
+    "help": null,
+    "labels": [],
+    "message": "`yarn cache clean` missing after `yarn install` was run",
+    "path": "",
+    "primary_span": {
+      "end_byte": 385,
+      "end_column": 66,
+      "end_line": 9,
+      "start_byte": 320,
+      "start_column": 1,
+      "start_line": 9
+    },
+    "severity": "info"
+  }
+]

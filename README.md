@@ -139,17 +139,17 @@ ignore:
   - RDK1003
 
 select:
-  - RDL
+  - DL
   - RDK1008
 
 severity:
-  RDL3007: error
+  DL3007: error
   RDK1000: warning
 
 per-file-ignores:
   # Patterns are matched relative to this config file's directory.
   fixtures/**:
-    - RDL3000
+    - DL3000
 
 trusted-registries:
   - docker.io
@@ -166,9 +166,10 @@ rudolint check . --config .rudolint.yaml
 
 | Prefix | Scope |
 | --- | --- |
-| `RDL` | Broad Dockerfile correctness, reproducibility, and maintainability checks. |
-| `RDK` | BuildKit-specific behavior such as frontend directives, mounts, entitlements, and Buildx platform behavior. |
-| `RSC` | Shell diagnostics extracted from `RUN` bodies. |
+| `DL` | Hadolint-compatible Dockerfile diagnostics. |
+| `RDK` | Rudolint-native BuildKit diagnostics such as frontend directives, mounts, entitlements, and Buildx platform behavior. |
+| `RUD` | Rudolint-native migration and project policy diagnostics. |
+| `SC` | ShellCheck-compatible diagnostics extracted from `RUN` bodies. |
 
 ## More Docs
 

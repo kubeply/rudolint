@@ -1,0 +1,119 @@
+---
+source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 660
+expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
+---
+[
+  {
+    "code": "DL3036",
+    "help": null,
+    "labels": [],
+    "message": "clean zypper metadata with `zypper clean` in the same RUN layer",
+    "path": "",
+    "primary_span": {
+      "end_byte": 50,
+      "end_column": 27,
+      "end_line": 2,
+      "start_byte": 24,
+      "start_column": 1,
+      "start_line": 2
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3036",
+    "help": null,
+    "labels": [],
+    "message": "clean zypper metadata with `zypper clean` in the same RUN layer",
+    "path": "",
+    "primary_span": {
+      "end_byte": 119,
+      "end_column": 26,
+      "end_line": 4,
+      "start_byte": 94,
+      "start_column": 1,
+      "start_line": 4
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3036",
+    "help": null,
+    "labels": [],
+    "message": "clean zypper metadata with `zypper clean` in the same RUN layer",
+    "path": "",
+    "primary_span": {
+      "end_byte": 217,
+      "end_column": 38,
+      "end_line": 8,
+      "start_byte": 180,
+      "start_column": 1,
+      "start_line": 8
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3036",
+    "help": null,
+    "labels": [],
+    "message": "clean zypper metadata with `zypper clean` in the same RUN layer",
+    "path": "",
+    "primary_span": {
+      "end_byte": 259,
+      "end_column": 42,
+      "end_line": 9,
+      "start_byte": 218,
+      "start_column": 1,
+      "start_line": 9
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3036",
+    "help": null,
+    "labels": [],
+    "message": "clean zypper metadata with `zypper clean` in the same RUN layer",
+    "path": "",
+    "primary_span": {
+      "end_byte": 287,
+      "end_column": 28,
+      "end_line": 10,
+      "start_byte": 260,
+      "start_column": 1,
+      "start_line": 10
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3036",
+    "help": null,
+    "labels": [],
+    "message": "clean zypper metadata with `zypper clean` in the same RUN layer",
+    "path": "",
+    "primary_span": {
+      "end_byte": 312,
+      "end_column": 25,
+      "end_line": 11,
+      "start_byte": 288,
+      "start_column": 1,
+      "start_line": 11
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3036",
+    "help": null,
+    "labels": [],
+    "message": "clean zypper metadata with `zypper clean` in the same RUN layer",
+    "path": "",
+    "primary_span": {
+      "end_byte": 410,
+      "end_column": 66,
+      "end_line": 13,
+      "start_byte": 345,
+      "start_column": 1,
+      "start_line": 13
+    },
+    "severity": "warning"
+  }
+]

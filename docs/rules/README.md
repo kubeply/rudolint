@@ -1,7 +1,7 @@
 # Rule Documentation
 
 Each implemented rule should have a dedicated page named after the rule code,
-for example `RDL3007.md` or `RDK1000.md`.
+for example `DL3007.md` or `RDK1000.md`.
 
 Rule pages should include:
 
@@ -19,8 +19,8 @@ Rule pages should include:
   - no-fix rationale.
 - compatibility notes.
 
-`RDL` pages document Hadolint compatibility provenance. `RDK` pages document
-project-native BuildKit behavior. `RSC` pages document shell-analysis behavior
+`DL` pages document Hadolint compatibility provenance. `RDK` pages document
+project-native BuildKit behavior. `SC` pages document ShellCheck-style behavior
 implemented by `rudolint-shell`.
 
 ## Adding a Rule

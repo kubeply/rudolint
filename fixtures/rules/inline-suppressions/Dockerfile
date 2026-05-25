@@ -1,7 +1,7 @@
-# rudolint ignore=RDL3007
+# rudolint ignore=DL3007
 FROM alpine:latest
 
-# rudolint ignore=RDL3000
+# rudolint ignore=DL3000
 WORKDIR relative
 
 # rudolint ignore=RDK1001

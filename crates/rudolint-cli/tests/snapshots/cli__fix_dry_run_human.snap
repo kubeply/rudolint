@@ -3,6 +3,6 @@ source: crates/rudolint-cli/tests/cli.rs
 expression: output
 ---
 $TEMP/Dockerfile:
-  1:1 warning RDL3007 avoid mutable latest base image tags
-  2:1 error RDL3000 WORKDIR should be absolute
+  1:1 warning DL3007 avoid mutable latest base image tags
+  2:1 error DL3000 WORKDIR should be absolute
 fixes: dry-run mode is enabled; no fixes are currently available

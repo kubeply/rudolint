@@ -5,7 +5,7 @@ expression: output
 {
   "findings": [
     {
-      "code": "RDL3000",
+      "code": "DL3000",
       "help": null,
       "labels": [],
       "message": "WORKDIR should be absolute",

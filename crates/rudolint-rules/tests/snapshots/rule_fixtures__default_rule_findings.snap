@@ -5,7 +5,7 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
 ---
 [
   {
-    "code": "RDL3007",
+    "code": "DL3007",
     "help": null,
     "labels": [],
     "message": "avoid mutable latest base image tags",
@@ -21,7 +21,7 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "severity": "warning"
   },
   {
-    "code": "RDL3000",
+    "code": "DL3000",
     "help": null,
     "labels": [],
     "message": "WORKDIR should be absolute",
@@ -53,6 +53,38 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "severity": "warning"
   },
   {
+    "code": "DL3018",
+    "help": null,
+    "labels": [],
+    "message": "pin versions in apk add",
+    "path": "",
+    "primary_span": {
+      "end_byte": 100,
+      "end_column": 17,
+      "end_line": 5,
+      "start_byte": 84,
+      "start_column": 1,
+      "start_line": 5
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3019",
+    "help": null,
+    "labels": [],
+    "message": "use `apk add --no-cache` to avoid persisting the apk package cache",
+    "path": "",
+    "primary_span": {
+      "end_byte": 100,
+      "end_column": 17,
+      "end_line": 5,
+      "start_byte": 84,
+      "start_column": 1,
+      "start_line": 5
+    },
+    "severity": "info"
+  },
+  {
     "code": "RDK1003",
     "help": null,
     "labels": [],
@@ -69,39 +101,7 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "severity": "info"
   },
   {
-    "code": "RDL3018",
-    "help": null,
-    "labels": [],
-    "message": "pin versions in apk add",
-    "path": "",
-    "primary_span": {
-      "end_byte": 100,
-      "end_column": 17,
-      "end_line": 5,
-      "start_byte": 84,
-      "start_column": 1,
-      "start_line": 5
-    },
-    "severity": "warning"
-  },
-  {
-    "code": "RDL3019",
-    "help": null,
-    "labels": [],
-    "message": "use `apk add --no-cache` to avoid persisting the apk package cache",
-    "path": "",
-    "primary_span": {
-      "end_byte": 100,
-      "end_column": 17,
-      "end_line": 5,
-      "start_byte": 84,
-      "start_column": 1,
-      "start_line": 5
-    },
-    "severity": "info"
-  },
-  {
-    "code": "RDL3020",
+    "code": "DL3020",
     "help": null,
     "labels": [],
     "message": "use COPY for local files unless archive extraction or remote fetch is intended",
@@ -117,7 +117,7 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "severity": "error"
   },
   {
-    "code": "RDL3025",
+    "code": "DL3025",
     "help": null,
     "labels": [],
     "message": "use exec/JSON form for CMD and ENTRYPOINT",
@@ -133,7 +133,7 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "severity": "warning"
   },
   {
-    "code": "RDL4003",
+    "code": "DL4003",
     "help": null,
     "labels": [],
     "message": "only the final CMD is used",

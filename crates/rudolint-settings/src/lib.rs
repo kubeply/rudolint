@@ -88,28 +88,28 @@ mod tests {
         let temp = tempfile::TempDir::new().expect("temp dir should be created");
         let discovered = temp.path().join(".rudolint.yaml");
         let explicit = temp.path().join("explicit.yaml");
-        std::fs::write(&discovered, "ignore:\n  - RDL3000\n").expect("config should be written");
-        std::fs::write(&explicit, "ignore:\n  - RDL3007\n").expect("config should be written");
+        std::fs::write(&discovered, "ignore:\n  - DL3000\n").expect("config should be written");
+        std::fs::write(&explicit, "ignore:\n  - DL3007\n").expect("config should be written");
 
         let settings = resolve_from_parts(Some(&explicit), false, vec![temp.path().to_path_buf()])
             .expect("settings should resolve");
 
         assert_eq!(settings.config_path, Some(explicit));
-        assert!(settings.config.ignores("RDL3007"));
-        assert!(!settings.config.ignores("RDL3000"));
+        assert!(settings.config.ignores("DL3007"));
+        assert!(!settings.config.ignores("DL3000"));
     }
 
     #[test]
     fn no_config_skips_discovery() {
         let temp = tempfile::TempDir::new().expect("temp dir should be created");
-        std::fs::write(temp.path().join(".rudolint.yaml"), "ignore:\n  - RDL3000\n")
+        std::fs::write(temp.path().join(".rudolint.yaml"), "ignore:\n  - DL3000\n")
             .expect("config should be written");
 
         let settings = resolve_from_parts(None, true, vec![temp.path().to_path_buf()])
             .expect("settings should resolve");
 
         assert!(settings.config_path.is_none());
-        assert!(!settings.config.ignores("RDL3000"));
+        assert!(!settings.config.ignores("DL3000"));
     }
 
     #[test]
@@ -118,13 +118,13 @@ mod tests {
         let nested = temp.path().join("service");
         std::fs::create_dir(&nested).expect("nested dir should be created");
         let config = temp.path().join(".rudolint.yaml");
-        std::fs::write(&config, "ignore:\n  - RDL3000\n").expect("config should be written");
+        std::fs::write(&config, "ignore:\n  - DL3000\n").expect("config should be written");
 
         let settings =
             resolve_from_parts(None, false, vec![nested]).expect("settings should resolve");
 
         assert_eq!(settings.config_path, Some(config.canonicalize().unwrap()));
-        assert!(settings.config.ignores("RDL3000"));
+        assert!(settings.config.ignores("DL3000"));
     }
 
     #[test]
@@ -135,9 +135,9 @@ mod tests {
         let discovered = temp.path().join(".rudolint.yaml");
         let explicit = temp.path().join("explicit.yaml");
 
-        std::fs::write(&discovered, "ignore: [RDL3000\n")
+        std::fs::write(&discovered, "ignore: [DL3000\n")
             .expect("invalid discovered config should be written");
-        std::fs::write(&explicit, "ignore:\n  - RDL3007\n")
+        std::fs::write(&explicit, "ignore:\n  - DL3007\n")
             .expect("explicit config should be written");
 
         let explicit_settings = resolve_from_parts(Some(&explicit), false, vec![nested.clone()])
@@ -155,8 +155,8 @@ mod tests {
                     .as_ref()
                     .and_then(|path| path.file_name())
                     .and_then(|name| name.to_str()),
-                "ignores_rdl3007": explicit_settings.config.ignores("RDL3007"),
-                "ignores_rdl3000": explicit_settings.config.ignores("RDL3000"),
+                "ignores_dl3007": explicit_settings.config.ignores("DL3007"),
+                "ignores_dl3000": explicit_settings.config.ignores("DL3000"),
             },
             "no_config": {
                 "path": no_config_settings
@@ -164,7 +164,7 @@ mod tests {
                     .as_ref()
                     .and_then(|path| path.file_name())
                     .and_then(|name| name.to_str()),
-                "ignores_rdl3000": no_config_settings.config.ignores("RDL3000"),
+                "ignores_dl3000": no_config_settings.config.ignores("DL3000"),
             },
             "discovered_config_error": discovered_error.contains(".rudolint.yaml"),
         });

@@ -4,7 +4,7 @@ use rudolint_config::Config;
 use rudolint_diagnostics::Finding;
 use rudolint_dockerfile::{Comment, Dockerfile, Instruction};
 use rudolint_fix::FixPreview;
-use rudolint_policy::{InlineSuppression, PolicyProfile};
+use rudolint_policy::{InlineSuppression, LegacySuppression, PolicyProfile};
 
 use crate::{Profile, Rule, RuleInfo, catalog, shell};
 
@@ -113,7 +113,13 @@ impl RuleEngine {
 #[derive(Debug, Clone)]
 struct TargetedSuppression {
     instruction_line: usize,
-    suppression: InlineSuppression,
+    target: Suppression,
+}
+
+#[derive(Debug, Clone)]
+enum Suppression {
+    Native(InlineSuppression),
+    Legacy(LegacySuppression),
 }
 
 fn targeted_suppressions(document: &Dockerfile) -> Vec<TargetedSuppression> {
@@ -128,7 +134,11 @@ fn targeted_suppression(
     comment: &Comment,
     instructions: &[Instruction],
 ) -> Option<TargetedSuppression> {
-    let suppression = InlineSuppression::parse_comment(comment.line, &comment.text)?;
+    let target = InlineSuppression::parse_comment(comment.line, &comment.text)
+        .map(Suppression::Native)
+        .or_else(|| {
+            LegacySuppression::parse_comment(comment.line, &comment.text).map(Suppression::Legacy)
+        })?;
     let instruction_line = instructions
         .iter()
         .find(|instruction| instruction.line > comment.line)?
@@ -136,13 +146,16 @@ fn targeted_suppression(
 
     Some(TargetedSuppression {
         instruction_line,
-        suppression,
+        target,
     })
 }
 
 fn is_suppressed(finding: &Finding, suppressions: &[TargetedSuppression]) -> bool {
     suppressions.iter().any(|suppression| {
         suppression.instruction_line == finding.line()
-            && suppression.suppression.matches(&finding.code)
+            && match &suppression.target {
+                Suppression::Native(native) => native.matches(&finding.code),
+                Suppression::Legacy(legacy) => legacy.matches(&finding.code),
+            }
     })
 }

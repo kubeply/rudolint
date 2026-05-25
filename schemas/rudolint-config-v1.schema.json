@@ -7,10 +7,10 @@
   "examples": [
     {
       "ignore": [
-        "RDL3007"
+        "DL3007"
       ],
       "severity": {
-        "RDL3026": "error"
+        "DL3026": "error"
       },
       "trusted-registries": [
         "docker.io",
@@ -19,16 +19,16 @@
     },
     {
       "select": [
-        "RDL",
+        "DL",
         "RDK"
       ],
       "per-file-ignores": {
         "fixtures/**": [
-          "RDL3008"
+          "DL3008"
         ],
         "legacy/**/Dockerfile": [
-          "RDL",
-          "RSC"
+          "DL",
+          "SC"
         ]
       }
     },
@@ -108,8 +108,8 @@
   "$defs": {
     "ruleSelector": {
       "type": "string",
-      "pattern": "^R[A-Z]{2}([0-9]{4})?$",
-      "description": "Rule family prefix such as RDL or exact rule code such as RDL3007."
+      "pattern": "^(DL|SC|RDK|RUD)([0-9]{4})?$",
+      "description": "Rule family prefix such as DL or exact rule code such as DL3007."
     },
     "ruleSelectorList": {
       "type": "array",
@@ -120,7 +120,7 @@
     },
     "ruleCode": {
       "type": "string",
-      "pattern": "^R[A-Z]{2}[0-9]{4}$"
+      "pattern": "^(DL|SC|RDK|RUD)[0-9]{4}$"
     },
     "severity": {
       "type": "string",

@@ -5,16 +5,16 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
 ---
 [
   {
-    "code": "RDL3020",
+    "code": "DL3020",
     "help": null,
     "labels": [],
     "message": "use COPY for local files unless archive extraction or remote fetch is intended",
     "path": "",
     "primary_span": {
-      "end_byte": 236,
+      "end_byte": 234,
       "end_column": 17,
       "end_line": 13,
-      "start_byte": 220,
+      "start_byte": 218,
       "start_column": 1,
       "start_line": 13
     },

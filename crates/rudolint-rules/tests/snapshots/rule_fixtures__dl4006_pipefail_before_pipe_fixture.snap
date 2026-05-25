@@ -1,0 +1,39 @@
+---
+source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 1335
+expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
+---
+[
+  {
+    "code": "DL4006",
+    "help": null,
+    "labels": [],
+    "message": "set the SHELL option -o pipefail before RUN with a pipe in it",
+    "path": "",
+    "primary_span": {
+      "end_byte": 70,
+      "end_column": 43,
+      "end_line": 2,
+      "start_byte": 28,
+      "start_column": 1,
+      "start_line": 2
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL4006",
+    "help": null,
+    "labels": [],
+    "message": "set the SHELL option -o pipefail before RUN with a pipe in it",
+    "path": "",
+    "primary_span": {
+      "end_byte": 334,
+      "end_column": 43,
+      "end_line": 11,
+      "start_byte": 292,
+      "start_column": 1,
+      "start_line": 11
+    },
+    "severity": "warning"
+  }
+]

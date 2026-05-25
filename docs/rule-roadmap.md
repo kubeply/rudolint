@@ -3,8 +3,8 @@
 This matrix tracks the rule families `rudolint` covers for the v1 supported
 surface and keeps future work separate from implemented rules.
 
-`RDL` compatibility IDs track Hadolint-derived behavior by fixtures and rule
-documentation. `RSC` IDs track shell-analysis rules for `RUN` commands. `RDK`
+`DL` compatibility IDs track Hadolint-derived behavior by fixtures and rule
+documentation. `SC` IDs track ShellCheck-style rules for `RUN` commands. `RDK`
 IDs track BuildKit-native behavior.
 
 The `Enabled profiles` column lists where each implemented rule runs. The
@@ -37,80 +37,80 @@ Negative fixture statuses are:
 | `RDK1008` | BuildKit | `default` | `warning` | yes | yes | shared | `not-applicable` | yes |
 | `RDK1009` | BuildKit | `default` | `warning` | yes | yes | shared | `not-applicable` | yes |
 | `RDK1010` | BuildKit | `default` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL1001` | Compatibility | `default` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3000` | Compatibility | `default`, `hadolint-compat` | `error` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3001` | Compatibility | `default`, `hadolint-compat` | `info` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3002` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | yes | `not-applicable` | yes |
-| `RDL3003` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3004` | Compatibility | `default`, `hadolint-compat` | `error` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3006` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3007` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3008` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3009` | Compatibility | `default`, `hadolint-compat` | `info` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3010` | Compatibility | `default`, `hadolint-compat` | `info` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3011` | Compatibility | `default`, `hadolint-compat` | `error` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3012` | Compatibility | `default`, `hadolint-compat` | `error` | yes | yes | yes | `not-applicable` | yes |
-| `RDL3013` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3014` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3015` | Compatibility | `default`, `hadolint-compat` | `info` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3016` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3018` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3019` | Compatibility | `default`, `hadolint-compat` | `info` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3020` | Compatibility | `default`, `hadolint-compat` | `error` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3021` | Compatibility | `default`, `hadolint-compat` | `error` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3022` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3023` | Compatibility | `default`, `hadolint-compat` | `error` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3024` | Compatibility | `default`, `hadolint-compat` | `error` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3025` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `manual` | yes |
-| `RDL3026` | Compatibility | `default`, `hadolint-compat` | `error` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3027` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3028` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3029` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3030` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3032` | Compatibility | `default`, `hadolint-compat` | `info` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3033` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3034` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3035` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3036` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3037` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3038` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3040` | Compatibility | `default`, `hadolint-compat` | `info` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3041` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3042` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3043` | Compatibility | `default`, `hadolint-compat` | `error` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3044` | Compatibility | `default`, `hadolint-compat` | `error` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3045` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3046` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3047` | Compatibility | `default`, `hadolint-compat` | `info` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3048` | Compatibility | `default`, `hadolint-compat` | `style` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3049` | Compatibility | `default`, `hadolint-compat` | `info` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3050` | Compatibility | `default`, `hadolint-compat` | `info` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3051` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3052` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3053` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3054` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3055` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3056` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3057` | Compatibility | `default`, `hadolint-compat` | `ignore` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3058` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3059` | Compatibility | `default`, `hadolint-compat` | `info` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3060` | Compatibility | `default`, `hadolint-compat` | `info` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3061` | Compatibility | `default`, `hadolint-compat` | `error` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3062` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL3063` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL4000` | Compatibility | `default`, `hadolint-compat` | `error` | yes | yes | shared | `safe` | yes |
-| `RDL4001` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL4003` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | yes | `not-applicable` | yes |
-| `RDL4004` | Compatibility | `default`, `hadolint-compat` | `error` | yes | yes | yes | `not-applicable` | yes |
-| `RDL4005` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RDL4006` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
-| `RSC2002` | Shell | `default`, `hadolint-compat` | `warning` | yes | shared | shared | `not-applicable` | yes |
-| `RSC2015` | Shell | `default`, `hadolint-compat` | `warning` | yes | shared | shared | `not-applicable` | yes |
-| `RSC2046` | Shell | `default`, `hadolint-compat` | `warning` | yes | shared | shared | `not-applicable` | yes |
-| `RSC2086` | Shell | `default`, `hadolint-compat` | `warning` | yes | shared | shared | `not-applicable` | yes |
-| `RSC2155` | Shell | `default`, `hadolint-compat` | `warning` | yes | shared | shared | `not-applicable` | yes |
-| `RSC2164` | Shell | `default`, `hadolint-compat` | `warning` | yes | shared | shared | `not-applicable` | yes |
-| `RSC2181` | Shell | `default`, `hadolint-compat` | `warning` | yes | shared | shared | `not-applicable` | yes |
+| `RUD1001` | Rudolint | `default` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3000` | Compatibility | `default`, `hadolint-compat` | `error` | yes | yes | shared | `not-applicable` | yes |
+| `DL3001` | Compatibility | `default`, `hadolint-compat` | `info` | yes | yes | shared | `not-applicable` | yes |
+| `DL3002` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | yes | `not-applicable` | yes |
+| `DL3003` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3004` | Compatibility | `default`, `hadolint-compat` | `error` | yes | yes | shared | `not-applicable` | yes |
+| `DL3006` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3007` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3008` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3009` | Compatibility | `default`, `hadolint-compat` | `info` | yes | yes | shared | `not-applicable` | yes |
+| `DL3010` | Compatibility | `default`, `hadolint-compat` | `info` | yes | yes | shared | `not-applicable` | yes |
+| `DL3011` | Compatibility | `default`, `hadolint-compat` | `error` | yes | yes | shared | `not-applicable` | yes |
+| `DL3012` | Compatibility | `default`, `hadolint-compat` | `error` | yes | yes | yes | `not-applicable` | yes |
+| `DL3013` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3014` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3015` | Compatibility | `default`, `hadolint-compat` | `info` | yes | yes | shared | `not-applicable` | yes |
+| `DL3016` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3018` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3019` | Compatibility | `default`, `hadolint-compat` | `info` | yes | yes | shared | `not-applicable` | yes |
+| `DL3020` | Compatibility | `default`, `hadolint-compat` | `error` | yes | yes | shared | `not-applicable` | yes |
+| `DL3021` | Compatibility | `default`, `hadolint-compat` | `error` | yes | yes | shared | `not-applicable` | yes |
+| `DL3022` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3023` | Compatibility | `default`, `hadolint-compat` | `error` | yes | yes | shared | `not-applicable` | yes |
+| `DL3024` | Compatibility | `default`, `hadolint-compat` | `error` | yes | yes | shared | `not-applicable` | yes |
+| `DL3025` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `manual` | yes |
+| `DL3026` | Compatibility | `default`, `hadolint-compat` | `error` | yes | yes | shared | `not-applicable` | yes |
+| `DL3027` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3028` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3029` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3030` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3032` | Compatibility | `default`, `hadolint-compat` | `info` | yes | yes | shared | `not-applicable` | yes |
+| `DL3033` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3034` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3035` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3036` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3037` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3038` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3040` | Compatibility | `default`, `hadolint-compat` | `info` | yes | yes | shared | `not-applicable` | yes |
+| `DL3041` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3042` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3043` | Compatibility | `default`, `hadolint-compat` | `error` | yes | yes | shared | `not-applicable` | yes |
+| `DL3044` | Compatibility | `default`, `hadolint-compat` | `error` | yes | yes | shared | `not-applicable` | yes |
+| `DL3045` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3046` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3047` | Compatibility | `default`, `hadolint-compat` | `info` | yes | yes | shared | `not-applicable` | yes |
+| `DL3048` | Compatibility | `default`, `hadolint-compat` | `style` | yes | yes | shared | `not-applicable` | yes |
+| `DL3049` | Compatibility | `default`, `hadolint-compat` | `info` | yes | yes | shared | `not-applicable` | yes |
+| `DL3050` | Compatibility | `default`, `hadolint-compat` | `info` | yes | yes | shared | `not-applicable` | yes |
+| `DL3051` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3052` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3053` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3054` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3055` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3056` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3057` | Compatibility | `default`, `hadolint-compat` | `ignore` | yes | yes | shared | `not-applicable` | yes |
+| `DL3058` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3059` | Compatibility | `default`, `hadolint-compat` | `info` | yes | yes | shared | `not-applicable` | yes |
+| `DL3060` | Compatibility | `default`, `hadolint-compat` | `info` | yes | yes | shared | `not-applicable` | yes |
+| `DL3061` | Compatibility | `default`, `hadolint-compat` | `error` | yes | yes | shared | `not-applicable` | yes |
+| `DL3062` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL3063` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL4000` | Compatibility | `default`, `hadolint-compat` | `error` | yes | yes | shared | `safe` | yes |
+| `DL4001` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL4003` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | yes | `not-applicable` | yes |
+| `DL4004` | Compatibility | `default`, `hadolint-compat` | `error` | yes | yes | yes | `not-applicable` | yes |
+| `DL4005` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `DL4006` | Compatibility | `default`, `hadolint-compat` | `warning` | yes | yes | shared | `not-applicable` | yes |
+| `SC2002` | Shell | `default`, `hadolint-compat` | `warning` | yes | shared | shared | `not-applicable` | yes |
+| `SC2015` | Shell | `default`, `hadolint-compat` | `warning` | yes | shared | shared | `not-applicable` | yes |
+| `SC2046` | Shell | `default`, `hadolint-compat` | `warning` | yes | shared | shared | `not-applicable` | yes |
+| `SC2086` | Shell | `default`, `hadolint-compat` | `warning` | yes | shared | shared | `not-applicable` | yes |
+| `SC2155` | Shell | `default`, `hadolint-compat` | `warning` | yes | shared | shared | `not-applicable` | yes |
+| `SC2164` | Shell | `default`, `hadolint-compat` | `warning` | yes | shared | shared | `not-applicable` | yes |
+| `SC2181` | Shell | `default`, `hadolint-compat` | `warning` | yes | shared | shared | `not-applicable` | yes |
 
 ## Planned Future Shell Rules
 
@@ -119,27 +119,27 @@ commands. They should not be implemented by ad hoc substring checks.
 
 | Rule ID | Family | Enabled profiles | Default severity | Docs | Positive fixture | Negative fixture | Autofix | Source span |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `RSC1000` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
-| `RSC1001` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
-| `RSC1007` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
-| `RSC1010` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
-| `RSC1018` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
-| `RSC1035` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
-| `RSC1045` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
-| `RSC1065` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
-| `RSC1066` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
-| `RSC1077` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
-| `RSC1078` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
-| `RSC1079` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
-| `RSC1081` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
-| `RSC1083` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
-| `RSC1086` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
-| `RSC1095` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
-| `RSC2026` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
-| `RSC2035` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
-| `RSC2140` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
-| `RSC2154` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
-| `RSC2196` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
+| `SC1000` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
+| `SC1001` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
+| `SC1007` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
+| `SC1010` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
+| `SC1018` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
+| `SC1035` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
+| `SC1045` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
+| `SC1065` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
+| `SC1066` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
+| `SC1077` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
+| `SC1078` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
+| `SC1079` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
+| `SC1081` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
+| `SC1083` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
+| `SC1086` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
+| `SC1095` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
+| `SC2026` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
+| `SC2035` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
+| `SC2140` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
+| `SC2154` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
+| `SC2196` | Shell | future | n/a | planned | not-yet | not-yet | not-yet | not-yet |
 
 ## Planned Native And Compatibility Rules
 

@@ -1,0 +1,151 @@
+---
+source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 1182
+expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
+---
+[
+  {
+    "code": "DL3062",
+    "help": null,
+    "labels": [],
+    "message": "pin versions in go package commands",
+    "path": "",
+    "primary_span": {
+      "end_byte": 64,
+      "end_column": 41,
+      "end_line": 2,
+      "start_byte": 24,
+      "start_column": 1,
+      "start_line": 2
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3062",
+    "help": null,
+    "labels": [],
+    "message": "pin versions in go package commands",
+    "path": "",
+    "primary_span": {
+      "end_byte": 160,
+      "end_column": 48,
+      "end_line": 4,
+      "start_byte": 113,
+      "start_column": 1,
+      "start_line": 4
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3062",
+    "help": null,
+    "labels": [],
+    "message": "pin versions in go package commands",
+    "path": "",
+    "primary_span": {
+      "end_byte": 191,
+      "end_column": 31,
+      "end_line": 5,
+      "start_byte": 161,
+      "start_column": 1,
+      "start_line": 5
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3062",
+    "help": null,
+    "labels": [],
+    "message": "pin versions in go package commands",
+    "path": "",
+    "primary_span": {
+      "end_byte": 227,
+      "end_column": 36,
+      "end_line": 6,
+      "start_byte": 192,
+      "start_column": 1,
+      "start_line": 6
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3062",
+    "help": null,
+    "labels": [],
+    "message": "pin versions in go package commands",
+    "path": "",
+    "primary_span": {
+      "end_byte": 257,
+      "end_column": 30,
+      "end_line": 7,
+      "start_byte": 228,
+      "start_column": 1,
+      "start_line": 7
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3062",
+    "help": null,
+    "labels": [],
+    "message": "pin versions in go package commands",
+    "path": "",
+    "primary_span": {
+      "end_byte": 393,
+      "end_column": 39,
+      "end_line": 11,
+      "start_byte": 355,
+      "start_column": 1,
+      "start_line": 11
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3062",
+    "help": null,
+    "labels": [],
+    "message": "pin versions in go package commands",
+    "path": "",
+    "primary_span": {
+      "end_byte": 500,
+      "end_column": 50,
+      "end_line": 13,
+      "start_byte": 451,
+      "start_column": 1,
+      "start_line": 13
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3062",
+    "help": null,
+    "labels": [],
+    "message": "pin versions in go package commands",
+    "path": "",
+    "primary_span": {
+      "end_byte": 709,
+      "end_column": 42,
+      "end_line": 20,
+      "start_byte": 668,
+      "start_column": 1,
+      "start_line": 20
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3062",
+    "help": null,
+    "labels": [],
+    "message": "pin versions in go package commands",
+    "path": "",
+    "primary_span": {
+      "end_byte": 814,
+      "end_column": 49,
+      "end_line": 22,
+      "start_byte": 766,
+      "start_column": 1,
+      "start_line": 22
+    },
+    "severity": "warning"
+  }
+]

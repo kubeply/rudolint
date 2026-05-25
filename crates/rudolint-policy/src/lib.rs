@@ -73,6 +73,8 @@ pub struct LegacySuppression {
     pub line: usize,
     /// Legacy tool that owns the suppression syntax.
     pub tool: LegacySuppressionTool,
+    /// Rule target covered by the suppression.
+    pub target: SuppressionTarget,
 }
 
 impl LegacySuppression {
@@ -87,11 +89,14 @@ impl LegacySuppression {
         };
 
         let ignored = rest.trim_start().strip_prefix("ignore=")?.trim();
-        if ignored.is_empty() {
-            return None;
-        }
+        let target = SuppressionTarget::parse(ignored)?;
 
-        Some(Self { line, tool })
+        Some(Self { line, tool, target })
+    }
+
+    /// Returns true when this suppression applies to `code`.
+    pub fn matches(&self, code: &str) -> bool {
+        self.target.matches(code)
     }
 }
 
@@ -208,15 +213,14 @@ mod tests {
 
     #[test]
     fn parses_project_native_inline_suppression_comments() {
-        let suppression =
-            InlineSuppression::parse_comment(12, "# rudolint ignore=rdl3000, RDK1001")
-                .expect("suppression should parse");
+        let suppression = InlineSuppression::parse_comment(12, "# rudolint ignore=dl3000, RDK1001")
+            .expect("suppression should parse");
 
         assert_eq!(suppression.line, 12);
         assert!(matches!(suppression.target, SuppressionTarget::Codes(_)));
-        assert!(suppression.matches("RDL3000"));
+        assert!(suppression.matches("DL3000"));
         assert!(suppression.matches("RDK1001"));
-        assert!(!suppression.matches("RDL3007"));
+        assert!(!suppression.matches("DL3007"));
     }
 
     #[test]
@@ -225,7 +229,7 @@ mod tests {
             .expect("suppression should parse");
 
         assert_eq!(suppression.target, SuppressionTarget::All);
-        assert!(suppression.matches("RDL3000"));
+        assert!(suppression.matches("DL3000"));
         assert!(suppression.matches("RDK1003"));
     }
 
@@ -243,11 +247,13 @@ mod tests {
 
         assert_eq!(suppression.line, 8);
         assert_eq!(suppression.tool, LegacySuppressionTool::Hadolint);
+        assert!(suppression.matches("DL3007"));
+        assert!(!suppression.matches("DL3000"));
     }
 
     #[test]
     fn ignores_unrelated_or_empty_legacy_suppression_comments() {
-        assert!(LegacySuppression::parse_comment(1, "# rudolint ignore=RDL3000").is_none());
+        assert!(LegacySuppression::parse_comment(1, "# rudolint ignore=DL3000").is_none());
         assert!(LegacySuppression::parse_comment(1, "# hadolint ignore=").is_none());
         assert!(LegacySuppression::parse_comment(1, "# regular comment").is_none());
     }

@@ -1,115 +1,116 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 146
 expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
 ---
 [
   {
-    "code": "RSC2002",
+    "code": "SC2002",
     "help": null,
     "labels": [],
     "message": "avoid piping cat output when the next command can read files directly",
     "path": "",
     "primary_span": {
-      "end_byte": 89,
+      "end_byte": 88,
       "end_column": 29,
       "end_line": 4,
-      "start_byte": 61,
+      "start_byte": 60,
       "start_column": 1,
       "start_line": 4
     },
     "severity": "warning"
   },
   {
-    "code": "RSC2086",
+    "code": "SC2086",
     "help": null,
     "labels": [],
     "message": "quote variable expansions to prevent word splitting and globbing",
     "path": "",
     "primary_span": {
-      "end_byte": 238,
+      "end_byte": 235,
       "end_column": 15,
       "end_line": 8,
-      "start_byte": 224,
+      "start_byte": 221,
       "start_column": 1,
       "start_line": 8
     },
     "severity": "warning"
   },
   {
-    "code": "RSC2046",
+    "code": "SC2046",
     "help": null,
     "labels": [],
     "message": "quote command substitutions to prevent word splitting",
     "path": "",
     "primary_span": {
-      "end_byte": 358,
+      "end_byte": 353,
       "end_column": 18,
       "end_line": 12,
-      "start_byte": 341,
+      "start_byte": 336,
       "start_column": 1,
       "start_line": 12
     },
     "severity": "warning"
   },
   {
-    "code": "RSC2015",
+    "code": "SC2015",
     "help": null,
     "labels": [],
     "message": "A && B || C is not a safe conditional expression",
     "path": "",
     "primary_span": {
-      "end_byte": 489,
+      "end_byte": 482,
       "end_column": 42,
       "end_line": 16,
-      "start_byte": 448,
+      "start_byte": 441,
       "start_column": 1,
       "start_line": 16
     },
     "severity": "warning"
   },
   {
-    "code": "RSC2155",
+    "code": "SC2155",
     "help": null,
     "labels": [],
     "message": "declare and assign separately to avoid masking command failures",
     "path": "",
     "primary_span": {
-      "end_byte": 743,
+      "end_byte": 733,
       "end_column": 31,
       "end_line": 22,
-      "start_byte": 713,
+      "start_byte": 703,
       "start_column": 1,
       "start_line": 22
     },
     "severity": "warning"
   },
   {
-    "code": "RSC2164",
+    "code": "SC2164",
     "help": null,
     "labels": [],
     "message": "check cd exit status before running more commands",
     "path": "",
     "primary_span": {
-      "end_byte": 878,
+      "end_byte": 866,
       "end_column": 18,
       "end_line": 26,
-      "start_byte": 861,
+      "start_byte": 849,
       "start_column": 1,
       "start_line": 26
     },
     "severity": "warning"
   },
   {
-    "code": "RSC2181",
+    "code": "SC2181",
     "help": null,
     "labels": [],
     "message": "check command exit status directly instead of testing $?",
     "path": "",
     "primary_span": {
-      "end_byte": 1075,
+      "end_byte": 1060,
       "end_column": 24,
       "end_line": 32,
-      "start_byte": 1052,
+      "start_byte": 1037,
       "start_column": 1,
       "start_line": 32
     },

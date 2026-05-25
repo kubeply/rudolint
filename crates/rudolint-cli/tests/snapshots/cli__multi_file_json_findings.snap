@@ -5,7 +5,7 @@ expression: output
 {
   "findings": [
     {
-      "code": "RDL3007",
+      "code": "DL3007",
       "help": null,
       "labels": [],
       "message": "avoid mutable latest base image tags",
@@ -21,7 +21,7 @@ expression: output
       "severity": "warning"
     },
     {
-      "code": "RDL3006",
+      "code": "DL3006",
       "help": null,
       "labels": [],
       "message": "base image should use an explicit tag or digest",
@@ -37,7 +37,7 @@ expression: output
       "severity": "warning"
     },
     {
-      "code": "RDL3000",
+      "code": "DL3000",
       "help": null,
       "labels": [],
       "message": "WORKDIR should be absolute",

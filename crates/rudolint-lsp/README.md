@@ -30,7 +30,7 @@ stdout.
 
 - full document synchronization
 - diagnostics on open and full-document changes
-- hover content for rule codes such as `RDL3007` and `RDK1004`
+- hover content for rule codes such as `DL3007` and `RDK1004`
 - safe quick-fix code actions from automatically applicable fixes
 - workspace and document-level `.rudolint.yaml` discovery
 

@@ -27,7 +27,7 @@ expression: output
           "message": {
             "text": "avoid mutable latest base image tags"
           },
-          "ruleId": "RDL3007"
+          "ruleId": "DL3007"
         },
         {
           "level": "warning",
@@ -49,7 +49,7 @@ expression: output
           "message": {
             "text": "base image should use an explicit tag or digest"
           },
-          "ruleId": "RDL3006"
+          "ruleId": "DL3006"
         },
         {
           "level": "error",
@@ -71,7 +71,7 @@ expression: output
           "message": {
             "text": "WORKDIR should be absolute"
           },
-          "ruleId": "RDL3000"
+          "ruleId": "DL3000"
         }
       ],
       "tool": {
@@ -83,27 +83,27 @@ expression: output
               "defaultConfiguration": {
                 "level": "warning"
               },
-              "id": "RDL3007",
+              "id": "DL3007",
               "shortDescription": {
-                "text": "RDL3007"
+                "text": "DL3007"
               }
             },
             {
               "defaultConfiguration": {
                 "level": "warning"
               },
-              "id": "RDL3006",
+              "id": "DL3006",
               "shortDescription": {
-                "text": "RDL3006"
+                "text": "DL3006"
               }
             },
             {
               "defaultConfiguration": {
                 "level": "error"
               },
-              "id": "RDL3000",
+              "id": "DL3000",
               "shortDescription": {
-                "text": "RDL3000"
+                "text": "DL3000"
               }
             }
           ]

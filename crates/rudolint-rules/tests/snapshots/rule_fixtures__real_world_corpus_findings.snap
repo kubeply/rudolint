@@ -68,7 +68,7 @@ expression: "serde_json::to_value(&cases).expect(\"cases should serialize\")"
   {
     "findings": [
       {
-        "code": "RDL3029",
+        "code": "DL3029",
         "help": null,
         "labels": [],
         "message": "avoid `--platform` in FROM; prefer build-time platform selection",

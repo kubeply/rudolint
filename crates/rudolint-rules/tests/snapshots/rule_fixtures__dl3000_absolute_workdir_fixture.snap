@@ -1,0 +1,71 @@
+---
+source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 99
+expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
+---
+[
+  {
+    "code": "DL3000",
+    "help": null,
+    "labels": [],
+    "message": "WORKDIR should be absolute",
+    "path": "",
+    "primary_span": {
+      "end_byte": 231,
+      "end_column": 12,
+      "end_line": 11,
+      "start_byte": 220,
+      "start_column": 1,
+      "start_line": 11
+    },
+    "severity": "error"
+  },
+  {
+    "code": "DL3000",
+    "help": null,
+    "labels": [],
+    "message": "WORKDIR should be absolute",
+    "path": "",
+    "primary_span": {
+      "end_byte": 279,
+      "end_column": 14,
+      "end_line": 14,
+      "start_byte": 266,
+      "start_column": 1,
+      "start_line": 14
+    },
+    "severity": "error"
+  },
+  {
+    "code": "DL3000",
+    "help": null,
+    "labels": [],
+    "message": "WORKDIR should be absolute",
+    "path": "",
+    "primary_span": {
+      "end_byte": 331,
+      "end_column": 15,
+      "end_line": 17,
+      "start_byte": 317,
+      "start_column": 1,
+      "start_line": 17
+    },
+    "severity": "error"
+  },
+  {
+    "code": "DL3000",
+    "help": null,
+    "labels": [],
+    "message": "WORKDIR should be absolute",
+    "path": "",
+    "primary_span": {
+      "end_byte": 382,
+      "end_column": 14,
+      "end_line": 20,
+      "start_byte": 369,
+      "start_column": 1,
+      "start_line": 20
+    },
+    "severity": "error"
+  }
+]

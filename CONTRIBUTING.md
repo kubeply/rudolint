@@ -90,7 +90,7 @@ Rules should be deterministic and should not perform network access. Avoid
 filesystem access inside rule implementations unless the CLI explicitly enables
 repository-wide analysis for that mode.
 
-`RDL` rules document Hadolint compatibility provenance. `RSC` rules document
+`DL` rules document Hadolint compatibility provenance. `SC` rules document
 shell-analysis behavior. BuildKit-native rules use `RDK`.
 
 Every rule must declare one of:

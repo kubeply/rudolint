@@ -1,12 +1,13 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 1685
 expression: snapshot
 ---
 {
   "config_filters": {
-    "ignore_rdl3000": [
+    "ignore_dl3000": [
       {
-        "code": "RDL3007",
+        "code": "DL3007",
         "severity": "warning"
       },
       {
@@ -14,33 +15,33 @@ expression: snapshot
         "severity": "warning"
       },
       {
+        "code": "DL3018",
+        "severity": "warning"
+      },
+      {
+        "code": "DL3019",
+        "severity": "info"
+      },
+      {
         "code": "RDK1003",
         "severity": "info"
       },
       {
-        "code": "RDL3018",
-        "severity": "warning"
-      },
-      {
-        "code": "RDL3019",
-        "severity": "info"
-      },
-      {
-        "code": "RDL3020",
+        "code": "DL3020",
         "severity": "error"
       },
       {
-        "code": "RDL3025",
+        "code": "DL3025",
         "severity": "warning"
       },
       {
-        "code": "RDL4003",
+        "code": "DL4003",
         "severity": "warning"
       }
     ],
-    "per_file_ignore_rdl3000": [
+    "per_file_ignore_dl3000": [
       {
-        "code": "RDL3007",
+        "code": "DL3007",
         "severity": "warning"
       },
       {
@@ -48,27 +49,27 @@ expression: snapshot
         "severity": "warning"
       },
       {
+        "code": "DL3018",
+        "severity": "warning"
+      },
+      {
+        "code": "DL3019",
+        "severity": "info"
+      },
+      {
         "code": "RDK1003",
         "severity": "info"
       },
       {
-        "code": "RDL3018",
-        "severity": "warning"
-      },
-      {
-        "code": "RDL3019",
-        "severity": "info"
-      },
-      {
-        "code": "RDL3020",
+        "code": "DL3020",
         "severity": "error"
       },
       {
-        "code": "RDL3025",
+        "code": "DL3025",
         "severity": "warning"
       },
       {
-        "code": "RDL4003",
+        "code": "DL4003",
         "severity": "warning"
       }
     ],
@@ -82,114 +83,180 @@ expression: snapshot
         "severity": "info"
       }
     ],
-    "severity_override_rdl3007": [
+    "severity_override_dl3007": [
       {
-        "code": "RDL3007",
+        "code": "DL3007",
         "severity": "error"
       },
       {
-        "code": "RDL3000",
+        "code": "DL3000",
         "severity": "error"
       },
       {
-        "code": "RDL3018",
+        "code": "DL3018",
         "severity": "warning"
       },
       {
-        "code": "RDL3019",
+        "code": "DL3019",
         "severity": "info"
       },
       {
-        "code": "RDL3020",
+        "code": "DL3020",
         "severity": "error"
       },
       {
-        "code": "RDL3025",
+        "code": "DL3025",
         "severity": "warning"
       },
       {
-        "code": "RDL4003",
+        "code": "DL4003",
         "severity": "warning"
       }
     ]
   },
   "implemented_catalog": {
     "compat": [
-      "RDL3000",
-      "RDL3001",
-      "RDL3002",
-      "RDL3003",
-      "RDL3004",
-      "RDL3006",
-      "RDL3007",
-      "RDL3008",
-      "RDL3009",
-      "RDL3010",
-      "RDL3011",
-      "RDL3012",
-      "RDL3013",
-      "RDL3014",
-      "RDL3015",
-      "RDL3016",
-      "RDL3018",
-      "RDL3019",
-      "RDL3020",
-      "RDL3021",
-      "RDL3022",
-      "RDL3023",
-      "RDL3024",
-      "RDL3025",
-      "RDL3026",
-      "RDL3027",
-      "RDL3028",
-      "RDL3029",
-      "RDL3030",
-      "RDL3032",
-      "RDL3033",
-      "RDL3034",
-      "RDL3035",
-      "RDL3036",
-      "RDL3037",
-      "RDL3038",
-      "RDL3040",
-      "RDL3041",
-      "RDL3042",
-      "RDL3043",
-      "RDL3044",
-      "RDL3045",
-      "RDL3046",
-      "RDL3047",
-      "RDL3048",
-      "RDL3049",
-      "RDL3050",
-      "RDL3051",
-      "RDL3052",
-      "RDL3053",
-      "RDL3054",
-      "RDL3055",
-      "RDL3056",
-      "RDL3057",
-      "RDL3058",
-      "RDL3059",
-      "RDL3060",
-      "RDL3061",
-      "RDL3062",
-      "RDL3063",
-      "RDL4000",
-      "RDL4001",
-      "RDL4003",
-      "RDL4004",
-      "RDL4005",
-      "RDL4006",
-      "RSC2002",
-      "RSC2015",
-      "RSC2046",
-      "RSC2086",
-      "RSC2155",
-      "RSC2164",
-      "RSC2181"
+      "DL3000",
+      "DL3001",
+      "DL3002",
+      "DL3003",
+      "DL3004",
+      "DL3006",
+      "DL3007",
+      "DL3008",
+      "DL3009",
+      "DL3010",
+      "DL3011",
+      "DL3012",
+      "DL3013",
+      "DL3014",
+      "DL3015",
+      "DL3016",
+      "DL3018",
+      "DL3019",
+      "DL3020",
+      "DL3021",
+      "DL3022",
+      "DL3023",
+      "DL3024",
+      "DL3025",
+      "DL3026",
+      "DL3027",
+      "DL3028",
+      "DL3029",
+      "DL3030",
+      "DL3032",
+      "DL3033",
+      "DL3034",
+      "DL3035",
+      "DL3036",
+      "DL3037",
+      "DL3038",
+      "DL3040",
+      "DL3041",
+      "DL3042",
+      "DL3043",
+      "DL3044",
+      "DL3045",
+      "DL3046",
+      "DL3047",
+      "DL3048",
+      "DL3049",
+      "DL3050",
+      "DL3051",
+      "DL3052",
+      "DL3053",
+      "DL3054",
+      "DL3055",
+      "DL3056",
+      "DL3057",
+      "DL3058",
+      "DL3059",
+      "DL3060",
+      "DL3061",
+      "DL3062",
+      "DL3063",
+      "DL4000",
+      "DL4001",
+      "DL4003",
+      "DL4004",
+      "DL4005",
+      "DL4006",
+      "SC2002",
+      "SC2015",
+      "SC2046",
+      "SC2086",
+      "SC2155",
+      "SC2164",
+      "SC2181"
     ],
     "default": [
+      "DL3000",
+      "DL3001",
+      "DL3002",
+      "DL3003",
+      "DL3004",
+      "DL3006",
+      "DL3007",
+      "DL3008",
+      "DL3009",
+      "DL3010",
+      "DL3011",
+      "DL3012",
+      "DL3013",
+      "DL3014",
+      "DL3015",
+      "DL3016",
+      "DL3018",
+      "DL3019",
+      "DL3020",
+      "DL3021",
+      "DL3022",
+      "DL3023",
+      "DL3024",
+      "DL3025",
+      "DL3026",
+      "DL3027",
+      "DL3028",
+      "DL3029",
+      "DL3030",
+      "DL3032",
+      "DL3033",
+      "DL3034",
+      "DL3035",
+      "DL3036",
+      "DL3037",
+      "DL3038",
+      "DL3040",
+      "DL3041",
+      "DL3042",
+      "DL3043",
+      "DL3044",
+      "DL3045",
+      "DL3046",
+      "DL3047",
+      "DL3048",
+      "DL3049",
+      "DL3050",
+      "DL3051",
+      "DL3052",
+      "DL3053",
+      "DL3054",
+      "DL3055",
+      "DL3056",
+      "DL3057",
+      "DL3058",
+      "DL3059",
+      "DL3060",
+      "DL3061",
+      "DL3062",
+      "DL3063",
+      "DL4000",
+      "DL4001",
+      "DL4003",
+      "DL4004",
+      "DL4005",
+      "DL4006",
       "RDK1000",
       "RDK1001",
       "RDK1002",
@@ -201,120 +268,54 @@ expression: snapshot
       "RDK1008",
       "RDK1009",
       "RDK1010",
-      "RDL1001",
-      "RDL3000",
-      "RDL3001",
-      "RDL3002",
-      "RDL3003",
-      "RDL3004",
-      "RDL3006",
-      "RDL3007",
-      "RDL3008",
-      "RDL3009",
-      "RDL3010",
-      "RDL3011",
-      "RDL3012",
-      "RDL3013",
-      "RDL3014",
-      "RDL3015",
-      "RDL3016",
-      "RDL3018",
-      "RDL3019",
-      "RDL3020",
-      "RDL3021",
-      "RDL3022",
-      "RDL3023",
-      "RDL3024",
-      "RDL3025",
-      "RDL3026",
-      "RDL3027",
-      "RDL3028",
-      "RDL3029",
-      "RDL3030",
-      "RDL3032",
-      "RDL3033",
-      "RDL3034",
-      "RDL3035",
-      "RDL3036",
-      "RDL3037",
-      "RDL3038",
-      "RDL3040",
-      "RDL3041",
-      "RDL3042",
-      "RDL3043",
-      "RDL3044",
-      "RDL3045",
-      "RDL3046",
-      "RDL3047",
-      "RDL3048",
-      "RDL3049",
-      "RDL3050",
-      "RDL3051",
-      "RDL3052",
-      "RDL3053",
-      "RDL3054",
-      "RDL3055",
-      "RDL3056",
-      "RDL3057",
-      "RDL3058",
-      "RDL3059",
-      "RDL3060",
-      "RDL3061",
-      "RDL3062",
-      "RDL3063",
-      "RDL4000",
-      "RDL4001",
-      "RDL4003",
-      "RDL4004",
-      "RDL4005",
-      "RDL4006",
-      "RSC2002",
-      "RSC2015",
-      "RSC2046",
-      "RSC2086",
-      "RSC2155",
-      "RSC2164",
-      "RSC2181"
+      "RUD1001",
+      "SC2002",
+      "SC2015",
+      "SC2046",
+      "SC2086",
+      "SC2155",
+      "SC2164",
+      "SC2181"
     ]
   },
   "profile_findings": {
     "compat": [
       {
-        "code": "RDL3007",
+        "code": "DL3007",
         "severity": "warning"
       },
       {
-        "code": "RDL3000",
+        "code": "DL3000",
         "severity": "error"
       },
       {
-        "code": "RDL3018",
+        "code": "DL3018",
         "severity": "warning"
       },
       {
-        "code": "RDL3019",
+        "code": "DL3019",
         "severity": "info"
       },
       {
-        "code": "RDL3020",
+        "code": "DL3020",
         "severity": "error"
       },
       {
-        "code": "RDL3025",
+        "code": "DL3025",
         "severity": "warning"
       },
       {
-        "code": "RDL4003",
+        "code": "DL4003",
         "severity": "warning"
       }
     ],
     "default": [
       {
-        "code": "RDL3007",
+        "code": "DL3007",
         "severity": "warning"
       },
       {
-        "code": "RDL3000",
+        "code": "DL3000",
         "severity": "error"
       },
       {
@@ -322,27 +323,27 @@ expression: snapshot
         "severity": "warning"
       },
       {
+        "code": "DL3018",
+        "severity": "warning"
+      },
+      {
+        "code": "DL3019",
+        "severity": "info"
+      },
+      {
         "code": "RDK1003",
         "severity": "info"
       },
       {
-        "code": "RDL3018",
-        "severity": "warning"
-      },
-      {
-        "code": "RDL3019",
-        "severity": "info"
-      },
-      {
-        "code": "RDL3020",
+        "code": "DL3020",
         "severity": "error"
       },
       {
-        "code": "RDL3025",
+        "code": "DL3025",
         "severity": "warning"
       },
       {
-        "code": "RDL4003",
+        "code": "DL4003",
         "severity": "warning"
       }
     ]
