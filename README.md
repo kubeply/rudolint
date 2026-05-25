@@ -29,7 +29,13 @@ workflows.
 ## Install
 
 ```bash
-curl --proto '=https' --tlsv1.2 -LsSf https://github.com/kubeply/rudolint/releases/latest/download/rudolint-installer.sh | sh
+curl -LsSf https://kubeply.com/rudolint/install.sh | sh
+```
+
+To install a specific release, include the tag in the URL:
+
+```bash
+curl -LsSf https://kubeply.com/rudolint/v1.0.0/install.sh | sh
 ```
 
 ## Usage

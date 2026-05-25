@@ -99,7 +99,7 @@ After the `Release` workflow succeeds, verify:
 
   ```bash
   curl --proto '=https' --tlsv1.2 -LsSf \
-    https://github.com/kubeply/rudolint/releases/download/<tag>/rudolint-installer.sh \
+    https://kubeply.com/rudolint/<tag>/install.sh \
     | sh
   rudolint --version
   ```
@@ -158,9 +158,7 @@ install into `CARGO_HOME` by default.
 Install the latest CLI release:
 
 ```bash
-curl --proto '=https' --tlsv1.2 -LsSf \
-  https://github.com/kubeply/rudolint/releases/latest/download/rudolint-installer.sh \
-  | sh
+curl -LsSf https://kubeply.com/rudolint/install.sh | sh
 ```
 
 Install the latest LSP server release:
@@ -174,9 +172,7 @@ curl --proto '=https' --tlsv1.2 -LsSf \
 Pinned CLI release:
 
 ```bash
-curl --proto '=https' --tlsv1.2 -LsSf \
-  https://github.com/kubeply/rudolint/releases/download/<tag>/rudolint-installer.sh \
-  | sh
+curl -LsSf https://kubeply.com/rudolint/<tag>/install.sh | sh
 ```
 
 Pinned LSP server release:
