@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use clap::builder::Styles;
-use clap::builder::styling::{AnsiColor, Color, Style};
+use clap::builder::styling::{AnsiColor, Color, RgbColor, Style};
 use clap::{Args, Parser, Subcommand, ValueEnum};
 use rudolint_diagnostics::Severity;
 use rudolint_rules::Profile;
@@ -31,12 +31,14 @@ fn styled(text: &str, color: AnsiColor) -> String {
 
 fn cli_styles() -> Styles {
     Styles::styled()
-        .literal(
-            Style::new()
-                .fg_color(Some(Color::Ansi(AnsiColor::BrightBlack)))
-                .bold(),
-        )
+        .literal(kubeply_accent_style())
         .placeholder(Style::new())
+}
+
+fn kubeply_accent_style() -> Style {
+    Style::new()
+        .fg_color(Some(Color::Rgb(RgbColor(0x14, 0xb8, 0xa6))))
+        .bold()
 }
 
 #[derive(Debug, Parser)]
@@ -259,9 +261,19 @@ mod tests {
             .expect("check subcommand should exist");
         let help = check.render_long_help().ansi().to_string();
 
-        assert!(help.contains("\x1b[1m\x1b[90m--format\x1b[0m"));
+        let styled_format = format!(
+            "{}--format{}",
+            super::kubeply_accent_style().render(),
+            super::kubeply_accent_style().render_reset()
+        );
+        assert!(help.contains(&styled_format));
         assert!(help.contains("<FORMAT>"));
-        assert!(!help.contains("\x1b[1m\x1b[90m<FORMAT>\x1b[0m"));
+        let styled_placeholder = format!(
+            "{}<FORMAT>{}",
+            super::kubeply_accent_style().render(),
+            super::kubeply_accent_style().render_reset()
+        );
+        assert!(!help.contains(&styled_placeholder));
     }
 
     #[test]
