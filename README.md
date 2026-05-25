@@ -35,7 +35,7 @@ curl -LsSf https://kubeply.com/rudolint/install.sh | sh
 To install a specific release, include the tag in the URL:
 
 ```bash
-curl -LsSf https://kubeply.com/rudolint/v1.0.0/install.sh | sh
+curl -LsSf https://kubeply.com/rudolint/<tag>/install.sh | sh
 ```
 
 ## Usage

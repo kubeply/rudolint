@@ -5,9 +5,9 @@
 
 ## Stability
 
-The JSON schema is review-stabilized with snapshots, but it may change before
-`rudolint` reaches `1.0.0`. Treat JSON fields as public enough for CI scripts to
-consume, but pin the binary version when depending on exact field names.
+The JSON schema is review-stabilized with snapshots and stable for v1 releases.
+Treat JSON fields as public enough for CI scripts to consume, but pin the
+binary version when depending on exact field names.
 
 SARIF output targets SARIF 2.1.0 and GitHub code scanning upload expectations.
 Changes should preserve the top-level `$schema`, `version`, `runs`, tool driver,
@@ -24,8 +24,7 @@ listed below.
 ### JSON Compatibility Policy
 
 `schemaVersion` names the JSON contract that automation can validate and parse.
-After `rudolint` reaches `v1.0.0`, patch and minor releases must keep
-`schemaVersion: "v1"` backward compatible.
+Patch and minor releases must keep `schemaVersion: "v1"` backward compatible.
 
 The following changes are breaking and require a new schema version:
 
