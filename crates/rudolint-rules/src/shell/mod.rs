@@ -5,8 +5,10 @@ use rudolint_config::Config;
 use rudolint_diagnostics::{Finding, Severity};
 use rudolint_dockerfile::{Dockerfile, Instruction};
 use rudolint_shell::{
-    QuoteKind, ShellCommandInvocation, ShellExpansionKind, ShellProgram, ShellTokenKind, analyze,
+    QuoteKind, ShellCommandInvocation, ShellExpansionKind, ShellProgram, ShellSpan, ShellToken,
+    ShellTokenKind, analyze,
 };
+use rudolint_source::Span;
 
 pub(crate) fn implemented_catalog() -> Vec<RuleInfo> {
     vec![
@@ -101,12 +103,13 @@ impl Rule for UnquotedCommandSubstitution {
 
     fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
         shell_findings(doc, |instruction, program| {
-            has_unquoted_command_substitution(program).then(|| {
-                diagnostic(
+            unquoted_command_substitution_token(program).map(|token| {
+                shell_diagnostic(
                     "SC2046",
                     Severity::Warning,
                     "quote command substitutions to prevent word splitting",
                     instruction,
+                    &token.span,
                 )
             })
         })
@@ -128,12 +131,13 @@ impl Rule for UnquotedVariableExpansion {
 
     fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
         shell_findings(doc, |instruction, program| {
-            has_unquoted_variable_expansion(program).then(|| {
-                diagnostic(
+            unquoted_variable_expansion_token(program).map(|token| {
+                shell_diagnostic(
                     "SC2086",
                     Severity::Warning,
                     "quote variable expansions to prevent word splitting and globbing",
                     instruction,
+                    &token.span,
                 )
             })
         })
@@ -248,6 +252,58 @@ fn shell_findings(
         .collect()
 }
 
+fn shell_diagnostic(
+    code: &'static str,
+    severity: Severity,
+    message: &'static str,
+    instruction: &Instruction,
+    shell_span: &ShellSpan,
+) -> Finding {
+    let span =
+        dockerfile_span_for_shell_span(instruction, shell_span).unwrap_or(instruction.raw_span);
+    Finding::with_span(code, severity, message, span)
+}
+
+fn dockerfile_span_for_shell_span(
+    instruction: &Instruction,
+    shell_span: &ShellSpan,
+) -> Option<Span> {
+    let shell = instruction.run.as_ref()?.shell.as_ref()?;
+    let start = shell.span.start_byte + shell_span.start;
+    let end = shell.span.start_byte + shell_span.end;
+    let start_position = shell_position(&shell.text, shell_span.start, &shell.span);
+    let end_position = shell_position(&shell.text, shell_span.end, &shell.span);
+
+    Some(Span {
+        start_byte: start,
+        end_byte: end,
+        start_line: start_position.0,
+        start_column: start_position.1,
+        end_line: end_position.0,
+        end_column: end_position.1,
+    })
+}
+
+fn shell_position(shell: &str, byte_offset: usize, base_span: &Span) -> (usize, usize) {
+    let mut line = base_span.start_line;
+    let mut column = base_span.start_column;
+
+    let Some(prefix) = shell.get(..byte_offset) else {
+        return (base_span.start_line, base_span.start_column);
+    };
+
+    for character in prefix.chars() {
+        if character == '\n' {
+            line += 1;
+            column = 1;
+        } else {
+            column += 1;
+        }
+    }
+
+    (line, column)
+}
+
 pub(crate) fn lint(doc: &Dockerfile, config: &Config, path: Option<&Path>) -> Vec<Finding> {
     let mut findings = Vec::new();
     for instruction in doc
@@ -308,12 +364,13 @@ fn lint_program(
         config,
         path,
         findings,
-        has_unquoted_command_substitution(program).then(|| {
-            diagnostic(
+        unquoted_command_substitution_token(program).map(|token| {
+            shell_diagnostic(
                 "SC2046",
                 Severity::Warning,
                 "quote command substitutions to prevent word splitting",
                 instruction,
+                &token.span,
             )
         }),
     );
@@ -322,12 +379,13 @@ fn lint_program(
         config,
         path,
         findings,
-        has_unquoted_variable_expansion(program).then(|| {
-            diagnostic(
+        unquoted_variable_expansion_token(program).map(|token| {
+            shell_diagnostic(
                 "SC2086",
                 Severity::Warning,
                 "quote variable expansions to prevent word splitting and globbing",
                 instruction,
+                &token.span,
             )
         }),
     );
@@ -403,8 +461,11 @@ fn push_if_enabled(
     }
 }
 
-fn has_unquoted_command_substitution(program: &ShellProgram) -> bool {
-    program.tokens.iter().any(|token| {
+// Shell rules currently emit one finding per Dockerfile instruction, so this
+// returns the first offending token to keep diagnostics precise without
+// changing rule cardinality.
+fn unquoted_command_substitution_token(program: &ShellProgram) -> Option<&ShellToken> {
+    program.tokens.iter().find(|token| {
         token.kind == ShellTokenKind::Word
             && token.quote == QuoteKind::None
             && !is_assignment_word(&token.text)
@@ -415,8 +476,11 @@ fn has_unquoted_command_substitution(program: &ShellProgram) -> bool {
     })
 }
 
-fn has_unquoted_variable_expansion(program: &ShellProgram) -> bool {
-    program.tokens.iter().any(|token| {
+// Shell rules currently emit one finding per Dockerfile instruction, so this
+// returns the first offending token to keep diagnostics precise without
+// changing rule cardinality.
+fn unquoted_variable_expansion_token(program: &ShellProgram) -> Option<&ShellToken> {
+    program.tokens.iter().find(|token| {
         token.kind == ShellTokenKind::Word
             && token.quote == QuoteKind::None
             && !is_assignment_word(&token.text)
