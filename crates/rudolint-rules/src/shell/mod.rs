@@ -128,26 +128,14 @@ impl Rule for UnquotedVariableExpansion {
 
     fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
         shell_findings(doc, |instruction, program| {
-            program
-                .tokens
-                .iter()
-                .any(|token| {
-                    token.kind == ShellTokenKind::Word
-                        && token.quote == QuoteKind::None
-                        && !is_assignment_word(&token.text)
-                        && token
-                            .expansions
-                            .iter()
-                            .any(|expansion| expansion.kind == ShellExpansionKind::Variable)
-                })
-                .then(|| {
-                    diagnostic(
-                        "SC2086",
-                        Severity::Warning,
-                        "quote variable expansions to prevent word splitting and globbing",
-                        instruction,
-                    )
-                })
+            has_unquoted_variable_expansion(program).then(|| {
+                diagnostic(
+                    "SC2086",
+                    Severity::Warning,
+                    "quote variable expansions to prevent word splitting and globbing",
+                    instruction,
+                )
+            })
         })
     }
 }
