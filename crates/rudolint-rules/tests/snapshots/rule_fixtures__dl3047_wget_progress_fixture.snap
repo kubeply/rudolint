@@ -26,12 +26,28 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "avoid wget without `--progress=dot:giga`, `-q`, or `-nv`",
     "path": "",
     "primary_span": {
-      "end_byte": 864,
-      "end_column": 52,
-      "end_line": 16,
-      "start_byte": 813,
+      "end_byte": 278,
+      "end_column": 56,
+      "end_line": 6,
+      "start_byte": 223,
       "start_column": 1,
-      "start_line": 16
+      "start_line": 6
+    },
+    "severity": "info"
+  },
+  {
+    "code": "DL3047",
+    "help": null,
+    "labels": [],
+    "message": "avoid wget without `--progress=dot:giga`, `-q`, or `-nv`",
+    "path": "",
+    "primary_span": {
+      "end_byte": 920,
+      "end_column": 52,
+      "end_line": 17,
+      "start_byte": 869,
+      "start_column": 1,
+      "start_line": 17
     },
     "severity": "info"
   }

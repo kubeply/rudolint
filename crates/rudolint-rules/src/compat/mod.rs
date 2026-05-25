@@ -3008,12 +3008,24 @@ fn wget_has_progress_control(arguments: &[String]) -> bool {
 }
 
 fn short_option_bundle_contains(argument: &str, option: char) -> bool {
-    argument.starts_with('-')
-        && !argument.starts_with("--")
-        && argument
-            .chars()
-            .skip(1)
-            .any(|character| character == option)
+    if !argument.starts_with('-') || argument.starts_with("--") {
+        return false;
+    }
+
+    for character in argument.chars().skip(1) {
+        if character == option {
+            return true;
+        }
+        if wget_short_option_takes_inline_value(character) {
+            return false;
+        }
+    }
+
+    false
+}
+
+fn wget_short_option_takes_inline_value(option: char) -> bool {
+    matches!(option, 'O' | 'U')
 }
 
 fn is_valid_docker_label_key(key: &str) -> bool {
