@@ -17,6 +17,8 @@ if [[ -s "$cargo_dist_body" ]]; then
     echo
     echo "## Install, Downloads, Checksums, And Attestations"
     echo
-    cat "$cargo_dist_body"
+    sed -E \
+      's#https://github\.com/kubeply/rudolint/releases/download/([^/[:space:]]+)/rudolint-installer\.sh#https://kubeply.com/rudolint/\1/install.sh#g' \
+      "$cargo_dist_body"
   } >> "$output_notes"
 fi

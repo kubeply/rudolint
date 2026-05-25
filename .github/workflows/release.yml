@@ -101,6 +101,8 @@ jobs:
           JSON
             cat > "$RUNNER_TEMP/cargo-dist-body.md" <<'MARKDOWN'
           cargo-dist installer, download, checksum, and attestation sections
+          curl --proto '=https' --tlsv1.2 -LsSf https://github.com/kubeply/rudolint/releases/download/v1.0.0/rudolint-installer.sh | sh
+          curl --proto '=https' --tlsv1.2 -LsSf https://github.com/kubeply/rudolint/releases/download/v1.0.0/rudolint-lsp-installer.sh | sh
           MARKDOWN
 
             scripts/compose-release-notes.sh \
@@ -111,6 +113,12 @@ jobs:
             grep -F "Example generated change for ${tag}" "$RUNNER_TEMP/notes-${tag}.txt"
             grep -F "## Install, Downloads, Checksums, And Attestations" "$RUNNER_TEMP/notes-${tag}.txt"
             grep -F "cargo-dist installer, download, checksum, and attestation sections" "$RUNNER_TEMP/notes-${tag}.txt"
+            grep -F "https://kubeply.com/rudolint/v1.0.0/install.sh" "$RUNNER_TEMP/notes-${tag}.txt"
+            grep -F "https://github.com/kubeply/rudolint/releases/download/v1.0.0/rudolint-lsp-installer.sh" "$RUNNER_TEMP/notes-${tag}.txt"
+            if grep -F "https://github.com/kubeply/rudolint/releases/download/v1.0.0/rudolint-installer.sh" "$RUNNER_TEMP/notes-${tag}.txt"; then
+              echo "release notes should use the Kubeply CLI install URL" >&2
+              exit 1
+            fi
           done
 
   # Build and packages all the platform-specific things
