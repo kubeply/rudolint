@@ -5,7 +5,7 @@ use std::env;
 use std::fs;
 use std::io::{self, IsTerminal, Read};
 use std::path::{Path, PathBuf};
-use std::process::ExitCode;
+use std::process::{Command as ProcessCommand, ExitCode};
 
 use anyhow::Context;
 use clap::Parser;
@@ -38,6 +38,7 @@ fn run() -> Result<ExitCode, AppError> {
         Command::Check(args) => run_check(args),
         Command::Rules(args) => run_rules(args),
         Command::Explain(args) => run_explain(args),
+        Command::Upgrade(args) => run_upgrade(args, cli.json),
     }
 }
 
@@ -245,6 +246,71 @@ fn run_version(json: bool) -> Result<ExitCode, AppError> {
         println!("{} {}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
     }
     Ok(ExitCode::SUCCESS)
+}
+
+fn run_upgrade(args: cli::UpgradeArgs, json: bool) -> Result<ExitCode, AppError> {
+    let installer_url = upgrade_installer_url(args.tag.as_deref())?;
+    let command = installer_command(&installer_url);
+
+    if args.dry_run {
+        if json {
+            println!(
+                "{}",
+                serde_json::json!({
+                    "installer_url": installer_url,
+                    "command": command,
+                })
+            );
+        } else {
+            println!("{command}");
+        }
+        return Ok(ExitCode::SUCCESS);
+    }
+
+    if cfg!(windows) {
+        return Err(AppError::usage(
+            "`rudolint upgrade` currently requires a Unix-like shell",
+        ));
+    }
+
+    let status = ProcessCommand::new("sh")
+        .arg("-c")
+        .arg(&command)
+        .status()
+        .map_err(|error| AppError::internal(format!("failed to run installer: {error}")))?;
+
+    if !status.success() {
+        return Err(AppError::internal(format!(
+            "installer exited with status {status}"
+        )));
+    }
+
+    Ok(ExitCode::SUCCESS)
+}
+
+fn upgrade_installer_url(version: Option<&str>) -> Result<String, AppError> {
+    let Some(version) = version else {
+        return Ok("https://kubeply.com/rudolint/install.sh".to_string());
+    };
+
+    let normalized = normalize_release_tag(version)?;
+    Ok(format!(
+        "https://kubeply.com/rudolint/{normalized}/install.sh"
+    ))
+}
+
+fn normalize_release_tag(version: &str) -> Result<String, AppError> {
+    let trimmed = version.trim();
+    let version = trimmed.strip_prefix('v').unwrap_or(trimmed);
+    semver::Version::parse(version).map_err(|error| {
+        AppError::usage(format!("invalid release version `{trimmed}`: {error}"))
+    })?;
+
+    Ok(format!("v{version}"))
+}
+
+fn installer_command(installer_url: &str) -> String {
+    format!("curl --proto '=https' --tlsv1.2 -LsSf {installer_url} | sh")
 }
 
 fn run_explain(args: cli::ExplainArgs) -> Result<ExitCode, AppError> {

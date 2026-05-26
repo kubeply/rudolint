@@ -17,6 +17,7 @@ rudolint-fix.workspace = true
 rudolint-output.workspace = true
 rudolint-rules.workspace = true
 rudolint-settings.workspace = true
+semver.workspace = true
 serde_json.workspace = true
 
 [dev-dependencies]

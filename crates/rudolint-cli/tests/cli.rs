@@ -1017,3 +1017,56 @@ fn emits_plain_version() {
             env!("CARGO_PKG_VERSION")
         )));
 }
+
+#[test]
+fn upgrade_dry_run_prints_latest_installer_command() {
+    rudolint_cmd()
+        .args(["upgrade", "--dry-run"])
+        .assert()
+        .success()
+        .stdout(predicates::str::contains(
+            "curl --proto '=https' --tlsv1.2 -LsSf https://kubeply.com/rudolint/install.sh | sh",
+        ));
+}
+
+#[test]
+fn upgrade_dry_run_accepts_pinned_release_tag() {
+    rudolint_cmd()
+        .args(["upgrade", "--dry-run", "--tag", "1.1.1"])
+        .assert()
+        .success()
+        .stdout(predicates::str::contains(
+            "https://kubeply.com/rudolint/v1.1.1/install.sh",
+        ));
+}
+
+#[test]
+fn upgrade_dry_run_json_reports_installer_command() {
+    let output = rudolint_cmd()
+        .args(["--json", "upgrade", "--dry-run", "--tag", "v1.1.1"])
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+
+    let output = String::from_utf8(output).expect("stdout should be UTF-8");
+    let output: Value = serde_json::from_str(&output).expect("upgrade output should be JSON");
+    assert_eq!(
+        output["installer_url"],
+        "https://kubeply.com/rudolint/v1.1.1/install.sh"
+    );
+    assert_eq!(
+        output["command"],
+        "curl --proto '=https' --tlsv1.2 -LsSf https://kubeply.com/rudolint/v1.1.1/install.sh | sh"
+    );
+}
+
+#[test]
+fn upgrade_rejects_invalid_release_version() {
+    rudolint_cmd()
+        .args(["upgrade", "--dry-run", "--tag", "latest;rm"])
+        .assert()
+        .code(2)
+        .stderr(predicates::str::contains("invalid release version"));
+}

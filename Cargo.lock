@@ -1363,6 +1363,7 @@ dependencies = [
  "rudolint-rules",
  "rudolint-settings",
  "rudolint-test",
+ "semver",
  "serde_json",
  "tempfile",
 ]

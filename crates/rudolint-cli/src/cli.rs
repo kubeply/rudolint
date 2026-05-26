@@ -64,6 +64,8 @@ pub enum Command {
     Rules(RulesArgs),
     /// Explain one rule.
     Explain(ExplainArgs),
+    /// Upgrade rudolint using the official installer.
+    Upgrade(UpgradeArgs),
 }
 
 impl Default for Command {
@@ -175,6 +177,17 @@ pub struct ExplainArgs {
     /// Rule profile.
     #[arg(long, value_enum, default_value_t = Profile::Default)]
     pub profile: Profile,
+}
+
+#[derive(Debug, Clone, Args)]
+pub struct UpgradeArgs {
+    /// Install a specific release tag instead of the latest stable release.
+    #[arg(long, value_name = "TAG")]
+    pub tag: Option<String>,
+
+    /// Print the installer command without running it.
+    #[arg(long)]
+    pub dry_run: bool,
 }
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
@@ -302,5 +315,17 @@ mod tests {
         assert!(help.contains("[default: text]"));
         assert!(help.contains("[possible values: text, json, sarif]"));
         assert!(!help.contains("[possible values: human, json, sarif]"));
+    }
+
+    #[test]
+    fn accepts_upgrade_dry_run() {
+        let cli = Cli::try_parse_from(["rudolint", "upgrade", "--dry-run"])
+            .expect("upgrade dry-run should parse");
+
+        let Some(Command::Upgrade(args)) = cli.command else {
+            panic!("expected upgrade command");
+        };
+        assert!(args.dry_run);
+        assert_eq!(args.tag, None);
     }
 }

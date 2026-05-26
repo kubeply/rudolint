@@ -174,6 +174,24 @@ Pinned CLI release:
 curl -LsSf https://kubeply.com/rudolint/<tag>/install.sh | sh
 ```
 
+Upgrade an existing CLI install to the latest release:
+
+```bash
+rudolint upgrade
+```
+
+Preview the installer command without changing the local machine:
+
+```bash
+rudolint upgrade --dry-run
+```
+
+Upgrade to a specific release tag:
+
+```bash
+rudolint upgrade --tag <tag>
+```
+
 Pinned LSP server release:
 
 ```bash

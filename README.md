@@ -38,6 +38,18 @@ To install a specific release, include the tag in the URL:
 curl -LsSf https://kubeply.com/rudolint/<tag>/install.sh | sh
 ```
 
+Upgrade an existing install to the latest release:
+
+```bash
+rudolint upgrade
+```
+
+To upgrade to a specific release tag:
+
+```bash
+rudolint upgrade --tag <tag>
+```
+
 ## Usage
 
 Check one Dockerfile:
