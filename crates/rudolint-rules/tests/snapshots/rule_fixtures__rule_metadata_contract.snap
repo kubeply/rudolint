@@ -1,6 +1,5 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
-assertion_line: 1711
 expression: metadata
 ---
 [
@@ -12,6 +11,9 @@ expression: metadata
     "fix": "none",
     "name": "absolute-workdir",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "require absolute WORKDIR paths"
   },
@@ -23,6 +25,9 @@ expression: metadata
     "fix": "none",
     "name": "disallowed-container-commands",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "avoid commands that rarely make sense during Docker builds"
   },
@@ -34,6 +39,9 @@ expression: metadata
     "fix": "none",
     "name": "final-user-not-root",
     "profile": "hadolint-compat",
+    "signals": [
+      "hardening"
+    ],
     "status": "implemented",
     "summary": "require the final USER to be non-root"
   },
@@ -45,6 +53,9 @@ expression: metadata
     "fix": "none",
     "name": "use-workdir-for-cd",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "prefer WORKDIR over RUN cd"
   },
@@ -56,6 +67,9 @@ expression: metadata
     "fix": "none",
     "name": "no-sudo",
     "profile": "hadolint-compat",
+    "signals": [
+      "hardening"
+    ],
     "status": "implemented",
     "summary": "avoid sudo in Docker builds"
   },
@@ -67,6 +81,9 @@ expression: metadata
     "fix": "none",
     "name": "explicit-from-tag",
     "profile": "hadolint-compat",
+    "signals": [
+      "hardening"
+    ],
     "status": "implemented",
     "summary": "require explicit image tags in FROM"
   },
@@ -78,6 +95,9 @@ expression: metadata
     "fix": "none",
     "name": "no-latest-tag",
     "profile": "hadolint-compat",
+    "signals": [
+      "hardening"
+    ],
     "status": "implemented",
     "summary": "reject latest base image tags"
   },
@@ -89,6 +109,9 @@ expression: metadata
     "fix": "none",
     "name": "pin-apt-get-install-versions",
     "profile": "hadolint-compat",
+    "signals": [
+      "hardening"
+    ],
     "status": "implemented",
     "summary": "pin versions in apt-get install"
   },
@@ -100,6 +123,9 @@ expression: metadata
     "fix": "none",
     "name": "clean-apt-lists",
     "profile": "hadolint-compat",
+    "signals": [
+      "performance"
+    ],
     "status": "implemented",
     "summary": "delete apt-get package lists after use"
   },
@@ -111,6 +137,9 @@ expression: metadata
     "fix": "none",
     "name": "use-add-for-archives",
     "profile": "hadolint-compat",
+    "signals": [
+      "performance"
+    ],
     "status": "implemented",
     "summary": "use ADD for extracting local archives"
   },
@@ -122,6 +151,9 @@ expression: metadata
     "fix": "none",
     "name": "valid-expose-port",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "validate EXPOSE port numbers"
   },
@@ -133,6 +165,9 @@ expression: metadata
     "fix": "none",
     "name": "single-healthcheck",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "allow only one HEALTHCHECK instruction"
   },
@@ -144,6 +179,9 @@ expression: metadata
     "fix": "none",
     "name": "pin-pip-versions",
     "profile": "hadolint-compat",
+    "signals": [
+      "hardening"
+    ],
     "status": "implemented",
     "summary": "pin versions in pip install"
   },
@@ -155,6 +193,9 @@ expression: metadata
     "fix": "none",
     "name": "apt-get-install-assume-yes",
     "profile": "hadolint-compat",
+    "signals": [
+      "performance"
+    ],
     "status": "implemented",
     "summary": "use -y with apt-get install"
   },
@@ -166,6 +207,9 @@ expression: metadata
     "fix": "none",
     "name": "apt-get-no-install-recommends",
     "profile": "hadolint-compat",
+    "signals": [
+      "performance"
+    ],
     "status": "implemented",
     "summary": "avoid recommended packages in apt-get install"
   },
@@ -177,6 +221,9 @@ expression: metadata
     "fix": "none",
     "name": "pin-npm-versions",
     "profile": "hadolint-compat",
+    "signals": [
+      "hardening"
+    ],
     "status": "implemented",
     "summary": "pin versions in npm install"
   },
@@ -188,6 +235,9 @@ expression: metadata
     "fix": "none",
     "name": "pin-apk-versions",
     "profile": "hadolint-compat",
+    "signals": [
+      "hardening"
+    ],
     "status": "implemented",
     "summary": "pin versions in apk add"
   },
@@ -199,6 +249,9 @@ expression: metadata
     "fix": "none",
     "name": "apk-add-no-cache",
     "profile": "hadolint-compat",
+    "signals": [
+      "performance"
+    ],
     "status": "implemented",
     "summary": "use --no-cache with apk add"
   },
@@ -210,6 +263,10 @@ expression: metadata
     "fix": "none",
     "name": "prefer-copy",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness",
+      "hardening"
+    ],
     "status": "implemented",
     "summary": "prefer COPY for plain local files"
   },
@@ -221,6 +278,9 @@ expression: metadata
     "fix": "none",
     "name": "copy-multiple-destination-slash",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "require trailing slash for COPY destinations with multiple sources"
   },
@@ -232,6 +292,9 @@ expression: metadata
     "fix": "none",
     "name": "copy-from-previous-stage",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "require COPY --from references to resolve to previous build stages"
   },
@@ -243,6 +306,9 @@ expression: metadata
     "fix": "none",
     "name": "copy-from-own-stage",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "forbid COPY --from references to the current stage"
   },
@@ -254,6 +320,9 @@ expression: metadata
     "fix": "none",
     "name": "unique-stage-names",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "require unique multi-stage aliases"
   },
@@ -265,6 +334,10 @@ expression: metadata
     "fix": "manual",
     "name": "json-entrypoints",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness",
+      "hardening"
+    ],
     "status": "implemented",
     "summary": "prefer JSON form for CMD and ENTRYPOINT"
   },
@@ -276,6 +349,9 @@ expression: metadata
     "fix": "none",
     "name": "trusted-registries",
     "profile": "hadolint-compat",
+    "signals": [
+      "hardening"
+    ],
     "status": "implemented",
     "summary": "restrict FROM images to trusted registries"
   },
@@ -287,6 +363,9 @@ expression: metadata
     "fix": "none",
     "name": "use-apt-get",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "prefer apt-get or apt-cache over apt"
   },
@@ -298,6 +377,9 @@ expression: metadata
     "fix": "none",
     "name": "pin-gem-versions",
     "profile": "hadolint-compat",
+    "signals": [
+      "hardening"
+    ],
     "status": "implemented",
     "summary": "pin versions in gem install"
   },
@@ -309,6 +391,9 @@ expression: metadata
     "fix": "none",
     "name": "no-from-platform-flag",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "avoid --platform in FROM"
   },
@@ -320,6 +405,9 @@ expression: metadata
     "fix": "none",
     "name": "yum-install-assume-yes",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "use -y with yum install"
   },
@@ -331,6 +419,9 @@ expression: metadata
     "fix": "none",
     "name": "yum-clean-all",
     "profile": "hadolint-compat",
+    "signals": [
+      "performance"
+    ],
     "status": "implemented",
     "summary": "clean yum metadata after installs"
   },
@@ -342,6 +433,9 @@ expression: metadata
     "fix": "none",
     "name": "pin-yum-versions",
     "profile": "hadolint-compat",
+    "signals": [
+      "hardening"
+    ],
     "status": "implemented",
     "summary": "pin versions in yum install"
   },
@@ -353,6 +447,9 @@ expression: metadata
     "fix": "none",
     "name": "zypper-install-assume-yes",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "use a non-interactive flag with zypper install"
   },
@@ -364,6 +461,9 @@ expression: metadata
     "fix": "none",
     "name": "no-zypper-dist-upgrade",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "avoid zypper dist-upgrade"
   },
@@ -375,6 +475,9 @@ expression: metadata
     "fix": "none",
     "name": "zypper-clean",
     "profile": "hadolint-compat",
+    "signals": [
+      "performance"
+    ],
     "status": "implemented",
     "summary": "clean zypper metadata after use"
   },
@@ -386,6 +489,9 @@ expression: metadata
     "fix": "none",
     "name": "pin-zypper-versions",
     "profile": "hadolint-compat",
+    "signals": [
+      "hardening"
+    ],
     "status": "implemented",
     "summary": "pin versions in zypper install"
   },
@@ -397,6 +503,9 @@ expression: metadata
     "fix": "none",
     "name": "dnf-install-assume-yes",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "use -y with dnf install"
   },
@@ -408,6 +517,9 @@ expression: metadata
     "fix": "none",
     "name": "dnf-clean-all",
     "profile": "hadolint-compat",
+    "signals": [
+      "performance"
+    ],
     "status": "implemented",
     "summary": "clean dnf metadata after installs"
   },
@@ -419,6 +531,9 @@ expression: metadata
     "fix": "none",
     "name": "pin-dnf-versions",
     "profile": "hadolint-compat",
+    "signals": [
+      "hardening"
+    ],
     "status": "implemented",
     "summary": "pin versions in dnf install"
   },
@@ -430,6 +545,9 @@ expression: metadata
     "fix": "none",
     "name": "pip-no-cache-dir",
     "profile": "hadolint-compat",
+    "signals": [
+      "performance"
+    ],
     "status": "implemented",
     "summary": "avoid pip cache directories"
   },
@@ -441,6 +559,9 @@ expression: metadata
     "fix": "none",
     "name": "no-onbuild-trigger",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "reject ONBUILD triggers for ONBUILD, FROM, or MAINTAINER"
   },
@@ -452,6 +573,9 @@ expression: metadata
     "fix": "none",
     "name": "no-env-self-reference",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "reject same-statement ENV references"
   },
@@ -463,6 +587,9 @@ expression: metadata
     "fix": "none",
     "name": "copy-relative-without-workdir",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "avoid COPY to relative destinations without WORKDIR"
   },
@@ -474,6 +601,9 @@ expression: metadata
     "fix": "none",
     "name": "useradd-no-log-init",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "use no-log-init with high useradd UIDs"
   },
@@ -485,6 +615,9 @@ expression: metadata
     "fix": "none",
     "name": "wget-progress",
     "profile": "hadolint-compat",
+    "signals": [
+      "performance"
+    ],
     "status": "implemented",
     "summary": "avoid noisy wget progress output"
   },
@@ -496,6 +629,9 @@ expression: metadata
     "fix": "none",
     "name": "valid-label-key",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "reject invalid label keys"
   },
@@ -507,6 +643,9 @@ expression: metadata
     "fix": "none",
     "name": "missing-required-labels",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "require configured labels"
   },
@@ -518,6 +657,9 @@ expression: metadata
     "fix": "none",
     "name": "no-superfluous-labels",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "reject labels outside the configured label schema"
   },
@@ -529,6 +671,9 @@ expression: metadata
     "fix": "none",
     "name": "no-empty-labels",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "reject empty configured label values"
   },
@@ -540,6 +685,9 @@ expression: metadata
     "fix": "none",
     "name": "valid-url-labels",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "validate URL label values"
   },
@@ -551,6 +699,9 @@ expression: metadata
     "fix": "none",
     "name": "valid-rfc3339-labels",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "validate RFC3339 label values"
   },
@@ -562,6 +713,9 @@ expression: metadata
     "fix": "none",
     "name": "valid-spdx-labels",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "validate SPDX license label values"
   },
@@ -573,6 +727,9 @@ expression: metadata
     "fix": "none",
     "name": "valid-git-hash-labels",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "validate git hash label values"
   },
@@ -584,6 +741,9 @@ expression: metadata
     "fix": "none",
     "name": "valid-semver-labels",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "validate semantic version label values"
   },
@@ -595,6 +755,9 @@ expression: metadata
     "fix": "none",
     "name": "missing-healthcheck",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "require HEALTHCHECK instructions"
   },
@@ -606,6 +769,9 @@ expression: metadata
     "fix": "none",
     "name": "valid-email-labels",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "validate email label values"
   },
@@ -617,6 +783,9 @@ expression: metadata
     "fix": "none",
     "name": "consecutive-run",
     "profile": "hadolint-compat",
+    "signals": [
+      "performance"
+    ],
     "status": "implemented",
     "summary": "combine consecutive RUN instructions"
   },
@@ -628,6 +797,9 @@ expression: metadata
     "fix": "none",
     "name": "yarn-cache-clean",
     "profile": "hadolint-compat",
+    "signals": [
+      "performance"
+    ],
     "status": "implemented",
     "summary": "clean yarn cache after yarn install"
   },
@@ -639,6 +811,9 @@ expression: metadata
     "fix": "none",
     "name": "instruction-order",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "require Dockerfiles to begin with FROM, ARG, or comments"
   },
@@ -650,6 +825,9 @@ expression: metadata
     "fix": "none",
     "name": "pin-go-versions",
     "profile": "hadolint-compat",
+    "signals": [
+      "hardening"
+    ],
     "status": "implemented",
     "summary": "pin Go package versions"
   },
@@ -661,6 +839,9 @@ expression: metadata
     "fix": "none",
     "name": "reserved-stage-name",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "avoid reserved stage names"
   },
@@ -672,6 +853,9 @@ expression: metadata
     "fix": "safe",
     "name": "deprecated-maintainer",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "reject deprecated MAINTAINER instructions"
   },
@@ -683,6 +867,10 @@ expression: metadata
     "fix": "none",
     "name": "either-wget-or-curl",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness",
+      "hardening"
+    ],
     "status": "implemented",
     "summary": "use either wget or curl in a stage"
   },
@@ -694,6 +882,9 @@ expression: metadata
     "fix": "none",
     "name": "single-cmd",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "allow only one CMD instruction"
   },
@@ -705,6 +896,9 @@ expression: metadata
     "fix": "none",
     "name": "single-entrypoint",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "allow only one ENTRYPOINT instruction"
   },
@@ -716,6 +910,9 @@ expression: metadata
     "fix": "none",
     "name": "use-shell-for-default-shell",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "use SHELL to change the default shell"
   },
@@ -727,6 +924,9 @@ expression: metadata
     "fix": "none",
     "name": "pipefail-before-pipe",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "set pipefail before RUN instructions with pipes"
   },
@@ -738,6 +938,9 @@ expression: metadata
     "fix": "safe",
     "name": "buildkit-syntax-directive",
     "profile": "default",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "require explicit syntax directive for BuildKit-only features"
   },
@@ -749,6 +952,9 @@ expression: metadata
     "fix": "none",
     "name": "secret-like-arg-or-env",
     "profile": "default",
+    "signals": [
+      "hardening"
+    ],
     "status": "implemented",
     "summary": "reject secret-like ARG and ENV names"
   },
@@ -760,6 +966,9 @@ expression: metadata
     "fix": "none",
     "name": "secret-in-run",
     "profile": "default",
+    "signals": [
+      "hardening"
+    ],
     "status": "implemented",
     "summary": "prefer BuildKit secret mounts for secret-consuming RUN steps"
   },
@@ -771,6 +980,9 @@ expression: metadata
     "fix": "none",
     "name": "cache-mount-for-package-install",
     "profile": "default",
+    "signals": [
+      "performance"
+    ],
     "status": "implemented",
     "summary": "prefer BuildKit cache mounts for package-manager caches"
   },
@@ -782,6 +994,9 @@ expression: metadata
     "fix": "none",
     "name": "secret-mount-copied-to-layer",
     "profile": "default",
+    "signals": [
+      "hardening"
+    ],
     "status": "implemented",
     "summary": "avoid copying BuildKit secret mount contents into image layers"
   },
@@ -793,6 +1008,9 @@ expression: metadata
     "fix": "none",
     "name": "ssh-mount-command-scope",
     "profile": "default",
+    "signals": [
+      "hardening"
+    ],
     "status": "implemented",
     "summary": "scope BuildKit SSH mounts to the command that needs the agent"
   },
@@ -804,6 +1022,9 @@ expression: metadata
     "fix": "none",
     "name": "cache-mount-stable-id",
     "profile": "default",
+    "signals": [
+      "performance"
+    ],
     "status": "implemented",
     "summary": "require stable cache mount ids in multi-stage builds"
   },
@@ -815,6 +1036,10 @@ expression: metadata
     "fix": "none",
     "name": "cache-mount-safe-sharing",
     "profile": "default",
+    "signals": [
+      "correctness",
+      "hardening"
+    ],
     "status": "implemented",
     "summary": "require safe cache mount sharing for lock-based package managers"
   },
@@ -826,6 +1051,9 @@ expression: metadata
     "fix": "none",
     "name": "buildkit-entitlement-opt-in",
     "profile": "default",
+    "signals": [
+      "hardening"
+    ],
     "status": "implemented",
     "summary": "require config opt-in for BuildKit network and security entitlements"
   },
@@ -837,6 +1065,9 @@ expression: metadata
     "fix": "none",
     "name": "multi-platform-host-architecture",
     "profile": "default",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "avoid host architecture detection in multi-platform builds"
   },
@@ -848,6 +1079,9 @@ expression: metadata
     "fix": "none",
     "name": "frontend-version-supports-syntax",
     "profile": "default",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "require a new enough Dockerfile frontend for used syntax"
   },
@@ -859,6 +1093,7 @@ expression: metadata
     "fix": "none",
     "name": "legacy-external-suppression",
     "profile": "default",
+    "signals": [],
     "status": "implemented",
     "summary": "warn on legacy external linter suppression comments"
   },
@@ -870,6 +1105,9 @@ expression: metadata
     "fix": "none",
     "name": "avoid-useless-cat",
     "profile": "hadolint-compat",
+    "signals": [
+      "performance"
+    ],
     "status": "implemented",
     "summary": "avoid piping cat output when the next command can read files directly"
   },
@@ -881,6 +1119,9 @@ expression: metadata
     "fix": "none",
     "name": "command-chain-as-condition",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "avoid using A && B || C as a conditional expression"
   },
@@ -892,6 +1133,9 @@ expression: metadata
     "fix": "none",
     "name": "quote-command-substitutions",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "quote command substitutions to prevent word splitting"
   },
@@ -903,6 +1147,9 @@ expression: metadata
     "fix": "none",
     "name": "quote-variable-expansions",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "quote variable expansions to prevent word splitting and globbing"
   },
@@ -914,6 +1161,9 @@ expression: metadata
     "fix": "none",
     "name": "declare-and-assign-separately",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "declare and assign separately to avoid masking command failures"
   },
@@ -925,6 +1175,9 @@ expression: metadata
     "fix": "none",
     "name": "check-cd-exit-status",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "check cd exit status before running more commands"
   },
@@ -936,6 +1189,9 @@ expression: metadata
     "fix": "none",
     "name": "check-exit-code-directly",
     "profile": "hadolint-compat",
+    "signals": [
+      "correctness"
+    ],
     "status": "implemented",
     "summary": "check command exit status directly instead of testing $?"
   }

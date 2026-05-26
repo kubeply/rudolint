@@ -19,7 +19,7 @@ workflows.
 | --- | --- |
 | Dockerfile parsing | Source-aware parsing for instructions, flags, heredocs, comments, and stage aliases. |
 | BuildKit support | Frontend syntax directives, cache mounts, secret mounts, SSH mounts, insecure entitlements, and Buildx platform checks. |
-| Rule profiles | `default` runs Hadolint-style compatibility rules plus BuildKit-native rules. `hadolint-compat` runs Hadolint-style and shell-style rules without BuildKit-native `RDK` diagnostics. |
+| Rule profiles | `default` runs every implemented rule. `hadolint-compat` keeps Hadolint-style Dockerfile and shell checks. `correctness`, `performance`, and `hardening` focus the output by signal. |
 | CI output | Text output for terminals, JSON for automation, and SARIF for GitHub code scanning. |
 | Configuration | `.rudolint.yaml` supports ignored rules, severity overrides, per-file ignores, selected rule prefixes, and trusted registries. |
 | GitHub Action | A [Marketplace action](https://github.com/marketplace/actions/rudolint) downloads checksummed release binaries and runs `rudolint` without compiling Rust in user workflows. |
@@ -151,8 +151,9 @@ steps:
 Use `profile: hadolint-compat` when you want Hadolint-style Dockerfile and
 shell-style checks without BuildKit-native `RDK` diagnostics. This is useful
 while migrating from Hadolint or when a project is not ready for BuildKit
-recommendations yet. See [docs/action.md](docs/action.md) for the full action
-contract.
+recommendations yet. Use `profile: correctness`, `profile: performance`, or
+`profile: hardening` to run only one signal category. See
+[docs/action.md](docs/action.md) for the full action contract.
 
 ```yaml
 - uses: kubeply/rudolint@v1

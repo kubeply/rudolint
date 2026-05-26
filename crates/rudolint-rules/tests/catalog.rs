@@ -104,29 +104,52 @@ fn rule_matrix_entries_are_known_catalog_rules() {
 
 #[test]
 fn rule_matrix_profile_coverage_matches_catalog() {
-    let default_codes = implemented_catalog_codes(Profile::Default);
-    let compat_codes = implemented_catalog_codes(Profile::HadolintCompat);
+    let profiles = [
+        (Profile::Default, "default"),
+        (Profile::HadolintCompat, "hadolint-compat"),
+        (Profile::Correctness, "correctness"),
+        (Profile::Performance, "performance"),
+        (Profile::Hardening, "hardening"),
+    ];
+    let profile_codes = profiles
+        .iter()
+        .map(|(profile, name)| (*name, implemented_catalog_codes(*profile)))
+        .collect::<Vec<_>>();
 
     for row in rule_matrix_section_rows("## Implemented V1 Surface") {
-        let expected_profiles = match (
-            default_codes.contains(row.code.as_str()),
-            compat_codes.contains(row.code.as_str()),
-        ) {
-            (true, true) => "`default`, `hadolint-compat`",
-            (true, false) => "`default`",
-            (false, true) => "`hadolint-compat`",
-            (false, false) => {
-                panic!(
-                    "{} appears in the implemented matrix but no profile enables it",
-                    row.code
-                )
-            }
-        };
+        let expected_profiles = profile_codes
+            .iter()
+            .filter_map(|(name, codes)| codes.contains(row.code.as_str()).then_some(*name))
+            .map(|name| format!("`{name}`"))
+            .collect::<Vec<_>>();
+        assert!(
+            !expected_profiles.is_empty(),
+            "{} appears in the implemented matrix but no profile enables it",
+            row.code
+        );
+        let expected_profiles = expected_profiles.join(", ");
 
         assert_eq!(
             row.enabled_profiles, expected_profiles,
             "{} has stale profile coverage in docs/rule-roadmap.md",
             row.code
+        );
+    }
+}
+
+#[test]
+fn implemented_rules_are_categorized_for_signal_profiles_when_relevant() {
+    let catalog = RuleEngine::new(Profile::Default, Config::default()).catalog();
+
+    for rule in catalog
+        .iter()
+        .filter(|rule| rule.status == RuleStatus::Implemented)
+        .filter(|rule| rule.code != "RUD1001")
+    {
+        assert!(
+            !rule.metadata.signals.is_empty(),
+            "{} must be assigned to at least one signal profile",
+            rule.code
         );
     }
 }

@@ -16,7 +16,7 @@ use rudolint_policy::PolicyProfile;
 use serde::Serialize;
 
 pub use engine::RuleEngine;
-pub use metadata::{FixAvailability, RuleCategory, RuleMetadata};
+pub use metadata::{FixAvailability, RuleCategory, RuleMetadata, RuleSignal};
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, ValueEnum)]
 pub enum Profile {
@@ -26,6 +26,12 @@ pub enum Profile {
     /// Emit Hadolint-style diagnostics without BuildKit-native rules.
     #[value(name = "hadolint-compat")]
     HadolintCompat,
+    /// Emit high-confidence build correctness diagnostics.
+    Correctness,
+    /// Emit cache, layer, and install performance diagnostics.
+    Performance,
+    /// Emit secret, provenance, pinning, and supply-chain hardening diagnostics.
+    Hardening,
 }
 
 impl From<Profile> for PolicyProfile {
@@ -33,6 +39,9 @@ impl From<Profile> for PolicyProfile {
         match profile {
             Profile::Default => Self::Default,
             Profile::HadolintCompat => Self::HadolintCompat,
+            Profile::Correctness => Self::Correctness,
+            Profile::Performance => Self::Performance,
+            Profile::Hardening => Self::Hardening,
         }
     }
 }

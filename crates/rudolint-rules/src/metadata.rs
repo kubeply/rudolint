@@ -19,6 +19,8 @@ pub struct RuleMetadata {
     pub profile: PolicyProfile,
     /// Broad rule category.
     pub category: RuleCategory,
+    /// Signal profiles this rule belongs to.
+    pub signals: &'static [RuleSignal],
     /// Implementation status of the rule.
     pub status: RuleStatus,
     /// Documentation URL for the rule.
@@ -43,6 +45,7 @@ impl RuleMetadata {
             default_severity,
             profile: profile_for_code(code),
             category: category_for_code(code),
+            signals: signals_for_code(code),
             status: RuleStatus::Implemented,
             docs_url: docs_url(code),
             fix,
@@ -58,6 +61,7 @@ impl RuleMetadata {
             default_severity: Severity::Warning,
             profile: PolicyProfile::HadolintCompat,
             category: RuleCategory::Compatibility,
+            signals: &[],
             status: RuleStatus::Planned,
             docs_url: docs_url(code),
             fix: FixAvailability::None,
@@ -73,9 +77,32 @@ impl RuleMetadata {
             default_severity: Severity::Warning,
             profile: PolicyProfile::HadolintCompat,
             category: RuleCategory::Shell,
+            signals: &[],
             status: RuleStatus::Planned,
             docs_url: docs_url(code),
             fix: FixAvailability::None,
+        }
+    }
+}
+
+/// User-facing signal profiles that group rules by intent.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RuleSignal {
+    /// Rules that catch likely broken, surprising, or non-portable builds.
+    Correctness,
+    /// Rules that improve cache reuse, install speed, or image build efficiency.
+    Performance,
+    /// Rules that reduce secret exposure, unpinned inputs, or supply-chain risk.
+    Hardening,
+}
+
+impl RuleSignal {
+    /// Returns the stable string identifier for this signal.
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Correctness => "correctness",
+            Self::Performance => "performance",
+            Self::Hardening => "hardening",
         }
     }
 }
@@ -152,6 +179,16 @@ macro_rules! rule_metadata {
 
 pub(crate) use rule_metadata;
 
+pub(crate) fn profile_includes_code(profile: PolicyProfile, code: &str) -> bool {
+    match profile {
+        PolicyProfile::Default | PolicyProfile::Strict => true,
+        PolicyProfile::HadolintCompat => code.starts_with("DL") || code.starts_with("SC"),
+        PolicyProfile::Correctness => signals_for_code(code).contains(&RuleSignal::Correctness),
+        PolicyProfile::Performance => signals_for_code(code).contains(&RuleSignal::Performance),
+        PolicyProfile::Hardening => signals_for_code(code).contains(&RuleSignal::Hardening),
+    }
+}
+
 pub(crate) fn diagnostic(
     code: &'static str,
     severity: Severity,
@@ -178,6 +215,39 @@ fn profile_for_code(code: &str) -> PolicyProfile {
         PolicyProfile::HadolintCompat
     } else {
         PolicyProfile::Default
+    }
+}
+
+pub(crate) fn signals_for_code(code: &str) -> &'static [RuleSignal] {
+    use RuleSignal::{Correctness, Hardening, Performance};
+
+    match code {
+        // Rudolint migration hygiene is intentionally kept out of signal profiles.
+        "RUD1001" => &[],
+
+        // Build structure and Dockerfile semantics.
+        "DL3000" | "DL3001" | "DL3003" | "DL3011" | "DL3012" | "DL3021" | "DL3022" | "DL3023"
+        | "DL3024" | "DL3027" | "DL3029" | "DL3030" | "DL3034" | "DL3035" | "DL3038" | "DL3043"
+        | "DL3044" | "DL3045" | "DL3046" | "DL3048" | "DL3049" | "DL3050" | "DL3051" | "DL3052"
+        | "DL3053" | "DL3054" | "DL3055" | "DL3056" | "DL3057" | "DL3058" | "DL3061" | "DL3063"
+        | "DL4000" | "DL4003" | "DL4004" | "DL4005" | "DL4006" | "SC2015" | "SC2046" | "SC2086"
+        | "SC2155" | "SC2164" | "SC2181" | "RDK1000" | "RDK1009" | "RDK1010" => &[Correctness],
+
+        // Build cache, layer, and package install efficiency.
+        "DL3009" | "DL3010" | "DL3014" | "DL3015" | "DL3019" | "DL3032" | "DL3036" | "DL3040"
+        | "DL3042" | "DL3047" | "DL3059" | "DL3060" | "SC2002" | "RDK1003" | "RDK1006" => {
+            &[Performance]
+        }
+
+        // User, provenance, pinning, and secret handling.
+        "DL3002" | "DL3004" | "DL3006" | "DL3007" | "DL3008" | "DL3013" | "DL3016" | "DL3018"
+        | "DL3026" | "DL3028" | "DL3033" | "DL3037" | "DL3041" | "DL3062" | "RDK1001"
+        | "RDK1002" | "RDK1004" | "RDK1005" | "RDK1008" => &[Hardening],
+
+        // Rules that are both a build-safety and hardening concern.
+        "DL3020" | "DL3025" | "DL4001" | "RDK1007" => &[Correctness, Hardening],
+
+        _ => &[],
     }
 }
 

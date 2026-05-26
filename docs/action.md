@@ -46,13 +46,13 @@ Set `version` only when a workflow needs a specific linter release:
       services/worker/Dockerfile
 ```
 
-## Compatibility Profile
+## Rule Profiles
 
 The default profile runs broadly compatible Dockerfile checks plus
-BuildKit-native `RDK` diagnostics. Use `hadolint-compat` when a workflow should
-stay on Hadolint-style Dockerfile and shell-style checks while excluding
-BuildKit-native recommendations. This is useful during migration from Hadolint
-or for repositories that are not ready to enforce BuildKit behavior yet.
+BuildKit-native `RDK` diagnostics. Use `hadolint-compat` when a workflow
+should stay on Hadolint-style Dockerfile and shell-style checks while excluding
+BuildKit-native recommendations. Use `correctness`, `performance`, or
+`hardening` when a workflow should focus on one signal category.
 
 ```yaml
 - uses: kubeply/rudolint@v1
@@ -144,7 +144,8 @@ Show `version` only when documenting how to pin a specific linter release.
   Default: `.`.
 - `config` (optional): `.rudolint.yaml` path. Default: empty, which lets
   rudolint use its normal config discovery.
-- `profile` (optional): `default` or `hadolint-compat`. Default: `default`.
+- `profile` (optional): `default`, `hadolint-compat`, `correctness`,
+  `performance`, or `hardening`. Default: `default`.
 - `format` (optional): `text`, `json`, or `sarif` when `upload-sarif` is
   false. Default: `text`.
 - `failure-threshold` (optional): `ignore`, `style`, `info`, `warning`, or

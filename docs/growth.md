@@ -20,8 +20,8 @@ and easier to adopt.
    as copied files, `.dockerignore`, lockfiles, or base-image consistency.
 7. Improve GitHub Action UX with clearer job summaries or annotations in
    addition to SARIF.
-8. Define and implement the reserved `strict` profile for stronger
-   reproducibility and supply-chain checks.
+8. Evaluate whether the signal profiles should eventually replace the reserved
+   `strict` profile concept.
 9. Keep performance reporting readable by aligning benchmark names with user
    scenarios and refreshing public charts.
 10. Reduce remaining release and Marketplace manual steps.

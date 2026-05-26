@@ -236,6 +236,23 @@ mod tests {
     }
 
     #[test]
+    fn accepts_signal_profile_names() {
+        for (name, expected) in [
+            ("correctness", Profile::Correctness),
+            ("performance", Profile::Performance),
+            ("hardening", Profile::Hardening),
+        ] {
+            let cli = Cli::try_parse_from(["rudolint", "check", "--profile", name])
+                .expect("signal profile should parse");
+
+            let Some(Command::Check(args)) = cli.command else {
+                panic!("expected check command");
+            };
+            assert_eq!(args.profile, expected);
+        }
+    }
+
+    #[test]
     fn rejects_removed_compat_profile_alias() {
         let error = Cli::try_parse_from(["rudolint", "check", "--profile", "compat"])
             .expect_err("compat should no longer parse");

@@ -23,7 +23,7 @@ inputs:
     required: false
     default: ""
   profile:
-    description: Rule profile to use. Use hadolint-compat for Hadolint-style checks without BuildKit-native RDK diagnostics.
+    description: Rule profile to use. Options are default, hadolint-compat, correctness, performance, and hardening.
     required: false
     default: default
   format:

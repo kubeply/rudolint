@@ -6,7 +6,7 @@ use rudolint_dockerfile::{Comment, Dockerfile, Instruction};
 use rudolint_fix::FixPreview;
 use rudolint_policy::{InlineSuppression, LegacySuppression, PolicyProfile};
 
-use crate::{Profile, Rule, RuleInfo, catalog, shell};
+use crate::{Profile, Rule, RuleInfo, catalog, metadata::profile_includes_code, shell};
 
 /// Executes configured lint rules and fix providers for a policy profile.
 pub struct RuleEngine {
@@ -59,14 +59,17 @@ impl RuleEngine {
             );
         }
         if self.policy.includes_shell_catalog() {
-            findings.extend(shell::lint(document, &self.config, path).into_iter().map(
-                |mut finding| {
-                    if let Some(severity) = self.config.severity_override(&finding.code) {
-                        finding.severity = severity;
-                    }
-                    finding
-                },
-            ));
+            findings.extend(
+                shell::lint(document, &self.config, path)
+                    .into_iter()
+                    .map(|mut finding| {
+                        if let Some(severity) = self.config.severity_override(&finding.code) {
+                            finding.severity = severity;
+                        }
+                        finding
+                    })
+                    .filter(|finding| profile_includes_code(self.policy, &finding.code)),
+            );
         }
         findings.retain(|finding| !is_suppressed(finding, &suppressions));
         findings.sort_by(|left, right| {

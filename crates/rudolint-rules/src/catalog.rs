@@ -1,4 +1,6 @@
-use crate::{Rule, RuleInfo, RuleMetadata, buildkit, compat, shell};
+use crate::{
+    Rule, RuleInfo, RuleMetadata, buildkit, compat, metadata::profile_includes_code, shell,
+};
 use rudolint_policy::PolicyProfile;
 
 pub(crate) fn implemented_rules(profile: PolicyProfile) -> Vec<Box<dyn Rule>> {
@@ -10,6 +12,7 @@ pub(crate) fn implemented_rules(profile: PolicyProfile) -> Vec<Box<dyn Rule>> {
     if profile.includes_buildkit_native_rules() {
         rules.extend(buildkit::rules());
     }
+    rules.retain(|rule| profile_includes_code(profile, rule.info().code));
 
     rules
 }
@@ -20,7 +23,7 @@ pub(crate) fn catalog(profile: PolicyProfile) -> Vec<RuleInfo> {
         .map(|rule| rule.info())
         .collect::<Vec<_>>();
 
-    if profile.includes_compatibility_rules() {
+    if profile.includes_compatibility_rules() && !profile.is_signal_profile() {
         rules.extend(
             compat::planned_catalog()
                 .into_iter()
@@ -30,13 +33,19 @@ pub(crate) fn catalog(profile: PolicyProfile) -> Vec<RuleInfo> {
     }
 
     if profile.includes_shell_catalog() {
-        rules.extend(shell::implemented_catalog());
         rules.extend(
-            shell::planned_catalog()
+            shell::implemented_catalog()
                 .into_iter()
-                .map(RuleMetadata::planned_shell)
-                .map(RuleInfo::from_metadata),
+                .filter(|rule| profile_includes_code(profile, rule.code)),
         );
+        if !profile.is_signal_profile() {
+            rules.extend(
+                shell::planned_catalog()
+                    .into_iter()
+                    .map(RuleMetadata::planned_shell)
+                    .map(RuleInfo::from_metadata),
+            );
+        }
     }
 
     rules.sort_by_key(|rule| rule.code);

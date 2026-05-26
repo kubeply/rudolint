@@ -147,7 +147,13 @@ fn snapshots_real_world_corpus_findings() {
 
 #[test]
 fn real_world_noise_fixtures_do_not_trigger_findings() {
-    let profiles = [Profile::Default, Profile::HadolintCompat];
+    let profiles = [
+        Profile::Default,
+        Profile::HadolintCompat,
+        Profile::Correctness,
+        Profile::Performance,
+        Profile::Hardening,
+    ];
 
     for fixture in [
         "noise-clean-runtime",
@@ -1696,6 +1702,9 @@ fn snapshots_rule_selection_matrix() {
 
     let default_engine = RuleEngine::new(Profile::Default, Config::default());
     let compat_engine = RuleEngine::new(Profile::HadolintCompat, Config::default());
+    let correctness_engine = RuleEngine::new(Profile::Correctness, Config::default());
+    let performance_engine = RuleEngine::new(Profile::Performance, Config::default());
+    let hardening_engine = RuleEngine::new(Profile::Hardening, Config::default());
 
     let ignore_config = Config {
         ignore: BTreeSet::from(["DL3000".to_string()]),
@@ -1724,10 +1733,16 @@ fn snapshots_rule_selection_matrix() {
         "profile_findings": {
             "default": finding_codes(&default_engine.lint(&document)),
             "compat": finding_codes(&compat_engine.lint(&document)),
+            "correctness": finding_codes(&correctness_engine.lint(&document)),
+            "performance": finding_codes(&performance_engine.lint(&document)),
+            "hardening": finding_codes(&hardening_engine.lint(&document)),
         },
         "implemented_catalog": {
             "default": implemented_codes(&default_engine.catalog()),
             "compat": implemented_codes(&compat_engine.catalog()),
+            "correctness": implemented_codes(&correctness_engine.catalog()),
+            "performance": implemented_codes(&performance_engine.catalog()),
+            "hardening": implemented_codes(&hardening_engine.catalog()),
         },
         "config_filters": {
             "ignore_dl3000": finding_codes(
@@ -1765,6 +1780,7 @@ fn snapshots_rule_metadata_contract() {
                 "default_severity": metadata.default_severity,
                 "profile": metadata.profile.as_str(),
                 "category": metadata.category.as_str(),
+                "signals": metadata.signals.iter().map(|signal| signal.as_str()).collect::<Vec<_>>(),
                 "status": metadata.status.to_string(),
                 "docs_url": metadata.docs_url,
                 "fix": metadata.fix.as_str(),

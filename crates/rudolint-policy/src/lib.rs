@@ -10,6 +10,12 @@ pub enum PolicyProfile {
     Default,
     /// Hadolint-style compatibility behavior that excludes native-only rules.
     HadolintCompat,
+    /// High-confidence diagnostics for build correctness.
+    Correctness,
+    /// Diagnostics focused on build cache, layer, and install performance.
+    Performance,
+    /// Diagnostics focused on secrets, provenance, pinning, and supply-chain hardening.
+    Hardening,
     /// Reserved stricter behavior for future opt-in checks.
     Strict,
 }
@@ -20,6 +26,9 @@ impl PolicyProfile {
         match self {
             Self::Default => "default",
             Self::HadolintCompat => "hadolint-compat",
+            Self::Correctness => "correctness",
+            Self::Performance => "performance",
+            Self::Hardening => "hardening",
             Self::Strict => "strict",
         }
     }
@@ -27,7 +36,11 @@ impl PolicyProfile {
     /// Returns true when BuildKit-native rules are enabled.
     pub const fn includes_buildkit_native_rules(self) -> bool {
         match self {
-            Self::Default | Self::Strict => true,
+            Self::Default
+            | Self::Correctness
+            | Self::Performance
+            | Self::Hardening
+            | Self::Strict => true,
             Self::HadolintCompat => false,
         }
     }
@@ -46,8 +59,16 @@ impl PolicyProfile {
     pub const fn warns_on_legacy_suppressions(self) -> bool {
         match self {
             Self::Default | Self::Strict => true,
-            Self::HadolintCompat => false,
+            Self::HadolintCompat | Self::Correctness | Self::Performance | Self::Hardening => false,
         }
+    }
+
+    /// Returns true when the profile filters rules by signal category.
+    pub const fn is_signal_profile(self) -> bool {
+        matches!(
+            self,
+            Self::Correctness | Self::Performance | Self::Hardening
+        )
     }
 
     /// Returns true for the strict policy profile.
@@ -209,6 +230,22 @@ mod tests {
         assert!(profile.includes_shell_catalog());
         assert!(profile.warns_on_legacy_suppressions());
         assert!(profile.is_strict());
+    }
+
+    #[test]
+    fn signal_profiles_keep_native_rules_without_legacy_suppression_warnings() {
+        for profile in [
+            PolicyProfile::Correctness,
+            PolicyProfile::Performance,
+            PolicyProfile::Hardening,
+        ] {
+            assert!(profile.includes_compatibility_rules());
+            assert!(profile.includes_buildkit_native_rules());
+            assert!(profile.includes_shell_catalog());
+            assert!(!profile.warns_on_legacy_suppressions());
+            assert!(profile.is_signal_profile());
+            assert!(!profile.is_strict());
+        }
     }
 
     #[test]

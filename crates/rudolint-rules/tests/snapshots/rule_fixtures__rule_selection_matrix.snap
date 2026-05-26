@@ -1,6 +1,5 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
-assertion_line: 1685
 expression: snapshot
 ---
 {
@@ -190,6 +189,58 @@ expression: snapshot
       "SC2164",
       "SC2181"
     ],
+    "correctness": [
+      "DL3000",
+      "DL3001",
+      "DL3003",
+      "DL3011",
+      "DL3012",
+      "DL3020",
+      "DL3021",
+      "DL3022",
+      "DL3023",
+      "DL3024",
+      "DL3025",
+      "DL3027",
+      "DL3029",
+      "DL3030",
+      "DL3034",
+      "DL3035",
+      "DL3038",
+      "DL3043",
+      "DL3044",
+      "DL3045",
+      "DL3046",
+      "DL3048",
+      "DL3049",
+      "DL3050",
+      "DL3051",
+      "DL3052",
+      "DL3053",
+      "DL3054",
+      "DL3055",
+      "DL3056",
+      "DL3057",
+      "DL3058",
+      "DL3061",
+      "DL3063",
+      "DL4000",
+      "DL4001",
+      "DL4003",
+      "DL4004",
+      "DL4005",
+      "DL4006",
+      "RDK1000",
+      "RDK1007",
+      "RDK1009",
+      "RDK1010",
+      "SC2015",
+      "SC2046",
+      "SC2086",
+      "SC2155",
+      "SC2164",
+      "SC2181"
+    ],
     "default": [
       "DL3000",
       "DL3001",
@@ -276,6 +327,48 @@ expression: snapshot
       "SC2155",
       "SC2164",
       "SC2181"
+    ],
+    "hardening": [
+      "DL3002",
+      "DL3004",
+      "DL3006",
+      "DL3007",
+      "DL3008",
+      "DL3013",
+      "DL3016",
+      "DL3018",
+      "DL3020",
+      "DL3025",
+      "DL3026",
+      "DL3028",
+      "DL3033",
+      "DL3037",
+      "DL3041",
+      "DL3062",
+      "DL4001",
+      "RDK1001",
+      "RDK1002",
+      "RDK1004",
+      "RDK1005",
+      "RDK1007",
+      "RDK1008"
+    ],
+    "performance": [
+      "DL3009",
+      "DL3010",
+      "DL3014",
+      "DL3015",
+      "DL3019",
+      "DL3032",
+      "DL3036",
+      "DL3040",
+      "DL3042",
+      "DL3047",
+      "DL3059",
+      "DL3060",
+      "RDK1003",
+      "RDK1006",
+      "SC2002"
     ]
   },
   "profile_findings": {
@@ -295,6 +388,24 @@ expression: snapshot
       {
         "code": "DL3019",
         "severity": "info"
+      },
+      {
+        "code": "DL3020",
+        "severity": "error"
+      },
+      {
+        "code": "DL3025",
+        "severity": "warning"
+      },
+      {
+        "code": "DL4003",
+        "severity": "warning"
+      }
+    ],
+    "correctness": [
+      {
+        "code": "DL3000",
+        "severity": "error"
       },
       {
         "code": "DL3020",
@@ -345,6 +456,38 @@ expression: snapshot
       {
         "code": "DL4003",
         "severity": "warning"
+      }
+    ],
+    "hardening": [
+      {
+        "code": "DL3007",
+        "severity": "warning"
+      },
+      {
+        "code": "RDK1001",
+        "severity": "warning"
+      },
+      {
+        "code": "DL3018",
+        "severity": "warning"
+      },
+      {
+        "code": "DL3020",
+        "severity": "error"
+      },
+      {
+        "code": "DL3025",
+        "severity": "warning"
+      }
+    ],
+    "performance": [
+      {
+        "code": "DL3019",
+        "severity": "info"
+      },
+      {
+        "code": "RDK1003",
+        "severity": "info"
       }
     ]
   }

@@ -28,7 +28,7 @@ implemented by `rudolint-shell`.
 A new rule is ready to land when it has:
 
 - stable metadata in the rule catalog, including code, name, summary, default
-  severity, profile family, category, status, docs URL, and autofix
+  severity, profile family, category, signal profiles, status, docs URL, and autofix
   availability.
 - a docs page in this directory named `<RULE_ID>.md`.
 - at least one positive fixture or snapshot proving the rule reports the
