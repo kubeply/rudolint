@@ -24,9 +24,8 @@ Run it locally after cloning Hadoop into `external-repos/hadoop`:
 scripts/run-hadoop-corpus.sh
 ```
 
-The script runs with `--exit-zero` because findings are signal for product
+The script runs with `--exit-zero` because findings are a signal for product
 analysis, not a failure condition for the external project. Parse failures,
 panics, or CLI errors still fail the script.
 
 The same check is available from the manual `external corpus` GitHub workflow.
-
