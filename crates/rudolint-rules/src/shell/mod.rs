@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::{collections::BTreeSet, path::Path};
 
 use crate::{Rule, RuleInfo, metadata::diagnostic, metadata::rule_metadata};
 use rudolint_config::Config;
@@ -131,7 +131,7 @@ impl Rule for UnquotedVariableExpansion {
 
     fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
         shell_findings(doc, |instruction, program| {
-            unquoted_variable_expansion_token(program).map(|token| {
+            unquoted_variable_expansion_token(program, &BTreeSet::new()).map(|token| {
                 shell_diagnostic(
                     "SC2086",
                     Severity::Warning,
@@ -306,16 +306,32 @@ fn shell_position(shell: &str, byte_offset: usize, base_span: &Span) -> (usize, 
 
 pub(crate) fn lint(doc: &Dockerfile, config: &Config, path: Option<&Path>) -> Vec<Finding> {
     let mut findings = Vec::new();
-    for instruction in doc
-        .instructions
-        .iter()
-        .filter(|instruction| instruction.keyword_is("RUN"))
-    {
+    let mut declared_variables = BTreeSet::from(["PATH".to_string()]);
+
+    for instruction in &doc.instructions {
+        if let Some(arg) = &instruction.arg {
+            declared_variables.insert(arg.name.clone());
+        }
+
         let Some(shell) = instruction.run.as_ref().and_then(|run| run.shell.as_ref()) else {
+            if let Some(env) = &instruction.env {
+                declared_variables.extend(
+                    env.assignments
+                        .iter()
+                        .map(|assignment| assignment.name.clone()),
+                );
+            }
             continue;
         };
         let program = analyze(&shell.text);
-        lint_program(instruction, &program, config, path, &mut findings);
+        lint_program(
+            instruction,
+            &program,
+            config,
+            path,
+            &declared_variables,
+            &mut findings,
+        );
     }
     findings
 }
@@ -325,6 +341,7 @@ fn lint_program(
     program: &ShellProgram,
     config: &Config,
     path: Option<&Path>,
+    declared_variables: &BTreeSet<String>,
     findings: &mut Vec<Finding>,
 ) {
     push_if_enabled(
@@ -379,7 +396,7 @@ fn lint_program(
         config,
         path,
         findings,
-        unquoted_variable_expansion_token(program).map(|token| {
+        unquoted_variable_expansion_token(program, declared_variables).map(|token| {
             shell_diagnostic(
                 "SC2086",
                 Severity::Warning,
@@ -479,16 +496,25 @@ fn unquoted_command_substitution_token(program: &ShellProgram) -> Option<&ShellT
 // Shell rules currently emit one finding per Dockerfile instruction, so this
 // returns the first offending token to keep diagnostics precise without
 // changing rule cardinality.
-fn unquoted_variable_expansion_token(program: &ShellProgram) -> Option<&ShellToken> {
+fn unquoted_variable_expansion_token<'a>(
+    program: &'a ShellProgram,
+    declared_variables: &BTreeSet<String>,
+) -> Option<&'a ShellToken> {
     program.tokens.iter().find(|token| {
         token.kind == ShellTokenKind::Word
             && token.quote == QuoteKind::None
             && !is_assignment_word(&token.text)
-            && token
-                .expansions
-                .iter()
-                .any(|expansion| expansion.kind == ShellExpansionKind::Variable)
+            && token.expansions.iter().any(|expansion| {
+                expansion.kind == ShellExpansionKind::Variable
+                    && !declared_variables.contains(shell_variable_name(&expansion.text))
+            })
     })
+}
+
+fn shell_variable_name(expansion: &str) -> &str {
+    expansion
+        .split_once(|character: char| !character.is_ascii_alphanumeric() && character != '_')
+        .map_or(expansion, |(name, _)| name)
 }
 
 fn has_and_or_chain(program: &ShellProgram) -> bool {
