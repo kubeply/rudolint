@@ -64,6 +64,13 @@ Check a repository:
 rudolint check .
 ```
 
+Convert Hadolint inline ignore comments before switching profiles:
+
+```bash
+rudolint check . --fix --migrate-hadolint-ignores --dry-run
+rudolint check . --fix --migrate-hadolint-ignores
+```
+
 Default output is grouped by file and uses colors automatically in terminals.
 Use `--color never` when plain text is preferred.
 

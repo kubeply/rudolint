@@ -18,6 +18,7 @@ use rudolint_dockerfile::parse_dockerfile;
 use rudolint_fix::{FixPreview, TextEdit, apply_edits};
 use rudolint_rules::{RuleEngine, RuleStatus};
 use rudolint_settings::resolve_from_parts;
+use rudolint_source::SourceSpan;
 
 fn main() -> ExitCode {
     match run() {
@@ -108,6 +109,7 @@ fn run_check(args: cli::CheckArgs) -> Result<ExitCode, AppError> {
             &source,
             &engine,
             args.fix,
+            args.migrate_hadolint_ignores,
         )?;
         findings.extend(analysis.findings);
         fixes.extend(analysis.fixes);
@@ -118,7 +120,14 @@ fn run_check(args: cli::CheckArgs) -> Result<ExitCode, AppError> {
                 AppError::usage(format!("failed to read {}: {error}", path.display()))
             })?;
             let lint_path = lint_path_for_config(&config_path, &path);
-            let analysis = analyze_source(&path, &lint_path, &source, &engine, args.fix)?;
+            let analysis = analyze_source(
+                &path,
+                &lint_path,
+                &source,
+                &engine,
+                args.fix,
+                args.migrate_hadolint_ignores,
+            )?;
             if args.fix && !args.dry_run {
                 apply_fixes(&path, &source, &analysis.fixes)?;
             }
@@ -338,6 +347,7 @@ fn analyze_source(
     source: &str,
     engine: &RuleEngine,
     collect_fixes: bool,
+    migrate_hadolint_ignores: bool,
 ) -> Result<Analysis, AppError> {
     let document = parse_dockerfile(source)
         .with_context(|| {
@@ -353,11 +363,64 @@ fn analyze_source(
         .map(|finding| finding.with_path(path))
         .collect();
     let fixes = if collect_fixes {
-        engine.fixes_path(lint_path, &document)
+        let mut fixes = engine.fixes_path(lint_path, &document);
+        if migrate_hadolint_ignores {
+            fixes.extend(hadolint_ignore_migration_fixes(source));
+        }
+        fixes
     } else {
         Vec::new()
     };
     Ok(Analysis { findings, fixes })
+}
+
+fn hadolint_ignore_migration_fixes(source: &str) -> Vec<FixPreview> {
+    source
+        .lines()
+        .enumerate()
+        .filter_map(|(index, line)| {
+            let column = hadolint_ignore_command_column(line)?;
+            Some(FixPreview {
+                title: "convert hadolint inline suppression to rudolint".to_string(),
+                applicability: rudolint_fix::FixApplicability::safe(),
+                edits: vec![TextEdit::replace(
+                    SourceSpan {
+                        line: index + 1,
+                        column,
+                        length: "hadolint".len(),
+                    },
+                    "rudolint",
+                )],
+            })
+        })
+        .collect()
+}
+
+fn hadolint_ignore_command_column(line: &str) -> Option<usize> {
+    let hash_index = line.find('#')?;
+    if !line[..hash_index].trim().is_empty() {
+        return None;
+    }
+    let after_hash = &line[hash_index + 1..];
+    let leading_whitespace = after_hash
+        .char_indices()
+        .find_map(|(index, character)| (!character.is_whitespace()).then_some(index))
+        .unwrap_or(after_hash.len());
+    let command_start = hash_index + 1 + leading_whitespace;
+    let rest = &line[command_start..];
+    let command = rest.get(.."hadolint".len())?;
+    if !command.eq_ignore_ascii_case("hadolint") {
+        return None;
+    }
+    let after_command = &rest["hadolint".len()..];
+    let whitespace = after_command
+        .char_indices()
+        .find_map(|(index, character)| (!character.is_whitespace()).then_some(index))
+        .unwrap_or(after_command.len());
+    let directive = &after_command[whitespace..];
+    directive
+        .starts_with("ignore=")
+        .then_some(command_start + 1)
 }
 
 fn lint_path_for_config(config_path: &Option<PathBuf>, path: &Path) -> PathBuf {

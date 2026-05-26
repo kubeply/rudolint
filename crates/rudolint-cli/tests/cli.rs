@@ -830,6 +830,64 @@ fn fix_write_mode_leaves_nonrewritable_maintainer_values() {
 }
 
 #[test]
+fn fix_write_mode_migrates_hadolint_inline_ignores() {
+    let temp = tempfile::TempDir::new().expect("temp dir should be created");
+    let dockerfile = temp.path().join("Dockerfile");
+    std::fs::write(
+        &dockerfile,
+        "# hadolint ignore=DL3007, SC2086\nFROM alpine:latest\nRUN echo ok # hadolint ignore=SC2086\n",
+    )
+    .expect("Dockerfile should be written");
+
+    rudolint_cmd()
+        .args([
+            "check",
+            "--fix",
+            "--migrate-hadolint-ignores",
+            "--exit-zero",
+        ])
+        .arg(&dockerfile)
+        .assert()
+        .success();
+
+    let output = std::fs::read_to_string(&dockerfile).expect("Dockerfile should exist");
+    insta::assert_snapshot!("fix_write_mode_migrate_hadolint_ignores_file", output);
+}
+
+#[test]
+fn fix_dry_run_migrates_hadolint_inline_ignores_without_writing() {
+    let temp = tempfile::TempDir::new().expect("temp dir should be created");
+    let dockerfile = temp.path().join("Dockerfile");
+    let original = "# hadolint ignore=DL3007\nFROM alpine:latest\n";
+    std::fs::write(&dockerfile, original).expect("Dockerfile should be written");
+
+    let output = rudolint_cmd()
+        .args([
+            "check",
+            "--fix",
+            "--migrate-hadolint-ignores",
+            "--dry-run",
+            "--exit-zero",
+        ])
+        .arg(&dockerfile)
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+
+    assert_eq!(
+        std::fs::read_to_string(&dockerfile).expect("Dockerfile should still exist"),
+        original
+    );
+    let output = String::from_utf8(output).expect("stdout should be UTF-8");
+    assert!(
+        output.contains("convert hadolint inline suppression to rudolint"),
+        "dry-run output should render the migration preview:\n{output}"
+    );
+}
+
+#[test]
 fn fix_dry_run_renders_manual_json_entrypoint_suggestion() {
     let output = rudolint_cmd()
         .args(["check", "--fix", "--dry-run"])

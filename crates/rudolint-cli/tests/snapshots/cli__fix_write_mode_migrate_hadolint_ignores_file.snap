@@ -1,0 +1,8 @@
+---
+source: crates/rudolint-cli/tests/cli.rs
+assertion_line: 854
+expression: output
+---
+# rudolint ignore=DL3007, SC2086
+FROM alpine:latest
+RUN echo ok # hadolint ignore=SC2086

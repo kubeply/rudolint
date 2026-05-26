@@ -1362,6 +1362,7 @@ dependencies = [
  "rudolint-output",
  "rudolint-rules",
  "rudolint-settings",
+ "rudolint-source",
  "rudolint-test",
  "semver",
  "serde_json",

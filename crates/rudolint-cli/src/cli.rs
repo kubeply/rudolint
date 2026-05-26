@@ -128,6 +128,10 @@ pub struct CheckArgs {
     #[arg(long)]
     pub fix: bool,
 
+    /// Convert `# hadolint ignore=...` comments to native `# rudolint ignore=...` comments.
+    #[arg(long, requires = "fix")]
+    pub migrate_hadolint_ignores: bool,
+
     /// Print the planned autofix output without writing files.
     #[arg(long, requires = "fix")]
     pub dry_run: bool,
@@ -149,6 +153,7 @@ impl Default for CheckArgs {
             verbose: false,
             show_source: false,
             fix: false,
+            migrate_hadolint_ignores: false,
             dry_run: false,
         }
     }
