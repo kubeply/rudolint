@@ -1,0 +1,54 @@
+name: external corpus
+
+on:
+  workflow_dispatch:
+    inputs:
+      hadoop-ref:
+        description: Apache Hadoop ref to test
+        required: false
+        default: trunk
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_INCREMENTAL: "0"
+  CARGO_TERM_COLOR: always
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  INSTA_UPDATE: "no"
+
+jobs:
+  hadoop:
+    name: apache hadoop
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          persist-credentials: false
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.95.0
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+
+      - name: Clone Apache Hadoop
+        shell: bash
+        env:
+          HADOOP_REF: ${{ inputs.hadoop-ref }}
+        run: |
+          set -euo pipefail
+          mkdir -p external-repos
+          git clone --depth=1 --branch "$HADOOP_REF" https://github.com/apache/hadoop.git external-repos/hadoop
+
+      - name: Run Hadoop corpus
+        run: scripts/run-hadoop-corpus.sh
+

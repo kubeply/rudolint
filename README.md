@@ -210,6 +210,7 @@ rudolint check . --config .rudolint.yaml
 - [Configuration](docs/config.md)
 - [Rule roadmap](docs/rule-roadmap.md)
 - [Architecture](docs/architecture.md)
+- [External corpus](docs/external-corpus.md)
 - [Completed implementation plan](docs/archive/implementation-plan.md)
 - [Release automation](docs/release.md)
 
