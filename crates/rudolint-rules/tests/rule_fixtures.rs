@@ -1047,6 +1047,28 @@ fn snapshots_dl3045_copy_relative_without_workdir_fixture() {
 }
 
 #[test]
+fn dl3045_treats_windows_drive_destinations_as_absolute() {
+    let source = r#"FROM mcr.microsoft.com/windows/servercore:ltsc2022
+COPY tool.exe C:\tools\tool.exe
+COPY tool.exe C:/tools/tool.exe
+COPY tool.exe .\tools
+"#;
+    let document = parse_dockerfile(source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "DL3045")
+        .map(|finding| finding.line())
+        .collect::<Vec<_>>();
+
+    assert_eq!(
+        findings,
+        vec![4],
+        "DL3045 should accept Windows drive-absolute destinations and keep flagging relative Windows destinations"
+    );
+}
+
+#[test]
 fn snapshots_dl3046_useradd_no_log_init_fixture() {
     let source = read_fixture("rules/DL3046.useradd-no-log-init/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
