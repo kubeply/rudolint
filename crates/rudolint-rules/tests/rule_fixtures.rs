@@ -71,6 +71,23 @@ fn hadolint_compat_accepts_hadolint_suppression_comments() {
 }
 
 #[test]
+fn hadolint_compat_suppresses_source_located_multiline_shell_findings() {
+    let source = r#"# hadolint ignore=SC2086, SC2010, DL3042
+RUN --mount=type=cache,target=/tmp/cache \
+    if [[ ${INSTALL_DISTRIBUTIONS_FROM_CONTEXT} == "true" ]]; then \
+        echo ok; \
+    fi
+"#;
+    let document = parse_dockerfile(source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::HadolintCompat, Config::default()).lint(&document);
+
+    assert!(
+        findings.iter().all(|finding| finding.code != "SC2086"),
+        "hadolint-compat should suppress shell findings located after the RUN start line"
+    );
+}
+
+#[test]
 fn snapshots_real_world_corpus_findings() {
     let cases = [
         "alpine-packages",

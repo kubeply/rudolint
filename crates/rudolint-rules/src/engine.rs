@@ -112,7 +112,8 @@ impl RuleEngine {
 
 #[derive(Debug, Clone)]
 struct TargetedSuppression {
-    instruction_line: usize,
+    instruction_start_line: usize,
+    instruction_end_line: usize,
     target: Suppression,
 }
 
@@ -139,20 +140,24 @@ fn targeted_suppression(
         .or_else(|| {
             LegacySuppression::parse_comment(comment.line, &comment.text).map(Suppression::Legacy)
         })?;
-    let instruction_line = instructions
+    let instruction = instructions
         .iter()
-        .find(|instruction| instruction.line > comment.line)?
-        .line;
+        .find(|instruction| instruction.line > comment.line)?;
+    let instruction_start_line = instruction.line;
+    let instruction_end_line =
+        instruction_start_line + instruction.raw.lines().count().saturating_sub(1);
 
     Some(TargetedSuppression {
-        instruction_line,
+        instruction_start_line,
+        instruction_end_line,
         target,
     })
 }
 
 fn is_suppressed(finding: &Finding, suppressions: &[TargetedSuppression]) -> bool {
     suppressions.iter().any(|suppression| {
-        suppression.instruction_line == finding.line()
+        (suppression.instruction_start_line..=suppression.instruction_end_line)
+            .contains(&finding.line())
             && match &suppression.target {
                 Suppression::Native(native) => native.matches(&finding.code),
                 Suppression::Legacy(legacy) => legacy.matches(&finding.code),
