@@ -271,10 +271,9 @@ where
     L: FnOnce() -> Result<String, AppError>,
     I: FnOnce(&str) -> Result<(), AppError>,
 {
-    let installer_url = upgrade_installer_url(args.tag.as_deref())?;
-    let command = installer_command(&installer_url);
-
     if args.dry_run {
+        let installer_url = upgrade_installer_url(args.tag.as_deref())?;
+        let command = installer_command(&installer_url);
         if json {
             println!(
                 "{}",
@@ -307,6 +306,8 @@ where
         return Ok(ExitCode::SUCCESS);
     }
 
+    let installer_url = upgrade_installer_url(Some(&target_tag))?;
+    let command = installer_command(&installer_url);
     install(&command)?;
 
     Ok(ExitCode::SUCCESS)
@@ -634,19 +635,20 @@ mod tests {
             tag: None,
             dry_run: false,
         };
-        let mut installed = false;
+        let mut install_command = None;
 
         let result = run_upgrade_with(
             args,
             false,
             || Ok("v999.0.0".to_string()),
-            |_| {
-                installed = true;
+            |command| {
+                install_command = Some(command.to_string());
                 Ok(())
             },
         );
 
         assert!(result.is_ok());
-        assert!(installed);
+        let install_command = install_command.expect("installer should run");
+        assert!(install_command.contains("https://kubeply.com/rudolint/v999.0.0/install.sh"));
     }
 }
