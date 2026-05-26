@@ -2882,14 +2882,13 @@ fn env_references_same_statement_variable(
     env: &rudolint_dockerfile::EnvInstruction,
     known_variables: &BTreeSet<String>,
 ) -> bool {
-    env.assignments
-        .iter()
-        .filter(|assignment| !known_variables.contains(&assignment.name))
-        .any(|assignment| {
-            env.assignments.iter().any(|candidate| {
-                shell_value_references_variable(&candidate.value, &assignment.name)
-            })
-        })
+    env.assignments.iter().any(|candidate| {
+        env.assignments
+            .iter()
+            .filter(|assignment| assignment.name != candidate.name)
+            .filter(|assignment| !known_variables.contains(&assignment.name))
+            .any(|assignment| shell_value_references_variable(&candidate.value, &assignment.name))
+    })
 }
 
 fn shell_value_references_variable(value: &str, name: &str) -> bool {

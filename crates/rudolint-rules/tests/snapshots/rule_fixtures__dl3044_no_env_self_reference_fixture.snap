@@ -42,22 +42,6 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "do not refer to an environment variable within the same `ENV` statement where it is defined",
     "path": "",
     "primary_span": {
-      "end_byte": 165,
-      "end_column": 15,
-      "end_line": 5,
-      "start_byte": 151,
-      "start_column": 1,
-      "start_line": 5
-    },
-    "severity": "error"
-  },
-  {
-    "code": "DL3044",
-    "help": null,
-    "labels": [],
-    "message": "do not refer to an environment variable within the same `ENV` statement where it is defined",
-    "path": "",
-    "primary_span": {
       "end_byte": 352,
       "end_column": 30,
       "end_line": 11,

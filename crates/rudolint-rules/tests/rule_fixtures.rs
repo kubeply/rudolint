@@ -932,6 +932,29 @@ fn snapshots_dl3044_no_env_self_reference_fixture() {
 }
 
 #[test]
+fn dl3044_allows_env_self_promotion_and_arg_promotion() {
+    let source = r#"FROM alpine:3.20
+ARG PROMOTED
+ENV SELF=${SELF}
+ENV PROMOTED=${PROMOTED}
+ENV NEW_VALUE=value PATH=$NEW_VALUE/bin:$PATH
+"#;
+    let document = parse_dockerfile(source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default()).lint(&document);
+    let dl3044_lines = findings
+        .iter()
+        .filter(|finding| finding.code == "DL3044")
+        .map(Finding::line)
+        .collect::<Vec<_>>();
+
+    assert_eq!(
+        dl3044_lines,
+        vec![5],
+        "DL3044 should only flag references to other variables defined in the same ENV"
+    );
+}
+
+#[test]
 fn snapshots_dl3045_copy_relative_without_workdir_fixture() {
     let source = read_fixture("rules/DL3045.copy-relative-without-workdir/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");
