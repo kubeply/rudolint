@@ -258,6 +258,19 @@ fn run_version(json: bool) -> Result<ExitCode, AppError> {
 }
 
 fn run_upgrade(args: cli::UpgradeArgs, json: bool) -> Result<ExitCode, AppError> {
+    run_upgrade_with(args, json, resolve_latest_release_tag, run_installer)
+}
+
+fn run_upgrade_with<L, I>(
+    args: cli::UpgradeArgs,
+    json: bool,
+    latest_release_tag: L,
+    install: I,
+) -> Result<ExitCode, AppError>
+where
+    L: FnOnce() -> Result<String, AppError>,
+    I: FnOnce(&str) -> Result<(), AppError>,
+{
     let installer_url = upgrade_installer_url(args.tag.as_deref())?;
     let command = installer_command(&installer_url);
 
@@ -276,6 +289,30 @@ fn run_upgrade(args: cli::UpgradeArgs, json: bool) -> Result<ExitCode, AppError>
         return Ok(ExitCode::SUCCESS);
     }
 
+    let target_tag = upgrade_target_tag(args.tag.as_deref(), latest_release_tag)?;
+    let current_tag = current_release_tag();
+    if target_tag == current_tag {
+        if json {
+            println!(
+                "{}",
+                serde_json::json!({
+                    "status": "up_to_date",
+                    "current_version": current_tag,
+                    "target_version": target_tag,
+                })
+            );
+        } else {
+            println!("rudolint is already up to date ({current_tag})");
+        }
+        return Ok(ExitCode::SUCCESS);
+    }
+
+    install(&command)?;
+
+    Ok(ExitCode::SUCCESS)
+}
+
+fn run_installer(command: &str) -> Result<(), AppError> {
     if cfg!(windows) {
         return Err(AppError::usage(
             "`rudolint upgrade` currently requires a Unix-like shell",
@@ -284,7 +321,7 @@ fn run_upgrade(args: cli::UpgradeArgs, json: bool) -> Result<ExitCode, AppError>
 
     let status = ProcessCommand::new("sh")
         .arg("-c")
-        .arg(&command)
+        .arg(command)
         .status()
         .map_err(|error| AppError::internal(format!("failed to run installer: {error}")))?;
 
@@ -294,7 +331,50 @@ fn run_upgrade(args: cli::UpgradeArgs, json: bool) -> Result<ExitCode, AppError>
         )));
     }
 
-    Ok(ExitCode::SUCCESS)
+    Ok(())
+}
+
+fn upgrade_target_tag<L>(version: Option<&str>, latest_release_tag: L) -> Result<String, AppError>
+where
+    L: FnOnce() -> Result<String, AppError>,
+{
+    match version {
+        Some(version) => normalize_release_tag(version),
+        None => latest_release_tag(),
+    }
+}
+
+fn current_release_tag() -> String {
+    format!("v{}", env!("CARGO_PKG_VERSION"))
+}
+
+fn resolve_latest_release_tag() -> Result<String, AppError> {
+    let output = ProcessCommand::new("curl")
+        .args([
+            "--proto",
+            "=https",
+            "--tlsv1.2",
+            "-LsSf",
+            "https://api.github.com/repos/kubeply/rudolint/releases/latest",
+        ])
+        .output()
+        .map_err(|error| AppError::internal(format!("failed to query latest release: {error}")))?;
+
+    if !output.status.success() {
+        return Err(AppError::internal(format!(
+            "failed to query latest release: curl exited with status {}",
+            output.status
+        )));
+    }
+
+    let response: serde_json::Value = serde_json::from_slice(&output.stdout)
+        .map_err(|error| AppError::internal(format!("failed to parse latest release: {error}")))?;
+    let tag = response
+        .get("tag_name")
+        .and_then(serde_json::Value::as_str)
+        .ok_or_else(|| AppError::internal("latest release response did not include tag_name"))?;
+
+    normalize_release_tag(tag)
 }
 
 fn upgrade_installer_url(version: Option<&str>) -> Result<String, AppError> {
@@ -524,5 +604,49 @@ fn source_excerpt(findings: &[Finding], sources: &BTreeMap<PathBuf, String>) -> 
 impl From<anyhow::Error> for AppError {
     fn from(error: anyhow::Error) -> Self {
         AppError::usage(format!("{error:#}"))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn upgrade_skips_installer_when_latest_is_current_version() {
+        let args = cli::UpgradeArgs {
+            tag: None,
+            dry_run: false,
+        };
+
+        let result = run_upgrade_with(
+            args,
+            false,
+            || Ok(current_release_tag()),
+            |_| panic!("installer should not run when rudolint is current"),
+        );
+
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn upgrade_runs_installer_when_latest_is_newer() {
+        let args = cli::UpgradeArgs {
+            tag: None,
+            dry_run: false,
+        };
+        let mut installed = false;
+
+        let result = run_upgrade_with(
+            args,
+            false,
+            || Ok("v999.0.0".to_string()),
+            |_| {
+                installed = true;
+                Ok(())
+            },
+        );
+
+        assert!(result.is_ok());
+        assert!(installed);
     }
 }

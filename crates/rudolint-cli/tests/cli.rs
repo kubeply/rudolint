@@ -1121,6 +1121,41 @@ fn upgrade_dry_run_json_reports_installer_command() {
 }
 
 #[test]
+fn upgrade_skips_current_release_tag() {
+    rudolint_cmd()
+        .args(["upgrade", "--tag", env!("CARGO_PKG_VERSION")])
+        .assert()
+        .success()
+        .stdout(predicates::str::contains(format!(
+            "rudolint is already up to date (v{})",
+            env!("CARGO_PKG_VERSION")
+        )));
+}
+
+#[test]
+fn upgrade_skips_current_release_tag_in_json() {
+    let output = rudolint_cmd()
+        .args(["--json", "upgrade", "--tag", env!("CARGO_PKG_VERSION")])
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+
+    let output = String::from_utf8(output).expect("stdout should be UTF-8");
+    let output: Value = serde_json::from_str(&output).expect("upgrade output should be JSON");
+    assert_eq!(output["status"], "up_to_date");
+    assert_eq!(
+        output["current_version"],
+        format!("v{}", env!("CARGO_PKG_VERSION"))
+    );
+    assert_eq!(
+        output["target_version"],
+        format!("v{}", env!("CARGO_PKG_VERSION"))
+    );
+}
+
+#[test]
 fn upgrade_rejects_invalid_release_version() {
     rudolint_cmd()
         .args(["upgrade", "--dry-run", "--tag", "latest;rm"])
