@@ -88,6 +88,30 @@ RUN --mount=type=cache,target=/tmp/cache \
 }
 
 #[test]
+fn shell_quote_checks_skip_dockerfile_declared_variables() {
+    let source = r#"FROM alpine:3.20
+ARG AIRFLOW_HOME
+ARG PGBOUNCER_VERSION
+RUN mkdir -p ${AIRFLOW_HOME}
+RUN tar -xzvf pgbouncer-$PGBOUNCER_VERSION.tar.gz
+RUN echo $UNKNOWN_VALUE
+"#;
+    let document = parse_dockerfile(source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::HadolintCompat, Config::default()).lint(&document);
+    let sc2086_lines = findings
+        .iter()
+        .filter(|finding| finding.code == "SC2086")
+        .map(Finding::line)
+        .collect::<Vec<_>>();
+
+    assert_eq!(
+        sc2086_lines,
+        vec![6],
+        "SC2086 should match Hadolint by ignoring declared Dockerfile variables"
+    );
+}
+
+#[test]
 fn snapshots_real_world_corpus_findings() {
     let cases = [
         "alpine-packages",
