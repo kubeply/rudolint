@@ -64,7 +64,11 @@ Check a repository:
 rudolint check .
 ```
 
-Convert Hadolint inline ignore comments before switching profiles:
+Migrate Hadolint inline suppression syntax:
+
+The first command previews conversion of `# hadolint ignore=...` comments to
+`# rudolint ignore=...` without writing files. The second command applies the
+same migration.
 
 ```bash
 rudolint check . --fix --migrate-hadolint-ignores --dry-run
