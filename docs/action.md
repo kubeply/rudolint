@@ -48,9 +48,9 @@ Set `version` only when a workflow needs a specific linter release:
 
 ## Rule Profiles
 
-The default profile runs broadly compatible Dockerfile checks plus
-BuildKit-native `RDK` diagnostics. Use `hadolint-compat` when a workflow
-should stay on Hadolint-style Dockerfile and shell-style checks while excluding
+The default profile runs all implemented rules, including shell-style checks
+and BuildKit-native diagnostics. Use `hadolint-compat` when a workflow should
+stay on Hadolint-style Dockerfile and shell-style checks while excluding
 BuildKit-native recommendations. Use `correctness`, `performance`, or
 `hardening` when a workflow should focus on one signal category.
 

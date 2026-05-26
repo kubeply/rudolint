@@ -2,6 +2,7 @@ use rudolint_diagnostics::{Finding, Severity};
 use rudolint_dockerfile::Instruction;
 use rudolint_policy::PolicyProfile;
 
+use self::RuleSignal::{Correctness, Hardening, Performance};
 use crate::RuleStatus;
 
 /// Stable metadata describing a rule in the catalog.
@@ -219,8 +220,6 @@ fn profile_for_code(code: &str) -> PolicyProfile {
 }
 
 pub(crate) fn signals_for_code(code: &str) -> &'static [RuleSignal] {
-    use RuleSignal::{Correctness, Hardening, Performance};
-
     match code {
         // Rudolint migration hygiene is intentionally kept out of signal profiles.
         "RUD1001" => &[],
