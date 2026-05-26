@@ -12,7 +12,10 @@ pub(crate) fn implemented_rules(profile: PolicyProfile) -> Vec<Box<dyn Rule>> {
     if profile.includes_buildkit_native_rules() {
         rules.extend(buildkit::rules());
     }
-    rules.retain(|rule| profile_includes_code(profile, rule.info().code));
+
+    if profile.is_signal_profile() {
+        rules.retain(|rule| profile_includes_code(profile, rule.info().code));
+    }
 
     rules
 }

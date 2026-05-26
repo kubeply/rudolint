@@ -10,17 +10,29 @@ use crate::{Profile, Rule, RuleInfo, catalog, metadata::profile_includes_code, s
 
 /// Executes configured lint rules and fix providers for a policy profile.
 pub struct RuleEngine {
-    rules: Vec<Box<dyn Rule>>,
+    rules: Vec<EnabledRule>,
     policy: PolicyProfile,
     config: Config,
+}
+
+struct EnabledRule {
+    code: &'static str,
+    rule: Box<dyn Rule>,
 }
 
 impl RuleEngine {
     /// Creates a rule engine for `profile` using the supplied configuration.
     pub fn new(profile: Profile, config: Config) -> Self {
         let policy = profile.policy();
+        let rules = catalog::implemented_rules(policy)
+            .into_iter()
+            .map(|rule| EnabledRule {
+                code: rule.info().code,
+                rule,
+            })
+            .collect();
         Self {
-            rules: catalog::implemented_rules(policy),
+            rules,
             policy,
             config,
         }
@@ -39,16 +51,17 @@ impl RuleEngine {
     fn lint_inner(&self, path: Option<&Path>, document: &Dockerfile) -> Vec<Finding> {
         let suppressions = targeted_suppressions(document);
         let mut findings = Vec::new();
-        for rule in &self.rules {
-            let info = rule.info();
-            if !self.config.selects(info.code)
-                || self.config.ignores(info.code)
-                || path.is_some_and(|path| self.config.ignores_for_path(info.code, path))
+        for enabled in &self.rules {
+            if !self.config.selects(enabled.code)
+                || self.config.ignores(enabled.code)
+                || path.is_some_and(|path| self.config.ignores_for_path(enabled.code, path))
             {
                 continue;
             }
             findings.extend(
-                rule.check_with_config(document, &self.config)
+                enabled
+                    .rule
+                    .check_with_config(document, &self.config)
                     .into_iter()
                     .map(|mut finding| {
                         if let Some(severity) = self.config.severity_override(&finding.code) {
@@ -99,15 +112,14 @@ impl RuleEngine {
 
     fn fixes_inner(&self, path: Option<&Path>, document: &Dockerfile) -> Vec<FixPreview> {
         let mut fixes = Vec::new();
-        for rule in &self.rules {
-            let info = rule.info();
-            if !self.config.selects(info.code)
-                || self.config.ignores(info.code)
-                || path.is_some_and(|path| self.config.ignores_for_path(info.code, path))
+        for enabled in &self.rules {
+            if !self.config.selects(enabled.code)
+                || self.config.ignores(enabled.code)
+                || path.is_some_and(|path| self.config.ignores_for_path(enabled.code, path))
             {
                 continue;
             }
-            fixes.extend(rule.fix(document));
+            fixes.extend(enabled.rule.fix(document));
         }
         fixes
     }
