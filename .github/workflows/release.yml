@@ -349,14 +349,72 @@ jobs:
           git tag --force v1 "$RELEASE_TAG"
           git push origin refs/tags/v1 --force
 
+  publish-container-image:
+    needs:
+      - plan
+      - host
+    if: ${{ always() && needs.host.result == 'success' && needs.plan.outputs.publishing == 'true' && !contains(needs.plan.outputs.tag, '-') }}
+    runs-on: depot-ubuntu-24.04
+    permissions:
+      "contents": "read"
+      "packages": "write"
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+          submodules: recursive
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3
+        with:
+          platforms: arm64
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+
+      - name: Log in to GHCR
+        env:
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "$GHCR_TOKEN" | docker login ghcr.io --username "${GITHUB_ACTOR}" --password-stdin
+
+      - name: Build and push image
+        env:
+          IMAGE: ghcr.io/kubeply/rudolint
+          RELEASE_TAG: ${{ needs.plan.outputs.tag }}
+          VCS_REF: ${{ github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          tags=(
+            --tag "$IMAGE:$RELEASE_TAG"
+            --tag "$IMAGE:latest"
+          )
+
+          if [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            major="${RELEASE_TAG%%.*}"
+            tags+=(--tag "$IMAGE:$major")
+          fi
+
+          docker buildx build \
+            --file Dockerfile \
+            --platform linux/amd64,linux/arm64 \
+            --build-arg "RUDOLINT_VERSION=$RELEASE_TAG" \
+            --build-arg "VCS_REF=$VCS_REF" \
+            "${tags[@]}" \
+            --push \
+            .
+
   announce:
     needs:
       - plan
       - host
+      - publish-container-image
     # use "always() && ..." to allow us to wait for all publish jobs while
     # still allowing individual publish jobs to skip themselves (for prereleases).
     # "host" however must run to completion, no skipping allowed!
-    if: ${{ always() && needs.host.result == 'success' }}
+    if: ${{ always() && needs.host.result == 'success' && (needs.publish-container-image.result == 'success' || needs.publish-container-image.result == 'skipped') }}
     runs-on: "ubuntu-24.04"
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

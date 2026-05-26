@@ -1,0 +1,13 @@
+/target
+/.git
+/.github
+/artifacts
+/dist
+/external-repos
+
+# Runtime image builds only need source, manifests, lockfile, and schemas.
+/benchmarks
+/docs
+/fixtures
+*.snap.new
+

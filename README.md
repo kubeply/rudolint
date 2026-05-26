@@ -50,6 +50,17 @@ To upgrade to a specific release tag:
 rudolint upgrade --tag <tag>
 ```
 
+## Container Image
+
+Run the published GHCR image without installing `rudolint` locally:
+
+```bash
+docker run --rm -v "$PWD:/workspace" ghcr.io/kubeply/rudolint check /workspace
+```
+
+Release images are published as `ghcr.io/kubeply/rudolint:<release-tag>`,
+`ghcr.io/kubeply/rudolint:v1`, and `ghcr.io/kubeply/rudolint:latest`.
+
 ## Usage
 
 Check one Dockerfile:

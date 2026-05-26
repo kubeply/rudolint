@@ -243,8 +243,21 @@ cargo install --path crates/rudolint-cli
 cargo install --path crates/rudolint-lsp
 ```
 
-No Docker image is published yet. Add one only when there is a concrete CI use
-case that benefits from image distribution over the released binary archives.
+Release tags publish a container image to GHCR after the GitHub Release assets
+are uploaded:
+
+```bash
+docker run --rm -v "$PWD:/workspace" ghcr.io/kubeply/rudolint check /workspace
+```
+
+Stable releases publish these tags:
+
+- `ghcr.io/kubeply/rudolint:<release-tag>`
+- `ghcr.io/kubeply/rudolint:v1`
+- `ghcr.io/kubeply/rudolint:latest`
+
+The image uses `rudolint` as its entrypoint and sets `/workspace` as the working
+directory.
 
 ## Marketplace
 
