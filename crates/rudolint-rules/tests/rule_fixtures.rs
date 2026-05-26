@@ -205,6 +205,7 @@ fn real_world_noise_fixtures_do_not_trigger_findings() {
         "noise-clean-runtime",
         "noise-directives-and-comments",
         "noise-metadata-runtime",
+        "noise-windows-dockerfile",
     ] {
         let path = format!("corpus/real-world/{fixture}/Dockerfile");
         let source = read_fixture(&path);
