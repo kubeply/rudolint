@@ -220,6 +220,8 @@ fn discovers_dockerfiles_in_directory() {
         .expect("root Dockerfile should be written");
     std::fs::write(nested.join("Dockerfile.api"), "FROM busybox\nWORKDIR app\n")
         .expect("nested Dockerfile should be written");
+    std::fs::write(nested.join("Dockerfile_ubuntu_24"), "FROM debian:latest\n")
+        .expect("underscore Dockerfile should be written");
 
     let output = rudolint_cmd()
         .args(["check", "--format", "json", "--failure-threshold", "error"])

@@ -51,6 +51,22 @@ expression: output
         "start_line": 2
       },
       "severity": "error"
+    },
+    {
+      "code": "DL3007",
+      "help": null,
+      "labels": [],
+      "message": "avoid mutable latest base image tags",
+      "path": "$TEMP/service/Dockerfile_ubuntu_24",
+      "primary_span": {
+        "end_byte": 18,
+        "end_column": 19,
+        "end_line": 1,
+        "start_byte": 0,
+        "start_column": 1,
+        "start_line": 1
+      },
+      "severity": "warning"
     }
   ],
   "schemaVersion": "v1"

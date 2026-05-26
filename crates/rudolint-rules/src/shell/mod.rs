@@ -3,7 +3,7 @@ use std::{collections::BTreeSet, path::Path};
 use crate::{Rule, RuleInfo, metadata::diagnostic, metadata::rule_metadata};
 use rudolint_config::Config;
 use rudolint_diagnostics::{Finding, Severity};
-use rudolint_dockerfile::{Dockerfile, Instruction};
+use rudolint_dockerfile::{Dockerfile, Instruction, InstructionForm};
 use rudolint_shell::{
     QuoteKind, ShellCommandInvocation, ShellExpansionKind, ShellProgram, ShellSpan, ShellToken,
     ShellTokenKind, analyze,
@@ -241,15 +241,68 @@ fn shell_findings(
     doc: &Dockerfile,
     check: impl Fn(&Instruction, &ShellProgram) -> Option<Finding>,
 ) -> Vec<Finding> {
-    doc.instructions
-        .iter()
-        .filter(|instruction| instruction.keyword_is("RUN"))
-        .filter_map(|instruction| {
-            let shell = instruction.run.as_ref()?.shell.as_ref()?;
-            let program = analyze(&shell.text);
-            check(instruction, &program)
-        })
-        .collect()
+    let mut findings = Vec::new();
+    let mut shell_kind = ShellKind::Posix;
+
+    for instruction in &doc.instructions {
+        if instruction.keyword_is("FROM") {
+            shell_kind = ShellKind::Posix;
+            continue;
+        }
+
+        if instruction.keyword_is("SHELL") {
+            shell_kind = shell_kind_for_instruction(instruction);
+            continue;
+        }
+
+        if !instruction.keyword_is("RUN") || shell_kind != ShellKind::Posix {
+            continue;
+        }
+
+        let Some(shell) = instruction.run.as_ref().and_then(|run| run.shell.as_ref()) else {
+            continue;
+        };
+        let program = analyze(&shell.text);
+        if let Some(finding) = check(instruction, &program) {
+            findings.push(finding);
+        }
+    }
+
+    findings
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum ShellKind {
+    Posix,
+    NonPosix,
+    Unknown,
+}
+
+fn shell_kind_for_instruction(instruction: &Instruction) -> ShellKind {
+    let InstructionForm::Json(values) = &instruction.form else {
+        return ShellKind::Unknown;
+    };
+    let Some(command) = values.first() else {
+        return ShellKind::Unknown;
+    };
+    shell_kind_for_command(command)
+}
+
+fn shell_kind_for_command(command: &str) -> ShellKind {
+    let executable = command
+        .rsplit(['/', '\\'])
+        .next()
+        .unwrap_or(command)
+        .to_ascii_lowercase();
+    let executable = executable
+        .strip_suffix(".exe")
+        .unwrap_or(executable.as_str());
+
+    match executable {
+        "sh" | "bash" | "dash" | "ash" | "zsh" | "ksh" => ShellKind::Posix,
+        "cmd" | "powershell" | "pwsh" => ShellKind::NonPosix,
+        _ => ShellKind::Unknown,
+    }
 }
 
 fn shell_diagnostic(
@@ -307,10 +360,21 @@ fn shell_position(shell: &str, byte_offset: usize, base_span: &Span) -> (usize, 
 pub(crate) fn lint(doc: &Dockerfile, config: &Config, path: Option<&Path>) -> Vec<Finding> {
     let mut findings = Vec::new();
     let mut declared_variables = BTreeSet::from(["PATH".to_string()]);
+    let mut shell_kind = ShellKind::Posix;
 
     for instruction in &doc.instructions {
+        if instruction.keyword_is("FROM") {
+            shell_kind = ShellKind::Posix;
+            continue;
+        }
+
         if let Some(arg) = &instruction.arg {
             declared_variables.insert(arg.name.clone());
+        }
+
+        if instruction.keyword_is("SHELL") {
+            shell_kind = shell_kind_for_instruction(instruction);
+            continue;
         }
 
         let Some(shell) = instruction.run.as_ref().and_then(|run| run.shell.as_ref()) else {
@@ -323,6 +387,11 @@ pub(crate) fn lint(doc: &Dockerfile, config: &Config, path: Option<&Path>) -> Ve
             }
             continue;
         };
+
+        if shell_kind != ShellKind::Posix {
+            continue;
+        }
+
         let program = analyze(&shell.text);
         lint_program(
             instruction,

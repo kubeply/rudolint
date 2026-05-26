@@ -574,13 +574,20 @@ fn resolve_inputs(paths: &[PathBuf]) -> Result<Vec<PathBuf>, AppError> {
                 continue;
             }
             let name = entry.file_name().to_string_lossy();
-            if name == "Dockerfile" || name.starts_with("Dockerfile.") {
+            if is_discovered_dockerfile_name(&name) {
                 files.push(entry.into_path());
             }
         }
     }
     files.sort();
     Ok(files)
+}
+
+fn is_discovered_dockerfile_name(name: &str) -> bool {
+    name == "Dockerfile"
+        || name.starts_with("Dockerfile.")
+        || name.starts_with("Dockerfile_")
+        || name.starts_with("Dockerfile-")
 }
 
 fn source_excerpt(findings: &[Finding], sources: &BTreeMap<PathBuf, String>) -> String {
