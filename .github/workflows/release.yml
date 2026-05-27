@@ -362,7 +362,18 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git tag --force v1 "$RELEASE_TAG"
-          git push origin refs/tags/v1 --force
+          for attempt in 1 2 3; do
+            if git push origin refs/tags/v1 --force; then
+              exit 0
+            fi
+            if [[ "$attempt" -eq 3 ]]; then
+              echo "failed to push v1 tag after $attempt attempts" >&2
+              exit 1
+            fi
+            sleep_seconds=$((attempt * 10))
+            echo "v1 tag push failed; retrying in ${sleep_seconds}s" >&2
+            sleep "$sleep_seconds"
+          done
 
   publish-container-image:
     needs:
