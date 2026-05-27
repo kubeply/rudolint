@@ -5,7 +5,7 @@ use rudolint_config::Config;
 use rudolint_diagnostics::{Finding, Severity};
 use rudolint_dockerfile::{Comment, CopyKind, Dockerfile, Instruction, InstructionForm};
 use rudolint_fix::{FixApplicability, FixPreview, TextEdit};
-use rudolint_policy::LegacySuppression;
+use rudolint_policy::{LegacySuppression, PolicyProfile};
 use rudolint_shell::{detect_command_invocations, detect_disallowed_container_commands};
 
 pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
@@ -1059,20 +1059,45 @@ impl Rule for NoFromPlatformFlag {
     }
 
     fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
-        doc.instructions
-            .iter()
-            .filter(|instruction| instruction.keyword_is("FROM"))
-            .filter(|instruction| instruction.has_flag("platform"))
-            .map(|instruction| {
-                diagnostic(
-                    "DL3029",
-                    Severity::Warning,
-                    "avoid `--platform` in FROM; prefer build-time platform selection",
-                    instruction,
-                )
-            })
-            .collect()
+        no_from_platform_flag_findings(doc, PolicyProfile::HadolintCompat)
     }
+
+    fn check_with_policy(
+        &self,
+        doc: &Dockerfile,
+        _config: &Config,
+        policy: PolicyProfile,
+    ) -> Vec<Finding> {
+        no_from_platform_flag_findings(doc, policy)
+    }
+}
+
+fn no_from_platform_flag_findings(doc: &Dockerfile, policy: PolicyProfile) -> Vec<Finding> {
+    doc.instructions
+        .iter()
+        .filter(|instruction| instruction.keyword_is("FROM"))
+        .filter(|instruction| from_platform_flag_is_diagnostic(instruction, policy))
+        .map(|instruction| {
+            diagnostic(
+                "DL3029",
+                Severity::Warning,
+                "avoid `--platform` in FROM; prefer build-time platform selection",
+                instruction,
+            )
+        })
+        .collect()
+}
+
+fn from_platform_flag_is_diagnostic(instruction: &Instruction, policy: PolicyProfile) -> bool {
+    let Some(platform) = instruction.flag_value("platform") else {
+        return false;
+    };
+
+    policy == PolicyProfile::HadolintCompat || !platform_uses_build_variable(platform)
+}
+
+fn platform_uses_build_variable(platform: &str) -> bool {
+    platform.contains('$')
 }
 
 rule_metadata!(

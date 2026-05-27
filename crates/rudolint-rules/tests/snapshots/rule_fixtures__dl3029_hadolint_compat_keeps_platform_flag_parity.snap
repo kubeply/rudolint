@@ -1,0 +1,86 @@
+---
+source: crates/rudolint-rules/tests/rule_fixtures.rs
+expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
+---
+[
+  {
+    "code": "DL3029",
+    "help": null,
+    "labels": [],
+    "message": "avoid `--platform` in FROM; prefer build-time platform selection",
+    "path": "",
+    "primary_span": {
+      "end_byte": 73,
+      "end_column": 49,
+      "end_line": 2,
+      "start_byte": 25,
+      "start_column": 1,
+      "start_line": 2
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3029",
+    "help": null,
+    "labels": [],
+    "message": "avoid `--platform` in FROM; prefer build-time platform selection",
+    "path": "",
+    "primary_span": {
+      "end_byte": 125,
+      "end_column": 52,
+      "end_line": 3,
+      "start_byte": 74,
+      "start_column": 1,
+      "start_line": 3
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3029",
+    "help": null,
+    "labels": [],
+    "message": "avoid `--platform` in FROM; prefer build-time platform selection",
+    "path": "",
+    "primary_span": {
+      "end_byte": 181,
+      "end_column": 56,
+      "end_line": 4,
+      "start_byte": 126,
+      "start_column": 1,
+      "start_line": 4
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3029",
+    "help": null,
+    "labels": [],
+    "message": "avoid `--platform` in FROM; prefer build-time platform selection",
+    "path": "",
+    "primary_span": {
+      "end_byte": 242,
+      "end_column": 61,
+      "end_line": 5,
+      "start_byte": 182,
+      "start_column": 1,
+      "start_line": 5
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3029",
+    "help": null,
+    "labels": [],
+    "message": "avoid `--platform` in FROM; prefer build-time platform selection",
+    "path": "",
+    "primary_span": {
+      "end_byte": 305,
+      "end_column": 63,
+      "end_line": 6,
+      "start_byte": 243,
+      "start_column": 1,
+      "start_line": 6
+    },
+    "severity": "warning"
+  }
+]

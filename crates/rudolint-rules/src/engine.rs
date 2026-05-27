@@ -61,7 +61,7 @@ impl RuleEngine {
             findings.extend(
                 enabled
                     .rule
-                    .check_with_config(document, &self.config)
+                    .check_with_policy(document, &self.config, self.policy)
                     .into_iter()
                     .map(|mut finding| {
                         if let Some(severity) = self.config.severity_override(&finding.code) {

@@ -66,24 +66,7 @@ expression: "serde_json::to_value(&cases).expect(\"cases should serialize\")"
     "fixture": "heredoc"
   },
   {
-    "findings": [
-      {
-        "code": "DL3029",
-        "help": null,
-        "labels": [],
-        "message": "avoid `--platform` in FROM; prefer build-time platform selection",
-        "path": "",
-        "primary_span": {
-          "end_byte": 123,
-          "end_column": 70,
-          "end_line": 4,
-          "start_byte": 54,
-          "start_column": 1,
-          "start_line": 4
-        },
-        "severity": "warning"
-      }
-    ],
+    "findings": [],
     "fixture": "multi-platform-build"
   },
   {

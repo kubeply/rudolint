@@ -801,6 +801,22 @@ fn snapshots_dl3029_no_from_platform_flag_fixture() {
 }
 
 #[test]
+fn snapshots_dl3029_hadolint_compat_keeps_platform_flag_parity() {
+    let source = read_fixture("rules/DL3029.no-from-platform-flag/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::HadolintCompat, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "DL3029")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "dl3029_hadolint_compat_keeps_platform_flag_parity",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_dl3030_yum_install_assume_yes_fixture() {
     let source = read_fixture("rules/DL3030.yum-install-assume-yes/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");

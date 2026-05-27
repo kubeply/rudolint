@@ -106,6 +106,16 @@ pub trait Rule: Send + Sync {
         self.check(document)
     }
 
+    /// Returns diagnostics for `document` using configuration and the active policy profile.
+    fn check_with_policy(
+        &self,
+        document: &Dockerfile,
+        config: &Config,
+        _policy: PolicyProfile,
+    ) -> Vec<Finding> {
+        self.check_with_config(document, config)
+    }
+
     /// Returns suggested fixes for `document`, if this rule supports them.
     fn fix(&self, _document: &Dockerfile) -> Vec<FixPreview> {
         Vec::new()
