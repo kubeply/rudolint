@@ -8,36 +8,74 @@ use rudolint_diagnostics::Severity;
 use serde::Deserialize;
 
 /// Project configuration loaded from a rudolint configuration file.
+#[derive(Debug, Clone, Default)]
+pub struct Config {
+    /// Rule code prefixes or exact codes to select explicitly.
+    pub select: BTreeSet<String>,
+    /// Rule codes to ignore.
+    pub ignore: BTreeSet<String>,
+    /// Additional rule codes to ignore without replacing default ignores.
+    pub extend_ignore: BTreeSet<String>,
+    /// Per-rule severity overrides keyed by rule code.
+    pub severity: BTreeMap<String, Severity>,
+    /// Registry hostnames considered trusted by registry-sensitive rules.
+    pub trusted_registries: Vec<String>,
+    /// Required label keys and expected schema values used by label validation rules.
+    pub label_schema: BTreeMap<String, String>,
+    /// BuildKit entitlements allowed by policy.
+    pub strict_labels: bool,
+    pub allow_entitlements: BTreeSet<String>,
+    /// Rule ignores scoped to path patterns.
+    pub per_file_ignores: BTreeMap<String, BTreeSet<String>>,
+}
+
 #[derive(Debug, Clone, Default, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 #[serde(deny_unknown_fields)]
-pub struct Config {
-    /// Rule code prefixes or exact codes to select explicitly.
+struct RawConfig {
     #[serde(default)]
-    pub select: BTreeSet<String>,
-    /// Rule codes to ignore.
+    select: BTreeSet<String>,
     #[serde(default)]
-    pub ignore: BTreeSet<String>,
-    /// Additional rule codes to ignore without replacing default ignores.
+    ignore: BTreeSet<String>,
     #[serde(default)]
-    pub extend_ignore: BTreeSet<String>,
-    /// Per-rule severity overrides keyed by rule code.
+    ignored: BTreeSet<String>,
     #[serde(default)]
-    pub severity: BTreeMap<String, Severity>,
-    /// Registry hostnames considered trusted by registry-sensitive rules.
+    extend_ignore: BTreeSet<String>,
     #[serde(default)]
-    pub trusted_registries: Vec<String>,
-    /// Required label keys and expected schema values used by label validation rules.
+    severity: BTreeMap<String, Severity>,
     #[serde(default)]
-    pub label_schema: BTreeMap<String, String>,
-    /// BuildKit entitlements allowed by policy.
+    trusted_registries: Vec<String>,
     #[serde(default)]
-    pub strict_labels: bool,
+    label_schema: BTreeMap<String, String>,
     #[serde(default)]
-    pub allow_entitlements: BTreeSet<String>,
-    /// Rule ignores scoped to path patterns.
+    strict_labels: bool,
     #[serde(default)]
-    pub per_file_ignores: BTreeMap<String, BTreeSet<String>>,
+    allow_entitlements: BTreeSet<String>,
+    #[serde(default)]
+    per_file_ignores: BTreeMap<String, BTreeSet<String>>,
+}
+
+impl<'de> Deserialize<'de> for Config {
+    fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let raw = RawConfig::deserialize(deserializer)?;
+        let mut ignore = raw.ignore;
+        ignore.extend(raw.ignored);
+
+        Ok(Self {
+            select: raw.select,
+            ignore,
+            extend_ignore: raw.extend_ignore,
+            severity: raw.severity,
+            trusted_registries: raw.trusted_registries,
+            label_schema: raw.label_schema,
+            strict_labels: raw.strict_labels,
+            allow_entitlements: raw.allow_entitlements,
+            per_file_ignores: raw.per_file_ignores,
+        })
+    }
 }
 
 impl Config {
@@ -287,6 +325,37 @@ per-file-ignores:
         assert!(config.per_file_ignores["fixtures/**"].contains("DL3000"));
         assert!(config.ignores_for_path("DL3000", Path::new("fixtures/rules/Dockerfile")));
         assert!(!config.ignores_for_path("DL3000", Path::new("src/Dockerfile")));
+    }
+
+    #[test]
+    fn parses_hadolint_ignored_alias() {
+        let config = serde_yaml::from_str::<Config>(
+            r#"
+ignored:
+  - DL3008
+  - SC2086
+"#,
+        )
+        .expect("hadolint-style ignored key should parse");
+
+        assert!(config.ignores("DL3008"));
+        assert!(config.ignores("SC2086"));
+    }
+
+    #[test]
+    fn merges_native_ignore_and_hadolint_ignored_alias() {
+        let config = serde_yaml::from_str::<Config>(
+            r#"
+ignore:
+  - DL3008
+ignored:
+  - SC2086
+"#,
+        )
+        .expect("native and hadolint ignore keys should parse together");
+
+        assert!(config.ignores("DL3008"));
+        assert!(config.ignores("SC2086"));
     }
 
     #[test]

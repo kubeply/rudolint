@@ -61,7 +61,8 @@ ignored:
   - SC2086
 ```
 
-Use `.rudolint.yaml` and the `ignore` key:
+Rudolint accepts `ignored` when reading an existing Hadolint config with
+`--config`, but native `.rudolint.yaml` files should use the `ignore` key:
 
 ```yaml
 ignore:

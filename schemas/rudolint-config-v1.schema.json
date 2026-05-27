@@ -56,6 +56,10 @@
       "description": "Rule code prefixes or exact rule codes to ignore.",
       "$ref": "#/$defs/ruleSelectorList"
     },
+    "ignored": {
+      "description": "Compatibility alias for Hadolint's ignored key. Prefer ignore in native rudolint configs.",
+      "$ref": "#/$defs/ruleSelectorList"
+    },
     "extend-ignore": {
       "description": "Additional rule code prefixes or exact rule codes to ignore without replacing default ignores.",
       "$ref": "#/$defs/ruleSelectorList"
