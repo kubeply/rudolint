@@ -219,9 +219,12 @@ pub enum OutputFormat {
     Sarif,
 }
 
+/// How to group findings in text output.
 #[derive(Debug, Clone, Copy, ValueEnum)]
 pub enum OutputGroupBy {
+    /// Group findings by rule code, ordered by severity and count.
     Rule,
+    /// Group findings by file path.
     File,
 }
 
