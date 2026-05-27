@@ -3,10 +3,6 @@
 This guide covers the low-friction path for repositories that already use
 Hadolint and want to try `rudolint`.
 
-> [!TIP]
-> Start with `hadolint-compat` and migrate ignores/config first. Move to the
-> default or focused profiles only after the compatibility baseline is stable.
-
 ## Choose A Profile
 
 Start with `hadolint-compat` when replacing an existing Hadolint check. It keeps

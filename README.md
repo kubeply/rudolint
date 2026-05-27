@@ -44,8 +44,10 @@ Upgrade an existing install to the latest release:
 rudolint upgrade
 ```
 
-> Migrating from Hadolint? See the [Hadolint migration guide](docs/hadolint-migration.md)
-> for profile, config, and inline-ignore conversion notes.
+> [!TIP]
+> Migrating from Hadolint? Start with `hadolint-compat` and see the
+> [Hadolint migration guide](docs/hadolint-migration.md) for profile, config,
+> and inline-ignore conversion notes.
 
 To upgrade to a specific release tag:
 
