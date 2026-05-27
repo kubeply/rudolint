@@ -1,6 +1,5 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
-assertion_line: 327
 expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
 ---
 [
@@ -27,12 +26,28 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "use -y with apt-get install",
     "path": "",
     "primary_span": {
-      "end_byte": 356,
-      "end_column": 50,
-      "end_line": 9,
-      "start_byte": 307,
+      "end_byte": 481,
+      "end_column": 64,
+      "end_line": 11,
+      "start_byte": 418,
       "start_column": 1,
-      "start_line": 9
+      "start_line": 11
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3014",
+    "help": null,
+    "labels": [],
+    "message": "use -y with apt-get install",
+    "path": "",
+    "primary_span": {
+      "end_byte": 561,
+      "end_column": 50,
+      "end_line": 13,
+      "start_byte": 512,
+      "start_column": 1,
+      "start_line": 13
     },
     "severity": "warning"
   }

@@ -3740,10 +3740,36 @@ fn apt_get_install_missing_yes(shell: &str) -> bool {
             let has_assume_yes = invocation
                 .arguments
                 .iter()
-                .any(|argument| matches!(argument.as_str(), "-y" | "--yes" | "--assume-yes"));
+                .any(|argument| apt_get_argument_is_assume_yes(argument));
 
             has_install && !has_assume_yes
         })
+}
+
+fn apt_get_argument_is_assume_yes(argument: &str) -> bool {
+    matches!(argument, "-y" | "--yes" | "--assume-yes")
+        || apt_get_short_option_bundle_contains(argument, 'y')
+}
+
+fn apt_get_short_option_bundle_contains(argument: &str, option: char) -> bool {
+    if !argument.starts_with('-') || argument.starts_with("--") {
+        return false;
+    }
+
+    for character in argument.chars().skip(1) {
+        if character == option {
+            return true;
+        }
+        if apt_get_short_option_takes_inline_value(character) {
+            return false;
+        }
+    }
+
+    false
+}
+
+fn apt_get_short_option_takes_inline_value(option: char) -> bool {
+    matches!(option, 'c' | 'o')
 }
 
 fn apt_get_install_missing_no_install_recommends(shell: &str) -> bool {
