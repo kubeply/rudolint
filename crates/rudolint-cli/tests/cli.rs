@@ -340,7 +340,13 @@ fn emits_human_findings_grouped_by_file() {
     .expect("second Dockerfile should be written");
 
     let output = rudolint_cmd()
-        .args(["check", "--failure-threshold", "error"])
+        .args([
+            "check",
+            "--group-by",
+            "file",
+            "--failure-threshold",
+            "error",
+        ])
         .arg(temp.path())
         .assert()
         .failure()
@@ -352,6 +358,65 @@ fn emits_human_findings_grouped_by_file() {
     let temp_path = temp.path().to_str().expect("temp path should be UTF-8");
     insta::assert_snapshot!(
         "multi_file_human_grouped",
+        output.replace(temp_path, "$TEMP")
+    );
+}
+
+#[test]
+fn emits_human_findings_grouped_by_rule_by_default() {
+    let temp = TempDir::new().expect("temp dir should be created");
+    std::fs::write(temp.path().join("Dockerfile"), "FROM alpine:latest\n")
+        .expect("root Dockerfile should be written");
+    std::fs::write(
+        temp.path().join("Dockerfile.api"),
+        "FROM busybox\nWORKDIR app\n",
+    )
+    .expect("second Dockerfile should be written");
+
+    let output = rudolint_cmd()
+        .args(["check", "--failure-threshold", "error"])
+        .arg(temp.path())
+        .assert()
+        .failure()
+        .get_output()
+        .stdout
+        .clone();
+
+    let output = String::from_utf8(output).expect("stdout should be UTF-8");
+    let temp_path = temp.path().to_str().expect("temp path should be UTF-8");
+    insta::assert_snapshot!(
+        "multi_file_human_grouped_by_rule",
+        output.replace(temp_path, "$TEMP")
+    );
+}
+
+#[test]
+fn human_rule_grouping_respects_max_examples_per_group() {
+    let temp = TempDir::new().expect("temp dir should be created");
+    for name in ["Dockerfile.a", "Dockerfile.b", "Dockerfile.c"] {
+        std::fs::write(temp.path().join(name), "FROM alpine:latest\n")
+            .expect("Dockerfile should be written");
+    }
+
+    let output = rudolint_cmd()
+        .args([
+            "check",
+            "--max-examples-per-group",
+            "2",
+            "--failure-threshold",
+            "error",
+        ])
+        .arg(temp.path())
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+
+    let output = String::from_utf8(output).expect("stdout should be UTF-8");
+    let temp_path = temp.path().to_str().expect("temp path should be UTF-8");
+    insta::assert_snapshot!(
+        "multi_file_human_rule_group_example_limit",
         output.replace(temp_path, "$TEMP")
     );
 }

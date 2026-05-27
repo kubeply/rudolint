@@ -88,6 +88,14 @@ pub struct CheckArgs {
     #[arg(long, value_enum, default_value_t = ColorChoice::Auto)]
     pub color: ColorChoice,
 
+    /// How to group text output findings.
+    #[arg(long, value_enum, default_value_t = OutputGroupBy::Rule)]
+    pub group_by: OutputGroupBy,
+
+    /// Maximum examples to show for each rule group in text output.
+    #[arg(long, default_value_t = 3)]
+    pub max_examples_per_group: usize,
+
     /// Rule profile.
     #[arg(long, value_enum, default_value_t = Profile::Default)]
     pub profile: Profile,
@@ -143,6 +151,8 @@ impl Default for CheckArgs {
             paths: Vec::new(),
             format: OutputFormat::Text,
             color: ColorChoice::Auto,
+            group_by: OutputGroupBy::Rule,
+            max_examples_per_group: 3,
             profile: Profile::Default,
             config: None,
             no_config: false,
@@ -207,6 +217,12 @@ pub enum OutputFormat {
     Text,
     Json,
     Sarif,
+}
+
+#[derive(Debug, Clone, Copy, ValueEnum)]
+pub enum OutputGroupBy {
+    Rule,
+    File,
 }
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
@@ -337,6 +353,23 @@ mod tests {
         assert!(help.contains("[default: text]"));
         assert!(help.contains("[possible values: text, json, sarif]"));
         assert!(!help.contains("[possible values: human, json, sarif]"));
+    }
+
+    #[test]
+    fn check_group_by_defaults_to_rule_and_accepts_file() {
+        let cli = Cli::try_parse_from(["rudolint", "check"]).expect("check should parse");
+        let Some(Command::Check(args)) = cli.command else {
+            panic!("expected check command");
+        };
+        assert!(matches!(args.group_by, super::OutputGroupBy::Rule));
+        assert_eq!(args.max_examples_per_group, 3);
+
+        let cli = Cli::try_parse_from(["rudolint", "check", "--group-by", "file"])
+            .expect("file grouping should parse");
+        let Some(Command::Check(args)) = cli.command else {
+            panic!("expected check command");
+        };
+        assert!(matches!(args.group_by, super::OutputGroupBy::File));
     }
 
     #[test]

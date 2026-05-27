@@ -4,8 +4,9 @@ expression: output
 ---
 rudolint found 1 finding in 1 file (1 info)
 
-<stdin>
-  i info    RDK1000    2:1   BuildKit features are used without an explicit # syntax directive
+i info    RDK1000  BuildKit features are used without an explicit # syntax directive
+  1 finding in 1 file
+  <stdin>:2:1
 fixes: dry-run mode is enabled; 1 fix(es) available
 title: insert BuildKit syntax directive
 applicability: safe

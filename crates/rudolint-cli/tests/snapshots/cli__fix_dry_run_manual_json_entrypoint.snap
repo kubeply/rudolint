@@ -4,8 +4,9 @@ expression: output
 ---
 rudolint found 1 finding in 1 file (1 warning)
 
-<stdin>
-  ! warning DL3025     2:1   use exec/JSON form for CMD and ENTRYPOINT
+! warning DL3025  use exec/JSON form for CMD and ENTRYPOINT
+  1 finding in 1 file
+  <stdin>:2:1
 fixes: dry-run mode is enabled; 1 fix(es) available
 title: convert CMD to exec/JSON form
 applicability: manual

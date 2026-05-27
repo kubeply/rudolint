@@ -92,8 +92,9 @@ rudolint check . --fix --migrate-hadolint-ignores --dry-run
 rudolint check . --fix --migrate-hadolint-ignores
 ```
 
-Default output is grouped by file and uses colors automatically in terminals.
-Use `--color never` when plain text is preferred.
+Default text output is grouped by rule and shows up to three example locations
+per rule. Use `--group-by file` when fixing one Dockerfile at a time, and
+`--color never` when plain text is preferred.
 
 Write SARIF for CI:
 

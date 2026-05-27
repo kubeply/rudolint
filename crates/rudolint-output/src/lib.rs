@@ -1,6 +1,7 @@
 //! Render lint findings and fix previews in user-facing output formats.
 
-use std::collections::{BTreeMap, HashSet};
+use std::cmp::Reverse;
+use std::collections::{BTreeMap, BTreeSet, HashSet};
 
 use anyhow::Result;
 use rudolint_diagnostics::{Finding, Severity};
@@ -10,10 +11,34 @@ use serde_json::json;
 const FINDINGS_SCHEMA_VERSION: &str = "v1";
 
 /// Human output rendering options.
-#[derive(Debug, Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy)]
 pub struct HumanOptions {
     /// Enable ANSI color styling.
     pub color: bool,
+    /// Group text output by file or by rule.
+    pub group_by: HumanGroupBy,
+    /// Maximum examples to render for each rule group.
+    pub max_examples_per_group: usize,
+}
+
+impl Default for HumanOptions {
+    fn default() -> Self {
+        Self {
+            color: false,
+            group_by: HumanGroupBy::Rule,
+            max_examples_per_group: 3,
+        }
+    }
+}
+
+/// Human-readable text grouping strategy.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub enum HumanGroupBy {
+    /// Group findings by rule code.
+    #[default]
+    Rule,
+    /// Group findings by file path.
+    File,
 }
 
 /// Renders findings as line-oriented human-readable diagnostics.
@@ -27,7 +52,13 @@ pub fn human_with_options(findings: &[Finding], options: HumanOptions) -> String
         return String::new();
     }
 
-    let mut rendered = String::new();
+    match options.group_by {
+        HumanGroupBy::Rule => human_grouped_by_rule(findings, options),
+        HumanGroupBy::File => human_grouped_by_file(findings, options),
+    }
+}
+
+fn human_grouped_by_file(findings: &[Finding], options: HumanOptions) -> String {
     let mut grouped = BTreeMap::new();
     for finding in findings {
         grouped
@@ -36,20 +67,7 @@ pub fn human_with_options(findings: &[Finding], options: HumanOptions) -> String
             .push(finding);
     }
 
-    rendered.push_str(&format!(
-        "{}\n\n",
-        style(
-            &format!(
-                "rudolint found {} in {} ({})",
-                plural(findings.len(), "finding", "findings"),
-                plural(grouped.len(), "file", "files"),
-                severity_summary(findings)
-            ),
-            Style::Bold,
-            options.color
-        )
-    ));
-
+    let mut rendered = summary(findings, grouped.len(), options);
     let mut first_group = true;
     for (path, mut group) in grouped {
         if !first_group {
@@ -62,29 +80,135 @@ pub fn human_with_options(findings: &[Finding], options: HumanOptions) -> String
         ));
         group.sort_by_key(|finding| (finding.line(), finding.column()));
         for finding in group {
-            let severity = finding.severity.to_string();
-            let severity_label = format!("{severity:<7}");
-            let code_label = format!("{:<7}", finding.code);
-            let location = format!("{:>4}:{:<3}", finding.line(), finding.column());
-            rendered.push_str(&format!(
-                "  {} {} {} {} {}\n",
-                style(
-                    severity_icon(finding.severity),
-                    severity_style(finding.severity),
-                    options.color
-                ),
-                style(
-                    &severity_label,
-                    severity_style(finding.severity),
-                    options.color
-                ),
-                style(&code_label, Style::Bold, options.color),
-                location,
-                finding.message
-            ));
+            rendered.push_str(&render_finding_row(finding, options));
         }
     }
     rendered
+}
+
+fn human_grouped_by_rule(findings: &[Finding], options: HumanOptions) -> String {
+    let mut grouped = BTreeMap::<&str, Vec<&Finding>>::new();
+    for finding in findings {
+        grouped
+            .entry(finding.code.as_str())
+            .or_default()
+            .push(finding);
+    }
+
+    let mut groups = grouped.into_iter().collect::<Vec<_>>();
+    groups.sort_by_key(|(code, group)| {
+        let severity = group
+            .iter()
+            .map(|finding| finding.severity)
+            .max()
+            .unwrap_or(Severity::Info);
+        (Reverse(severity), Reverse(group.len()), *code)
+    });
+
+    let mut rendered = summary(findings, file_count(findings), options);
+    let mut first_group = true;
+    for (_code, mut group) in groups {
+        if !first_group {
+            rendered.push('\n');
+        }
+        first_group = false;
+        group.sort_by_key(|finding| (&finding.path, finding.line(), finding.column()));
+
+        let representative = group[0];
+        let severity = representative.severity.to_string();
+        let severity_label = format!("{severity:<7}");
+        rendered.push_str(&format!(
+            "{} {} {}  {}\n",
+            style(
+                severity_icon(representative.severity),
+                severity_style(representative.severity),
+                options.color
+            ),
+            style(
+                &severity_label,
+                severity_style(representative.severity),
+                options.color
+            ),
+            style(&representative.code, Style::Bold, options.color),
+            representative.message
+        ));
+        rendered.push_str(&format!(
+            "  {} in {}\n",
+            plural(group.len(), "finding", "findings"),
+            plural(file_count_for_group(&group), "file", "files")
+        ));
+
+        let shown = group.len().min(options.max_examples_per_group);
+        for finding in group.iter().take(shown) {
+            rendered.push_str(&format!(
+                "  {}:{}:{}\n",
+                finding.path.display(),
+                finding.line(),
+                finding.column()
+            ));
+        }
+        if group.len() > shown {
+            rendered.push_str(&format!("  ... {} more\n", group.len() - shown));
+        }
+    }
+    rendered
+}
+
+fn summary(findings: &[Finding], file_count: usize, options: HumanOptions) -> String {
+    let mut rendered = String::new();
+    rendered.push_str(&format!(
+        "{}\n\n",
+        style(
+            &format!(
+                "rudolint found {} in {} ({})",
+                plural(findings.len(), "finding", "findings"),
+                plural(file_count, "file", "files"),
+                severity_summary(findings)
+            ),
+            Style::Bold,
+            options.color
+        )
+    ));
+    rendered
+}
+
+fn render_finding_row(finding: &Finding, options: HumanOptions) -> String {
+    let severity = finding.severity.to_string();
+    let severity_label = format!("{severity:<7}");
+    let code_label = format!("{:<7}", finding.code);
+    let location = format!("{:>4}:{:<3}", finding.line(), finding.column());
+    format!(
+        "  {} {} {} {} {}\n",
+        style(
+            severity_icon(finding.severity),
+            severity_style(finding.severity),
+            options.color
+        ),
+        style(
+            &severity_label,
+            severity_style(finding.severity),
+            options.color
+        ),
+        style(&code_label, Style::Bold, options.color),
+        location,
+        finding.message
+    )
+}
+
+fn file_count(findings: &[Finding]) -> usize {
+    findings
+        .iter()
+        .map(|finding| &finding.path)
+        .collect::<BTreeSet<_>>()
+        .len()
+}
+
+fn file_count_for_group(findings: &[&Finding]) -> usize {
+    findings
+        .iter()
+        .map(|finding| &finding.path)
+        .collect::<BTreeSet<_>>()
+        .len()
 }
 
 fn severity_summary(findings: &[Finding]) -> String {
@@ -278,10 +402,10 @@ mod tests {
 
     use rudolint_diagnostics::{Finding, Severity};
 
-    use super::{HumanOptions, human_with_options};
+    use super::{HumanGroupBy, HumanOptions, human_with_options};
 
     #[test]
-    fn human_output_groups_findings_with_summary() {
+    fn human_output_groups_findings_by_file_with_summary() {
         let findings = vec![
             Finding::new(
                 "DL3007",
@@ -302,8 +426,57 @@ mod tests {
         ];
 
         assert_eq!(
-            human_with_options(&findings, HumanOptions { color: false }),
+            human_with_options(
+                &findings,
+                HumanOptions {
+                    color: false,
+                    group_by: HumanGroupBy::File,
+                    ..HumanOptions::default()
+                }
+            ),
             "rudolint found 2 findings in 1 file (1 error, 1 warning)\n\nDockerfile\n  ! warning DL3007     1:1   avoid mutable latest base image tags\n  x error   DL3000     2:1   WORKDIR should be absolute\n"
+        );
+    }
+
+    #[test]
+    fn human_output_groups_findings_by_rule_with_example_limit() {
+        let findings = vec![
+            Finding::new(
+                "DL3007",
+                Severity::Warning,
+                "avoid mutable latest base image tags",
+                1,
+                1,
+            )
+            .with_path(Path::new("Dockerfile")),
+            Finding::new(
+                "DL3007",
+                Severity::Warning,
+                "avoid mutable latest base image tags",
+                1,
+                1,
+            )
+            .with_path(Path::new("service/Dockerfile")),
+            Finding::new(
+                "DL3000",
+                Severity::Error,
+                "WORKDIR should be absolute",
+                2,
+                1,
+            )
+            .with_path(Path::new("service/Dockerfile")),
+        ];
+
+        assert_eq!(
+            human_with_options(
+                &findings,
+                HumanOptions {
+                    color: false,
+                    group_by: HumanGroupBy::Rule,
+                    max_examples_per_group: 1,
+                }
+            ),
+            "rudolint found 3 findings in 2 files (1 error, 2 warnings)\n\nx error   DL3000  WORKDIR should be absolute\n  1 finding in 1 file\n  service/Dockerfile:2:1\n\n! warning DL3007  avoid mutable latest base image tags\n  2 findings in 2 files\n  Dockerfile:1:1\n  ... 1 more\n"
         );
     }
 
@@ -320,9 +493,15 @@ mod tests {
             .with_path(Path::new("Dockerfile")),
         ];
 
-        let output = human_with_options(&findings, HumanOptions { color: true });
+        let output = human_with_options(
+            &findings,
+            HumanOptions {
+                color: true,
+                ..HumanOptions::default()
+            },
+        );
 
-        assert!(output.contains("\x1b[1mDockerfile\x1b[0m"));
+        assert!(output.contains("\x1b[1mDL3000\x1b[0m"));
         assert!(output.contains("\x1b[1;31mx\x1b[0m"));
         assert!(output.contains("\x1b[1;31merror  \x1b[0m"));
     }

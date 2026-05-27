@@ -1,0 +1,11 @@
+---
+source: crates/rudolint-cli/tests/cli.rs
+expression: "output.replace(temp_path, \"$TEMP\")"
+---
+rudolint found 3 findings in 3 files (3 warnings)
+
+! warning DL3007  avoid mutable latest base image tags
+  3 findings in 3 files
+  $TEMP/Dockerfile.a:1:1
+  $TEMP/Dockerfile.b:1:1
+  ... 1 more

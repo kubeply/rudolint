@@ -129,14 +129,35 @@ finding code.
 
 ## Text
 
-Text output is grouped by file and starts with a compact run summary:
+Text output is grouped by rule by default and starts with a compact run summary:
+
+```text
+rudolint found 4 findings in 3 files (1 error, 3 warnings)
+
+x error   DL3000  WORKDIR should be absolute
+  1 finding in 1 file
+  Dockerfile:2:1
+
+! warning DL3007  avoid mutable latest base image tags
+  3 findings in 3 files
+  Dockerfile:1:1
+  services/api/Dockerfile:1:1
+  services/worker/Dockerfile:1:1
+```
+
+Rule grouping makes repeated findings easier to scan in generated Dockerfile
+trees and large repositories. It shows at most three example locations per rule
+by default; use `--max-examples-per-group <N>` to change that limit.
+
+Use `--group-by file` to keep the previous file-oriented view when fixing one
+Dockerfile at a time:
 
 ```text
 rudolint found 2 findings in 1 file (1 error, 1 warning)
 
 Dockerfile
-  ! warning DL3007    1:1   avoid mutable latest base image tags
-  x error   DL3000    2:1   WORKDIR should be absolute
+  ! warning DL3007     1:1   avoid mutable latest base image tags
+  x error   DL3000     2:1   WORKDIR should be absolute
 ```
 
 Output uses ANSI color automatically when stdout is a terminal. Use

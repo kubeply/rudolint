@@ -4,9 +4,13 @@ expression: output
 ---
 rudolint found 2 findings in 1 file (1 error, 1 warning)
 
-<stdin>
-  ! warning DL3007     1:1   avoid mutable latest base image tags
-  x error   DL3000     2:1   WORKDIR should be absolute
+x error   DL3000  WORKDIR should be absolute
+  1 finding in 1 file
+  <stdin>:2:1
+
+! warning DL3007  avoid mutable latest base image tags
+  1 finding in 1 file
+  <stdin>:1:1
   |
   1 | FROM alpine:latest
   | ^

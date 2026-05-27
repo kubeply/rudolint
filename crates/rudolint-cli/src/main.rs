@@ -11,7 +11,7 @@ use anyhow::Context;
 use clap::Parser;
 use ignore::WalkBuilder;
 
-use crate::cli::{Cli, ColorChoice, Command, OutputFormat, RulesOutputFormat};
+use crate::cli::{Cli, ColorChoice, Command, OutputFormat, OutputGroupBy, RulesOutputFormat};
 use rudolint_config::Config;
 use rudolint_diagnostics::Finding;
 use rudolint_dockerfile::parse_dockerfile;
@@ -143,6 +143,11 @@ fn run_check(args: cli::CheckArgs) -> Result<ExitCode, AppError> {
                 &findings,
                 rudolint_output::HumanOptions {
                     color: should_colorize(args.color),
+                    group_by: match args.group_by {
+                        OutputGroupBy::Rule => rudolint_output::HumanGroupBy::Rule,
+                        OutputGroupBy::File => rudolint_output::HumanGroupBy::File,
+                    },
+                    max_examples_per_group: args.max_examples_per_group,
                 },
             ),
             OutputFormat::Json => {
