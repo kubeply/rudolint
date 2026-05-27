@@ -59,7 +59,8 @@ docker run --rm -v "$PWD:/workspace" ghcr.io/kubeply/rudolint check /workspace
 ```
 
 Release images are published as `ghcr.io/kubeply/rudolint:<release-tag>`,
-`ghcr.io/kubeply/rudolint:v1`, and `ghcr.io/kubeply/rudolint:latest`.
+`ghcr.io/kubeply/rudolint:v1`, and `ghcr.io/kubeply/rudolint:latest`. See
+[docs/docker.md](docs/docker.md) for tag, platform, config, and CI examples.
 
 ## Usage
 
