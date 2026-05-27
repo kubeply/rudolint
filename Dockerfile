@@ -6,6 +6,9 @@ ARG TARGETARCH
 
 WORKDIR /src
 
+# Builder-only packages come from a digest-pinned Rust image. Pinning Debian
+# revisions here would make routine security updates brittle without changing
+# the scratch runtime image.
 # rudolint ignore=DL3008
 RUN --mount=type=cache,id=rudolint-apt-cache,target=/var/cache/apt,sharing=locked \
     apt-get update \
@@ -43,5 +46,6 @@ LABEL org.opencontainers.image.title="rudolint" \
 
 COPY --from=build /usr/local/bin/rudolint /usr/local/bin/rudolint
 
+USER 65532:65532
 WORKDIR /workspace
 ENTRYPOINT ["/usr/local/bin/rudolint"]

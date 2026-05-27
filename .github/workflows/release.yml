@@ -51,6 +51,7 @@ jobs:
     outputs:
       val: ${{ steps.plan.outputs.manifest }}
       tag: ${{ !github.event.pull_request && github.ref_name || '' }}
+      normalized_tag: ${{ steps.release-tag.outputs.normalized_tag }}
       tag-flag: ${{ !github.event.pull_request && format('--tag={0}', github.ref_name) || '' }}
       publishing: ${{ !github.event.pull_request }}
       plan-only: ${{ github.event_name == 'pull_request' && fromJson(steps.plan.outputs.manifest).ci.github.pr_run_mode == 'plan' }}
@@ -84,6 +85,14 @@ jobs:
           echo "dist ran successfully"
           cat plan-dist-manifest.json
           echo "manifest=$(jq -c "." plan-dist-manifest.json)" >> "$GITHUB_OUTPUT"
+      - id: release-tag
+        shell: bash
+        env:
+          RAW_TAG: ${{ !github.event.pull_request && github.ref_name || '' }}
+        run: |
+          set -euo pipefail
+          normalized_tag="${RAW_TAG##*/}"
+          echo "normalized_tag=$normalized_tag" >> "$GITHUB_OUTPUT"
       - name: "Upload dist-manifest.json"
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
@@ -328,7 +337,7 @@ jobs:
     needs:
       - plan
       - host
-    if: ${{ always() && needs.host.result == 'success' && needs.plan.outputs.publishing == 'true' && startsWith(needs.plan.outputs.tag, 'v1.') && !contains(needs.plan.outputs.tag, '-') }}
+    if: ${{ always() && needs.host.result == 'success' && needs.plan.outputs.publishing == 'true' && startsWith(needs.plan.outputs.normalized_tag, 'v1.') && !contains(needs.plan.outputs.normalized_tag, '-') }}
     runs-on: "ubuntu-24.04"
     permissions:
       "contents": "write"
@@ -341,9 +350,10 @@ jobs:
       - name: Move v1 tag
         env:
           RELEASE_TAG: ${{ needs.plan.outputs.tag }}
+          NORMALIZED_RELEASE_TAG: ${{ needs.plan.outputs.normalized_tag }}
         shell: bash
         run: |
-          scripts/validate-v1-release-tag.sh "$RELEASE_TAG"
+          scripts/validate-v1-release-tag.sh "$NORMALIZED_RELEASE_TAG"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git tag --force v1 "$RELEASE_TAG"
@@ -353,7 +363,7 @@ jobs:
     needs:
       - plan
       - host
-    if: ${{ always() && needs.host.result == 'success' && needs.plan.outputs.publishing == 'true' && !contains(needs.plan.outputs.tag, '-') }}
+    if: ${{ always() && needs.host.result == 'success' && needs.plan.outputs.publishing == 'true' && !contains(needs.plan.outputs.normalized_tag, '-') }}
     runs-on: depot-ubuntu-24.04
     permissions:
       "contents": "read"
@@ -381,7 +391,7 @@ jobs:
       - name: Build and push image
         env:
           IMAGE: ghcr.io/kubeply/rudolint
-          RELEASE_TAG: ${{ needs.plan.outputs.tag }}
+          RELEASE_TAG: ${{ needs.plan.outputs.normalized_tag }}
           VCS_REF: ${{ github.sha }}
         shell: bash
         run: |
