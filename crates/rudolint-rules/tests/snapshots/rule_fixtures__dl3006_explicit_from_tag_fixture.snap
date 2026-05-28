@@ -1,6 +1,5 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
-assertion_line: 182
 expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
 ---
 [
@@ -11,42 +10,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "base image should use an explicit tag or digest",
     "path": "",
     "primary_span": {
-      "end_byte": 11,
+      "end_byte": 164,
       "end_column": 12,
-      "end_line": 1,
-      "start_byte": 0,
-      "start_column": 1,
-      "start_line": 1
-    },
-    "severity": "warning"
-  },
-  {
-    "code": "DL3006",
-    "help": null,
-    "labels": [],
-    "message": "base image should use an explicit tag or digest",
-    "path": "",
-    "primary_span": {
-      "end_byte": 32,
-      "end_column": 20,
-      "end_line": 3,
-      "start_byte": 13,
-      "start_column": 1,
-      "start_line": 3
-    },
-    "severity": "warning"
-  },
-  {
-    "code": "DL3006",
-    "help": null,
-    "labels": [],
-    "message": "base image should use an explicit tag or digest",
-    "path": "",
-    "primary_span": {
-      "end_byte": 59,
-      "end_column": 26,
       "end_line": 5,
-      "start_byte": 34,
+      "start_byte": 153,
       "start_column": 1,
       "start_line": 5
     },
@@ -59,10 +26,10 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "base image should use an explicit tag or digest",
     "path": "",
     "primary_span": {
-      "end_byte": 87,
-      "end_column": 27,
+      "end_byte": 185,
+      "end_column": 20,
       "end_line": 7,
-      "start_byte": 61,
+      "start_byte": 166,
       "start_column": 1,
       "start_line": 7
     },
@@ -75,12 +42,76 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "base image should use an explicit tag or digest",
     "path": "",
     "primary_span": {
-      "end_byte": 126,
-      "end_column": 38,
+      "end_byte": 212,
+      "end_column": 26,
       "end_line": 9,
-      "start_byte": 89,
+      "start_byte": 187,
       "start_column": 1,
       "start_line": 9
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3006",
+    "help": null,
+    "labels": [],
+    "message": "base image should use an explicit tag or digest",
+    "path": "",
+    "primary_span": {
+      "end_byte": 240,
+      "end_column": 27,
+      "end_line": 11,
+      "start_byte": 214,
+      "start_column": 1,
+      "start_line": 11
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3006",
+    "help": null,
+    "labels": [],
+    "message": "base image should use an explicit tag or digest",
+    "path": "",
+    "primary_span": {
+      "end_byte": 279,
+      "end_column": 38,
+      "end_line": 13,
+      "start_byte": 242,
+      "start_column": 1,
+      "start_line": 13
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3006",
+    "help": null,
+    "labels": [],
+    "message": "base image should use an explicit tag or digest",
+    "path": "",
+    "primary_span": {
+      "end_byte": 709,
+      "end_column": 43,
+      "end_line": 35,
+      "start_byte": 667,
+      "start_column": 1,
+      "start_line": 35
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3006",
+    "help": null,
+    "labels": [],
+    "message": "base image should use an explicit tag or digest",
+    "path": "",
+    "primary_span": {
+      "end_byte": 757,
+      "end_column": 47,
+      "end_line": 37,
+      "start_byte": 711,
+      "start_column": 1,
+      "start_line": 37
     },
     "severity": "warning"
   }

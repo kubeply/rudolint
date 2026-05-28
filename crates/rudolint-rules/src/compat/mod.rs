@@ -299,6 +299,7 @@ impl Rule for ExplicitFromTag {
     }
 
     fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        let global_args = global_arg_defaults(doc);
         let mut stage_aliases = BTreeSet::new();
         let mut findings = Vec::new();
 
@@ -311,7 +312,9 @@ impl Rule for ExplicitFromTag {
                 continue;
             };
 
-            if image_needs_explicit_tag(image, &stage_aliases) {
+            let resolved_image = resolve_from_arg_image(image, &global_args).unwrap_or(image);
+
+            if image_needs_explicit_tag(resolved_image, &stage_aliases) {
                 findings.push(diagnostic(
                     "DL3006",
                     Severity::Warning,
@@ -2605,6 +2608,31 @@ fn image_needs_explicit_tag(image: &str, stage_aliases: &BTreeSet<String>) -> bo
     }
 
     !image.rsplit('/').next().unwrap_or("").contains(':')
+}
+
+fn global_arg_defaults(doc: &Dockerfile) -> BTreeMap<String, String> {
+    doc.instructions
+        .iter()
+        .take_while(|instruction| instruction.keyword != "FROM")
+        .filter_map(|instruction| instruction.arg.as_ref())
+        .filter_map(|arg| {
+            arg.default
+                .as_ref()
+                .map(|default| (arg.name.clone(), default.clone()))
+        })
+        .collect()
+}
+
+fn resolve_from_arg_image<'a>(
+    image: &'a str,
+    global_args: &'a BTreeMap<String, String>,
+) -> Option<&'a str> {
+    let variable_name = image
+        .strip_prefix("${")
+        .and_then(|name| name.strip_suffix('}'))
+        .or_else(|| image.strip_prefix('$'))?;
+
+    global_args.get(variable_name).map(String::as_str)
 }
 
 fn is_url_source(source: &str) -> bool {

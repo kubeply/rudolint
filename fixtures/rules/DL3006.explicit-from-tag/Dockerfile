@@ -1,3 +1,7 @@
+ARG TAGGED_BASE=debian:bookworm
+ARG DIGEST_BASE=ubuntu@sha256:2c047404e52a3cfceb09e5c46f73076d8a3cf9931d9b145438cdd093b87aa970
+ARG UNTAGGED_BASE=debian
+
 FROM alpine
 
 FROM library/alpine
@@ -23,3 +27,11 @@ FROM empty AS copied_from_scratch_stage
 FROM alpine:3.20 AS MixedTag
 
 FROM mixedtag AS copied_from_mixed_case_stage
+
+FROM ${TAGGED_BASE} AS tagged_arg_base
+
+FROM $DIGEST_BASE AS digest_arg_base
+
+FROM ${UNTAGGED_BASE} AS untagged_arg_base
+
+FROM ${UNDECLARED_BASE} AS undeclared_arg_base
