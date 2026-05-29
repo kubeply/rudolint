@@ -481,11 +481,14 @@ impl Rule for ValidExposePort {
             .filter(|instruction| instruction.keyword == "EXPOSE")
             .flat_map(|instruction| {
                 instruction
-                    .args
-                    .split_whitespace()
-                    .filter_map(|port| {
-                        let port = port.split('/').next().unwrap_or(port);
-                        let valid = port.parse::<u32>().is_ok_and(|value| value <= 65535);
+                    .expose
+                    .iter()
+                    .flat_map(|expose| expose.ports.iter())
+                    .filter_map(|exposed| {
+                        let port = exposed.port.as_str();
+                        let valid = is_continuation_marker(port)
+                            || is_dockerfile_variable_reference(port)
+                            || port.parse::<u32>().is_ok_and(|value| value <= 65535);
                         (!valid).then(|| {
                             diagnostic(
                                 "DL3011",
@@ -499,6 +502,29 @@ impl Rule for ValidExposePort {
             })
             .collect()
     }
+}
+
+fn is_continuation_marker(value: &str) -> bool {
+    value == "\\"
+}
+
+fn is_dockerfile_variable_reference(value: &str) -> bool {
+    let value = value.trim_matches(|character| matches!(character, '\'' | '"'));
+    if let Some(name) = value
+        .strip_prefix("${")
+        .and_then(|rest| rest.strip_suffix('}'))
+    {
+        return is_valid_variable_name(name);
+    }
+
+    value.strip_prefix('$').is_some_and(is_valid_variable_name)
+}
+
+fn is_valid_variable_name(name: &str) -> bool {
+    !name.is_empty()
+        && name
+            .chars()
+            .all(|character| character == '_' || character.is_ascii_alphanumeric())
 }
 
 rule_metadata!(

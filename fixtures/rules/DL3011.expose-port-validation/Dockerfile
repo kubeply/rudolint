@@ -5,6 +5,11 @@ EXPOSE 0
 EXPOSE 80 443/tcp 53/udp
 # Valid: upper boundary in range.
 EXPOSE 65535
+# Valid: Dockerfile environment substitution is supported in EXPOSE.
+EXPOSE $PORT ${PORT_SSL}/tcp
+# Valid: multiline EXPOSE should ignore continuation markers.
+EXPOSE ${PORT_HTTP} \
+       ${PORT_HTTPS}
 # Invalid: port exceeds 65535.
 EXPOSE 65536
 # Invalid: port exceeds 65535 with protocol.
