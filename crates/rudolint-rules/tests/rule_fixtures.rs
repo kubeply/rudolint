@@ -1781,6 +1781,62 @@ COPY --parents src/file /dst/
 }
 
 #[test]
+fn rdk1010_copy_parents_accepts_labs_frontend_threshold() {
+    let source = r#"# syntax=docker/dockerfile:1.7-labs
+FROM alpine:3.20
+COPY --parents src/file /dst/
+"#;
+    let document = parse_dockerfile(source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDK1010")
+        .collect::<Vec<_>>();
+
+    assert!(findings.is_empty());
+}
+
+#[test]
+fn rdk1010_copy_parents_keeps_stable_frontend_threshold() {
+    let source = r#"# syntax=docker/dockerfile:1.19
+FROM alpine:3.20
+COPY --parents src/file /dst/
+"#;
+    let document = parse_dockerfile(source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDK1010")
+        .collect::<Vec<_>>();
+
+    assert_eq!(findings.len(), 1);
+    assert_eq!(
+        findings[0].message,
+        "COPY --parents requires Dockerfile frontend 1.20, but syntax directive pins 1.19"
+    );
+}
+
+#[test]
+fn rdk1010_copy_parents_reports_labs_frontend_threshold() {
+    let source = r#"# syntax=docker/dockerfile:1.6-labs
+FROM alpine:3.20
+COPY --parents src/file /dst/
+"#;
+    let document = parse_dockerfile(source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDK1010")
+        .collect::<Vec<_>>();
+
+    assert_eq!(findings.len(), 1);
+    assert_eq!(
+        findings[0].message,
+        "COPY --parents requires Dockerfile frontend 1.7-labs, but syntax directive pins 1.6-labs"
+    );
+}
+
+#[test]
 fn snapshots_rule_selection_matrix() {
     let source = read_fixture("rules/default-basic/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");

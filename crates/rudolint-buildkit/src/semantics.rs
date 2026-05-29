@@ -617,6 +617,7 @@ impl FrontendVersion {
 pub struct FrontendRequirement {
     pub feature: &'static str,
     pub version: FrontendVersion,
+    pub labs_version: Option<FrontendVersion>,
 }
 
 impl FrontendRequirement {
@@ -629,6 +630,7 @@ impl FrontendRequirement {
                 patch: None,
                 labs: false,
             },
+            labs_version: None,
         }
     }
 
@@ -641,6 +643,41 @@ impl FrontendRequirement {
                 patch: None,
                 labs: true,
             },
+            labs_version: None,
+        }
+    }
+
+    const fn stable_with_labs(
+        feature: &'static str,
+        stable_major: u16,
+        stable_minor: u16,
+        labs_major: u16,
+        labs_minor: u16,
+    ) -> Self {
+        Self {
+            feature,
+            version: FrontendVersion {
+                major: stable_major,
+                minor: Some(stable_minor),
+                patch: None,
+                labs: false,
+            },
+            labs_version: Some(FrontendVersion {
+                major: labs_major,
+                minor: Some(labs_minor),
+                patch: None,
+                labs: true,
+            }),
+        }
+    }
+
+    pub fn required_version_for(self, frontend: FrontendVersion) -> FrontendVersion {
+        if frontend.labs
+            && let Some(labs_version) = self.labs_version
+        {
+            labs_version
+        } else {
+            self.version
         }
     }
 }
@@ -744,7 +781,13 @@ pub fn frontend_requirements(instruction: &Instruction) -> Vec<FrontendRequireme
                 requirements.push(FrontendRequirement::stable("COPY --link", 1, 4));
             }
             if instruction.has_flag("parents") {
-                requirements.push(FrontendRequirement::stable("COPY --parents", 1, 20));
+                requirements.push(FrontendRequirement::stable_with_labs(
+                    "COPY --parents",
+                    1,
+                    20,
+                    1,
+                    7,
+                ));
             }
             if instruction.has_flag("exclude") {
                 requirements.push(FrontendRequirement::stable("COPY --exclude", 1, 19));
@@ -777,20 +820,22 @@ pub fn frontend_version_is_too_old(
     frontend: FrontendVersion,
     requirement: &FrontendRequirement,
 ) -> bool {
-    if requirement.version.labs && !frontend.labs {
+    let required_version = requirement.required_version_for(frontend);
+
+    if required_version.labs && !frontend.labs {
         return true;
     }
-    if frontend.major != requirement.version.major {
-        return frontend.major < requirement.version.major;
+    if frontend.major != required_version.major {
+        return frontend.major < required_version.major;
     }
 
     let frontend_minor = frontend.minor.unwrap_or_default();
-    let required_minor = requirement.version.minor.unwrap_or_default();
+    let required_minor = required_version.minor.unwrap_or_default();
     if frontend_minor != required_minor {
         return frontend_minor < required_minor;
     }
 
-    frontend.patch.unwrap_or_default() < requirement.version.patch.unwrap_or_default()
+    frontend.patch.unwrap_or_default() < required_version.patch.unwrap_or_default()
 }
 
 #[cfg(test)]

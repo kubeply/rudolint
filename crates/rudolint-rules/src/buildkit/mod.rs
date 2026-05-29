@@ -458,13 +458,14 @@ impl Rule for FrontendVersionSupportsSyntax {
                     .into_iter()
                     .filter(|requirement| frontend_version_is_too_old(frontend, requirement))
                     .map(|requirement| {
+                        let required_version = requirement.required_version_for(frontend);
                         diagnostic(
                             "RDK1010",
                             Severity::Warning,
                             format!(
                                 "{} requires Dockerfile frontend {}, but syntax directive pins {}",
                                 requirement.feature,
-                                requirement.version.display(),
+                                required_version.display(),
                                 frontend.display(),
                             ),
                             instruction,
