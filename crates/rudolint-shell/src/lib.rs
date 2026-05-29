@@ -398,6 +398,7 @@ pub fn tokenize(shell: &str) -> Vec<ShellToken> {
                 index += escaped.len_utf8();
                 if escaped == '\n' {
                     text.pop();
+                    index = skip_continued_comment_lines(shell, index);
                 }
                 continue;
             }
@@ -435,6 +436,22 @@ fn skip_shell_comment(shell: &str, start: usize) -> usize {
     shell[start..]
         .find('\n')
         .map_or(shell.len(), |offset| start + offset + 1)
+}
+
+fn skip_continued_comment_lines(shell: &str, mut index: usize) -> usize {
+    loop {
+        let line_start = index;
+        while matches!(char_at(shell, index), Some(' ' | '\t' | '\r')) {
+            index += 1;
+        }
+
+        if char_at(shell, index) == Some('#') {
+            index = skip_shell_comment(shell, index);
+            continue;
+        }
+
+        return line_start;
+    }
 }
 
 /// Detects package manager commands mentioned in shell command text.
@@ -805,6 +822,7 @@ mod tests {
             "printf \\$PATH \"$PATH\"",
             "cmd 2>/tmp/error || true",
             "apt-get install curl # keep image small\n&& rm -rf /var/lib/apt/lists/*",
+            "apt-get install curl=1 \\\n# package group\n  git=2",
         ];
         let values = cases
             .iter()
@@ -849,6 +867,7 @@ mod tests {
             "echo $(uname -m) | tee /tmp/arch",
             "cat < input.txt > output.txt && rm input.txt",
             "apt-get install curl # keep image small\n&& rm -rf /var/lib/apt/lists/*",
+            "apt-get install curl=1 \\\n# package group\n  git=2",
         ];
         let values = cases
             .iter()

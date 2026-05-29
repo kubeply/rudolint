@@ -463,5 +463,53 @@ expression: values
       }
     ],
     "shell": "apt-get install curl # keep image small\n&& rm -rf /var/lib/apt/lists/*"
+  },
+  {
+    "commands": [
+      {
+        "argument_facts": [
+          {
+            "quote": "None",
+            "raw": "install",
+            "span": {
+              "end": 15,
+              "start": 8
+            },
+            "text": "install"
+          },
+          {
+            "quote": "None",
+            "raw": "curl=1",
+            "span": {
+              "end": 22,
+              "start": 16
+            },
+            "text": "curl=1"
+          },
+          {
+            "quote": "None",
+            "raw": "git=2",
+            "span": {
+              "end": 48,
+              "start": 43
+            },
+            "text": "git=2"
+          }
+        ],
+        "arguments": [
+          "install",
+          "curl=1",
+          "git=2"
+        ],
+        "command": "apt-get",
+        "command_span": {
+          "end": 7,
+          "start": 0
+        },
+        "command_word": "apt-get",
+        "env": []
+      }
+    ],
+    "shell": "apt-get install curl=1 \\\n# package group\n  git=2"
   }
 ]
