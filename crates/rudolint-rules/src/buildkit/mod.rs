@@ -1,14 +1,14 @@
 use crate::{Rule, RuleInfo, metadata::diagnostic, metadata::rule_metadata};
 use rudolint_buildkit::{
     final_stage_uses_build_platform, frontend_requirements, frontend_version_is_too_old,
-    has_multi_platform_intent, has_secret_like_arg_or_env_name, is_official_dockerfile_frontend,
+    has_secret_like_arg_or_env_name, is_official_dockerfile_frontend,
     missing_buildkit_entitlements, parse_pinned_frontend_version, run_copies_secret_mount,
     run_uses_host_architecture_probe, run_uses_lock_based_package_manager_with_shared_cache,
     ssh_mount_scope_is_broad,
 };
 use rudolint_config::Config;
 use rudolint_diagnostics::{Finding, Severity};
-use rudolint_dockerfile::Dockerfile;
+use rudolint_dockerfile::{Dockerfile, Instruction};
 use rudolint_fix::{FixApplicability, FixPreview, TextEdit};
 
 pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
@@ -388,31 +388,39 @@ impl Rule for MultiPlatformHostArchitecture {
     }
 
     fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
-        if !has_multi_platform_intent(doc) {
-            return Vec::new();
-        }
-
         let final_from_index = doc
             .instructions
             .iter()
             .rposition(|instruction| instruction.keyword_is("FROM"));
 
-        doc.instructions
-            .iter()
-            .enumerate()
-            .filter(|(index, instruction)| {
-                final_stage_uses_build_platform(final_from_index, *index, instruction)
-                    || run_uses_host_architecture_probe(instruction)
-            })
-            .map(|(_, instruction)| {
-                diagnostic(
+        let mut stage_has_target_platform_intent = false;
+        let mut findings = Vec::new();
+
+        for (index, instruction) in doc.instructions.iter().enumerate() {
+            if instruction.keyword_is("FROM") {
+                stage_has_target_platform_intent = false;
+            }
+
+            let final_stage_mismatch =
+                final_stage_uses_build_platform(final_from_index, index, instruction);
+            let host_architecture_probe =
+                stage_has_target_platform_intent && run_uses_host_architecture_probe(instruction);
+
+            if final_stage_mismatch || host_architecture_probe {
+                findings.push(diagnostic(
                     "RDK1009",
                     Severity::Warning,
                     "multi-platform build should use target platform variables instead of host architecture",
                     instruction,
-                )
-            })
-            .collect()
+                ));
+            }
+
+            if instruction_has_target_platform_intent(instruction) {
+                stage_has_target_platform_intent = true;
+            }
+        }
+
+        findings
     }
 }
 
@@ -461,4 +469,34 @@ impl Rule for FrontendVersionSupportsSyntax {
             })
             .collect()
     }
+}
+
+fn instruction_has_target_platform_intent(instruction: &Instruction) -> bool {
+    instruction
+        .arg
+        .as_ref()
+        .is_some_and(|arg| target_platform_variable(&arg.name))
+        || instruction_references_target_platform(&instruction.args)
+        || instruction
+            .from
+            .as_ref()
+            .and_then(|from| from.platform.as_deref())
+            .is_some_and(instruction_references_target_platform)
+}
+
+fn instruction_references_target_platform(value: &str) -> bool {
+    [
+        "$TARGETARCH",
+        "${TARGETARCH}",
+        "$TARGETOS",
+        "${TARGETOS}",
+        "$TARGETPLATFORM",
+        "${TARGETPLATFORM}",
+    ]
+    .iter()
+    .any(|variable| value.contains(variable))
+}
+
+fn target_platform_variable(name: &str) -> bool {
+    matches!(name, "TARGETARCH" | "TARGETOS" | "TARGETPLATFORM")
 }

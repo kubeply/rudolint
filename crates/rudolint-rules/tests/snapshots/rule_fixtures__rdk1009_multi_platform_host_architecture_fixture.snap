@@ -11,12 +11,12 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "multi-platform build should use target platform variables instead of host architecture",
     "path": "",
     "primary_span": {
-      "end_byte": 211,
+      "end_byte": 433,
       "end_column": 85,
-      "end_line": 6,
-      "start_byte": 127,
+      "end_line": 14,
+      "start_byte": 349,
       "start_column": 1,
-      "start_line": 6
+      "start_line": 14
     },
     "severity": "warning"
   },
@@ -27,12 +27,12 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "multi-platform build should use target platform variables instead of host architecture",
     "path": "",
     "primary_span": {
-      "end_byte": 238,
+      "end_byte": 460,
       "end_column": 27,
-      "end_line": 7,
-      "start_byte": 212,
+      "end_line": 15,
+      "start_byte": 434,
       "start_column": 1,
-      "start_line": 7
+      "start_line": 15
     },
     "severity": "warning"
   },
@@ -43,12 +43,12 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "multi-platform build should use target platform variables instead of host architecture",
     "path": "",
     "primary_span": {
-      "end_byte": 481,
+      "end_byte": 703,
       "end_column": 39,
-      "end_line": 13,
-      "start_byte": 443,
+      "end_line": 21,
+      "start_byte": 665,
       "start_column": 1,
-      "start_line": 13
+      "start_line": 21
     },
     "severity": "warning"
   }
