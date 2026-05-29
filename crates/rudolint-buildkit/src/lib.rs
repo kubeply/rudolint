@@ -5,12 +5,13 @@ mod semantics;
 use rudolint_dockerfile::{Dockerfile, Mount};
 
 pub use semantics::{
-    FrontendRequirement, FrontendVersion, chmod_value_is_symbolic, final_stage_uses_build_platform,
-    frontend_requirements, frontend_version_is_too_old, has_multi_platform_intent,
-    has_secret_like_arg_or_env_name, invocation_copies_secret, is_official_dockerfile_frontend,
-    missing_buildkit_entitlements, parse_pinned_frontend_version, run_copies_secret_mount,
-    run_uses_host_architecture_probe, run_uses_lock_based_package_manager_with_shared_cache,
-    secret_mount_target, shell_wrapper_command, source_operands, ssh_mount_scope_is_broad,
+    FrontendRequirement, FrontendVersion, TARGET_PLATFORM_VARIABLES, chmod_value_is_symbolic,
+    final_stage_uses_build_platform, frontend_requirements, frontend_version_is_too_old,
+    has_multi_platform_intent, has_secret_like_arg_or_env_name, invocation_copies_secret,
+    is_official_dockerfile_frontend, missing_buildkit_entitlements, parse_pinned_frontend_version,
+    run_copies_secret_mount, run_uses_host_architecture_probe,
+    run_uses_lock_based_package_manager_with_shared_cache, secret_mount_target,
+    shell_wrapper_command, source_operands, ssh_mount_scope_is_broad,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq)]

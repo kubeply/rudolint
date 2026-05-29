@@ -1,10 +1,10 @@
 use crate::{Rule, RuleInfo, metadata::diagnostic, metadata::rule_metadata};
 use rudolint_buildkit::{
-    final_stage_uses_build_platform, frontend_requirements, frontend_version_is_too_old,
-    has_secret_like_arg_or_env_name, is_official_dockerfile_frontend,
-    missing_buildkit_entitlements, parse_pinned_frontend_version, run_copies_secret_mount,
-    run_uses_host_architecture_probe, run_uses_lock_based_package_manager_with_shared_cache,
-    ssh_mount_scope_is_broad,
+    TARGET_PLATFORM_VARIABLES, final_stage_uses_build_platform, frontend_requirements,
+    frontend_version_is_too_old, has_multi_platform_intent, has_secret_like_arg_or_env_name,
+    is_official_dockerfile_frontend, missing_buildkit_entitlements, parse_pinned_frontend_version,
+    run_copies_secret_mount, run_uses_host_architecture_probe,
+    run_uses_lock_based_package_manager_with_shared_cache, ssh_mount_scope_is_broad,
 };
 use rudolint_config::Config;
 use rudolint_diagnostics::{Finding, Severity};
@@ -388,6 +388,10 @@ impl Rule for MultiPlatformHostArchitecture {
     }
 
     fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
+        if !has_multi_platform_intent(doc) {
+            return Vec::new();
+        }
+
         let final_from_index = doc
             .instructions
             .iter()
@@ -485,16 +489,9 @@ fn instruction_has_target_platform_intent(instruction: &Instruction) -> bool {
 }
 
 fn instruction_references_target_platform(value: &str) -> bool {
-    [
-        "$TARGETARCH",
-        "${TARGETARCH}",
-        "$TARGETOS",
-        "${TARGETOS}",
-        "$TARGETPLATFORM",
-        "${TARGETPLATFORM}",
-    ]
-    .iter()
-    .any(|variable| value.contains(variable))
+    TARGET_PLATFORM_VARIABLES
+        .iter()
+        .any(|variable| value.contains(variable))
 }
 
 fn target_platform_variable(name: &str) -> bool {

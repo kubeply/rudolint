@@ -4,6 +4,15 @@ use rudolint_shell::{
 };
 use std::collections::BTreeSet;
 
+pub const TARGET_PLATFORM_VARIABLES: [&str; 6] = [
+    "$TARGETARCH",
+    "${TARGETARCH}",
+    "$TARGETPLATFORM",
+    "${TARGETPLATFORM}",
+    "$TARGETOS",
+    "${TARGETOS}",
+];
+
 pub fn has_secret_like_arg_or_env_name(keyword: &str, args: &str, secret_words: &[&str]) -> bool {
     let has_secret_like_name = |name: &str| {
         let upper_name = name.to_ascii_uppercase();
@@ -533,16 +542,9 @@ pub fn run_uses_host_architecture_probe(instruction: &Instruction) -> bool {
 }
 
 fn shell_references_target_platform(shell: &str) -> bool {
-    [
-        "$TARGETARCH",
-        "${TARGETARCH}",
-        "$TARGETPLATFORM",
-        "${TARGETPLATFORM}",
-        "$TARGETOS",
-        "${TARGETOS}",
-    ]
-    .iter()
-    .any(|variable| shell.contains(variable))
+    TARGET_PLATFORM_VARIABLES
+        .iter()
+        .any(|variable| shell.contains(variable))
 }
 
 fn shell_contains_host_architecture_probe(shell: &str) -> bool {
