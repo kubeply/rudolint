@@ -4090,7 +4090,13 @@ fn copy_multiple_sources_without_directory_destination(instruction: &Instruction
     operands.len() > 2
         && operands
             .last()
-            .is_some_and(|destination| !destination.ends_with('/'))
+            .is_some_and(|destination| !copy_destination_ends_with_directory_slash(destination))
+}
+
+fn copy_destination_ends_with_directory_slash(destination: &str) -> bool {
+    destination
+        .trim_matches(|character| matches!(character, '\'' | '"'))
+        .ends_with('/')
 }
 
 fn copy_from_reference_is_unresolved(
