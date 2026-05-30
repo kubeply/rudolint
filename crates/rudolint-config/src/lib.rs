@@ -86,10 +86,10 @@ impl Config {
         };
         let raw = fs::read_to_string(path)
             .with_context(|| format!("failed to read {}", path.display()))?;
-        let config = serde_yaml::from_str(&raw)
+        let config: Self = serde_yaml::from_str(&raw)
             .map_err(|error| parse_error(path, error))
             .with_context(|| format!("failed to parse {}", path.display()))?;
-        validate_per_file_ignore_patterns(&config, path)?;
+        config.validate(path)?;
         Ok(config)
     }
 
@@ -127,6 +127,11 @@ impl Config {
     /// Returns the configured severity override for `code`, if present.
     pub fn severity_override(&self, code: &str) -> Option<Severity> {
         self.severity.get(code).copied()
+    }
+
+    /// Validates config fields that depend on runtime parsing.
+    pub fn validate(&self, path: &Path) -> Result<()> {
+        validate_per_file_ignore_patterns(self, path)
     }
 }
 

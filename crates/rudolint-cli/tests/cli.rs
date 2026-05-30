@@ -566,6 +566,27 @@ fn config_ignore_templates_writes_template_per_file_ignores() {
 }
 
 #[test]
+fn config_ignore_templates_rejects_invalid_existing_per_file_ignore_globs() {
+    let temp = TempDir::new().expect("temp dir should be created");
+    let template = temp.path().join("Dockerfile.template");
+    let config = temp.path().join(".rudolint.yaml");
+    std::fs::write(&template, "{{ if .Alpine }}\nFROM alpine:latest\n")
+        .expect("template should be written");
+    std::fs::write(&config, "per-file-ignores:\n  \"[\":\n    - DL\n")
+        .expect("config should be written");
+
+    rudolint_cmd()
+        .args(["config", "ignore-templates", "--config"])
+        .arg(&config)
+        .arg(temp.path())
+        .assert()
+        .failure()
+        .stderr(predicates::str::contains(
+            "invalid per-file-ignores pattern `[`",
+        ));
+}
+
+#[test]
 fn explicit_config_can_override_severity() {
     let temp = TempDir::new().expect("temp dir should be created");
     let dockerfile = temp.path().join("Dockerfile");

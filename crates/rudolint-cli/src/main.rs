@@ -348,8 +348,11 @@ fn updated_config_with_template_ignores(
         merge_template_ignore_pattern(per_file, pattern)?;
     }
 
-    serde_yaml::from_value::<Config>(config.clone())
+    let updated_config = serde_yaml::from_value::<Config>(config.clone())
         .map_err(|error| AppError::usage(format!("updated config would be invalid: {error}")))?;
+    updated_config
+        .validate(config_path)
+        .map_err(|error| AppError::usage(format!("updated config would be invalid: {error:#}")))?;
     let mut rendered = serde_yaml::to_string(&config)
         .map_err(|error| AppError::internal(format!("failed to render config: {error}")))?;
     if !rendered.ends_with('\n') {
