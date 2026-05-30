@@ -1622,7 +1622,13 @@ impl Rule for CopyRelativeWithoutWorkdir {
                             .as_ref()
                             .and_then(|stage| stage_workdir.get(stage))
                             .copied()
-                            .unwrap_or_default();
+                            .unwrap_or_else(|| {
+                                inherited_workdir_from_variable_stage_reference(
+                                    &from.image,
+                                    &alias_to_stage,
+                                    &stage_workdir,
+                                )
+                            });
 
                         let stage_key = format!("__stage_{stage_idx}");
                         stage_workdir.insert(stage_key.clone(), workdir_set);
@@ -1662,6 +1668,65 @@ impl Rule for CopyRelativeWithoutWorkdir {
 
         findings
     }
+}
+
+fn inherited_workdir_from_variable_stage_reference(
+    image: &str,
+    alias_to_stage: &BTreeMap<String, String>,
+    stage_workdir: &BTreeMap<String, bool>,
+) -> bool {
+    let image = image.to_ascii_lowercase();
+    if !image.contains('$') {
+        return false;
+    }
+
+    let mut matching_states = alias_to_stage
+        .iter()
+        .filter(|(alias, _)| variable_stage_reference_could_match(&image, alias))
+        .filter_map(|(_, stage)| stage_workdir.get(stage).copied());
+
+    let Some(first_state) = matching_states.next() else {
+        return false;
+    };
+
+    matching_states.all(|state| state == first_state) && first_state
+}
+
+fn variable_stage_reference_could_match(reference: &str, alias: &str) -> bool {
+    let mut remaining = alias;
+    let mut literal = String::new();
+    let mut chars = reference.chars().peekable();
+
+    while let Some(character) = chars.next() {
+        match character {
+            '$' => {
+                if !literal.is_empty() {
+                    let Some(index) = remaining.find(&literal) else {
+                        return false;
+                    };
+                    remaining = &remaining[index + literal.len()..];
+                    literal.clear();
+                }
+
+                if matches!(chars.peek(), Some('{')) {
+                    chars.next();
+                    for variable_character in chars.by_ref() {
+                        if variable_character == '}' {
+                            break;
+                        }
+                    }
+                } else {
+                    while matches!(chars.peek(), Some(next) if *next == '_' || next.is_ascii_alphanumeric())
+                    {
+                        chars.next();
+                    }
+                }
+            }
+            _ => literal.push(character),
+        }
+    }
+
+    literal.is_empty() || remaining.contains(&literal)
 }
 
 rule_metadata!(

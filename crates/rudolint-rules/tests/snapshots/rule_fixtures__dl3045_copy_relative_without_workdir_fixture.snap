@@ -50,5 +50,37 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
       "start_line": 30
     },
     "severity": "warning"
+  },
+  {
+    "code": "DL3045",
+    "help": null,
+    "labels": [],
+    "message": "`COPY` to a relative destination without `WORKDIR` set",
+    "path": "",
+    "primary_span": {
+      "end_byte": 797,
+      "end_column": 14,
+      "end_line": 48,
+      "start_byte": 784,
+      "start_column": 1,
+      "start_line": 48
+    },
+    "severity": "warning"
+  },
+  {
+    "code": "DL3045",
+    "help": null,
+    "labels": [],
+    "message": "`COPY` to a relative destination without `WORKDIR` set",
+    "path": "",
+    "primary_span": {
+      "end_byte": 940,
+      "end_column": 14,
+      "end_line": 56,
+      "start_byte": 927,
+      "start_column": 1,
+      "start_line": 56
+    },
+    "severity": "warning"
   }
 ]
