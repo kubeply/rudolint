@@ -548,6 +548,7 @@ impl Rule for SingleHealthcheck {
             "DL3012",
             Severity::Error,
             "only one HEALTHCHECK is allowed",
+            false,
         )
     }
 }
@@ -2568,6 +2569,7 @@ impl Rule for SingleCmd {
             "DL4003",
             Severity::Warning,
             "only the final CMD is used",
+            true,
         )
     }
 }
@@ -2592,6 +2594,7 @@ impl Rule for SingleEntrypoint {
             "DL4004",
             Severity::Error,
             "only the final ENTRYPOINT is used",
+            true,
         )
     }
 }
@@ -2602,11 +2605,12 @@ fn duplicates(
     code: &'static str,
     severity: Severity,
     message: &'static str,
+    reset_on_from: bool,
 ) -> Vec<Finding> {
     let mut seen = false;
     let mut findings = Vec::new();
     for instruction in &doc.instructions {
-        if instruction.keyword == "FROM" {
+        if reset_on_from && instruction.keyword == "FROM" {
             seen = false;
             continue;
         }

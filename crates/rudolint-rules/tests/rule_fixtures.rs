@@ -461,6 +461,7 @@ fn snapshots_dl3012_healthcheck_cardinality_fixture() {
         "DL3012.single-healthcheck-cmd",
         "DL3012.single-healthcheck-none",
         "DL3012.duplicate-healthcheck",
+        "DL3012.multi-stage-healthcheck",
     ];
 
     let cases = fixtures

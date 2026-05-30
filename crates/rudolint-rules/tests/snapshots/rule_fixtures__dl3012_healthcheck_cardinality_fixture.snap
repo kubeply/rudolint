@@ -1,6 +1,5 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
-assertion_line: 295
 expression: "serde_json::to_value(&cases).expect(\"cases should serialize\")"
 ---
 [
@@ -52,5 +51,26 @@ expression: "serde_json::to_value(&cases).expect(\"cases should serialize\")"
       }
     ],
     "fixture": "DL3012.duplicate-healthcheck"
+  },
+  {
+    "findings": [
+      {
+        "code": "DL3012",
+        "help": null,
+        "labels": [],
+        "message": "only one HEALTHCHECK is allowed",
+        "path": "",
+        "primary_span": {
+          "end_byte": 165,
+          "end_column": 59,
+          "end_line": 5,
+          "start_byte": 107,
+          "start_column": 1,
+          "start_line": 5
+        },
+        "severity": "error"
+      }
+    ],
+    "fixture": "DL3012.multi-stage-healthcheck"
   }
 ]
