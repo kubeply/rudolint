@@ -488,6 +488,7 @@ impl Rule for ValidExposePort {
                         let port = exposed.port.as_str();
                         let valid = is_continuation_marker(port)
                             || is_dockerfile_variable_reference(port)
+                            // TCP and UDP ports are 16-bit values, so 65535 is the upper bound.
                             || port.parse::<u32>().is_ok_and(|value| value <= 65535);
                         (!valid).then(|| {
                             diagnostic(
