@@ -516,6 +516,56 @@ fn config_per_file_ignores_match_paths_relative_to_config() {
 }
 
 #[test]
+fn check_text_output_suggests_template_ignore_command() {
+    let temp = TempDir::new().expect("temp dir should be created");
+    let template = temp.path().join("Dockerfile.template");
+    std::fs::write(&template, "{{ if .Alpine }}\nFROM alpine:latest\n")
+        .expect("template should be written");
+
+    let output = rudolint_cmd()
+        .args(["check", "--exit-zero", "--color", "never"])
+        .arg(&template)
+        .assert()
+        .success()
+        .get_output()
+        .stdout
+        .clone();
+
+    let output = String::from_utf8(output).expect("stdout should be UTF-8");
+    assert!(
+        output.contains("rudolint config ignore-templates"),
+        "template output should suggest the config helper:\n{output}"
+    );
+}
+
+#[test]
+fn config_ignore_templates_writes_template_per_file_ignores() {
+    let temp = TempDir::new().expect("temp dir should be created");
+    let template = temp.path().join("Dockerfile.template");
+    let custom_template = temp.path().join("Dockerfile.oracle");
+    let config = temp.path().join(".rudolint.yaml");
+    std::fs::write(&template, "{{ if .Alpine }}\nFROM alpine:latest\n")
+        .expect("template should be written");
+    std::fs::write(&custom_template, "{{ if .Oracle }}\nFROM oraclelinux:9\n")
+        .expect("custom template should be written");
+
+    rudolint_cmd()
+        .args(["config", "ignore-templates", "--config"])
+        .arg(&config)
+        .arg(temp.path())
+        .assert()
+        .success();
+
+    let output = std::fs::read_to_string(&config).expect("config should be written");
+    assert!(output.contains("**/*.template"));
+    assert!(output.contains("Dockerfile.oracle"));
+    assert!(output.contains("- DL"));
+    assert!(output.contains("- SC"));
+    assert!(output.contains("- RDK"));
+    assert!(output.contains("- RUD"));
+}
+
+#[test]
 fn explicit_config_can_override_severity() {
     let temp = TempDir::new().expect("temp dir should be created");
     let dockerfile = temp.path().join("Dockerfile");

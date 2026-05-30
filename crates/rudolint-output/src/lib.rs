@@ -169,7 +169,25 @@ fn summary(findings: &[Finding], file_count: usize, options: HumanOptions) -> St
             options.color
         )
     ));
+    if findings.iter().any(finding_is_in_template_path) {
+        rendered.push_str(&format!(
+            "{}\n\n",
+            style(
+                "template files detected; run `rudolint config ignore-templates` to add reusable per-file ignores when these files are rendered before builds",
+                Style::Dim,
+                options.color
+            )
+        ));
+    }
     rendered
+}
+
+fn finding_is_in_template_path(finding: &Finding) -> bool {
+    finding
+        .path
+        .file_name()
+        .and_then(|name| name.to_str())
+        .is_some_and(|name| name.ends_with(".template") || name.ends_with(".tmpl"))
 }
 
 fn render_finding_row(finding: &Finding, options: HumanOptions) -> String {

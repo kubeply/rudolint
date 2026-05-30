@@ -20,6 +20,7 @@ rudolint-settings.workspace = true
 rudolint-source.workspace = true
 semver.workspace = true
 serde_json.workspace = true
+serde_yaml.workspace = true
 
 [dev-dependencies]
 assert_cmd.workspace = true

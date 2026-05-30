@@ -60,6 +60,9 @@ pub struct Cli {
 pub enum Command {
     /// Lint Dockerfiles.
     Check(CheckArgs),
+    /// Manage rudolint project configuration.
+    #[command(subcommand)]
+    Config(ConfigCommand),
     /// Print the rule catalog.
     Rules(RulesArgs),
     /// Explain one rule.
@@ -72,6 +75,27 @@ impl Default for Command {
     fn default() -> Self {
         Self::Check(CheckArgs::default())
     }
+}
+
+#[derive(Debug, Clone, Subcommand)]
+pub enum ConfigCommand {
+    /// Ignore detected Dockerfile template sources in .rudolint.yaml.
+    IgnoreTemplates(ConfigIgnoreTemplatesArgs),
+}
+
+#[derive(Debug, Clone, Args)]
+pub struct ConfigIgnoreTemplatesArgs {
+    /// Paths to scan for template-like Dockerfile sources.
+    #[arg(default_value = ".")]
+    pub paths: Vec<PathBuf>,
+
+    /// Config file to update.
+    #[arg(long, default_value = ".rudolint.yaml")]
+    pub config: PathBuf,
+
+    /// Print the updated config without writing it.
+    #[arg(long)]
+    pub dry_run: bool,
 }
 
 #[derive(Debug, Clone, Args)]

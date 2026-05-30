@@ -45,6 +45,28 @@ Configuration resolves in this order:
 Per-file ignore patterns are matched relative to the loaded config file's
 directory. When no config file is loaded, paths are linted as provided.
 
+## Dockerfile Templates
+
+Some repositories keep source templates such as `Dockerfile.template` and render
+them into real Dockerfiles before building. Rudolint reports findings for these
+files when they are discovered, but text output suggests a config helper when
+template paths are detected.
+
+To add reusable ignores for common Dockerfile template patterns:
+
+```bash
+rudolint config ignore-templates
+```
+
+Preview the config change without writing:
+
+```bash
+rudolint config ignore-templates --dry-run
+```
+
+The command updates `.rudolint.yaml` with `per-file-ignores` entries for common
+template file names and any detected template-like Dockerfile sources.
+
 ## Compatibility Policy
 
 The v1 config schema is a stable contract for `.rudolint.yaml` validation.

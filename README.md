@@ -213,6 +213,12 @@ Run with:
 rudolint check . --config .rudolint.yaml
 ```
 
+For repositories with rendered Dockerfile templates, use:
+
+```bash
+rudolint config ignore-templates
+```
+
 ## Rule Families
 
 | Prefix | Scope |

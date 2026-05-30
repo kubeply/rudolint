@@ -1,6 +1,6 @@
 mod cli;
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::env;
 use std::fs;
 use std::io::{self, IsTerminal, Read};
@@ -11,7 +11,9 @@ use anyhow::Context;
 use clap::Parser;
 use ignore::WalkBuilder;
 
-use crate::cli::{Cli, ColorChoice, Command, OutputFormat, OutputGroupBy, RulesOutputFormat};
+use crate::cli::{
+    Cli, ColorChoice, Command, ConfigCommand, OutputFormat, OutputGroupBy, RulesOutputFormat,
+};
 use rudolint_config::Config;
 use rudolint_diagnostics::Finding;
 use rudolint_dockerfile::parse_dockerfile;
@@ -37,6 +39,7 @@ fn run() -> Result<ExitCode, AppError> {
     }
     match cli.command.unwrap_or_default() {
         Command::Check(args) => run_check(args),
+        Command::Config(command) => run_config(command),
         Command::Rules(args) => run_rules(args),
         Command::Explain(args) => run_explain(args),
         Command::Upgrade(args) => run_upgrade(args, cli.json),
@@ -245,6 +248,188 @@ fn run_rules(args: cli::RulesArgs) -> Result<ExitCode, AppError> {
         }
     }
     Ok(ExitCode::SUCCESS)
+}
+
+fn run_config(command: ConfigCommand) -> Result<ExitCode, AppError> {
+    match command {
+        ConfigCommand::IgnoreTemplates(args) => run_config_ignore_templates(args),
+    }
+}
+
+fn run_config_ignore_templates(args: cli::ConfigIgnoreTemplatesArgs) -> Result<ExitCode, AppError> {
+    let template_patterns = template_ignore_patterns(&args.paths, &args.config)?;
+    let rendered = updated_config_with_template_ignores(&args.config, &template_patterns)?;
+
+    if args.dry_run {
+        print!("{rendered}");
+        return Ok(ExitCode::SUCCESS);
+    }
+
+    if let Some(parent) = args
+        .config
+        .parent()
+        .filter(|parent| !parent.as_os_str().is_empty())
+    {
+        fs::create_dir_all(parent).map_err(|error| {
+            AppError::usage(format!(
+                "failed to create config directory {}: {error}",
+                parent.display()
+            ))
+        })?;
+    }
+    fs::write(&args.config, rendered).map_err(|error| {
+        AppError::usage(format!(
+            "failed to write {}: {error}",
+            args.config.display()
+        ))
+    })?;
+    println!("updated {}", args.config.display());
+    Ok(ExitCode::SUCCESS)
+}
+
+fn template_ignore_patterns(
+    paths: &[PathBuf],
+    config_path: &Path,
+) -> Result<BTreeSet<String>, AppError> {
+    let mut patterns = BTreeSet::from([
+        "*.template".to_string(),
+        "**/*.template".to_string(),
+        "*.tmpl".to_string(),
+        "**/*.tmpl".to_string(),
+    ]);
+
+    for path in resolve_inputs(paths)? {
+        let source = fs::read_to_string(&path).map_err(|error| {
+            AppError::usage(format!("failed to read {}: {error}", path.display()))
+        })?;
+        if is_template_like_source(&source) && !is_common_template_path(&path) {
+            patterns.insert(path_for_config_pattern(config_path, &path));
+        }
+    }
+
+    Ok(patterns)
+}
+
+fn updated_config_with_template_ignores(
+    config_path: &Path,
+    patterns: &BTreeSet<String>,
+) -> Result<String, AppError> {
+    let mut config = if config_path.exists() {
+        let raw = fs::read_to_string(config_path).map_err(|error| {
+            AppError::usage(format!("failed to read {}: {error}", config_path.display()))
+        })?;
+        if raw.trim().is_empty() {
+            serde_yaml::Value::Mapping(serde_yaml::Mapping::new())
+        } else {
+            serde_yaml::from_str::<serde_yaml::Value>(&raw).map_err(|error| {
+                AppError::usage(format!(
+                    "failed to parse {}: {error}",
+                    config_path.display()
+                ))
+            })?
+        }
+    } else {
+        serde_yaml::Value::Mapping(serde_yaml::Mapping::new())
+    };
+
+    let mapping = config
+        .as_mapping_mut()
+        .ok_or_else(|| AppError::usage("rudolint config must be a YAML mapping"))?;
+    let per_file_key = serde_yaml::Value::String("per-file-ignores".to_string());
+    mapping
+        .entry(per_file_key.clone())
+        .or_insert_with(|| serde_yaml::Value::Mapping(serde_yaml::Mapping::new()));
+    let per_file = mapping
+        .get_mut(&per_file_key)
+        .and_then(serde_yaml::Value::as_mapping_mut)
+        .ok_or_else(|| AppError::usage("`per-file-ignores` must be a YAML mapping"))?;
+
+    for pattern in patterns {
+        merge_template_ignore_pattern(per_file, pattern)?;
+    }
+
+    serde_yaml::from_value::<Config>(config.clone())
+        .map_err(|error| AppError::usage(format!("updated config would be invalid: {error}")))?;
+    let mut rendered = serde_yaml::to_string(&config)
+        .map_err(|error| AppError::internal(format!("failed to render config: {error}")))?;
+    if !rendered.ends_with('\n') {
+        rendered.push('\n');
+    }
+    Ok(rendered)
+}
+
+fn merge_template_ignore_pattern(
+    per_file: &mut serde_yaml::Mapping,
+    pattern: &str,
+) -> Result<(), AppError> {
+    let key = serde_yaml::Value::String(pattern.to_string());
+    per_file
+        .entry(key.clone())
+        .or_insert_with(|| serde_yaml::Value::Sequence(Vec::new()));
+    let rules = per_file
+        .get_mut(&key)
+        .and_then(serde_yaml::Value::as_sequence_mut)
+        .ok_or_else(|| {
+            AppError::usage(format!(
+                "`per-file-ignores.{pattern}` must be a YAML sequence"
+            ))
+        })?;
+
+    let existing = rules
+        .iter()
+        .filter_map(serde_yaml::Value::as_str)
+        .map(str::to_string)
+        .collect::<BTreeSet<_>>();
+    for prefix in ["DL", "SC", "RDK", "RUD"] {
+        if !existing.contains(prefix) {
+            rules.push(serde_yaml::Value::String(prefix.to_string()));
+        }
+    }
+    Ok(())
+}
+
+fn is_common_template_path(path: &Path) -> bool {
+    let Some(name) = path.file_name().and_then(|name| name.to_str()) else {
+        return false;
+    };
+    name.ends_with(".template") || name.ends_with(".tmpl")
+}
+
+fn is_template_like_source(source: &str) -> bool {
+    let trimmed = source.trim_start();
+    trimmed.starts_with("{{") || trimmed.starts_with("{%") || trimmed.starts_with("<%")
+}
+
+fn path_for_config_pattern(config_path: &Path, path: &Path) -> String {
+    let config_parent = config_path
+        .parent()
+        .filter(|parent| !parent.as_os_str().is_empty())
+        .map(Path::to_path_buf)
+        .unwrap_or_else(|| env::current_dir().unwrap_or_else(|_| PathBuf::from(".")));
+    let absolute_base = config_parent
+        .canonicalize()
+        .unwrap_or_else(|_| config_parent.clone());
+    let absolute_path = path.canonicalize().unwrap_or_else(|_| {
+        if path.is_absolute() {
+            path.to_path_buf()
+        } else {
+            env::current_dir()
+                .unwrap_or_else(|_| PathBuf::from("."))
+                .join(path)
+        }
+    });
+    let relative = absolute_path
+        .strip_prefix(&absolute_base)
+        .map(Path::to_path_buf)
+        .unwrap_or_else(|_| lint_path_for_config(&Some(config_path.to_path_buf()), path));
+    path_to_glob_string(&relative)
+}
+
+fn path_to_glob_string(path: &Path) -> String {
+    path.components()
+        .map(|component| component.as_os_str().to_string_lossy())
+        .collect::<Vec<_>>()
+        .join("/")
 }
 
 fn run_version(json: bool) -> Result<ExitCode, AppError> {
