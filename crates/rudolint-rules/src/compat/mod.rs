@@ -2280,15 +2280,29 @@ impl Rule for ConsecutiveRun {
 
     fn check(&self, doc: &Dockerfile) -> Vec<Finding> {
         let mut previous_run: Option<&Instruction> = None;
+        let mut non_posix_shell = false;
         let mut findings = Vec::new();
 
         for instruction in &doc.instructions {
+            if instruction.keyword_is("FROM") {
+                non_posix_shell = false;
+                previous_run = None;
+                continue;
+            }
+
+            if instruction.keyword_is("SHELL") {
+                non_posix_shell = shell_instruction_is_non_posix(instruction);
+                previous_run = None;
+                continue;
+            }
+
             if instruction.keyword != "RUN" {
                 previous_run = None;
                 continue;
             }
 
-            if let Some(previous) = previous_run
+            if !non_posix_shell
+                && let Some(previous) = previous_run
                 && consecutive_run_instructions_should_be_combined(previous, instruction)
             {
                 findings.push(diagnostic(
@@ -3628,6 +3642,31 @@ fn shell_instruction_handles_pipes(instruction: &Instruction) -> bool {
         }
         _ => false,
     }
+}
+
+fn shell_instruction_is_non_posix(instruction: &Instruction) -> bool {
+    match &instruction.form {
+        InstructionForm::Json(parts) => parts
+            .first()
+            .map(String::as_str)
+            .map(normalized_shell_executable)
+            .is_some_and(|shell| shell_is_non_posix(&shell)),
+        InstructionForm::Shell { text, .. } => shell_form_executable(text)
+            .map(normalized_shell_executable)
+            .is_some_and(|shell| shell_is_non_posix(&shell)),
+        _ => false,
+    }
+}
+
+fn shell_form_executable(text: &str) -> Option<&str> {
+    let trimmed = text.trim_start();
+    if let Some(rest) = trimmed.strip_prefix('"') {
+        return rest.split('"').next();
+    }
+    if let Some(rest) = trimmed.strip_prefix('\'') {
+        return rest.split('\'').next();
+    }
+    trimmed.split_whitespace().next()
 }
 
 fn normalized_shell_executable(shell: &str) -> String {

@@ -1,6 +1,5 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
-assertion_line: 1134
 expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
 ---
 [
@@ -33,6 +32,38 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
       "start_byte": 224,
       "start_column": 1,
       "start_line": 11
+    },
+    "severity": "info"
+  },
+  {
+    "code": "DL3059",
+    "help": null,
+    "labels": [],
+    "message": "combine consecutive RUN instructions to reduce image layers",
+    "path": "",
+    "primary_span": {
+      "end_byte": 643,
+      "end_column": 19,
+      "end_line": 28,
+      "start_byte": 625,
+      "start_column": 1,
+      "start_line": 28
+    },
+    "severity": "info"
+  },
+  {
+    "code": "DL3059",
+    "help": null,
+    "labels": [],
+    "message": "combine consecutive RUN instructions to reduce image layers",
+    "path": "",
+    "primary_span": {
+      "end_byte": 1034,
+      "end_column": 30,
+      "end_line": 43,
+      "start_byte": 1005,
+      "start_column": 1,
+      "start_line": 43
     },
     "severity": "info"
   }
