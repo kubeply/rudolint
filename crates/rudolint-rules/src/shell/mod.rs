@@ -5,8 +5,8 @@ use rudolint_config::Config;
 use rudolint_diagnostics::{Finding, Severity};
 use rudolint_dockerfile::{Dockerfile, Instruction, InstructionForm};
 use rudolint_shell::{
-    QuoteKind, ShellCommandInvocation, ShellExpansionKind, ShellProgram, ShellSpan, ShellToken,
-    ShellTokenKind, analyze,
+    QuoteKind, ShellArgument, ShellCommandInvocation, ShellExpansionKind, ShellProgram, ShellSpan,
+    ShellToken, ShellTokenKind, analyze,
 };
 use rudolint_source::Span;
 
@@ -162,13 +162,14 @@ impl Rule for DeclareAndAssignSeparately {
             program
                 .commands
                 .iter()
-                .any(invocation_declares_assignment_with_command_substitution)
-                .then(|| {
-                    diagnostic(
+                .find_map(invocation_declaration_assignment_with_command_substitution)
+                .map(|argument| {
+                    shell_diagnostic(
                         "SC2155",
                         Severity::Warning,
                         "declare and assign separately to avoid masking command failures",
                         instruction,
+                        &argument.span,
                     )
                 })
         })
@@ -483,13 +484,14 @@ fn lint_program(
         program
             .commands
             .iter()
-            .any(invocation_declares_assignment_with_command_substitution)
-            .then(|| {
-                diagnostic(
+            .find_map(invocation_declaration_assignment_with_command_substitution)
+            .map(|argument| {
+                shell_diagnostic(
                     "SC2155",
                     Severity::Warning,
                     "declare and assign separately to avoid masking command failures",
                     instruction,
+                    &argument.span,
                 )
             }),
     );
@@ -635,13 +637,17 @@ fn next_command_separator_after<'a>(
     })
 }
 
-fn invocation_declares_assignment_with_command_substitution(
+fn invocation_declaration_assignment_with_command_substitution(
     invocation: &ShellCommandInvocation,
-) -> bool {
-    matches!(
+) -> Option<&ShellArgument> {
+    if !matches!(
         invocation.command.as_str(),
         "export" | "readonly" | "local" | "declare"
-    ) && invocation.argument_facts.iter().any(|argument| {
+    ) {
+        return None;
+    }
+
+    invocation.argument_facts.iter().find(|argument| {
         argument.text.contains('=')
             && analyze(&argument.raw).tokens.iter().any(|token| {
                 token

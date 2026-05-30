@@ -1,5 +1,6 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
+assertion_line: 240
 expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
 ---
 [
@@ -77,8 +78,8 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
       "end_byte": 937,
       "end_column": 31,
       "end_line": 25,
-      "start_byte": 907,
-      "start_column": 1,
+      "start_byte": 918,
+      "start_column": 12,
       "start_line": 25
     },
     "severity": "warning"
