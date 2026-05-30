@@ -1,0 +1,54 @@
+---
+source: crates/rudolint-rules/tests/rule_fixtures.rs
+expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
+---
+[
+  {
+    "code": "RDK1003",
+    "help": null,
+    "labels": [],
+    "message": "package install step can use a BuildKit cache mount for repeat builds",
+    "path": "",
+    "primary_span": {
+      "end_byte": 59,
+      "end_column": 28,
+      "end_line": 2,
+      "start_byte": 32,
+      "start_column": 1,
+      "start_line": 2
+    },
+    "severity": "info"
+  },
+  {
+    "code": "RDK1003",
+    "help": null,
+    "labels": [],
+    "message": "package install step can use a BuildKit cache mount for repeat builds",
+    "path": "",
+    "primary_span": {
+      "end_byte": 212,
+      "end_column": 46,
+      "end_line": 8,
+      "start_byte": 167,
+      "start_column": 1,
+      "start_line": 8
+    },
+    "severity": "info"
+  },
+  {
+    "code": "RDK1003",
+    "help": null,
+    "labels": [],
+    "message": "package install step can use a BuildKit cache mount for repeat builds",
+    "path": "",
+    "primary_span": {
+      "end_byte": 339,
+      "end_column": 69,
+      "end_line": 11,
+      "start_byte": 271,
+      "start_column": 1,
+      "start_line": 11
+    },
+    "severity": "info"
+  }
+]

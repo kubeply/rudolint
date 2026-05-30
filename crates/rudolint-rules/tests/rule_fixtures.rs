@@ -1636,6 +1636,22 @@ fn snapshots_dl4006_pipefail_before_pipe_fixture() {
 }
 
 #[test]
+fn snapshots_rdk1003_cache_mount_package_install_fixture() {
+    let source = read_fixture("rules/RDK1003.cache-mount-package-install/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "RDK1003")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "rdk1003_cache_mount_package_install_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_rdk1004_secret_mount_copied_to_layer_fixture() {
     let source = read_fixture("rules/RDK1004.secret-mount-copied-to-layer/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");

@@ -167,12 +167,7 @@ impl Rule for CacheMountForPackageInstall {
         doc.instructions
             .iter()
             .filter(|instruction| instruction.keyword_is("RUN"))
-            .filter(|instruction| {
-                instruction.args.contains("apt-get install")
-                    || instruction.args.contains("apk add")
-                    || instruction.args.contains("dnf install")
-                    || instruction.args.contains("yum install")
-            })
+            .filter(|instruction| package_install_can_use_cache_mount(&instruction.args))
             .filter(|instruction| {
                 !instruction
                     .mounts
@@ -189,6 +184,17 @@ impl Rule for CacheMountForPackageInstall {
             })
             .collect()
     }
+}
+
+fn package_install_can_use_cache_mount(args: &str) -> bool {
+    args.contains("apt-get install")
+        || args.contains("dnf install")
+        || args.contains("yum install")
+        || (args.contains("apk add") && !apk_add_disables_cache(args))
+}
+
+fn apk_add_disables_cache(args: &str) -> bool {
+    args.split_whitespace().any(|token| token == "--no-cache")
 }
 
 rule_metadata!(
