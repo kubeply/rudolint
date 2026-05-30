@@ -2605,15 +2605,18 @@ fn duplicates(
 ) -> Vec<Finding> {
     let mut seen = false;
     let mut findings = Vec::new();
-    for instruction in doc
-        .instructions
-        .iter()
-        .filter(|instruction| instruction.keyword == keyword)
-    {
-        if seen {
-            findings.push(diagnostic(code, severity, message, instruction));
+    for instruction in &doc.instructions {
+        if instruction.keyword == "FROM" {
+            seen = false;
+            continue;
         }
-        seen = true;
+
+        if instruction.keyword == keyword {
+            if seen {
+                findings.push(diagnostic(code, severity, message, instruction));
+            }
+            seen = true;
+        }
     }
     findings
 }

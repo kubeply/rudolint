@@ -1,6 +1,5 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
-assertion_line: 1303
 expression: "serde_json::to_value(&cases).expect(\"cases should serialize\")"
 ---
 [
@@ -48,5 +47,9 @@ expression: "serde_json::to_value(&cases).expect(\"cases should serialize\")"
       }
     ],
     "fixture": "DL4004.duplicate-entrypoint"
+  },
+  {
+    "findings": [],
+    "fixture": "DL4004.multi-stage-entrypoint"
   }
 ]

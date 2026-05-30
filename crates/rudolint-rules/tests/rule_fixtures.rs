@@ -1538,7 +1538,12 @@ fn snapshots_dl4001_either_wget_or_curl_fixture() {
 
 #[test]
 fn snapshots_dl4003_cmd_cardinality_fixture() {
-    let fixtures = ["DL4003.no-cmd", "DL4003.single-cmd", "DL4003.duplicate-cmd"];
+    let fixtures = [
+        "DL4003.no-cmd",
+        "DL4003.single-cmd",
+        "DL4003.duplicate-cmd",
+        "DL4003.multi-stage-cmd",
+    ];
 
     let cases = fixtures
         .into_iter()
@@ -1570,6 +1575,7 @@ fn snapshots_dl4004_entrypoint_cardinality_fixture() {
         "DL4004.no-entrypoint",
         "DL4004.single-entrypoint",
         "DL4004.duplicate-entrypoint",
+        "DL4004.multi-stage-entrypoint",
     ];
 
     let cases = fixtures
