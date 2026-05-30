@@ -44,6 +44,8 @@ COPY app.py .
 
 FROM alpine:3.20 AS no-workdir-mode-false
 
+FROM alpine:3.20 AS no-workdir-mode-true
+
 FROM no-workdir-mode-${MODE} AS no-workdir-base
 COPY app.py .
 

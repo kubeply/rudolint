@@ -58,12 +58,12 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "`COPY` to a relative destination without `WORKDIR` set",
     "path": "",
     "primary_span": {
-      "end_byte": 797,
+      "end_byte": 839,
       "end_column": 14,
-      "end_line": 48,
-      "start_byte": 784,
+      "end_line": 50,
+      "start_byte": 826,
       "start_column": 1,
-      "start_line": 48
+      "start_line": 50
     },
     "severity": "warning"
   },
@@ -74,12 +74,12 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "`COPY` to a relative destination without `WORKDIR` set",
     "path": "",
     "primary_span": {
-      "end_byte": 940,
+      "end_byte": 982,
       "end_column": 14,
-      "end_line": 56,
-      "start_byte": 927,
+      "end_line": 58,
+      "start_byte": 969,
       "start_column": 1,
-      "start_line": 56
+      "start_line": 58
     },
     "severity": "warning"
   }

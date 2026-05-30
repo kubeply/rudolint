@@ -1675,6 +1675,10 @@ fn inherited_workdir_from_variable_stage_reference(
     alias_to_stage: &BTreeMap<String, String>,
     stage_workdir: &BTreeMap<String, bool>,
 ) -> bool {
+    // Only infer inherited WORKDIR for variable-expanded stage names when every
+    // possible alias match resolves to the same known WORKDIR state. Ambiguous
+    // or unresolved references stay conservative and behave as if no WORKDIR
+    // was inherited.
     let image = image.to_ascii_lowercase();
     if !image.contains('$') {
         return false;
@@ -1726,7 +1730,7 @@ fn variable_stage_reference_could_match(reference: &str, alias: &str) -> bool {
         }
     }
 
-    literal.is_empty() || remaining.contains(&literal)
+    literal.is_empty() || remaining.ends_with(&literal)
 }
 
 rule_metadata!(
