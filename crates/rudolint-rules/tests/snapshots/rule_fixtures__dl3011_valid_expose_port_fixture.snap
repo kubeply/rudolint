@@ -1,6 +1,5 @@
 ---
 source: crates/rudolint-rules/tests/rule_fixtures.rs
-assertion_line: 451
 expression: "serde_json::to_value(&findings).expect(\"findings should serialize\")"
 ---
 [
@@ -11,12 +10,12 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "invalid exposed port `65536`",
     "path": "",
     "primary_span": {
-      "end_byte": 426,
+      "end_byte": 526,
       "end_column": 13,
-      "end_line": 14,
-      "start_byte": 414,
+      "end_line": 16,
+      "start_byte": 514,
       "start_column": 1,
-      "start_line": 14
+      "start_line": 16
     },
     "severity": "error"
   },
@@ -27,12 +26,12 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "invalid exposed port `70000`",
     "path": "",
     "primary_span": {
-      "end_byte": 488,
+      "end_byte": 588,
       "end_column": 17,
-      "end_line": 16,
-      "start_byte": 472,
+      "end_line": 18,
+      "start_byte": 572,
       "start_column": 1,
-      "start_line": 16
+      "start_line": 18
     },
     "severity": "error"
   },
@@ -43,12 +42,12 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "invalid exposed port `-1`",
     "path": "",
     "primary_span": {
-      "end_byte": 541,
+      "end_byte": 641,
       "end_column": 10,
-      "end_line": 18,
-      "start_byte": 532,
+      "end_line": 20,
+      "start_byte": 632,
       "start_column": 1,
-      "start_line": 18
+      "start_line": 20
     },
     "severity": "error"
   },
@@ -59,12 +58,12 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "message": "invalid exposed port `port`",
     "path": "",
     "primary_span": {
-      "end_byte": 585,
+      "end_byte": 685,
       "end_column": 12,
-      "end_line": 20,
-      "start_byte": 574,
+      "end_line": 22,
+      "start_byte": 674,
       "start_column": 1,
-      "start_line": 20
+      "start_line": 22
     },
     "severity": "error"
   },
@@ -72,15 +71,31 @@ expression: "serde_json::to_value(&findings).expect(\"findings should serialize\
     "code": "DL3011",
     "help": null,
     "labels": [],
-    "message": "invalid exposed port `80-90`",
+    "message": "invalid exposed port `90-80`",
     "path": "",
     "primary_span": {
-      "end_byte": 645,
+      "end_byte": 740,
       "end_column": 13,
-      "end_line": 22,
-      "start_byte": 633,
+      "end_line": 24,
+      "start_byte": 728,
       "start_column": 1,
-      "start_line": 22
+      "start_line": 24
+    },
+    "severity": "error"
+  },
+  {
+    "code": "DL3011",
+    "help": null,
+    "labels": [],
+    "message": "invalid exposed port `65000-70000`",
+    "path": "",
+    "primary_span": {
+      "end_byte": 795,
+      "end_column": 19,
+      "end_line": 26,
+      "start_byte": 777,
+      "start_column": 1,
+      "start_line": 26
     },
     "severity": "error"
   }

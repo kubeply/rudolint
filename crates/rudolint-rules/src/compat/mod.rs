@@ -486,10 +486,7 @@ impl Rule for ValidExposePort {
                     .flat_map(|expose| expose.ports.iter())
                     .filter_map(|exposed| {
                         let port = exposed.port.as_str();
-                        let valid = is_continuation_marker(port)
-                            || is_dockerfile_variable_reference(port)
-                            // TCP and UDP ports are 16-bit values, so 65535 is the upper bound.
-                            || port.parse::<u32>().is_ok_and(|value| value <= 65535);
+                        let valid = is_valid_expose_port(port);
                         (!valid).then(|| {
                             diagnostic(
                                 "DL3011",
@@ -505,8 +502,50 @@ impl Rule for ValidExposePort {
     }
 }
 
+fn is_valid_expose_port(port: &str) -> bool {
+    is_continuation_marker(port)
+        || is_dockerfile_variable_reference(port)
+        || is_valid_port_number(port)
+        || is_valid_port_range(port)
+}
+
 fn is_continuation_marker(value: &str) -> bool {
     value == "\\"
+}
+
+fn is_valid_port_range(value: &str) -> bool {
+    let Some((start, end)) = value.split_once('-') else {
+        return false;
+    };
+
+    match (parse_port_bound(start), parse_port_bound(end)) {
+        (Some(PortBound::Number(start)), Some(PortBound::Number(end))) => start <= end,
+        (Some(_), Some(_)) => true,
+        _ => false,
+    }
+}
+
+fn parse_port_bound(value: &str) -> Option<PortBound> {
+    if is_dockerfile_variable_reference(value) {
+        Some(PortBound::Variable)
+    } else {
+        value
+            .parse::<u32>()
+            .ok()
+            .filter(|value| *value <= 65535)
+            .map(PortBound::Number)
+    }
+}
+
+fn is_valid_port_number(value: &str) -> bool {
+    // TCP and UDP ports are 16-bit values, so 65535 is the upper bound.
+    value.parse::<u32>().is_ok_and(|value| value <= 65535)
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum PortBound {
+    Number(u32),
+    Variable,
 }
 
 fn is_dockerfile_variable_reference(value: &str) -> bool {
