@@ -1,6 +1,6 @@
 {
   "private": true,
   "dependencies": {
-    "tally-cli": "0.41.0"
+    "tally-cli": "0.44.0"
   }
 }
