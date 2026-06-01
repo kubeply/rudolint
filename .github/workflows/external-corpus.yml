@@ -24,7 +24,7 @@ env:
 jobs:
   hadoop:
     name: apache hadoop
-    runs-on: ubuntu-24.04
+    runs-on: depot-ubuntu-24.04
     timeout-minutes: 15
     steps:
       - name: Checkout
