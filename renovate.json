@@ -16,6 +16,7 @@
     "before 7am every weekday"
   ],
   "ignorePaths": [
+    "rust-toolchain.toml",
     "fixtures/**",
     "crates/**/snapshots/**",
     "**/*.snap",
