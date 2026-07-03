@@ -9,7 +9,7 @@ repository.workspace = true
 [dependencies]
 
 [dev-dependencies]
-criterion = { version = "4.6.0", package = "codspeed-criterion-compat" }
+criterion = { version = "5.0.0", package = "codspeed-criterion-compat" }
 rudolint-config = { path = "../rudolint-config" }
 rudolint-diagnostics = { path = "../rudolint-diagnostics" }
 rudolint-dockerfile = { path = "../rudolint-dockerfile" }
