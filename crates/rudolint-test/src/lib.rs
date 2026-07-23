@@ -28,7 +28,7 @@ pub fn rudolint_cmd() -> Command {
     Command::cargo_bin("rudolint").expect("rudolint binary should be built for integration tests")
 }
 
-pub fn normalize_json_paths(value: &mut Value) {
+fn normalize_json_paths(value: &mut Value) {
     normalize_paths(value);
 }
 
@@ -42,7 +42,8 @@ pub fn normalized_json(raw: &str) -> Value {
     value
 }
 
-pub fn snapshot_name(parts: &[&str]) -> String {
+#[cfg(test)]
+fn snapshot_name(parts: &[&str]) -> String {
     assert!(!parts.is_empty(), "snapshot names need at least one part");
     parts
         .iter()

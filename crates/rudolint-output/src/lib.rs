@@ -41,11 +41,6 @@ pub enum HumanGroupBy {
     File,
 }
 
-/// Renders findings as line-oriented human-readable diagnostics.
-pub fn human(findings: &[Finding]) -> String {
-    human_with_options(findings, HumanOptions::default())
-}
-
 /// Renders findings as grouped, human-readable diagnostics.
 pub fn human_with_options(findings: &[Finding], options: HumanOptions) -> String {
     if findings.is_empty() {

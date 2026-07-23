@@ -11,7 +11,7 @@ use rudolint_diagnostics::{Finding, Severity};
 use rudolint_dockerfile::{Dockerfile, Instruction};
 use rudolint_fix::{FixApplicability, FixPreview, TextEdit};
 
-pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
+pub(super) fn rules() -> Vec<Box<dyn Rule>> {
     vec![
         Box::new(BuildkitSyntaxWhenFeaturesUsed),
         Box::new(SecretLikeArgOrEnv),

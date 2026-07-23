@@ -40,7 +40,7 @@ pub fn has_secret_like_arg_or_env_name(keyword: &str, args: &str, secret_words: 
     }
 }
 
-pub fn secret_mount_target(mount: &Mount) -> Option<String> {
+fn secret_mount_target(mount: &Mount) -> Option<String> {
     mount
         .target()
         .map(ToString::to_string)
@@ -48,7 +48,7 @@ pub fn secret_mount_target(mount: &Mount) -> Option<String> {
         .filter(|target| target != "/")
 }
 
-pub fn invocation_copies_secret(
+fn invocation_copies_secret(
     invocation: &ShellCommandInvocation,
     secret_targets: &[String],
 ) -> bool {
@@ -89,7 +89,7 @@ pub fn run_copies_secret_mount(instruction: &Instruction) -> bool {
         })
 }
 
-pub fn source_operands<'a>(command: &str, arguments: &'a [String]) -> Vec<&'a str> {
+fn source_operands<'a>(command: &str, arguments: &'a [String]) -> Vec<&'a str> {
     let mut operands = Vec::new();
     let mut target_directory = false;
     let mut directory_mode = false;
@@ -406,7 +406,7 @@ pub fn ssh_mount_scope_is_broad(shell: &str) -> bool {
             .is_some_and(|invocation| shell_wrapper_command(&invocation.command))
 }
 
-pub fn shell_wrapper_command(command: &str) -> bool {
+fn shell_wrapper_command(command: &str) -> bool {
     let wrapper_name = command.rsplit('/').next().unwrap_or(command);
     matches!(wrapper_name, "sh" | "bash" | "dash" | "ash" | "zsh")
 }
@@ -589,10 +589,10 @@ fn invocation_uses_host_architecture_probe(invocation: &ShellCommandInvocation) 
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct FrontendVersion {
-    pub major: u16,
-    pub minor: Option<u16>,
-    pub patch: Option<u16>,
-    pub labs: bool,
+    major: u16,
+    minor: Option<u16>,
+    patch: Option<u16>,
+    labs: bool,
 }
 
 impl FrontendVersion {
@@ -616,8 +616,8 @@ impl FrontendVersion {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct FrontendRequirement {
     pub feature: &'static str,
-    pub version: FrontendVersion,
-    pub labs_version: Option<FrontendVersion>,
+    version: FrontendVersion,
+    labs_version: Option<FrontendVersion>,
 }
 
 impl FrontendRequirement {
@@ -807,7 +807,7 @@ fn chmod_frontend_requirement(feature: &'static str, value: &str) -> FrontendReq
     }
 }
 
-pub fn chmod_value_is_symbolic(value: &str) -> bool {
+fn chmod_value_is_symbolic(value: &str) -> bool {
     value.chars().any(|character| {
         matches!(
             character,

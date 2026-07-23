@@ -3,7 +3,7 @@
 [![CI](https://github.com/kubeply/rudolint/actions/workflows/ci.yml/badge.svg)](https://github.com/kubeply/rudolint/actions/workflows/ci.yml)
 [![Release](https://github.com/kubeply/rudolint/actions/workflows/release.yml/badge.svg)](https://github.com/kubeply/rudolint/actions/workflows/release.yml)
 [![GitHub release](https://img.shields.io/github/v/release/kubeply/rudolint?sort=semver)](https://github.com/kubeply/rudolint/releases)
-[![Rust 1.95.0](https://img.shields.io/badge/rust-1.95.0-orange)](rust-toolchain.toml)
+[![Rust 1.97.1](https://img.shields.io/badge/rust-1.97.1-orange)](rust-toolchain.toml)
 [![License](https://img.shields.io/github/license/kubeply/rudolint)](LICENSE)
 [![GitHub Marketplace](https://img.shields.io/badge/marketplace-rudolint-blue?logo=github)](https://github.com/marketplace/actions/rudolint)
 [![CodSpeed](https://img.shields.io/endpoint?url=https://codspeed.io/badge.json)](https://codspeed.io/kubeply/rudolint?utm_source=badge)

@@ -1,16 +1,18 @@
 //! Benchmark harness support and corpus metadata.
 
-use std::path::{Path, PathBuf};
+#[cfg(test)]
+use std::path::Path;
+use std::path::PathBuf;
 
 /// Metadata for a built-in benchmark corpus fixture.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BenchmarkCorpus {
     /// Stable human-readable corpus identifier.
-    pub name: String,
+    name: String,
     /// Corpus shape used to decide how benchmark runners discover inputs.
-    pub kind: CorpusKind,
+    kind: CorpusKind,
     /// Filesystem location of the corpus fixture.
-    pub path: PathBuf,
+    path: PathBuf,
 }
 
 /// Distinguishes single-file and directory-tree benchmark corpora.
@@ -27,7 +29,8 @@ pub enum CorpusKind {
 /// `root` is the repository or workspace root used to resolve the fixture
 /// directory. The returned list is deterministic and includes each corpus name,
 /// [`CorpusKind`], and [`PathBuf`].
-pub fn benchmark_corpora(root: impl AsRef<Path>) -> Vec<BenchmarkCorpus> {
+#[cfg(test)]
+fn benchmark_corpora(root: impl AsRef<Path>) -> Vec<BenchmarkCorpus> {
     let root = root.as_ref().join("fixtures/corpus");
     vec![
         BenchmarkCorpus {

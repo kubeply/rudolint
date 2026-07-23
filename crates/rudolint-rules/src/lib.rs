@@ -83,7 +83,7 @@ pub struct RuleInfo {
 
 impl RuleInfo {
     /// Creates rule info from catalog metadata.
-    pub fn from_metadata(metadata: RuleMetadata) -> Self {
+    fn from_metadata(metadata: RuleMetadata) -> Self {
         Self {
             code: metadata.code,
             severity: metadata.default_severity,

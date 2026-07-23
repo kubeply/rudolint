@@ -32,7 +32,7 @@ pub struct RuleMetadata {
 
 impl RuleMetadata {
     /// Builds metadata for an implemented native rule.
-    pub fn implemented(
+    pub(super) fn implemented(
         code: &'static str,
         name: &'static str,
         default_severity: Severity,
@@ -54,7 +54,7 @@ impl RuleMetadata {
     }
 
     /// Builds metadata for a planned compatibility rule.
-    pub fn planned_compat(code: &'static str) -> Self {
+    pub(super) fn planned_compat(code: &'static str) -> Self {
         Self {
             code,
             name: code,
@@ -70,7 +70,7 @@ impl RuleMetadata {
     }
 
     /// Builds metadata for a planned shell-rule catalog entry.
-    pub fn planned_shell(code: &'static str) -> Self {
+    pub(super) fn planned_shell(code: &'static str) -> Self {
         Self {
             code,
             name: code,
@@ -219,7 +219,7 @@ fn profile_for_code(code: &str) -> PolicyProfile {
     }
 }
 
-pub(crate) fn signals_for_code(code: &str) -> &'static [RuleSignal] {
+fn signals_for_code(code: &str) -> &'static [RuleSignal] {
     match code {
         // Rudolint migration hygiene is intentionally kept out of signal profiles.
         "RUD1001" => &[],

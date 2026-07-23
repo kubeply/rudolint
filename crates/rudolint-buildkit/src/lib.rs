@@ -2,34 +2,37 @@
 
 mod semantics;
 
+#[cfg(test)]
 use rudolint_dockerfile::{Dockerfile, Mount};
 
 pub use semantics::{
-    FrontendRequirement, FrontendVersion, TARGET_PLATFORM_VARIABLES, chmod_value_is_symbolic,
+    FrontendRequirement, FrontendVersion, TARGET_PLATFORM_VARIABLES,
     final_stage_uses_build_platform, frontend_requirements, frontend_version_is_too_old,
-    has_multi_platform_intent, has_secret_like_arg_or_env_name, invocation_copies_secret,
-    is_official_dockerfile_frontend, missing_buildkit_entitlements, parse_pinned_frontend_version,
-    run_copies_secret_mount, run_uses_host_architecture_probe,
-    run_uses_lock_based_package_manager_with_shared_cache, secret_mount_target,
-    shell_wrapper_command, source_operands, ssh_mount_scope_is_broad,
+    has_multi_platform_intent, has_secret_like_arg_or_env_name, is_official_dockerfile_frontend,
+    missing_buildkit_entitlements, parse_pinned_frontend_version, run_copies_secret_mount,
+    run_uses_host_architecture_probe, run_uses_lock_based_package_manager_with_shared_cache,
+    ssh_mount_scope_is_broad,
 };
 
+#[cfg(test)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Frontend {
-    pub image: String,
-    pub version: Option<String>,
+    image: String,
+    version: Option<String>,
 }
 
+#[cfg(test)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BuildkitFeatures {
-    pub frontend: Option<Frontend>,
-    pub mounts: Vec<Mount>,
-    pub heredoc_count: usize,
-    pub network_modes: Vec<String>,
-    pub security_modes: Vec<String>,
+    frontend: Option<Frontend>,
+    mounts: Vec<Mount>,
+    heredoc_count: usize,
+    network_modes: Vec<String>,
+    security_modes: Vec<String>,
 }
 
-pub fn analyze(document: &Dockerfile) -> BuildkitFeatures {
+#[cfg(test)]
+fn analyze(document: &Dockerfile) -> BuildkitFeatures {
     let frontend = document.syntax.as_ref().map(|syntax| Frontend {
         image: syntax.image.clone(),
         version: syntax

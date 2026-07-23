@@ -3,7 +3,7 @@ use crate::{
 };
 use rudolint_policy::PolicyProfile;
 
-pub(crate) fn implemented_rules(profile: PolicyProfile) -> Vec<Box<dyn Rule>> {
+pub(super) fn implemented_rules(profile: PolicyProfile) -> Vec<Box<dyn Rule>> {
     let mut rules = compat::rules();
     if !profile.warns_on_legacy_suppressions() {
         rules.retain(|rule| rule.info().code != "RUD1001");
@@ -20,7 +20,7 @@ pub(crate) fn implemented_rules(profile: PolicyProfile) -> Vec<Box<dyn Rule>> {
     rules
 }
 
-pub(crate) fn catalog(profile: PolicyProfile) -> Vec<RuleInfo> {
+pub(super) fn catalog(profile: PolicyProfile) -> Vec<RuleInfo> {
     let mut rules = implemented_rules(profile)
         .into_iter()
         .map(|rule| rule.info())

@@ -8,13 +8,13 @@ use serde::Serialize;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SourceFile {
     /// Canonical path used for file reads and identity.
-    pub path: PathBuf,
+    path: PathBuf,
     /// Path rendered in diagnostics and user-facing output.
-    pub display_path: PathBuf,
+    display_path: PathBuf,
     /// Full source text.
-    pub text: String,
+    text: String,
     /// Byte-offset index for mapping spans to line and column positions.
-    pub line_index: LineIndex,
+    line_index: LineIndex,
 }
 
 impl SourceFile {
@@ -28,12 +28,6 @@ impl SourceFile {
             path,
             text,
         }
-    }
-
-    /// Overrides the path used in diagnostics and user-facing output.
-    pub fn with_display_path(mut self, display_path: impl Into<PathBuf>) -> Self {
-        self.display_path = display_path.into();
-        self
     }
 
     /// Maps a byte range in this file to a compact span model.
@@ -51,7 +45,7 @@ pub struct LineIndex {
 
 impl LineIndex {
     /// Builds a line index from UTF-8 source text.
-    pub fn new(text: &str) -> Self {
+    fn new(text: &str) -> Self {
         let mut line_starts = vec![0];
         let mut character_starts = Vec::new();
         for (index, character) in text.char_indices() {
@@ -71,7 +65,7 @@ impl LineIndex {
     }
 
     /// Maps a byte offset to a one-based line and character-column position.
-    pub fn position(&self, byte: usize) -> SourcePosition {
+    fn position(&self, byte: usize) -> SourcePosition {
         let line_index = match self.line_starts.binary_search(&byte) {
             Ok(index) => index,
             Err(index) => index.saturating_sub(1),
@@ -85,7 +79,7 @@ impl LineIndex {
     }
 
     /// Maps a byte range to one-based start and end positions.
-    pub fn range(&self, start: usize, end: usize) -> SourceRange {
+    fn range(&self, start: usize, end: usize) -> SourceRange {
         SourceRange {
             start: self.position(start),
             end: self.position(end),
@@ -93,7 +87,7 @@ impl LineIndex {
     }
 
     /// Maps a byte range to a compact span model.
-    pub fn span(&self, start: usize, end: usize) -> Span {
+    fn span(&self, start: usize, end: usize) -> Span {
         let range = self.range(start, end);
         Span {
             start_byte: start,
@@ -118,20 +112,20 @@ impl LineIndex {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SourcePosition {
     /// One-based line number.
-    pub line: usize,
+    line: usize,
     /// One-based column within the line, counted in Unicode scalar values.
-    pub column: usize,
+    column: usize,
     /// Zero-based byte offset in the source text.
-    pub byte: usize,
+    byte: usize,
 }
 
 /// Start and end positions for a source byte range.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SourceRange {
     /// Inclusive start position.
-    pub start: SourcePosition,
+    start: SourcePosition,
     /// Exclusive end position.
-    pub end: SourcePosition,
+    end: SourcePosition,
 }
 
 /// Compact source span with byte offsets and one-based line/column positions.

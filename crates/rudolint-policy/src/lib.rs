@@ -72,13 +72,11 @@ impl PolicyProfile {
     }
 
     /// Returns true for the strict policy profile.
-    pub const fn is_strict(self) -> bool {
+    #[cfg(test)]
+    const fn is_strict(self) -> bool {
         matches!(self, Self::Strict)
     }
 }
-
-/// Backwards-compatible alias for the active policy profile type.
-pub type PolicyMode = PolicyProfile;
 
 /// Legacy inline suppression tool recognized by rudolint.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -91,11 +89,11 @@ pub enum LegacySuppressionTool {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LegacySuppression {
     /// Source line where the legacy suppression comment appears.
-    pub line: usize,
+    line: usize,
     /// Legacy tool that owns the suppression syntax.
-    pub tool: LegacySuppressionTool,
+    tool: LegacySuppressionTool,
     /// Rule target covered by the suppression.
-    pub target: SuppressionTarget,
+    target: SuppressionTarget,
 }
 
 impl LegacySuppression {
@@ -125,9 +123,9 @@ impl LegacySuppression {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct InlineSuppression {
     /// Source line where the suppression comment appears.
-    pub line: usize,
+    line: usize,
     /// Rule target covered by the suppression.
-    pub target: SuppressionTarget,
+    target: SuppressionTarget,
 }
 
 impl InlineSuppression {

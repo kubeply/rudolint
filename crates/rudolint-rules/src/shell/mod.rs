@@ -10,7 +10,7 @@ use rudolint_shell::{
 };
 use rudolint_source::Span;
 
-pub(crate) fn implemented_catalog() -> Vec<RuleInfo> {
+pub(super) fn implemented_catalog() -> Vec<RuleInfo> {
     vec![
         UselessCat.metadata_info(),
         CommandChainAsCondition.metadata_info(),
@@ -22,7 +22,7 @@ pub(crate) fn implemented_catalog() -> Vec<RuleInfo> {
     ]
 }
 
-pub(crate) fn planned_catalog() -> Vec<&'static str> {
+pub(super) fn planned_catalog() -> Vec<&'static str> {
     vec![
         "SC1000", "SC1001", "SC1007", "SC1010", "SC1018", "SC1035", "SC1045", "SC1065", "SC1066",
         "SC1077", "SC1078", "SC1079", "SC1081", "SC1083", "SC1086", "SC1095", "SC2026", "SC2035",
@@ -358,7 +358,7 @@ fn shell_position(shell: &str, byte_offset: usize, base_span: &Span) -> (usize, 
     (line, column)
 }
 
-pub(crate) fn lint(doc: &Dockerfile, config: &Config, path: Option<&Path>) -> Vec<Finding> {
+pub(super) fn lint(doc: &Dockerfile, config: &Config, path: Option<&Path>) -> Vec<Finding> {
     let mut findings = Vec::new();
     let mut declared_variables = BTreeSet::from(["PATH".to_string()]);
     let mut shell_kind = ShellKind::Posix;

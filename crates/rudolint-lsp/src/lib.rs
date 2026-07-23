@@ -3,7 +3,9 @@
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
-use anyhow::{Context, Result, bail};
+#[cfg(test)]
+use anyhow::bail;
+use anyhow::{Context, Result};
 use lsp_types::{
     CodeAction, CodeActionKind, Diagnostic, DiagnosticSeverity, DiagnosticTag, Hover,
     HoverContents, MarkupContent, MarkupKind, NumberOrString, Position, Range,
@@ -35,7 +37,7 @@ impl Default for DocumentLinter {
 
 impl DocumentLinter {
     /// Creates a document linter from a rule profile and resolved settings.
-    pub fn new(profile: Profile, settings: Settings) -> Self {
+    fn new(profile: Profile, settings: Settings) -> Self {
         Self { profile, settings }
     }
 
@@ -76,7 +78,8 @@ impl DocumentLinter {
     /// This helper expects the client to use full document synchronization. It
     /// returns an error for incremental changes so callers do not accidentally
     /// lint a partial replacement as the whole Dockerfile.
-    pub fn lint_changed_document(
+    #[cfg(test)]
+    fn lint_changed_document(
         &self,
         params: &lsp_types::DidChangeTextDocumentParams,
     ) -> Result<Vec<Diagnostic>> {
@@ -143,7 +146,7 @@ impl DocumentLinter {
 /// `rudolint` spans are one-based line and column positions. LSP ranges use
 /// zero-based line and character positions, so the conversion saturates at zero
 /// for defensive handling of synthetic diagnostics.
-pub fn diagnostic(finding: &Finding) -> Diagnostic {
+pub(crate) fn diagnostic(finding: &Finding) -> Diagnostic {
     Diagnostic {
         range: range(finding.primary_span),
         severity: Some(severity(finding.severity)),
@@ -158,12 +161,12 @@ pub fn diagnostic(finding: &Finding) -> Diagnostic {
 }
 
 /// Converts a set of [`Finding`] values into LSP [`Diagnostic`] values.
-pub fn diagnostics(findings: &[Finding]) -> Vec<Diagnostic> {
+pub(crate) fn diagnostics(findings: &[Finding]) -> Vec<Diagnostic> {
     findings.iter().map(diagnostic).collect()
 }
 
 /// Converts a `rudolint` source [`Span`] into an LSP [`Range`].
-pub fn range(span: Span) -> Range {
+pub(crate) fn range(span: Span) -> Range {
     Range {
         start: position(span.start_line, span.start_column),
         end: position(span.end_line, span.end_column),
@@ -172,7 +175,7 @@ pub fn range(span: Span) -> Range {
 
 /// Converts a `rudolint` one-based line and column pair into an LSP
 /// zero-based [`Position`].
-pub fn position(line: usize, column: usize) -> Position {
+pub(crate) fn position(line: usize, column: usize) -> Position {
     Position {
         line: zero_based(line),
         character: zero_based(column),
@@ -180,7 +183,7 @@ pub fn position(line: usize, column: usize) -> Position {
 }
 
 /// Converts a `rudolint` [`Severity`] into LSP [`DiagnosticSeverity`].
-pub fn severity(severity: Severity) -> DiagnosticSeverity {
+fn severity(severity: Severity) -> DiagnosticSeverity {
     match severity {
         Severity::Error => DiagnosticSeverity::ERROR,
         Severity::Warning => DiagnosticSeverity::WARNING,
@@ -240,6 +243,7 @@ fn lint_path_for_config(config_path: &Option<PathBuf>, path: &Path) -> PathBuf {
         .unwrap_or(canonical_path)
 }
 
+#[cfg(test)]
 fn full_document_text(params: &lsp_types::DidChangeTextDocumentParams) -> Result<Option<&str>> {
     if params
         .content_changes

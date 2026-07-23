@@ -1,18 +1,19 @@
 //! Shell command parsing and analysis for `RUN` instructions.
 
+#[cfg(test)]
 use std::ops::Range;
 
 /// Shell command text extracted from a Dockerfile `RUN` instruction.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ShellProgram {
     /// Original shell source text.
-    pub source: String,
+    source: String,
     /// Lexical tokens extracted from the shell source.
     pub tokens: Vec<ShellToken>,
     /// Command invocations recognized at command boundaries.
     pub commands: Vec<ShellCommandInvocation>,
     /// Package-manager invocations recognized from command facts.
-    pub package_managers: Vec<PackageManagerInvocation>,
+    package_managers: Vec<PackageManagerInvocation>,
 }
 
 /// A byte span in shell source text.
@@ -26,12 +27,14 @@ pub struct ShellSpan {
 
 impl ShellSpan {
     /// Returns the span as a standard byte range.
-    pub fn range(&self) -> Range<usize> {
+    #[cfg(test)]
+    fn range(&self) -> Range<usize> {
         self.start..self.end
     }
 
     /// Returns this span shifted into an enclosing Dockerfile source.
-    pub fn with_base_offset(&self, base_offset: usize) -> Self {
+    #[cfg(test)]
+    fn with_base_offset(&self, base_offset: usize) -> Self {
         Self {
             start: self.start + base_offset,
             end: self.end + base_offset,
@@ -97,16 +100,6 @@ impl ShellToken {
     pub fn is_command_separator(&self) -> bool {
         self.kind == ShellTokenKind::Separator
     }
-
-    /// Returns true when this token is a command-chain operator.
-    pub fn is_command_chain(&self) -> bool {
-        matches!(self.raw.as_str(), "&&" | "||")
-    }
-
-    /// Returns true when this token is a pipeline operator.
-    pub fn is_pipeline(&self) -> bool {
-        self.raw == "|"
-    }
 }
 
 /// A shell variable or command expansion.
@@ -117,7 +110,7 @@ pub struct ShellExpansion {
     /// Expansion text without the leading shell sigil when available.
     pub text: String,
     /// Expansion span relative to shell source text.
-    pub span: ShellSpan,
+    span: ShellSpan,
 }
 
 /// Shell expansion kind.
@@ -133,11 +126,11 @@ pub enum ShellExpansionKind {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EnvAssignment {
     /// Assignment variable name.
-    pub name: String,
+    name: String,
     /// Assignment value, if one was provided.
-    pub value: Option<String>,
+    value: Option<String>,
     /// Assignment span relative to shell source text.
-    pub span: ShellSpan,
+    span: ShellSpan,
 }
 
 /// An argument word belonging to a command invocation.
@@ -150,7 +143,7 @@ pub struct ShellArgument {
     /// Argument span relative to shell source text.
     pub span: ShellSpan,
     /// Quoting state observed for this argument.
-    pub quote: QuoteKind,
+    quote: QuoteKind,
 }
 
 /// Executable command detected at a shell command boundary.
@@ -182,7 +175,7 @@ impl ShellCommandInvocation {
     }
 
     /// Returns `true` when the invocation contains `expected` as a contiguous argument sequence.
-    pub fn has_arg_sequence(&self, expected: &[&str]) -> bool {
+    fn has_arg_sequence(&self, expected: &[&str]) -> bool {
         expected.is_empty()
             || self.arguments.windows(expected.len()).any(|window| {
                 window
@@ -231,9 +224,9 @@ pub enum PackageManager {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PackageManagerInvocation {
     /// Canonical package manager.
-    pub manager: PackageManager,
+    manager: PackageManager,
     /// Command invocation that used the package manager.
-    pub command: ShellCommandInvocation,
+    command: ShellCommandInvocation,
 }
 
 /// Commands that rarely make sense inside Docker build `RUN` steps.
@@ -281,7 +274,8 @@ impl DisallowedContainerCommand {
 
 impl PackageManager {
     /// Returns the canonical command name for this package manager.
-    pub fn as_str(self) -> &'static str {
+    #[cfg(test)]
+    fn as_str(self) -> &'static str {
         match self {
             PackageManager::AptGet => "apt-get",
             PackageManager::Apt => "apt",
@@ -314,7 +308,7 @@ pub fn analyze(shell: &str) -> ShellProgram {
 }
 
 /// Tokenizes shell source and preserves byte spans relative to that source.
-pub fn tokenize(shell: &str) -> Vec<ShellToken> {
+fn tokenize(shell: &str) -> Vec<ShellToken> {
     let bytes = shell.as_bytes();
     let mut tokens = Vec::new();
     let mut index = 0;
@@ -469,7 +463,8 @@ pub fn detect_package_managers(shell: &str) -> Vec<PackageManager> {
 }
 
 /// Returns package-manager command facts in first-seen order.
-pub fn detect_package_manager_invocations(shell: &str) -> Vec<PackageManagerInvocation> {
+#[cfg(test)]
+fn detect_package_manager_invocations(shell: &str) -> Vec<PackageManagerInvocation> {
     analyze(shell).package_managers
 }
 

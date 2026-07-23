@@ -59,4 +59,5 @@ cargo fmt --all -- --check
 cargo check --all-targets --all-features --locked
 cargo clippy --all-targets --all-features --locked -- -D warnings
 cargo test --all-targets --all-features --locked
+cargo hawk check --manifest-path Cargo.toml -D warnings -D hawk::unnecessary_crate_visibility
 ```

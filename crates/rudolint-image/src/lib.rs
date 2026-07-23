@@ -7,17 +7,17 @@
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ImageReference {
     /// Original unparsed image reference string.
-    pub raw: String,
+    raw: String,
     /// Optional registry host, such as `docker.io` or `localhost:5000`.
-    pub registry: Option<String>,
+    registry: Option<String>,
     /// Repository path without registry, tag, or digest.
     pub repository: String,
     /// Optional tag suffix after the final `:`, such as `latest` or `3.20`.
     pub tag: Option<String>,
     /// Optional digest suffix after `@`, such as `sha256:...`.
-    pub digest: Option<String>,
+    digest: Option<String>,
     /// Whether the parsed image name matches a known local build stage name.
-    pub local_stage_reference: bool,
+    local_stage_reference: bool,
 }
 
 impl ImageReference {

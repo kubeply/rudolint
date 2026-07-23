@@ -1,0 +1,9 @@
+[[production]]
+package = "rudolint"
+bin = "rudolint"
+reason = "released Dockerfile linter command-line interface"
+
+[[production]]
+package = "rudolint-lsp"
+bin = "rudolint-lsp"
+reason = "released stdio language server"

@@ -93,17 +93,6 @@ impl Config {
         Ok(config)
     }
 
-    /// Loads an explicit config or discovers `.rudolint.yaml` from the provided start paths.
-    pub fn load_discovered(explicit: Option<&Path>, starts: &[PathBuf]) -> Result<Self> {
-        if let Some(path) = explicit {
-            return Self::load(Some(path));
-        }
-        let Some(path) = discover(starts)? else {
-            return Ok(Self::default());
-        };
-        Self::load(Some(&path))
-    }
-
     /// Returns true when `code` is ignored by either ignore list.
     pub fn ignores(&self, code: &str) -> bool {
         code_matches_any(code, &self.ignore) || code_matches_any(code, &self.extend_ignore)

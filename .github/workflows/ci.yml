@@ -82,7 +82,7 @@ jobs:
     needs: changes
     if: ${{ needs.changes.outputs.run_rust == 'true' }}
     runs-on: depot-ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -95,7 +95,7 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: 1.95.0
+          toolchain: 1.97.1
           components: clippy,rustfmt
 
       - name: Cache Rust build
@@ -109,6 +109,17 @@ jobs:
 
       - name: Lint
         run: cargo clippy --all-targets --all-features --locked -- -D warnings
+
+      - name: Install Hawk
+        run: ./scripts/install-hawk.sh
+
+      - name: Check workspace visibility
+        run: >-
+          cargo hawk check
+          --manifest-path Cargo.toml
+          --target-dir target/hawk
+          -D warnings
+          -D hawk::unnecessary_crate_visibility
 
       - name: Test
         run: cargo test --all-targets --all-features --locked
@@ -131,7 +142,7 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: 1.95.0
+          toolchain: 1.97.1
 
       - name: Cache Rust build
         uses: Swatinem/rust-cache@v2
@@ -155,7 +166,7 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@3c5f7ea28cd621ae0bf5283f0e981fb97b8a7af9 # master as of 2026-05-16
         with:
-          toolchain: 1.95.0
+          toolchain: 1.97.1
 
       - name: Cache Rust build
         uses: Swatinem/rust-cache@v2

@@ -8,7 +8,7 @@ use rudolint_fix::{FixApplicability, FixPreview, TextEdit};
 use rudolint_policy::{LegacySuppression, PolicyProfile};
 use rudolint_shell::{detect_command_invocations, detect_disallowed_container_commands};
 
-pub(crate) fn rules() -> Vec<Box<dyn Rule>> {
+pub(super) fn rules() -> Vec<Box<dyn Rule>> {
     vec![
         Box::new(InlineIgnore),
         Box::new(DisallowedContainerCommands),
@@ -4811,6 +4811,6 @@ fn dnf_install_has_unpinned_packages(shell: &str) -> bool {
         })
 }
 
-pub(crate) fn planned_catalog() -> Vec<&'static str> {
+pub(super) fn planned_catalog() -> Vec<&'static str> {
     Vec::new()
 }

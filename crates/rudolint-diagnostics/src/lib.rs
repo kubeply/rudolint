@@ -49,14 +49,14 @@ pub struct Finding {
     pub message: String,
     pub path: PathBuf,
     pub primary_span: Span,
-    pub labels: Vec<DiagnosticLabel>,
+    labels: Vec<DiagnosticLabel>,
     pub help: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize)]
 pub struct DiagnosticLabel {
-    pub span: Span,
-    pub message: String,
+    span: Span,
+    message: String,
 }
 
 impl Finding {
@@ -102,14 +102,6 @@ impl Finding {
 
     pub fn with_help(mut self, help: impl Into<String>) -> Self {
         self.help = Some(help.into());
-        self
-    }
-
-    pub fn with_label(mut self, span: Span, message: impl Into<String>) -> Self {
-        self.labels.push(DiagnosticLabel {
-            span,
-            message: message.into(),
-        });
         self
     }
 }

@@ -17,6 +17,12 @@ rustup show
 cargo --version
 ```
 
+Install the pinned Hawk 0.1.9 binaries:
+
+```bash
+./scripts/install-hawk.sh
+```
+
 ## Repository Layout
 
 The Rust workspace lives under `crates/`. Each crate should have one clear job.
@@ -54,7 +60,13 @@ cargo check --all-targets --all-features --locked
 cargo clippy --all-targets --all-features --locked -- -D warnings
 cargo test --all-targets --all-features --locked
 cargo deny check
+cargo hawk check --manifest-path Cargo.toml -D warnings -D hawk::unnecessary_crate_visibility
 ```
+
+Hawk treats the released `rudolint` and `rudolint-lsp` binaries as the
+production roots for workspace-wide visibility analysis. The additional
+`hawk::unnecessary_crate_visibility` denial opts into its strictest supported
+visibility reduction.
 
 Once snapshots are added, CI and local validation should run them with updates
 disabled:

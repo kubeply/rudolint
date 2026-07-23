@@ -18,11 +18,11 @@ pub struct Settings {
 #[derive(Debug, Clone, Default)]
 pub struct SettingsOptions {
     /// Explicit configuration file path supplied by the caller.
-    pub explicit_config: Option<PathBuf>,
+    explicit_config: Option<PathBuf>,
     /// Whether configuration loading and discovery are disabled.
-    pub no_config: bool,
+    no_config: bool,
     /// Paths used as starting points for configuration discovery.
-    pub search_starts: Vec<PathBuf>,
+    search_starts: Vec<PathBuf>,
 }
 
 /// Resolves effective settings from discovery and override options.
@@ -47,18 +47,6 @@ pub fn resolve(options: &SettingsOptions) -> Result<Settings> {
 }
 
 impl SettingsOptions {
-    /// Sets an explicit configuration file path.
-    pub fn with_explicit_config(mut self, path: impl Into<PathBuf>) -> Self {
-        self.explicit_config = Some(path.into());
-        self
-    }
-
-    /// Disables configuration loading and discovery.
-    pub fn without_config(mut self) -> Self {
-        self.no_config = true;
-        self
-    }
-
     /// Sets the start paths used for configuration discovery.
     pub fn with_search_starts(mut self, starts: impl IntoIterator<Item = PathBuf>) -> Self {
         self.search_starts = starts.into_iter().collect();

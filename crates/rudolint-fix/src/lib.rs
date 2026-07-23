@@ -11,7 +11,7 @@ pub struct TextEdit {
     /// Span affected by the edit, or insertion point for insertions.
     pub span: SourceSpan,
     /// Kind of edit to apply at `span`.
-    pub kind: EditKind,
+    kind: EditKind,
 }
 
 impl TextEdit {
@@ -40,7 +40,8 @@ impl TextEdit {
     }
 
     /// Creates a deletion edit for `span`.
-    pub fn delete(span: SourceSpan) -> Self {
+    #[cfg(test)]
+    fn delete(span: SourceSpan) -> Self {
         Self {
             span,
             kind: EditKind::Delete,
@@ -78,9 +79,9 @@ pub enum EditKind {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct EditConflict {
     /// First conflicting edit.
-    pub first: TextEdit,
+    first: TextEdit,
     /// Second conflicting edit.
-    pub second: TextEdit,
+    second: TextEdit,
 }
 
 /// Returns all conflicting edit pairs from `edits`.
@@ -201,14 +202,15 @@ impl FixApplicability {
     }
 
     /// Creates a not-available applicability value with a reason.
-    pub fn not_available(reason: impl Into<String>) -> Self {
+    #[cfg(test)]
+    fn not_available(reason: impl Into<String>) -> Self {
         Self::NotAvailable {
             reason: reason.into(),
         }
     }
 
     /// Returns the [`FixApplicabilityKind`] for this applicability.
-    pub fn kind(&self) -> FixApplicabilityKind {
+    fn kind(&self) -> FixApplicabilityKind {
         match self {
             Self::Safe => FixApplicabilityKind::Safe,
             Self::Manual => FixApplicabilityKind::Manual,
@@ -236,7 +238,7 @@ pub enum FixApplicabilityKind {
 
 impl FixApplicabilityKind {
     /// Returns the stable string identifier for this [`FixApplicabilityKind`].
-    pub fn as_str(self) -> &'static str {
+    fn as_str(self) -> &'static str {
         match self {
             Self::Safe => "safe",
             Self::Manual => "manual",
