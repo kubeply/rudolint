@@ -82,3 +82,10 @@ install -m 0755 "${temporary_directory}/cargo-hawk" "${destination}/cargo-hawk"
 install -m 0755 "${temporary_directory}/cargo-hawk-driver" "${destination}/cargo-hawk-driver"
 
 echo "installed Hawk ${hawk_version} for ${target} to ${destination}"
+
+case ":${PATH:-}:" in
+  *":${destination}:"*) ;;
+  *)
+    echo "warning: add ${destination} to PATH before running 'cargo hawk'" >&2
+    ;;
+esac

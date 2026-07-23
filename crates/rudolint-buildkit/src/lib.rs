@@ -16,14 +16,14 @@ pub use semantics::{
 
 #[cfg(test)]
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Frontend {
+struct Frontend {
     image: String,
     version: Option<String>,
 }
 
 #[cfg(test)]
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct BuildkitFeatures {
+struct BuildkitFeatures {
     frontend: Option<Frontend>,
     mounts: Vec<Mount>,
     heredoc_count: usize,
