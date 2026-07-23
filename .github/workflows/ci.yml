@@ -110,6 +110,12 @@ jobs:
       - name: Lint
         run: cargo clippy --all-targets --all-features --locked -- -D warnings
 
+      - name: Test Hawk installer
+        run: |
+          bash -n scripts/install-hawk.sh scripts/install-hawk-path.sh scripts/test-install-hawk.sh
+          shellcheck -x scripts/install-hawk.sh scripts/test-install-hawk.sh
+          ./scripts/test-install-hawk.sh
+
       - name: Install Hawk
         run: ./scripts/install-hawk.sh
 
