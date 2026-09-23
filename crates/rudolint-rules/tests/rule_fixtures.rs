@@ -375,6 +375,22 @@ fn snapshots_dl3006_explicit_from_tag_fixture() {
 }
 
 #[test]
+fn snapshots_dl3006_arg_expanded_stage_fixture() {
+    let source = read_fixture("rules/DL3006.arg-expanded-stage/Dockerfile");
+    let document = parse_dockerfile(&source).expect("fixture should parse");
+    let findings = RuleEngine::new(Profile::Default, Config::default())
+        .lint(&document)
+        .into_iter()
+        .filter(|finding| finding.code == "DL3006")
+        .collect::<Vec<_>>();
+
+    insta::assert_json_snapshot!(
+        "dl3006_arg_expanded_stage_fixture",
+        serde_json::to_value(&findings).expect("findings should serialize")
+    );
+}
+
+#[test]
 fn snapshots_dl3007_no_latest_tag_fixture() {
     let source = read_fixture("rules/DL3007.no-latest-tag/Dockerfile");
     let document = parse_dockerfile(&source).expect("fixture should parse");

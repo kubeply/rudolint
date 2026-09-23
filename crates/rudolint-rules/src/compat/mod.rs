@@ -312,9 +312,10 @@ impl Rule for ExplicitFromTag {
                 continue;
             };
 
-            let resolved_image = resolve_from_arg_image(image, &global_args).unwrap_or(image);
+            let resolved_image = resolve_from_arg_image(image, &global_args);
 
-            if image_needs_explicit_tag(resolved_image, &stage_aliases) {
+            if image_needs_explicit_tag(resolved_image.as_deref().unwrap_or(image), &stage_aliases)
+            {
                 findings.push(diagnostic(
                     "DL3006",
                     Severity::Warning,
@@ -2779,16 +2780,33 @@ fn global_arg_defaults(doc: &Dockerfile) -> BTreeMap<String, String> {
         .collect()
 }
 
-fn resolve_from_arg_image<'a>(
-    image: &'a str,
-    global_args: &'a BTreeMap<String, String>,
-) -> Option<&'a str> {
-    let variable_name = image
-        .strip_prefix("${")
-        .and_then(|name| name.strip_suffix('}'))
-        .or_else(|| image.strip_prefix('$'))?;
+fn resolve_from_arg_image(image: &str, global_args: &BTreeMap<String, String>) -> Option<String> {
+    let mut remaining = image;
+    let mut resolved = String::new();
+    let mut expanded = false;
 
-    global_args.get(variable_name).map(String::as_str)
+    while let Some((literal, after_dollar)) = remaining.split_once('$') {
+        resolved.push_str(literal);
+        let (variable_name, rest) = if let Some(after_brace) = after_dollar.strip_prefix('{') {
+            after_brace.split_once('}')?
+        } else {
+            let end = after_dollar
+                .find(|character: char| !is_shell_variable_character(character))
+                .unwrap_or(after_dollar.len());
+            after_dollar.split_at(end)
+        };
+        if !is_valid_variable_name(variable_name) {
+            return None;
+        }
+        resolved.push_str(global_args.get(variable_name)?);
+        remaining = rest;
+        expanded = true;
+    }
+
+    expanded.then(|| {
+        resolved.push_str(remaining);
+        resolved
+    })
 }
 
 fn is_url_source(source: &str) -> bool {
