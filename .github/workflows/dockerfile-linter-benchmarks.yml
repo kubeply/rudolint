@@ -27,7 +27,7 @@ env:
 jobs:
   update-benchmarks:
     name: update external benchmark charts
-    runs-on: depot-ubuntu-24.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 90
     steps:
       - name: Checkout

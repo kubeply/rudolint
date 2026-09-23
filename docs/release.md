@@ -259,10 +259,10 @@ Stable releases publish these tags:
 The image uses `rudolint` as its entrypoint and sets `/workspace` as the working
 directory.
 
-Container publishing uses Depot remote container builds through GitHub OIDC. The
-release workflow requires a repository or organization variable named
-`DEPOT_PROJECT_ID`, and the matching Depot project must trust the
-`kubeply/rudolint` GitHub repository.
+Container publishing runs on a GitHub-hosted `ubuntu-24.04` runner. Docker
+Buildx builds and pushes both `linux/amd64` and `linux/arm64` images to GHCR;
+QEMU provides ARM64 emulation. The release job uses `GITHUB_TOKEN` with
+`packages: write` permission to publish the image.
 
 ## Marketplace
 
