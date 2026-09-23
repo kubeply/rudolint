@@ -63,7 +63,7 @@ env:
 jobs:
   changes:
     name: Select benchmark groups
-    runs-on: depot-ubuntu-24.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
       parser: ${{ steps.filter.outputs.parser }}
@@ -162,7 +162,7 @@ jobs:
     name: parser benchmarks
     needs: changes
     if: ${{ needs.changes.outputs.parser == 'true' }}
-    runs-on: depot-ubuntu-24.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - name: Checkout
@@ -194,7 +194,7 @@ jobs:
     name: lint benchmarks
     needs: changes
     if: ${{ needs.changes.outputs.lint == 'true' }}
-    runs-on: depot-ubuntu-24.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - name: Checkout
@@ -226,7 +226,7 @@ jobs:
     name: end-to-end benchmarks
     needs: changes
     if: ${{ needs.changes.outputs.end_to_end == 'true' }}
-    runs-on: depot-ubuntu-24.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - name: Checkout
@@ -290,7 +290,7 @@ jobs:
     name: output benchmarks
     needs: changes
     if: ${{ needs.changes.outputs.output == 'true' }}
-    runs-on: depot-ubuntu-24.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - name: Checkout
@@ -322,7 +322,7 @@ jobs:
     name: cli benchmarks
     needs: changes
     if: ${{ needs.changes.outputs.cli == 'true' }}
-    runs-on: depot-ubuntu-24.04
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - name: Checkout
