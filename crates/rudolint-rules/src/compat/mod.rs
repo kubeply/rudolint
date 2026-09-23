@@ -2787,18 +2787,20 @@ fn resolve_from_arg_image(image: &str, global_args: &BTreeMap<String, String>) -
 
     while let Some((literal, after_dollar)) = remaining.split_once('$') {
         resolved.push_str(literal);
-        let (variable_name, rest) = if let Some(after_brace) = after_dollar.strip_prefix('{') {
-            after_brace.split_once('}')?
+        let (replacement, rest) = if let Some(after_brace) = after_dollar.strip_prefix('{') {
+            let (expression, rest) = split_braced_from_arg(after_brace)?;
+            (resolve_braced_from_arg(expression, global_args)?, rest)
         } else {
             let end = after_dollar
                 .find(|character: char| !is_shell_variable_character(character))
                 .unwrap_or(after_dollar.len());
-            after_dollar.split_at(end)
+            let (variable_name, rest) = after_dollar.split_at(end);
+            if !is_valid_variable_name(variable_name) {
+                return None;
+            }
+            (global_args.get(variable_name)?.clone(), rest)
         };
-        if !is_valid_variable_name(variable_name) {
-            return None;
-        }
-        resolved.push_str(global_args.get(variable_name)?);
+        resolved.push_str(&replacement);
         remaining = rest;
         expanded = true;
     }
@@ -2807,6 +2809,78 @@ fn resolve_from_arg_image(image: &str, global_args: &BTreeMap<String, String>) -
         resolved.push_str(remaining);
         resolved
     })
+}
+
+fn split_braced_from_arg(input: &str) -> Option<(&str, &str)> {
+    let mut depth = 1;
+    let mut characters = input.char_indices().peekable();
+
+    while let Some((index, character)) = characters.next() {
+        if character == '$' && characters.peek().is_some_and(|(_, next)| *next == '{') {
+            depth += 1;
+            characters.next();
+        } else if character == '}' {
+            depth -= 1;
+            if depth == 0 {
+                return Some((&input[..index], &input[index + 1..]));
+            }
+        }
+    }
+
+    None
+}
+
+fn resolve_braced_from_arg(
+    expression: &str,
+    global_args: &BTreeMap<String, String>,
+) -> Option<String> {
+    let name_end = expression
+        .find(|character: char| !is_shell_variable_character(character))
+        .unwrap_or(expression.len());
+    let (variable_name, modifier) = expression.split_at(name_end);
+    if !is_valid_variable_name(variable_name) {
+        return None;
+    }
+
+    let value = global_args.get(variable_name).map(String::as_str);
+    if modifier.is_empty() {
+        return value.map(str::to_string);
+    }
+    if let Some(word) = modifier.strip_prefix(":-") {
+        return value
+            .filter(|value| !value.is_empty())
+            .map(str::to_string)
+            .or_else(|| expand_from_arg_word(word, global_args));
+    }
+    if let Some(word) = modifier.strip_prefix('-') {
+        return value
+            .map(str::to_string)
+            .or_else(|| expand_from_arg_word(word, global_args));
+    }
+    if let Some(word) = modifier.strip_prefix(":+") {
+        return if value.is_some_and(|value| !value.is_empty()) {
+            expand_from_arg_word(word, global_args)
+        } else {
+            Some(String::new())
+        };
+    }
+    if let Some(word) = modifier.strip_prefix('+') {
+        return if value.is_some() {
+            expand_from_arg_word(word, global_args)
+        } else {
+            Some(String::new())
+        };
+    }
+
+    None
+}
+
+fn expand_from_arg_word(word: &str, global_args: &BTreeMap<String, String>) -> Option<String> {
+    if word.contains('$') {
+        resolve_from_arg_image(word, global_args)
+    } else {
+        Some(word.to_string())
+    }
 }
 
 fn is_url_source(source: &str) -> bool {
