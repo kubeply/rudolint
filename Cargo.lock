@@ -1333,7 +1333,7 @@ checksum = "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4"
 
 [[package]]
 name = "rudolint"
-version = "1.5.0"
+version = "1.5.1"
 dependencies = [
  "anyhow",
  "assert_cmd",
@@ -1359,7 +1359,7 @@ dependencies = [
 
 [[package]]
 name = "rudolint-bench"
-version = "1.5.0"
+version = "1.5.1"
 dependencies = [
  "codspeed-criterion-compat",
  "rudolint-config",
@@ -1371,7 +1371,7 @@ dependencies = [
 
 [[package]]
 name = "rudolint-buildkit"
-version = "1.5.0"
+version = "1.5.1"
 dependencies = [
  "insta",
  "rudolint-dockerfile",
@@ -1382,7 +1382,7 @@ dependencies = [
 
 [[package]]
 name = "rudolint-config"
-version = "1.5.0"
+version = "1.5.1"
 dependencies = [
  "anyhow",
  "globset",
@@ -1397,7 +1397,7 @@ dependencies = [
 
 [[package]]
 name = "rudolint-diagnostics"
-version = "1.5.0"
+version = "1.5.1"
 dependencies = [
  "clap",
  "rudolint-source",
@@ -1406,7 +1406,7 @@ dependencies = [
 
 [[package]]
 name = "rudolint-dockerfile"
-version = "1.5.0"
+version = "1.5.1"
 dependencies = [
  "insta",
  "regex",
@@ -1417,7 +1417,7 @@ dependencies = [
 
 [[package]]
 name = "rudolint-fix"
-version = "1.5.0"
+version = "1.5.1"
 dependencies = [
  "insta",
  "rudolint-source",
@@ -1426,7 +1426,7 @@ dependencies = [
 
 [[package]]
 name = "rudolint-image"
-version = "1.5.0"
+version = "1.5.1"
 dependencies = [
  "insta",
  "serde_json",
@@ -1434,7 +1434,7 @@ dependencies = [
 
 [[package]]
 name = "rudolint-lsp"
-version = "1.5.0"
+version = "1.5.1"
 dependencies = [
  "anyhow",
  "lsp-server",
@@ -1453,7 +1453,7 @@ dependencies = [
 
 [[package]]
 name = "rudolint-output"
-version = "1.5.0"
+version = "1.5.1"
 dependencies = [
  "anyhow",
  "rudolint-diagnostics",
@@ -1463,7 +1463,7 @@ dependencies = [
 
 [[package]]
 name = "rudolint-policy"
-version = "1.5.0"
+version = "1.5.1"
 dependencies = [
  "rudolint-config",
  "rudolint-diagnostics",
@@ -1471,7 +1471,7 @@ dependencies = [
 
 [[package]]
 name = "rudolint-rules"
-version = "1.5.0"
+version = "1.5.1"
 dependencies = [
  "clap",
  "email_address",
@@ -1494,7 +1494,7 @@ dependencies = [
 
 [[package]]
 name = "rudolint-settings"
-version = "1.5.0"
+version = "1.5.1"
 dependencies = [
  "anyhow",
  "insta",
@@ -1505,7 +1505,7 @@ dependencies = [
 
 [[package]]
 name = "rudolint-shell"
-version = "1.5.0"
+version = "1.5.1"
 dependencies = [
  "insta",
  "serde_json",
@@ -1513,14 +1513,14 @@ dependencies = [
 
 [[package]]
 name = "rudolint-source"
-version = "1.5.0"
+version = "1.5.1"
 dependencies = [
  "serde",
 ]
 
 [[package]]
 name = "rudolint-test"
-version = "1.5.0"
+version = "1.5.1"
 dependencies = [
  "assert_cmd",
  "serde_json",
@@ -2077,7 +2077,7 @@ checksum = "1ffae5123b2d3fc086436f8834ae3ab053a283cfac8fe0a0b8eaae044768a4c4"
 
 [[package]]
 name = "xtask"
-version = "1.5.0"
+version = "1.5.1"
 dependencies = [
  "serde_json",
 ]
