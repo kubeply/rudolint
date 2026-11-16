@@ -11,7 +11,7 @@ anyhow.workspace = true
 globset.workspace = true
 rudolint-diagnostics.workspace = true
 serde.workspace = true
-serde_yaml.workspace = true
+yaml_serde.workspace = true
 
 [dev-dependencies]
 jsonschema.workspace = true

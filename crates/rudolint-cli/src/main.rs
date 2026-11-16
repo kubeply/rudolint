@@ -319,9 +319,9 @@ fn updated_config_with_template_ignores(
             AppError::usage(format!("failed to read {}: {error}", config_path.display()))
         })?;
         if raw.trim().is_empty() {
-            serde_yaml::Value::Mapping(serde_yaml::Mapping::new())
+            yaml_serde::Value::Mapping(yaml_serde::Mapping::new())
         } else {
-            serde_yaml::from_str::<serde_yaml::Value>(&raw).map_err(|error| {
+            yaml_serde::from_str::<yaml_serde::Value>(&raw).map_err(|error| {
                 AppError::usage(format!(
                     "failed to parse {}: {error}",
                     config_path.display()
@@ -329,31 +329,31 @@ fn updated_config_with_template_ignores(
             })?
         }
     } else {
-        serde_yaml::Value::Mapping(serde_yaml::Mapping::new())
+        yaml_serde::Value::Mapping(yaml_serde::Mapping::new())
     };
 
     let mapping = config
         .as_mapping_mut()
         .ok_or_else(|| AppError::usage("rudolint config must be a YAML mapping"))?;
-    let per_file_key = serde_yaml::Value::String("per-file-ignores".to_string());
+    let per_file_key = yaml_serde::Value::String("per-file-ignores".to_string());
     mapping
         .entry(per_file_key.clone())
-        .or_insert_with(|| serde_yaml::Value::Mapping(serde_yaml::Mapping::new()));
+        .or_insert_with(|| yaml_serde::Value::Mapping(yaml_serde::Mapping::new()));
     let per_file = mapping
         .get_mut(&per_file_key)
-        .and_then(serde_yaml::Value::as_mapping_mut)
+        .and_then(yaml_serde::Value::as_mapping_mut)
         .ok_or_else(|| AppError::usage("`per-file-ignores` must be a YAML mapping"))?;
 
     for pattern in patterns {
         merge_template_ignore_pattern(per_file, pattern)?;
     }
 
-    let updated_config = serde_yaml::from_value::<Config>(config.clone())
+    let updated_config = yaml_serde::from_value::<Config>(config.clone())
         .map_err(|error| AppError::usage(format!("updated config would be invalid: {error}")))?;
     updated_config
         .validate(config_path)
         .map_err(|error| AppError::usage(format!("updated config would be invalid: {error:#}")))?;
-    let mut rendered = serde_yaml::to_string(&config)
+    let mut rendered = yaml_serde::to_string(&config)
         .map_err(|error| AppError::internal(format!("failed to render config: {error}")))?;
     if !rendered.ends_with('\n') {
         rendered.push('\n');
@@ -362,16 +362,16 @@ fn updated_config_with_template_ignores(
 }
 
 fn merge_template_ignore_pattern(
-    per_file: &mut serde_yaml::Mapping,
+    per_file: &mut yaml_serde::Mapping,
     pattern: &str,
 ) -> Result<(), AppError> {
-    let key = serde_yaml::Value::String(pattern.to_string());
+    let key = yaml_serde::Value::String(pattern.to_string());
     per_file
         .entry(key.clone())
-        .or_insert_with(|| serde_yaml::Value::Sequence(Vec::new()));
+        .or_insert_with(|| yaml_serde::Value::Sequence(Vec::new()));
     let rules = per_file
         .get_mut(&key)
-        .and_then(serde_yaml::Value::as_sequence_mut)
+        .and_then(yaml_serde::Value::as_sequence_mut)
         .ok_or_else(|| {
             AppError::usage(format!(
                 "`per-file-ignores.{pattern}` must be a YAML sequence"
@@ -380,12 +380,12 @@ fn merge_template_ignore_pattern(
 
     let existing = rules
         .iter()
-        .filter_map(serde_yaml::Value::as_str)
+        .filter_map(yaml_serde::Value::as_str)
         .map(str::to_string)
         .collect::<BTreeSet<_>>();
     for prefix in ["DL", "SC", "RDK", "RUD"] {
         if !existing.contains(prefix) {
-            rules.push(serde_yaml::Value::String(prefix.to_string()));
+            rules.push(yaml_serde::Value::String(prefix.to_string()));
         }
     }
     Ok(())

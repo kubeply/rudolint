@@ -566,6 +566,59 @@ fn config_ignore_templates_writes_template_per_file_ignores() {
 }
 
 #[test]
+fn config_ignore_templates_preserves_values_and_is_idempotent() {
+    let temp = TempDir::new().expect("temp dir should be created");
+    let template = temp.path().join("Dockerfile.template");
+    let config = temp.path().join(".rudolint.yaml");
+    let original = r#"
+ignore: &ignored [DL3007]
+extend-ignore: *ignored
+trusted-registries: ["123", "true", "null"]
+strict-labels: true
+per-file-ignores:
+  "**/*.template": [DL]
+  "services/**": [DL3000]
+"#;
+    std::fs::write(&template, "{{ if .Alpine }}\nFROM alpine:latest\n")
+        .expect("template should be written");
+    std::fs::write(&config, original).expect("config should be written");
+
+    rudolint_cmd()
+        .args(["config", "ignore-templates", "--config"])
+        .arg(&config)
+        .arg(temp.path())
+        .assert()
+        .success();
+
+    let output = std::fs::read_to_string(&config).expect("config should be written");
+    let updated: Value = yaml_serde::from_str(&output).expect("config should parse");
+    let expected = serde_json::json!({
+        "ignore": ["DL3007"],
+        "extend-ignore": ["DL3007"],
+        "trusted-registries": ["123", "true", "null"],
+        "strict-labels": true,
+        "per-file-ignores": {
+            "*.template": ["DL", "SC", "RDK", "RUD"],
+            "**/*.template": ["DL", "SC", "RDK", "RUD"],
+            "*.tmpl": ["DL", "SC", "RDK", "RUD"],
+            "**/*.tmpl": ["DL", "SC", "RDK", "RUD"],
+            "services/**": ["DL3000"],
+        },
+    });
+    assert_eq!(updated, expected);
+
+    rudolint_cmd()
+        .args(["config", "ignore-templates", "--config"])
+        .arg(&config)
+        .arg(temp.path())
+        .assert()
+        .success();
+
+    let repeated = std::fs::read_to_string(&config).expect("config should be written");
+    assert_eq!(repeated, output);
+}
+
+#[test]
 fn config_ignore_templates_rejects_invalid_existing_per_file_ignore_globs() {
     let temp = TempDir::new().expect("temp dir should be created");
     let template = temp.path().join("Dockerfile.template");

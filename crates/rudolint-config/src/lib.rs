@@ -86,7 +86,7 @@ impl Config {
         };
         let raw = fs::read_to_string(path)
             .with_context(|| format!("failed to read {}", path.display()))?;
-        let config: Self = serde_yaml::from_str(&raw)
+        let config: Self = yaml_serde::from_str(&raw)
             .map_err(|error| parse_error(path, error))
             .with_context(|| format!("failed to parse {}", path.display()))?;
         config.validate(path)?;
@@ -153,7 +153,7 @@ fn validate_per_file_ignore_patterns(config: &Config, path: &Path) -> Result<()>
     Ok(())
 }
 
-fn parse_error(path: &Path, error: serde_yaml::Error) -> anyhow::Error {
+fn parse_error(path: &Path, error: yaml_serde::Error) -> anyhow::Error {
     let location = error
         .location()
         .map(|location| format!(" at line {}, column {}", location.line(), location.column()))
@@ -214,7 +214,7 @@ mod tests {
     fn assert_matches_config_schema(path: &Path) {
         let raw = fs::read_to_string(path)
             .unwrap_or_else(|err| panic!("failed to read {}: {err}", path.display()));
-        let yaml = serde_yaml::from_str::<serde_yaml::Value>(&raw)
+        let yaml = yaml_serde::from_str::<yaml_serde::Value>(&raw)
             .unwrap_or_else(|err| panic!("{} should parse as YAML: {err}", path.display()));
         let value = serde_json::to_value(yaml)
             .unwrap_or_else(|err| panic!("{} should convert to JSON: {err}", path.display()));
@@ -274,7 +274,7 @@ mod tests {
 
     #[test]
     fn parses_full_config_schema() {
-        let config = serde_yaml::from_str::<Config>(
+        let config = yaml_serde::from_str::<Config>(
             r#"
 select:
   - DL
@@ -323,7 +323,7 @@ per-file-ignores:
 
     #[test]
     fn parses_hadolint_ignored_alias() {
-        let config = serde_yaml::from_str::<Config>(
+        let config = yaml_serde::from_str::<Config>(
             r#"
 ignored:
   - DL3008
@@ -338,7 +338,7 @@ ignored:
 
     #[test]
     fn merges_native_ignore_and_hadolint_ignored_alias() {
-        let config = serde_yaml::from_str::<Config>(
+        let config = yaml_serde::from_str::<Config>(
             r#"
 ignore:
   - DL3008
@@ -390,6 +390,19 @@ ignored:
 
         assert!(message.contains("invalid per-file-ignores pattern"));
         assert!(message.contains("[unterminated"));
+    }
+
+    #[test]
+    fn load_rejects_duplicate_config_fields() {
+        let temp = tempfile::TempDir::new().expect("temp dir should be created");
+        let path = temp.path().join(".rudolint.yaml");
+        std::fs::write(&path, "ignore: [DL3000]\nignore: [DL3007]\n")
+            .expect("config should be written");
+
+        let error = Config::load(Some(&path)).expect_err("duplicate fields should be rejected");
+        let message = format!("{error:#}");
+
+        assert!(message.contains("duplicate field `ignore`"));
     }
 
     #[test]
