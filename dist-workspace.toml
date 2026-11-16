@@ -27,6 +27,9 @@ hosting = "github"
 # Whether to install an updater program
 install-updater = false
 
+[dist.github-custom-runners]
+aarch64-apple-darwin = "macos-15"
+
 [dist.github-action-commits]
 "actions/checkout" = "de0fac2e4500dabe0009e67214ff5f5447ce83dd"
 "actions/upload-artifact" = "043fb46d1a93c77aae656e7c1c64a875d1fc6a0a"
