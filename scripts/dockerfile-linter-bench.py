@@ -34,7 +34,7 @@ HADOLINT_REPO = "hadolint/hadolint"
 TALLY_NPM = "tally-cli"
 
 HADOLINT_VERSION = "v2.14.0"
-TALLY_VERSION = "0.41.0"
+TALLY_VERSION = "0.45.0"
 
 SCENARIOS = {
     "small": "Single small Dockerfile",
